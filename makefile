@@ -1,7 +1,9 @@
 ## COMPILER ##
 CXX = g++
 RM = rm -f
-CXXFLAGS = -Wall -std=c++11 -I $(HDR_DIR)
+XENO_CONFIG = /usr/xenomai/bin/xeno-config
+XENO_CFLAGS = $(shell $(XENO_CONFIG) --skin native --posix --alchemy --cflags)
+XENO_LDFLAGS = $(shell $(XENO_CONFIG) --skin native --posix --alchemy --ldflags)
 
 ## PROJECT ##
 EXEC_NAME = SchedulerSimulator
@@ -12,7 +14,10 @@ OBJ_DIR = bin
 SRC_DIR = src
 HDR_DIR = include
 # INCLUDES =  # to include other makefiles
-LIBS = -lboost_system -lboost_chrono -lpthread -lboost_thread
+LIBS = #-lboost_system -lboost_chrono -lpthread -lboost_thread
+
+CXXFLAGS = $(XENO_CFLAGS) -Wall -std=c++11 -I $(HDR_DIR)
+LDFLAGS = $(XENO_LDFLAGS) $(LIBS)
 
 ## FILES & FOLDERS ##
 HEADER_FILES = $(shell find $(HDR_DIR) -name "*.h")
@@ -29,16 +34,16 @@ clean :
 
 $(EXEC_NAME) : $(OBJ_FILES)
 	mkdir -p $(OBJ_DIR)
-	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $(EXEC_NAME) $(OBJ_FILES) $(LIBS)
+	$(CXX) $(CXXFLAGS) -o $(EXEC_NAME) $(OBJ_FILES) $(LDFLAGS)
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
 	$(CXX) $(CXXFLAGS) $(INCLUDES) -o $@ -c $<
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cc
-	$(CXX) $(CFLAGS) $(INCLUDES) -o $@ -c $<
+	$(CXX) $(CXXFLAGS) $(INCLUDES) -o $@ -c $<
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
-	gcc $(CFLAGS) $(INCLUDES) -o $@ -c $<
+	gcc $(CXXFLAGS) $(INCLUDES) -o $@ -c $<
 
 install :
 	cp $(OBJ_DIR)/$(EXEC_NAME) $(INSTALL_DIR)
