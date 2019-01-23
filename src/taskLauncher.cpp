@@ -1,19 +1,12 @@
-#include <fstream>
-#include <sstream>
-#include <iostream>
-#include <stdio.h>
-#include <signal.h>
+#include "tools.h"
 
-#include <alchemy/task.h>
+#include "mcAgent.h"
+#include "macroTask.h"
 
-#include <string>
-using std::string;
-
-RT_TASK mcAgent;
 
 void readTasksList(string);
-void mcAgentMain(void *arg);
-
+void RunmcAgentMain(void *arg);
+void RunTask(void* arg);
 
 int main(int argc, char* argv[])
 {
@@ -26,15 +19,16 @@ int main(int argc, char* argv[])
    *             priority
    *             mode (FPU, Start suspended, ...)
    */
-  rt_task_create(&mcAgent, "Hello", 0, 50, 0);
+  RT_TASK mcAgent;
+  int rep = rt_task_create(&mcAgent, "Hello", 0, 50, 0);
 
   /* To start a task
    * Arguments : &task,
    *             task main
    *             function Arguments
    */
-
-   rt_task_start(&mcAgent, &mcAgentMain, 0);
+   rtTaskInfos rtTI = { mcAgent, "Hello", "./bin/testApp"};
+   rt_task_start(&mcAgent, RunTask, &rtTI);
 
 /*
   // get input file, either indicated by user as argument or default location
@@ -47,6 +41,19 @@ int main(int argc, char* argv[])
   return return_code;
 }
 
+void RunmcAgentMain(void *arg)
+{
+  MCAgent* mcAgent = new MCAgent();
+}
+
+
+
+void RunTask(void* arg)
+{
+  rtTaskInfos rtTI = *(rtTaskInfos*) arg;
+
+  std::cout << "name : " << rtTI.name << " path: " << rtTI.path << std::endl;
+}
 
 void readTasksList(string input_file)
 {
@@ -63,15 +70,4 @@ void readTasksList(string input_file)
     char *cmd = &str[0u];
     int result = system(cmd);
   }
-}
-
-
-void mcAgentMain(void *arg)
-{
-  RT_TASK_INFO curtaskinfo;
-
-  std::cout << "Hello World !" << std::endl;
-  rt_task_inquire(NULL,&curtaskinfo);
-
-  std::cout << "I am task : " << curtaskinfo.name << std::endl;
 }
