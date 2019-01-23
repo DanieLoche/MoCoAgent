@@ -6,6 +6,8 @@
 #include <iostream>
 #include <stdio.h>
 #include <string>
+#include <vector>
+#include<algorithm>
 
 #include <alchemy/task.h>
 
@@ -13,13 +15,13 @@ using std::string;
 
 struct rtTaskInfos
 {
-    RT_TASK task;
-    string name;
+    char name[64];
     string path;
 
     bool isHardRealTime;
     int periodicity;
-    int affinity[8];
+    int deadline;
+    int affinity;
 } ;
 
 #endif

@@ -1,3 +1,4 @@
-exe1
-exe2 Comment ça va ?
-exe3 1 2 3
+name        path      isRT  periodicity  deadline  affinity  priority   parameters
+exe1        /titi/    1     10           10        8
+exe2        /toto/    0     50           40        2
+exe3        /blup/    0     100          80        4
