@@ -2,8 +2,8 @@
 CXX = g++
 RM = rm -f
 XENO_CONFIG = /usr/xenomai/bin/xeno-config
-XENO_CFLAGS = $(shell $(XENO_CONFIG) --alchemy --cflags) #--skin native --posix
-XENO_LDFLAGS = $(shell $(XENO_CONFIG) --alchemy --ldflags)
+XENO_CFLAGS = $(shell $(XENO_CONFIG) --alchemy --posix --cflags) #--skin native
+XENO_LDFLAGS = $(shell $(XENO_CONFIG) --alchemy --posix --ldflags)
 
 ## PROJECT ##
 EXEC_NAME = SchedulerSimulator

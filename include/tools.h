@@ -7,14 +7,16 @@
 #include <stdio.h>
 #include <string>
 #include <vector>
-#include<algorithm>
+#include <algorithm>
 
+#include <sched.h>
 #include <alchemy/task.h>
 
 using std::string;
 
-struct rtTaskInfos
+struct rtTaskInfosStruct
 {
+    RT_TASK* task;
     char name[64];
     string path;
 

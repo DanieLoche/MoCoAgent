@@ -3,7 +3,7 @@
 class MacroTask
 {
   private :
-    rtTaskInfos properties;
+    rtTaskInfosStruct properties;
 
     int before();
     void proceed();
