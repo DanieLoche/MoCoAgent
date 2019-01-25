@@ -113,7 +113,7 @@ void TaskLauncher::print_affinity(pid_t _pid) {
             std::cout << CPU_ISSET(i, &mask);
         }
         std::cout << std::endl;
-        /*
+        /* using printf
         printf("sched_getaffinity = ");
         for (i = 0; i < nproc; i++) {
             printf("%d ", CPU_ISSET(i, &mask));

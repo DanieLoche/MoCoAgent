@@ -12,6 +12,7 @@ void RunmcAgentMain(void *arg)
 
 void TaskMain(void* arg)
 {
+  /*
   std::cout << "Running !!!" << std::endl;
   rtTaskInfosStruct* rtTI = (rtTaskInfosStruct*) arg;
   //printTaskInfo (rtTI);
@@ -19,6 +20,11 @@ void TaskMain(void* arg)
   RT_TASK_INFO curtaskinfo;
   rt_task_inquire(NULL, &curtaskinfo);
   std::cout << "I am task : " << curtaskinfo.name << " of priority " << curtaskinfo.prio << std::endl;
+  */
+  MacroTask macroRT;
+
+  macroRT.executeRun();
+
 }
 
 int main(int argc, char* argv[])

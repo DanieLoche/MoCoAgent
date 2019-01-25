@@ -1,5 +1,8 @@
 #include "tools.h"
 
+extern void RunmcAgentMain(void *arg);
+extern void TaskMain(void* arg);
+
 class TaskLauncher
 {
   public :
@@ -18,6 +21,3 @@ class TaskLauncher
     void print_affinity(pid_t _pid);
 
 };
-
-extern void RunmcAgentMain(void *arg);
-extern void TaskMain(void* arg);
