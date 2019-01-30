@@ -1,3 +1,4 @@
+
 #include "tools.h"
 
 class MCAgent
@@ -5,7 +6,7 @@ class MCAgent
   private :
     int taskListSize;
     RT_TASK *taskList;
-    vector<rtTaskInfosStruct> TasksInformations;
+    std::vector<rtTaskInfosStruct> TasksInformations;
   public :
     MCAgent();
     void mcAgentMain(void *arg);

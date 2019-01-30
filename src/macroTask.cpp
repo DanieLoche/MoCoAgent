@@ -12,8 +12,9 @@ int MacroTask::before()
 
 void MacroTask::proceed()
 {
+  char* cmd;
   if (properties.path != "")
-    char *cmd = &properties.path[0u];
+    cmd = &properties.path[0u];
   system(cmd);
 }
 

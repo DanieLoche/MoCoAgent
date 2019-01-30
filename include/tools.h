@@ -13,6 +13,9 @@
 #include <alchemy/task.h>
 
 using std::string;
+using std::cout;
+using std::endl;
+using std::cin;
 
 struct rtTaskInfosStruct
 {

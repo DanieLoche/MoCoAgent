@@ -5,21 +5,30 @@
 TaskLauncher::TaskLauncher(string input_file)
 {
   tasksInfosList = readTasksList(input_file);
+
+      RT_TASK task;
+      char   name[64] = "MoCoAgent";
+      rt_task_create(&task, name, 0, 30, 0);
+      cout << "Monitoring and Control Agent created." << endl;
+      set_affinity(&task, 2);
+
+      cout << "Task " << name << " started." << endl;
+      int rep = rt_task_start(&task, &RunmcAgentMain, NULL);
+
 }
 
 
 std::vector<rtTaskInfosStruct> TaskLauncher::readTasksList(string input_file)
 {
-
   system("clear");
-  std::cout << "Initialising machine...\n";
+  cout << "Initialising machine...\n";
   std::ifstream myFile(input_file);
   if (!myFile.is_open())
   {
       exit(EXIT_FAILURE);
   }
 
-  std::vector<rtTaskInfosStruct> myTasksInfos;
+  //std::vector<rtTaskInfosStruct> myTasksInfos;
 
   string str;
   std::getline(myFile, str); // skip the first line
@@ -28,19 +37,18 @@ std::vector<rtTaskInfosStruct> TaskLauncher::readTasksList(string input_file)
       rtTaskInfosStruct taskInfo;
       std::istringstream iss(str);
       string token;
-      //std::cout << "Managing line : " << str << std::endl;
+      cout << "Managing line : " << str << endl;
       if (!(iss >> taskInfo.name
                 >> taskInfo.path
                 >> taskInfo.isHardRealTime
                 >> taskInfo.periodicity
                 >> taskInfo.deadline
                 >> taskInfo.affinity) )
-      { std::cout << "FAIL !" << std::endl; break; } // error
-
-      myTasksInfos.push_back(taskInfo);
+      { cout << "FAIL !" << endl; break; } // error
+      tasksInfosList.push_back(taskInfo);
   }
 
-  return myTasksInfos;
+  return tasksInfosList;
 
 }
 
@@ -48,23 +56,23 @@ void TaskLauncher::printTasksInfos (/* std::vector<rtTaskInfosStruct> _myTasksIn
 {
   for (auto &taskInfo : tasksInfosList)
   {
-    std::cout << "name: " << taskInfo.name
-              << "| path: " << taskInfo.path
-              << "| is RT ? " << taskInfo.isHardRealTime
-              << "| Period: " << taskInfo.periodicity
-              << "| Deadline: " << taskInfo.deadline
-              << "| affinity: " << taskInfo.affinity << std::endl;
+      cout << "Name: " << taskInfo.name
+          << "| path: " << taskInfo.path
+          << "| is RT ? " << taskInfo.isHardRealTime
+          << "| Period: " << taskInfo.periodicity
+          << "| Deadline: " << taskInfo.deadline
+          << "| affinity: " << taskInfo.affinity << endl;
   }
 }
 
 void TaskLauncher::printTaskInfo(rtTaskInfosStruct* task)
 {
-  std::cout << "name: " << task->name
-            << "| path: " << task->path
-            << "| is RT ? " << task->isHardRealTime
-            << "| Period: " << task->periodicity
-            << "| Deadline: " << task->deadline
-            << "| affinity: " << task->affinity << std::endl;
+  cout << "Name: " << task->name
+      << "| path: " << task->path
+      << "| is RT ? " << task->isHardRealTime
+      << "| Period: " << task->periodicity
+      << "| Deadline: " << task->deadline
+      << "| affinity: " << task->affinity << endl;
 }
 
 void TaskLauncher::runTasks( )
@@ -75,7 +83,7 @@ void TaskLauncher::runTasks( )
       RT_TASK* task = new RT_TASK;
       taskInfo->task = task;
       rt_task_create(task, taskInfo->name, 0, 50, 0);
-      std::cout << "Task " << taskInfo->name << " created." << std::endl;
+      cout << "Task " << taskInfo->name << " created." << endl;
       set_affinity(task, 1);
       /*
       RT_TASK_INFO rti;
@@ -86,7 +94,7 @@ void TaskLauncher::runTasks( )
 
   for (auto taskInfo = tasksInfosList.begin(); taskInfo != tasksInfosList.end(); ++taskInfo)
   {
-      std::cout << "Task " << taskInfo->name << " started." << std::endl;
+      cout << "Task " << taskInfo->name << " started." << endl;
       int rep = rt_task_start(taskInfo->task, TaskMain, &taskInfo);
   }
 }
@@ -108,11 +116,11 @@ void TaskLauncher::print_affinity(pid_t _pid) {
         assert(false);
     } else {
         nproc = get_nprocs();
-        std::cout << "Affinity of thread " << _pid << " = ";
+        cout << "Affinity of thread " << _pid << " = ";
         for (i = 0; i < nproc; i++) {
-            std::cout << CPU_ISSET(i, &mask);
+            cout << CPU_ISSET(i, &mask);
         }
-        std::cout << std::endl;
+        cout << endl;
         /* using printf
         printf("sched_getaffinity = ");
         for (i = 0; i < nproc; i++) {
