@@ -9,7 +9,6 @@
 #include <vector>
 #include <algorithm>
 
-#include <sched.h>
 #include <alchemy/task.h>
 
 using std::string;
@@ -43,9 +42,9 @@ struct rtTaskInfosStruct
 *             task main
 *             function Arguments
 */
-  
+
 /* RT_TASK_INFO structure
-* returned by a call to rt_task_inquire().
+* returned by a call to rt_task_inquire(task, &rti).
 * int 	                  prio
 * struct threadobj_stat 	stat
 * char 	                  name

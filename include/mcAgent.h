@@ -8,7 +8,5 @@ class MCAgent
     RT_TASK *taskList;
     std::vector<rtTaskInfosStruct> TasksInformations;
   public :
-    MCAgent();
-    void mcAgentMain(void *arg);
-
+    MCAgent(void* arg);
 };

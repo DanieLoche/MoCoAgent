@@ -1,5 +1,8 @@
 #include "macroTask.h"
 
+extern void print_affinity(pid_t _pid);
+extern void printTaskInfo(rtTaskInfosStruct* task);
+
 MacroTask::MacroTask()
 {
 
@@ -7,6 +10,7 @@ MacroTask::MacroTask()
 
 int MacroTask::before()
 {
+  print_affinity(0);
   return 0;
 }
 
