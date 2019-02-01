@@ -13,9 +13,13 @@ int MacroTask::before()
 void MacroTask::proceed()
 {
   char* cmd;
-  if (properties.path != "")
+  cout << "path :" << properties.path << "." << endl;
+  if (properties.path != "/null/")
+  {
     cmd = &properties.path[0u];
-  system(cmd);
+    system(cmd);
+  }
+  else cout << "Oups, no valid path found !" << endl;
 }
 
 int MacroTask::after()
@@ -25,6 +29,7 @@ int MacroTask::after()
 
 void MacroTask::executeRun()
 {
+  cout << "Running..." << endl;
   before(); // Check if execution allowed
 
   proceed();  // execute task

@@ -13,13 +13,13 @@ class MacroTask
           int       deadline;
           int       affinity;
     */
-    rtTaskInfosStruct properties;
-
     int before();
     void proceed();
     int after();
 
   public :
+    rtTaskInfosStruct properties;
+
     MacroTask();
     void executeRun();
 

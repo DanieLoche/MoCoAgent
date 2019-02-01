@@ -4,15 +4,14 @@ MCAgent::MCAgent()
 {
 
   taskList = new RT_TASK[taskListSize];
-  mcAgentMain(0);
 }
 
 void MCAgent::mcAgentMain(void *arg)
 {
   RT_TASK_INFO curtaskinfo;
 
-  cout << "Hello World !" << endl;
   rt_task_inquire(NULL, &curtaskinfo);
 
-  cout << "I am task : " << curtaskinfo.name << endl;
+  cout << "I am task : " << curtaskinfo.name << "PID : " << curtaskinfo.pid << ", of priority " << curtaskinfo.prio << endl;
+  cout << curtaskinfo.pid << " : " << "executed in primary for " << curtaskinfo.stat.xtime << " ns" << endl;
 }

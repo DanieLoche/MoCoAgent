@@ -16,8 +16,7 @@ class TaskLauncher
 
     int set_affinity (RT_TASK* task, int _aff);
 
-    void printTasksInfos ( );
-    void printTaskInfo(rtTaskInfosStruct*);
+    void printTasksInfos (/* std::vector<rtTaskInfosStruct> _myTasksInfos*/);
     void print_affinity(pid_t _pid);
 
 };

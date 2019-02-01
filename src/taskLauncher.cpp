@@ -5,16 +5,6 @@
 TaskLauncher::TaskLauncher(string input_file)
 {
   tasksInfosList = readTasksList(input_file);
-
-      RT_TASK task;
-      char   name[64] = "MoCoAgent";
-      rt_task_create(&task, name, 0, 30, 0);
-      cout << "Monitoring and Control Agent created." << endl;
-      set_affinity(&task, 2);
-
-      cout << "Task " << name << " started." << endl;
-      int rep = rt_task_start(&task, &RunmcAgentMain, NULL);
-
 }
 
 
@@ -52,28 +42,6 @@ std::vector<rtTaskInfosStruct> TaskLauncher::readTasksList(string input_file)
 
 }
 
-void TaskLauncher::printTasksInfos (/* std::vector<rtTaskInfosStruct> _myTasksInfos*/)
-{
-  for (auto &taskInfo : tasksInfosList)
-  {
-      cout << "Name: " << taskInfo.name
-          << "| path: " << taskInfo.path
-          << "| is RT ? " << taskInfo.isHardRealTime
-          << "| Period: " << taskInfo.periodicity
-          << "| Deadline: " << taskInfo.deadline
-          << "| affinity: " << taskInfo.affinity << endl;
-  }
-}
-
-void TaskLauncher::printTaskInfo(rtTaskInfosStruct* task)
-{
-  cout << "Name: " << task->name
-      << "| path: " << task->path
-      << "| is RT ? " << task->isHardRealTime
-      << "| Period: " << task->periodicity
-      << "| Deadline: " << task->deadline
-      << "| affinity: " << task->affinity << endl;
-}
 
 void TaskLauncher::runTasks( )
 {
@@ -84,7 +52,7 @@ void TaskLauncher::runTasks( )
       taskInfo->task = task;
       rt_task_create(task, taskInfo->name, 0, 50, 0);
       cout << "Task " << taskInfo->name << " created." << endl;
-      set_affinity(task, 1);
+      //set_affinity(task, 1);
       /*
       RT_TASK_INFO rti;
       rt_task_inquire(task, &rti);
@@ -92,11 +60,20 @@ void TaskLauncher::runTasks( )
       */
   }
 
-  for (auto taskInfo = tasksInfosList.begin(); taskInfo != tasksInfosList.end(); ++taskInfo)
+  for (auto& taskInfo : tasksInfosList)
   {
-      cout << "Task " << taskInfo->name << " started." << endl;
-      int rep = rt_task_start(taskInfo->task, TaskMain, &taskInfo);
+      cout << "Task " << taskInfo.name << " started." << endl;
+      int rep = rt_task_start(taskInfo.task, TaskMain, &taskInfo);
   }
+/*
+  cout << "Now launching the MoCoAgent ! " << endl;
+
+  RT_TASK mcAgent;
+  int rep = rt_task_create(&mcAgent, "MoCoAgent", 0, 2, 0);
+  //set_affinity(&mcAgent, 2);
+
+  rt_task_start(&mcAgent, RunmcAgentMain, 0);
+*/
 }
 
 int TaskLauncher::set_affinity (RT_TASK* task, int _aff)
@@ -130,4 +107,17 @@ void TaskLauncher::print_affinity(pid_t _pid) {
         */
     }
 
+}
+
+void TaskLauncher::printTasksInfos (/* std::vector<rtTaskInfosStruct> _myTasksInfos*/)
+{
+  for (auto &taskInfo : tasksInfosList)
+  {
+      cout << "Name: " << taskInfo.name
+          << "| path: " << taskInfo.path
+          << "| is RT ? " << taskInfo.isHardRealTime
+          << "| Period: " << taskInfo.periodicity
+          << "| Deadline: " << taskInfo.deadline
+          << "| affinity: " << taskInfo.affinity << endl;
+  }
 }

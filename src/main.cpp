@@ -4,25 +4,34 @@
 #include "macroTask.h"
 #include "taskLauncher.h"
 
+void printTaskInfo(rtTaskInfosStruct* task)
+{
+  cout << "Name: " << task->name
+      << "| path: " << task->path
+      << "| is RT ? " << task->isHardRealTime
+      << "| Period: " << task->periodicity
+      << "| Deadline: " << task->deadline
+      << "| affinity: " << task->affinity << endl;
+}
+
 void RunmcAgentMain(void *arg)
 {
+  cout << " I am working" << endl;
   MCAgent* mcAgent = new MCAgent();
+  mcAgent->mcAgentMain(0);
 }
 
 
 void TaskMain(void* arg)
 {
-  /*
-  cout << "Running !!!" << endl;
   rtTaskInfosStruct* rtTI = (rtTaskInfosStruct*) arg;
-  //printTaskInfo (rtTI);
 
   RT_TASK_INFO curtaskinfo;
   rt_task_inquire(NULL, &curtaskinfo);
   cout << "I am task : " << curtaskinfo.name << " of priority " << curtaskinfo.prio << endl;
-  */
-  MacroTask macroRT;
 
+  MacroTask macroRT;
+  macroRT.properties = *rtTI;
   macroRT.executeRun();
 
 }
@@ -41,22 +50,6 @@ int main(int argc, char* argv[])
 
   tln.printTasksInfos();
   tln.runTasks();
-  /* To create a task :
-   * Arguments : &task,
-   *             name,
-   *             stack size (def = 0)
-   *             priority
-   *             mode (FPU, Start suspended, ...)
-   */
-//  RT_TASK mcAgent;
-//  int rep = rt_task_create(&mcAgent, "Hello", 0, 50, 0);
-
-  /* To start a task
-   * Arguments : &task,
-   *             task main
-   *             function Arguments
-   */
-//   rt_task_start(&mcAgent, RunTask, &tasksInfos);
 
 
   return return_code;
