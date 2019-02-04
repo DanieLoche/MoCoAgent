@@ -1,7 +1,5 @@
 #include "tools.h"
 
-
-
 class TaskLauncher
 {
   public :

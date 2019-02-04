@@ -11,7 +11,39 @@ MCAgent::MCAgent(void *arg)
   rt_task_inquire(NULL, &curtaskinfo);
 
   cout << "I am task : " << curtaskinfo.name << " (PID : " << curtaskinfo.pid << "), of priority " << curtaskinfo.prio << endl;
-  print_affinity(0);
-  cout << curtaskinfo.pid << " : " << "executed in primary for " << curtaskinfo.stat.xtime << " ns" << endl;
-  2*7/9;
+  //print_affinity(0);
+
+  std::vector<rtTaskInfosStruct>* rtTI = (std::vector<rtTaskInfosStruct>*) arg;
+  setTasksInfos(rtTI);
+
+  displayInformations();
+
+    while(false)
+    {
+      mcAgent.checkTasks();
+    }
+}
+
+void MCAgent::setTasksInfos(std::vector<rtTaskInfosStruct>* _tasksInfos)
+{
+  TasksInformations = _tasksInfos;
+
+}
+
+int MCAgent::checkTasks()
+{
+  return 0;
+}
+
+void MCAgent::displayInformations()
+{
+  for (auto &taskInfo : *TasksInformations)
+  {
+      cout << "Name: " << taskInfo.name
+          << "| path: " << taskInfo.path
+          << "| is RT ? " << taskInfo.isHardRealTime
+          << "| Period: " << taskInfo.periodicity
+          << "| Deadline: " << taskInfo.deadline
+          << "| affinity: " << taskInfo.affinity << endl;
+  }
 }

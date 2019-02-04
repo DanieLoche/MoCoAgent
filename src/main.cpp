@@ -46,8 +46,12 @@ void print_affinity(pid_t _pid)
 
 void RunmcAgentMain(void* arg)
 {
-  cout << "MoCoAgent running ?!" << endl;
   MCAgent mcAgent(arg);
+  RT_TASK_INFO curtaskinfo;
+
+  rt_task_inquire(NULL, &curtaskinfo);
+  cout << curtaskinfo.pid << " : " << "executed in primary for " << curtaskinfo.stat.xtime << " ns" << endl;
+
 }
 
 

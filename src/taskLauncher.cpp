@@ -47,13 +47,7 @@ std::vector<rtTaskInfosStruct> TaskLauncher::readTasksList(string input_file)
 
 void TaskLauncher::runTasks( )
 {
-  cout << "Now launching the MoCoAgent ! " << endl;
 
-  RT_TASK mcAgent;
-  int rep = rt_task_create(&mcAgent, "MoCoAgent", 0, 2, 0);
-  set_affinity(&mcAgent, 3);
-
-  rt_task_start(&mcAgent, RunmcAgentMain, 0);
 
   for (auto taskInfo = tasksInfosList.begin(); taskInfo != tasksInfosList.end(); ++taskInfo)
   {
@@ -74,6 +68,14 @@ void TaskLauncher::runTasks( )
       cout << "Task " << taskInfo.name << " started." << endl;
       int rep = rt_task_start(taskInfo.task, TaskMain, &taskInfo);
   }
+
+  cout << "Now launching the MoCoAgent ! " << endl;
+
+  RT_TASK mcAgent;
+  int rep = rt_task_create(&mcAgent, "MoCoAgent", 0, 2, 0);
+  set_affinity(&mcAgent, 3);
+
+  rt_task_start(&mcAgent, RunmcAgentMain, &tasksInfosList);
 
 }
 
