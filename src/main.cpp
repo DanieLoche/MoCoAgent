@@ -7,6 +7,7 @@
 #include "taskLauncher.h"
 
 long nproc;
+RT_SEM mysync;
 
 void printTaskInfo(rtTaskInfosStruct* task)
 {
@@ -61,12 +62,13 @@ void TaskMain(void* arg)
 
   MacroTask macroRT;
   macroRT.properties = *rtTI;
-  macroRT.executeRun();
+  macroRT.executeRun(&mysync);
 
 }
 
 int main(int argc, char* argv[])
 {
+  rt_sem_create(&mysync,"MySemaphore",0,S_FIFO);
   int return_code = 0;
   nproc = get_nprocs();
   // get input file, either indicated by user as argument or default location
@@ -79,7 +81,12 @@ int main(int argc, char* argv[])
 
   tln.printTasksInfos();
   tln.runTasks();
+  usleep(1000000);
+  cout<<"wake up all tasks\n"<<endl;
+  rt_sem_broadcast(&mysync);
 
+  //printf("\nType CTRL-C to end this program\n\n" );
+  pause();
 
   return return_code;
 }

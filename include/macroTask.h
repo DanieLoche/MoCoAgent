@@ -14,13 +14,13 @@ class MacroTask
           int       affinity;
     */
     int before();
-    void proceed();
+    void proceed(RT_SEM* mysync);
     int after();
 
   public :
     rtTaskInfosStruct properties;
 
     MacroTask();
-    void executeRun();
+    void executeRun(RT_SEM* mysync);
 
 };

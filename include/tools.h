@@ -8,9 +8,12 @@
 #include <string>
 #include <vector>
 #include <algorithm>
+#include <unistd.h>
 
-#include <sched.h>
 #include <alchemy/task.h>
+#include <alchemy/sem.h>
+#include <alchemy/timer.h>
+
 
 using std::string;
 using std::cout;
