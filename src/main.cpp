@@ -59,6 +59,11 @@ void TaskMain(void* arg)
   RT_TASK_INFO curtaskinfo;
   rt_task_inquire(NULL, &curtaskinfo);
   cout << "I am task : " << curtaskinfo.name << " of priority " << curtaskinfo.prio << endl;
+  RTIME starttime,period;
+  period = (*rtTI).periodicity*1e8 ;
+  starttime = TM_NOW ;
+  rt_task_set_periodic(NULL, starttime, period);
+  cout<<"starting at "<< (*rtTI).name<<"=" << starttime <<endl;
 
   MacroTask macroRT;
   macroRT.properties = *rtTI;
@@ -78,7 +83,6 @@ int main(int argc, char* argv[])
 
   TaskLauncher tln(input_file);
   //tln.tasksInfos = readTasksList(input_file);
-
   tln.printTasksInfos();
   tln.runTasks();
   usleep(1000000);
