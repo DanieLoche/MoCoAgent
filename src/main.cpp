@@ -5,6 +5,7 @@
 #include "mcAgent.h"
 #include "macroTask.h"
 #include "taskLauncher.h"
+#include "buildSet.h"
 
 long nproc;
 RT_SEM mysync;
@@ -73,24 +74,55 @@ void TaskMain(void* arg)
 
 int main(int argc, char* argv[])
 {
+  // POUR TEST EN ATTENDANT LA LISTE D'ENTREE
+  std::vector<string> long_task;
+  std::vector<string> short_task;
+
+  for (int i = 0; i<10; i++) {
+    std::string l = "exe" + std::to_string(i+1) + "L";
+    std::string s = "exe" + std::to_string(i+1) + "S";
+    long_task.push_back(l);
+    short_task.push_back(s);
+  }
+  /////////////////////////////////////////////////////
+
   rt_sem_create(&mysync,"MySemaphore",0,S_FIFO);
   int return_code = 0;
   nproc = get_nprocs();
   // get input file, either indicated by user as argument or default location
   string input_file;
+  string task_file;
+
   if (argc > 1) input_file = argv[1];
   else input_file = "./input.txt";
+  if (argc > 2) task_file = argv[2];
+  else task_file = "./tasks.txt";
+
+  buildSet bS;
+
+  // Définition des listes comportant les tâches longue et courte
+  std::vector<string> all_crit_tasks = bS.distributionCrit(long_task, short_task, 50, 25);
+
+  // Définition des tâches non critiques choisies
+  std::vector<string> uncrit_tasks = bS.get_uncrit_tasks();
+
+  // Récupération infos tâches
+  std::vector<rtTaskInfosStruct> info_task = bS.get_infos_tasks(task_file);
+
+  // Edition du fichier input.txt
+  bS.buildInput();
+
 
   TaskLauncher tln(input_file);
-  //tln.tasksInfos = readTasksList(input_file);
-  tln.printTasksInfos();
-  tln.runTasks();
-  usleep(1000000);
-  cout<<"wake up all tasks\n"<<endl;
-  rt_sem_broadcast(&mysync);
+
+  //tln.printTasksInfos();
+  //tln.runTasks();
+  //usleep(1000000);
+  //cout<<"wake up all tasks\n"<<endl;
+  //rt_sem_broadcast(&mysync);
 
   //printf("\nType CTRL-C to end this program\n\n" );
-  pause();
+  //pause();
 
   return return_code;
 }
