@@ -7,15 +7,13 @@
 
 using namespace std;
 
-std::vector<string> buildSet::distributionCrit (std::vector<string> long_task, std::vector<string> short_task, int long_percent, int crit_percent){
-
-    int short_percent = 100 - long_percent;
+std::vector<string> buildSet::distributionCrit (std::vector<string> long_task, std::vector<string> short_task, double nbr_long, double nbr_short, int crit_percent){
 
     // Choix des tâches longues parmis toutes les tâches
-    distributionLong(long_task, long_percent);
+    distributionLong(long_task, nbr_long);
 
     // Choix des tâches courtes parmis toutes les tâches
-    distributionShort(short_task, short_percent);
+    distributionShort(short_task, nbr_short);
 
     // Concaténation de toutes les tâches
     long_choosen_task.insert(long_choosen_task.end(), short_choosen_task.begin(), short_choosen_task.end());
@@ -54,17 +52,16 @@ std::vector<string> buildSet::distributionCrit (std::vector<string> long_task, s
     return all_crit_tasks;
 }
 
-void buildSet::distributionLong(std::vector<string> long_task, int long_percent){
+void buildSet::distributionLong(std::vector<string> long_task, double nbr_long){
 
 
   int size = long_task.size();
-  int nbr_tach = (int) size*long_percent/100;
   std::vector<int> choix_tache_mem;
   int i = 0;            // Incrémentation
   int var_test_choix;   // Variable pour savoir si la tâche a dejà été choisie
 
   // Choix des tâches parmis toutes les tâches longues
-  while (i < nbr_tach) {
+  while (i < nbr_long) {
 
     // Choix des x tâches
     var_test_choix = 0;
@@ -90,17 +87,16 @@ void buildSet::distributionLong(std::vector<string> long_task, int long_percent)
   }
 }
 
-void buildSet::distributionShort(std::vector<string> short_task, int short_percent){
+void buildSet::distributionShort(std::vector<string> short_task, double nbr_short){
 
 
   int size = short_task.size();
-  int nbr_tach = (int) size*short_percent/100;
   std::vector<int> choix_tache_mem;
   int i = 0;            // Incrémentation
   int var_test_choix;   // Variable pour savoir si la tâche a dejà été choisie comme critique
 
   // Repartition tache critique longue dans deux listes
-  while (i < nbr_tach) {
+  while (i < nbr_short) {
 
     // Choix des x tâches critque
     var_test_choix = 0;

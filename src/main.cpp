@@ -101,7 +101,7 @@ int main(int argc, char* argv[])
   buildSet bS;
 
   // Définition des listes comportant les tâches longue et courte
-  std::vector<string> all_crit_tasks = bS.distributionCrit(long_task, short_task, 50, 25);
+  std::vector<string> all_crit_tasks = bS.distributionCrit(long_task, short_task, 8, 4, 80);
 
   // Définition des tâches non critiques choisies
   std::vector<string> uncrit_tasks = bS.get_uncrit_tasks();
