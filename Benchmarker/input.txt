@@ -1,0 +1,2 @@
+name		path		isRT  periodicity  deadline  affinity  priority   parameters
+basicmath_small	./files/	1     70           70        8
