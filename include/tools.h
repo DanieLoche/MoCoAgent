@@ -1,10 +1,15 @@
 #ifndef TOOLS_H
 #define TOOLS_H
 
+#define VERBOSE_INFO  1 // Cout d'informations, démarrage, etc...
+#define VERBOSE_DEBUG 1 // Cout de débug...
+#define VERBOSE_OTHER 1 // Cout autre...
+#define VERBOSE_ASK   1 // cout explicitement demandés dans le code
+
 #include <fstream>
 #include <sstream>
 #include <iostream>
-#include <stdio.h>
+#include <cobalt/stdio.h>
 #include <string>
 #include <vector>
 #include <algorithm>

@@ -1,3 +1,8 @@
+#define VERBOSE_INFO  1 // Cout d'informations, démarrage, etc...
+#define VERBOSE_DEBUG 1 // Cout de débug...
+#define VERBOSE_OTHER 1 // Cout autre...
+#define VERBOSE_ASK   1 // cout explicitement demandés dans le code
+
 #include "tools.h"
 #include <sys/sysinfo.h>
 #include "sched.h"
@@ -6,20 +11,24 @@
 #include "macroTask.h"
 #include "taskLauncher.h"
 
+
 long nproc;
 
 void printTaskInfo(rtTaskInfosStruct* task)
 {
+  #if VERBOSE_INFO
   cout << "Name: " << task->name
       << "| path: " << task->path
       << "| is RT ? " << task->isHardRealTime
       << "| Period: " << task->periodicity
       << "| Deadline: " << task->deadline
       << "| affinity: " << task->affinity << endl;
+  #endif
 }
 
 void print_affinity(pid_t _pid)
 {
+ #if VERBOSE_INFO
     cpu_set_t mask;
     long i;
 
@@ -41,6 +50,7 @@ void print_affinity(pid_t _pid)
         printf("\n");
         */
     }
+ #endif
 
 }
 
@@ -50,7 +60,9 @@ void RunmcAgentMain(void* arg)
   RT_TASK_INFO curtaskinfo;
 
   rt_task_inquire(NULL, &curtaskinfo);
-  cout << curtaskinfo.pid << " : " << "executed in primary for " << curtaskinfo.stat.xtime << " ns" << endl;
+  #if VERBOSE_INFO
+    cout << curtaskinfo.pid << " : " << "executed in primary for " << curtaskinfo.stat.xtime << " ns" << endl;
+  #endif
 
 }
 
@@ -61,7 +73,9 @@ void TaskMain(void* arg)
 
   RT_TASK_INFO curtaskinfo;
   rt_task_inquire(NULL, &curtaskinfo);
-  cout << "I am task : " << curtaskinfo.name << " of priority " << curtaskinfo.prio << endl;
+  #if VERBOSE_INFO
+    cout << "I am task : " << curtaskinfo.name << " of priority " << curtaskinfo.prio << endl;
+  #endif
 
   MacroTask macroRT;
   macroRT.properties = *rtTI;

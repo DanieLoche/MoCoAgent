@@ -9,8 +9,11 @@ TaskLauncher::TaskLauncher(string input_file)
 
 std::vector<rtTaskInfosStruct> TaskLauncher::readTasksList(string input_file)
 {
+  #if VERBOSE_OTHER
   system("clear");
-  cout << "Initialising machine...\n";
+  rt_printf("Initialising machine...\n");
+  //cout << "Initialising machine...\n";
+  #endif
   std::ifstream myFile(input_file);
   if (!myFile.is_open())
   {
@@ -26,7 +29,9 @@ std::vector<rtTaskInfosStruct> TaskLauncher::readTasksList(string input_file)
       rtTaskInfosStruct taskInfo;
       std::istringstream iss(str);
       string token;
+      #if VERBOSE_ASK
       cout << "Managing line : " << str << endl;
+      #endif
       if (str.substr(0,2) != "//")
       {
         if (!(iss >> taskInfo.name
@@ -37,7 +42,11 @@ std::vector<rtTaskInfosStruct> TaskLauncher::readTasksList(string input_file)
                   >> taskInfo.affinity) )
         { cout << "FAIL !" << endl; break; } // error
         tasksInfosList.push_back(taskInfo);
-      } else cout << "line ignored." << endl;
+      }
+      #if VERBOSE_ASK
+      else
+        cout << "line ignored." << endl;
+      #endif
   }
 
   return tasksInfosList;
@@ -54,8 +63,11 @@ void TaskLauncher::runTasks( )
       RT_TASK* task = new RT_TASK;
       taskInfo->task = task;
       rt_task_create(task, taskInfo->name, 0, 50, 0);
-      cout << "Task " << taskInfo->name << " created." << endl;
       set_affinity(task, 0);
+      #if VERBOSE_INFO
+      cout << "Task " << taskInfo->name << " created." << endl;
+      #endif
+
       /*
       RT_TASK_INFO rti;
       rt_task_inquire(task, &rti);
@@ -65,12 +77,15 @@ void TaskLauncher::runTasks( )
 
   for (auto& taskInfo : tasksInfosList)
   {
+    #if VERBOSE_INFO
       cout << "Task " << taskInfo.name << " started." << endl;
+    #endif
       int rep = rt_task_start(taskInfo.task, TaskMain, &taskInfo);
   }
 
-  cout << "Now launching the MoCoAgent ! " << endl;
-
+  #if VERBOSE_OTHER
+    cout << "Now launching the MoCoAgent ! " << endl;
+  #endif
   RT_TASK mcAgent;
   int rep = rt_task_create(&mcAgent, "MoCoAgent", 0, 2, 0);
   set_affinity(&mcAgent, 3);
@@ -84,13 +99,13 @@ void TaskLauncher::set_affinity (RT_TASK* task, int _aff)
   cpu_set_t mask;
   CPU_ZERO(&mask);
   CPU_SET(_aff, &mask);
-  /*RT_TASK_INFO tsk_infos;
-  rt_task_inquire(0, &tsk_infos);*/
-  cout << "Setting affinity :" << rt_task_set_affinity(task, &mask) << endl;
+  rt_task_set_affinity(task, &mask);
+
 }
 
 void TaskLauncher::printTasksInfos (/* std::vector<rtTaskInfosStruct> _myTasksInfos*/)
 {
+  #if VERBOSE_INFO
   for (auto &taskInfo : tasksInfosList)
   {
       cout << "Name: " << taskInfo.name
@@ -100,4 +115,5 @@ void TaskLauncher::printTasksInfos (/* std::vector<rtTaskInfosStruct> _myTasksIn
           << "| Deadline: " << taskInfo.deadline
           << "| affinity: " << taskInfo.affinity << endl;
   }
+  #endif
 }
