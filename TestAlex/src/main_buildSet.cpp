@@ -21,7 +21,7 @@ int main()
   }
 
   // Définition des listes comportant les tâches longue et courte
-  std::vector<string> all_crit_tasks = bS.distributionCrit(long_task, short_task, 50, 25);
+  std::vector<string> all_crit_tasks = bS.distributionCrit(long_task, short_task, 4, 8, 50);
 
   // Affichage des tâches critiques choisies
   std::cout << "Toutes les tâches critiques choisies : " << '\n';
@@ -41,7 +41,7 @@ int main()
   std::cout << "" << '\n';
 
   // Récupération infos tâches
-  std::vector<structInfo> info_task = bS.get_infos_tasks(input_file);
+  std::vector<rtTaskInfosStruct> info_task = bS.get_infos_tasks();
 
   // Edition du fichier input.txt
   bS.buildInput();

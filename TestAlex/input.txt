@@ -1,11 +1,2 @@
-name path isHRT periodicity deadline
-exe1S /null/ 1 10 50
-exe6L /null/ 1 20 60
-exe4L /null/ 0 40 100
-exe7L /null/ 0 30 70
-exe8L /null/ 0 40 100
-exe3L /null/ 0 30 70
-exe10S /null/ 0 40 100
-exe2S /null/ 0 20 60
-exe3S /null/ 0 30 70
-exe8S /null/ 0 40 100
+name path isHRT periodicity deadline affinity
+exe1S /null 1 10 50 3

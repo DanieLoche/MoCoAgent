@@ -18,20 +18,23 @@ class buildSet
 
   public:
 
-    std::vector<structInfo> list_info_task;
+    std::vector<rtTaskInfosStruct> list_info_task;
+
+    // Constructeur
+    buildSet();
 
     // Fonctions pour l'automatisation des sets de tâches
-    std::vector<string> distributionCrit(std::vector<string> long_task, std::vector<string> short_task, int long_percent, int crit_percent);
+    std::vector<string> distributionCrit(std::vector<string> long_task, std::vector<string> short_task, double nbr_long, double nbr_short, int crit_percent);
     // Choix des tâches critiques parmis les tâches longues et courtes choisies ^
 
-    void distributionLong(std::vector<string> long_task, int long_percent); // Choix des tâches longues
-    void distributionShort(std::vector<string> short_task, int short_percent); // Choix des tâches courtes
+    void distributionLong(std::vector<string> long_task, double nbr_long); // Choix des tâches longues
+    void distributionShort(std::vector<string> short_task, double nbr_short); // Choix des tâches courtes
 
     // Récupération des tâches non critiques
     std::vector<string> get_uncrit_tasks(); // Toujours lancer après distributionCrit
 
     // Récupération des informations de chaque tâches
-    std::vector<structInfo> get_infos_tasks(string input_file);
+    std::vector<rtTaskInfosStruct> get_infos_tasks();
 
     // Création fichier input.txt
     void buildInput();     // Toujours lancer après distributionCrit

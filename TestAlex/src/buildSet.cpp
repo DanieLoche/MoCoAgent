@@ -7,31 +7,29 @@
 
 using namespace std;
 
-std::vector<string> buildSet::distributionCrit (std::vector<string> long_task, std::vector<string> short_task, int long_percent, int crit_percent){
+buildSet::buildSet() {
+  // name path periodicity deadline affinity parameters
+  rtTaskInfosStruct taskInfo;
+  taskInfo.name = "exe1S"; taskInfo.path = "/null"; taskInfo.periodicity = 10; taskInfo.deadline = 50; taskInfo.affinity = 3; taskInfo.task_args = "";
+  list_info_task.push_back(taskInfo);
 
-    int short_percent = 100 - long_percent;
+
+  /*{"exe3S"; "/null/"; "30"; "70"; "3"; ""];
+  ["exe4S"; "/null/"; "40"; "100"; "4"; ""];["exe5S"; "/null/"; "10"; "50"; "1"; ""];["exe6S"; "/null/"; "20"; "60"; "2"; ""];
+  ["exe7S"; "/null/"; "30"; "70"; "3"; ""];["exe8S"; "/null/"; "40"; "100"; "4"; ""];["exe9S"; "/null/"; "10"; "50"; "1"; ""];
+  ["exe10S"; "/null/"; "20"; "60"; "2"; ""];["exe1L"; "/null/"; "30"; "70"; "3"; ""];["exe2L"; "/null/"; "40"; "100"; "4"; ""];
+  ["exe3L"; "/null/"; "10"; "50"; "1"; ""];["exe4L"; "/null/"; "20"; "60"; "2"; ""];["exe5L"; "/null/"; "30"; "700"; "3"; ""];
+  ["exe6L"; "/null/"; "40"; "100"; "4"; ""];["exe7L"; "/null/"; "10"; "50"; "1"; ""];["exe8L"; "/null/"; "20"; "60"; "2"; ""];
+  ["exe9L"; "/null/"; "30"; "70"; "3"; ""];["exe10L"; "/null/"; "40"; "100"; "4"; ""]];*/
+}
+
+std::vector<string> buildSet::distributionCrit (std::vector<string> long_task, std::vector<string> short_task, double nbr_long, double nbr_short, int crit_percent){
 
     // Choix des tâches longues parmis toutes les tâches
-    distributionLong(long_task, long_percent);
-
-    // Affichage des tâches longues choisies
-    std::cout << "Longues tâches choisies : " << '\n';
-    for (int i = 0; i<long_choosen_task.size(); i++){
-
-      std::cout << long_choosen_task[i] << " - ";
-    }
-    std::cout << "" << '\n';
+    distributionLong(long_task, nbr_long);
 
     // Choix des tâches courtes parmis toutes les tâches
-    distributionShort(short_task, short_percent);
-
-    // Affichage des tâches courtes choisies
-    std::cout << "Courtes tâchse choisies : " << '\n';
-    for (int i = 0; i<short_choosen_task.size(); i++){
-
-      std::cout << short_choosen_task[i] << " - ";
-    }
-    std::cout << "" << '\n';
+    distributionShort(short_task, nbr_short);
 
     // Concaténation de toutes les tâches
     long_choosen_task.insert(long_choosen_task.end(), short_choosen_task.begin(), short_choosen_task.end());
@@ -70,17 +68,16 @@ std::vector<string> buildSet::distributionCrit (std::vector<string> long_task, s
     return all_crit_tasks;
 }
 
-void buildSet::distributionLong(std::vector<string> long_task, int long_percent){
+void buildSet::distributionLong(std::vector<string> long_task, double nbr_long){
 
 
   int size = long_task.size();
-  int nbr_tach = (int) size*long_percent/100;
   std::vector<int> choix_tache_mem;
   int i = 0;            // Incrémentation
   int var_test_choix;   // Variable pour savoir si la tâche a dejà été choisie
 
   // Choix des tâches parmis toutes les tâches longues
-  while (i < nbr_tach) {
+  while (i < nbr_long) {
 
     // Choix des x tâches
     var_test_choix = 0;
@@ -106,17 +103,16 @@ void buildSet::distributionLong(std::vector<string> long_task, int long_percent)
   }
 }
 
-void buildSet::distributionShort(std::vector<string> short_task, int short_percent){
+void buildSet::distributionShort(std::vector<string> short_task, double nbr_short){
 
 
   int size = short_task.size();
-  int nbr_tach = (int) size*short_percent/100;
   std::vector<int> choix_tache_mem;
   int i = 0;            // Incrémentation
   int var_test_choix;   // Variable pour savoir si la tâche a dejà été choisie comme critique
 
   // Repartition tache critique longue dans deux listes
-  while (i < nbr_tach) {
+  while (i < nbr_short) {
 
     // Choix des x tâches critque
     var_test_choix = 0;
@@ -161,30 +157,8 @@ std::vector<string> buildSet::get_uncrit_tasks() {
   return uncrit_tasks;
 }
 
-std::vector<structInfo> buildSet::get_infos_tasks(string input_file)
+std::vector<rtTaskInfosStruct> buildSet::get_infos_tasks()
 {
-  std::ifstream myFile(input_file);
-  if (!myFile.is_open())
-  {
-      std::cout << "Merde, ouveture fichier tasks.txt à chier" << '\n';
-      exit(EXIT_FAILURE);
-  }
-
-  string str;
-  std::getline(myFile, str); // skip the first line
-  while (std::getline(myFile, str))
-  {
-      structInfo taskInfo;
-      std::istringstream iss(str);
-      cout << "Ligne traitée : " << str << endl;
-      if (!(iss >> taskInfo.name
-                >> taskInfo.path
-                >> taskInfo.periodicity
-                >> taskInfo.deadline) )
-      { cout << "FAIL !" << endl; break; } // error
-
-      list_info_task.push_back(taskInfo);
-  }
 
   return list_info_task;
 
@@ -196,11 +170,9 @@ void buildSet::buildInput() {
 
   if (myFile)
   {
-      std::cout << "Fichier ouvert" << '\n';
-      std::cout << '\n';
 
       // Ecriture de la premiere ligne
-      myFile << "name path isHRT periodicity deadline" << endl;
+      myFile << "name path isHRT periodicity deadline affinity" << endl;
 
       // Ecriture des infos de chaque tâches critiques selectionnées
       for (int i = 0; i<all_crit_tasks.size(); i++) {
@@ -208,8 +180,7 @@ void buildSet::buildInput() {
         for (auto taskInfo = list_info_task.begin(); taskInfo != list_info_task.end(); ++taskInfo) {
           // Parcours de toutes les tâches lues dans tasks.txt
           if (all_crit_tasks[i] == taskInfo->name) {
-            std::cout << "Eciture tâche critiqe : " << taskInfo->name << '\n';
-            myFile << taskInfo->name << " " << taskInfo->path << " 1 " << taskInfo->periodicity << " " << taskInfo->deadline << endl;
+            myFile << taskInfo->name << " " << taskInfo->path << " 1 " << taskInfo->periodicity << " " << taskInfo->deadline << " " << taskInfo->affinity << endl;
           }
         }
       }
@@ -220,15 +191,12 @@ void buildSet::buildInput() {
         for (auto taskInfo = list_info_task.begin(); taskInfo != list_info_task.end(); ++taskInfo) {
           // Parcours de toutes les tâches lues dans tasks.txt
           if (uncrit_tasks[i] == taskInfo->name) {
-            std::cout << "Eciture tâche non critiqe : " << taskInfo->name << '\n';
-            myFile << taskInfo->name << " " << taskInfo->path << " 0 " << taskInfo->periodicity << " " << taskInfo->deadline << endl;
+            myFile << taskInfo->name << " " << taskInfo->path << " 0 " << taskInfo->periodicity << " " << taskInfo->deadline << " " << taskInfo->affinity << endl;
           }
         }
       }
 
-      std::cout << '\n';
       myFile.close();
-      std::cout << "Fichier fermé" << '\n';
   }
 
   else
