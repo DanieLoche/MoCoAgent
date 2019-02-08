@@ -175,7 +175,6 @@ void buildSet::buildInput() {
 
   if (myFile)
   {
-      std::cout << '\n';
 
       // Ecriture de la premiere ligne
       myFile << "name path isHRT periodicity deadline affinity" << endl;
@@ -202,7 +201,6 @@ void buildSet::buildInput() {
         }
       }
 
-      std::cout << '\n';
       myFile.close();
   }
 
