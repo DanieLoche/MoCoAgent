@@ -1,4 +1,4 @@
 name        path      isRT  periodicity  deadline  affinity  priority   parameters
-exe1        /null/    1     10           10        8
-exe2        /null/    0     50           40        2
+exe1        /null/    1     5           10        8
+exe2        /null/    0     20           40        2
 //exe3        /null/    0     100          80        4

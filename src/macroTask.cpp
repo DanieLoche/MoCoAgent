@@ -21,33 +21,33 @@ void MacroTask::proceed(RT_SEM* mysync)
 {
   char* cmd;
   RTIME  runtime;
-  cout << "path :" << properties.path << "." << endl;
-
+  //cout << "path :" << properties.path << "." << endl;
   rt_sem_p(mysync,TM_INFINITE);
+
   while (1) {
-           // let the task run RUNTIME ns in steps of SPINTIME ns
-           runtime = 0;
-           while(runtime < EXECTIME) {
-             rt_timer_spin(SPINTIME);  // spin cpu doing nothing
-             runtime = runtime + SPINTIME;
-             cout<<"Running Task  :"<< properties.name <<"at time : "<< runtime<<endl ;
-           }
-           rt_task_wait_period(NULL);
-           cout<< properties.name<<rt_timer_read()<<endl;
+             // let the task run RUNTIME ns in steps of SPINTIME ns
+     runtime = 0;
+     while(runtime < EXECTIME) {
+       rt_timer_spin(SPINTIME);  // spin cpu doing nothing
+       runtime = runtime + SPINTIME;
+
+       printf("Running Task  : %s  at time : %lld \n",properties.name,runtime);
+     }
+     printf("End Task  : %s\n",properties.name);
+     rt_task_wait_period(NULL);
 
  }
+  printf("End Task  : %s\n",properties.name);
 
-   cout<<"End Task  :"<< properties.name <<endl;
 
+      /*  if (properties.path != "/null/")
+        {
+          cmd = &properties.path[0u];
+          system(cmd);
+        }
+        else cout << properties.name <<"Oups, no valid path found !" << endl;
 
-/*  if (properties.path != "/null/")
-  {
-    cmd = &properties.path[0u];
-    system(cmd);
-  }
-  else cout << properties.name <<"Oups, no valid path found !" << endl;
-
-  */
+        */
 }
 
 int MacroTask::after()

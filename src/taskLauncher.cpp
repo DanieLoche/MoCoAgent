@@ -1,6 +1,10 @@
 #include "taskLauncher.h"
 #include "sched.h"
 
+#define NTASKS 4
+
+RT_TASK demo_task[NTASKS];
+
 TaskLauncher::TaskLauncher(string input_file)
 {
   tasksInfosList = readTasksList(input_file);
@@ -44,16 +48,10 @@ std::vector<rtTaskInfosStruct> TaskLauncher::readTasksList(string input_file)
 
 }
 
-
 void TaskLauncher::runTasks( )
 {
-  cout << "Now launching the MoCoAgent ! " << endl;
-
-  RT_TASK mcAgent;
-  int rep = rt_task_create(&mcAgent, "MoCoAgent", 0, 2, 0);
-  set_affinity(&mcAgent, 3);
-
-  rt_task_start(&mcAgent, RunmcAgentMain, 0);
+   SRTIME quant=10e7;
+   SRTIME qt = rt_timer_ns2ticks(quant);
 
   for (auto taskInfo = tasksInfosList.begin(); taskInfo != tasksInfosList.end(); ++taskInfo)
   {
@@ -62,18 +60,28 @@ void TaskLauncher::runTasks( )
       rt_task_create(task, taskInfo->name, 0, 50, 0);
       cout << "Task " << taskInfo->name << " created." << endl;
       set_affinity(task, 0);
-      /*
+    //  rt_task_slice(task,qt);
+     /*
       RT_TASK_INFO rti;
       rt_task_inquire(task, &rti);
       print_affinity(rti.pid);
       */
   }
 
+   //Periodicity
+  RTIME starttime,period;
+  starttime = TM_NOW ;
+
   for (auto& taskInfo : tasksInfosList)
   {
-      cout << "Task " << taskInfo.name << " started." << endl;
+      period = taskInfo.periodicity*1e8 ;
+      rt_task_set_periodic(taskInfo.task, starttime, period);
+
+      //Starting
+      cout << "Task " << taskInfo.name << " started.at =" << starttime <<endl;
       int rep = rt_task_start(taskInfo.task, TaskMain, &taskInfo);
   }
+
 
 }
 

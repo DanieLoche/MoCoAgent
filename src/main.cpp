@@ -6,6 +6,7 @@
 #include "macroTask.h"
 #include "taskLauncher.h"
 
+
 long nproc;
 RT_SEM mysync;
 
@@ -58,12 +59,9 @@ void TaskMain(void* arg)
 
   RT_TASK_INFO curtaskinfo;
   rt_task_inquire(NULL, &curtaskinfo);
+
   cout << "I am task : " << curtaskinfo.name << " of priority " << curtaskinfo.prio << endl;
-  RTIME starttime,period;
-  period = (*rtTI).periodicity*1e8 ;
-  starttime = TM_NOW ;
-  rt_task_set_periodic(NULL, starttime, period);
-  cout<<"starting at "<< (*rtTI).name<<"=" << starttime <<endl;
+
 
   MacroTask macroRT;
   macroRT.properties = *rtTI;
@@ -71,9 +69,14 @@ void TaskMain(void* arg)
 
 }
 
+
+
 int main(int argc, char* argv[])
 {
   rt_sem_create(&mysync,"MySemaphore",0,S_FIFO);
+
+  //rt_task_set_mode(0,XNRRB,NULL);
+
   int return_code = 0;
   nproc = get_nprocs();
   // get input file, either indicated by user as argument or default location
@@ -85,6 +88,8 @@ int main(int argc, char* argv[])
   //tln.tasksInfos = readTasksList(input_file);
   tln.printTasksInfos();
   tln.runTasks();
+
+  //sleeping the time that all tasks will be started
   usleep(1000000);
   cout<<"wake up all tasks\n"<<endl;
   rt_sem_broadcast(&mysync);
@@ -94,3 +99,80 @@ int main(int argc, char* argv[])
 
   return return_code;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#define include define // TOUJOURS VERROUILLER SA SESSION !!!
