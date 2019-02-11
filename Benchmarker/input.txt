@@ -1,3 +1,21 @@
 name		        path		  isRT  periodicity  deadline  affinity  priority   parameters
-//runme_large.sh	./files/	1     70           70        8                    a
-basicmath_small	./files/	1     70           70        8                    a           
+basicmath_large.sh	home/BrixCode/MoCoAgent/Benchmarker/bench/automotive/basicmath/	1     70           70        8                    a
+basicmath_small.sh	home/BrixCode/MoCoAgent/Benchmarker/bench/automotive/basicmath/	1     70           70        8                    a
+bitcount_large.sh  home/BrixCode/MoCoAgent/Benchmarker/bench/automotive/bitcount/ 1     70      70    8
+bitcount_small.sh  home/BrixCode/MoCoAgent/Benchmarker/bench/automotive/bitcount/ 1     70    70    8
+qsort_large.sh  home/BrixCode/MoCoAgent/Benchmarker/bench/automotive/qsort/ 1 70  70  8
+qsort_small.sh  home/BrixCode/MoCoAgent/Benchmarker/bench/automotive/qsort/ 1 70  70  8
+susan_large.sh  home/BrixCode/MoCoAgent/Benchmarker/bench/automotive/susan/ 1 70  70  8
+susan_small.sh  home/BrixCode/MoCoAgent/Benchmarker/bench/automotive/susan/ 1 70  70  8
+jpeg_large.sh home/BrixCode/MoCoAgent/Benchmarker/bench/consumer/jpeg/  1 70  8
+jpeg_small.sh home/BrixCode/MoCoAgent/Benchmarker/bench/consumer/jpeg/  1 70  8
+lame_large.sh home/BrixCode/MoCoAgent/Benchmarker/bench/consumer/lame/  1 70  8
+lame_small.sh home/BrixCode/MoCoAgent/Benchmarker/bench/consumer/lame/  1 70  8
+mad_large.sh  home/BrixCode/MoCoAgent/Benchmarker/bench/consumer/mad/ 1 70  8
+mad_small.sh  home/BrixCode/MoCoAgent/Benchmarker/bench/consumer/mad/ 1 70  8
+tiff2bw_large.sh  home/BrixCode/MoCoAgent/Benchmarker/bench/consumer/tiff2bw/ 1 70  8
+tiff2bw_small.sh  home/BrixCode/MoCoAgent/Benchmarker/bench/consumer/tiff2bw/ 1 70  8
+tiff2rgba_large.sh  home/BrixCode/MoCoAgent/Benchmarker/bench/consumer/tiff2rgba/ 1 70  8
+tiff2rgba_small.sh  home/BrixCode/MoCoAgent/Benchmarker/bench/consumer/tiff2rgba/ 1 70  8
+tiffdither_large.sh home/BrixCode/MoCoAgent/Benchmarker/bench/consumer/tiffdither/ 1  70  8
+tiffdither_small.sh home/BrixCode/MoCoAgent/Benchmarker/bench/consumer/tiffdither/  1 70  8
