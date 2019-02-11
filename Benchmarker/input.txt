@@ -1,2 +1,3 @@
-name		path		isRT  periodicity  deadline  affinity  priority   parameters
-basicmath_small	./files/	1     70           70        8
+name		        path		  isRT  periodicity  deadline  affinity  priority   parameters
+//runme_large.sh	./files/	1     70           70        8                    a
+basicmath_small	./files/	1     70           70        8                    a           

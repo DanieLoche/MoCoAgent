@@ -26,6 +26,9 @@ void MacroTask::proceed()
   {
     cmd = &properties.path[0u];
     strcat(cmd,properties.name);
+    char space[5] = " ";
+    strcat(cmd,space);
+    strcat(cmd,properties.parameters);
     system(cmd);
   }
   else
@@ -37,6 +40,7 @@ void MacroTask::proceed()
 
 int MacroTask::after()
 {
+
   this->set_time(1);
   this->compute_time();
   //raise(SIGUSR1);
@@ -72,8 +76,6 @@ void MacroTask::compute_time()
 {
   cout.precision(17);
   execution_time_ms = (end_time_ms - start_time_ms );
-  cout << "Temps d'exécution mesuré : " << execution_time_ms << " ms" << endl;
-
    // Convert seconds to miliseconds
 }
 

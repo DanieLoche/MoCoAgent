@@ -7,6 +7,7 @@
 #include "taskLauncher.h"
 
 #define TARGET 10;
+#define OUTPUT_FILE "results.txt";
 
 using namespace std;
 long nproc;
@@ -49,27 +50,19 @@ void TaskMain(void* arg)
   double exec_time;
   RT_TASK_INFO curtaskinfo;
   rt_task_inquire(NULL, &curtaskinfo);
+
   cout << "I am task : " << curtaskinfo.name << " of priority " << curtaskinfo.prio << endl; cout.flush();
-  MacroTask macroRT;
-  macroRT.properties = *rtTI;
-  macroRT.set_main_pid(pid);
-  macroRT.executeRun();
-  exec_time = macroRT.get_execution_time();
+  MacroTask *macroRT = new MacroTask;
+
+  macroRT->properties = *rtTI;
+  macroRT->set_main_pid(pid);
+
+  macroRT->executeRun();
+  exec_time = macroRT->get_execution_time();
   sum += exec_time;
-  if (exec_time<minimum)
-  {
-    minimum = exec_time;
-  }
-  if (exec_time > maximum)
-  {
-    maximum = exec_time;
-  }
-
-}
-
-void handler(int signal, TaskLauncher laucher)
-{
-    cout << signal << "SIGUSR1 -> Execution terminated" << endl; cout.flush();
+  if (exec_time<minimum) minimum = exec_time;
+  if (exec_time > maximum) maximum = exec_time;
+  kill(curtaskinfo.pid, SIGINT);
 }
 
 void RunmcAgentMain(void* arg)
@@ -80,28 +73,53 @@ void RunmcAgentMain(void* arg)
 
 int main(int argc, char *argv[])
 {
+  char tache[64];
   int return_code = 0;
   nproc = get_nprocs();
   pid = getpid();
   cout << "I'm main, PID " << pid << "." << endl;
   // get input file, either indicated by user as argument or default location
   string input_file;
+  string out_file = OUTPUT_FILE;
+  ofstream myfile;
+  myfile.open (out_file);
   if (argc > 1) input_file = argv[1];
   else input_file = "./input.txt";
-
   TaskLauncher launcher(input_file);
   launcher.printTasksInfos();
   RT_TASK_INFO curtaskinfo;
   int i;
   int target = TARGET;
   for (i = 0 ; i<target ; i++){
-    launcher.runTasks();
-    sleep(1);
+    for (auto& taskInfo : launcher.tasksInfosList)  {
+      RT_TASK* task = new RT_TASK;
+      taskInfo.task = task;
+      rt_task_create(task, taskInfo.name, 90000000, 50, 0);
+      cout << "Task " << taskInfo.name << " created." << endl; cout.flush();
+      launcher.set_affinity(task, 0);
+      cout << "Launching task " << taskInfo.name << " ..." << endl; cout.flush();
+      usleep(500);
+      cout << "Task " << taskInfo.name << " started." << endl; cout.flush();
+      int rep = rt_task_start(taskInfo.task, TaskMain, &taskInfo);
+      sleep(2);
+      cout << "Task " << taskInfo.name << " stopped." << endl; cout.flush();
+      strcpy(tache,taskInfo.name);
+      int delrep = rt_task_delete(taskInfo.task);
+    }
   }
   sum = (sum / target);
-  cout << "Temps d'exécution min : " << minimum << " ms" << endl; cout.flush();
-  cout << "Temps d'exécution max : " << maximum << " ms" << endl; cout.flush();
-  cout << "Temps d'exécution moyen : " << sum << " ms" << endl; cout.flush();
-
+  myfile << "Tâche ";
+  myfile << tache;
+  myfile << " \n";
+  myfile << "Temps d'exécution min : ";
+  myfile << minimum;
+  myfile << " ms\n";
+  myfile << "Temps d'exécution max : ";
+  myfile << maximum;
+  myfile << " ms\n";
+  myfile << "Temps d'exécution moyen : ";
+  myfile << sum;
+  myfile << " ms\n";
+  myfile.close();
   return return_code;
 }
