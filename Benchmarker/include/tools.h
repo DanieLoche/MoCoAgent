@@ -30,7 +30,6 @@ struct rtTaskInfosStruct
     int  periodicity;
     int  deadline;
     int  affinity;
-    char parameters[64];
 } ;
 
 /* To create a task :

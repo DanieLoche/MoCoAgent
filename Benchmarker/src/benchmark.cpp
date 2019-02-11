@@ -77,12 +77,11 @@ int main(int argc, char *argv[])
   int return_code = 0;
   nproc = get_nprocs();
   pid = getpid();
-  cout << "I'm main, PID " << pid << "." << endl;
   // get input file, either indicated by user as argument or default location
   string input_file;
   string out_file = OUTPUT_FILE;
   ofstream myfile;
-  myfile.open (out_file);
+  myfile.open (out_file,ios_base::app);
   if (argc > 1) input_file = argv[1];
   else input_file = "./input.txt";
   TaskLauncher launcher(input_file);
@@ -119,7 +118,7 @@ int main(int argc, char *argv[])
   myfile << " ms\n";
   myfile << "Temps d'exécution moyen : ";
   myfile << sum;
-  myfile << " ms\n";
+  myfile << " ms\n\n----------------------------\n\n";
   myfile.close();
   return return_code;
 }

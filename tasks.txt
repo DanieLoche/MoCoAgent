@@ -1,5 +1,5 @@
 name      path      periodicity   deadline  affinity   parameters
-exe1L      /null/    10            50        1
+basicmath_large      /home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/automotive/basicmath/    1000            50        1
 exe2L      /null/    20            60        2
 exe3L      /null/    30            70        3
 exe4L      /null/    40            100       4

@@ -35,8 +35,7 @@ std::vector<rtTaskInfosStruct> TaskLauncher::readTasksList(string input_file)
                   >> taskInfo.isHardRealTime
                   >> taskInfo.periodicity
                   >> taskInfo.deadline
-                  >> taskInfo.affinity
-                  >> taskInfo.parameters) )
+                  >> taskInfo.affinity) )
         { cout << "FAIL !" << endl; cout.flush(); break; } // error
         tasksInfosList.push_back(taskInfo);
       } else cout << "line ignored." << endl; cout.flush();
@@ -118,7 +117,6 @@ void TaskLauncher::printTasksInfos (/* std::vector<rtTaskInfosStruct> _myTasksIn
           << "| is RT ? " << taskInfo.isHardRealTime
           << "| Period: " << taskInfo.periodicity
           << "| Deadline: " << taskInfo.deadline
-          << "| affinity: " << taskInfo.affinity
-          << "| parameters: " << taskInfo.parameters << endl; cout.flush();
+          << "| affinity: " << taskInfo.affinity << endl; cout.flush();
   }
 }

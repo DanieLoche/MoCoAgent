@@ -26,9 +26,6 @@ void MacroTask::proceed()
   {
     cmd = &properties.path[0u];
     strcat(cmd,properties.name);
-    char space[5] = " ";
-    strcat(cmd,space);
-    strcat(cmd,properties.parameters);
     system(cmd);
   }
   else
