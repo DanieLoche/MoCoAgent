@@ -9,29 +9,25 @@ class taskMonitoringStruct
     bool isExecuted;
     double rwcet;
 
-  taskMonitoringStruct(RT_TASK* t, double d, double r)
-    { task = t; deadline = d; rwcet = r;}
+    taskMonitoringStruct(rtTaskInfosStruct rtTaskInfos);
+    taskMonitoringStruct(RT_TASK* t, double d, double r)
+                          { task = t; deadline = d; rwcet = r;}
 
 };
 
 class taskChain
 {
   public :
-    std::vector<taskMonitoringStruct> taskChainList;
+    taskChain(end2endDeadlineStruct _tcDeadline);
+    taskChain(int _id, double _deadline);
+
+    int id;
     double end2endDeadline;
+    double slackTime;
+    std::vector<taskMonitoringStruct> taskChainList;
 
-    void setTaskChain(std::vector<rtTaskInfosStruct> rtTasks)
-      { for (auto& task : rtTasks)
-        {
-            taskMonitoringStruct tMStruct(task.task, task.deadline, task.periodicity);
-            taskChainList.push_back(tMStruct);
-        }
-      }
-
-    int checkTaskRT()
-      {
-
-      }
+    void setTaskChain(std::vector<rtTaskInfosStruct> rtTasks);
+    int checkTaskE2E();
 };
 
 class MCAgent
@@ -42,7 +38,10 @@ class MCAgent
     std::vector<taskChain> allTaskChain;
   public :
     MCAgent(void* arg);
+
     void displayInformations();
     int checkTasks();
+    void setAllDeadlines(std::vector<end2endDeadlineStruct> _tcDeadlineStructs);
+    void setAllTasks(std::vector<rtTaskInfosStruct> _TasksInfos);
     void setMode(int mode);
 };

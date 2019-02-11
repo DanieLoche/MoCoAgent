@@ -21,6 +21,12 @@ using std::cout;
 using std::endl;
 using std::cin;
 
+struct end2endDeadlineStruct
+{
+  double deadline;
+  id taskChainID;
+}
+
 struct rtTaskInfosStruct
 {
     RT_TASK* task;
@@ -33,6 +39,10 @@ struct rtTaskInfosStruct
     int  deadline;
     int  affinity;
 } ;
+
+void printInquireInfo();
+void printTaskInfo(rtTaskInfosStruct* task);
+void print_affinity(pid_t _pid);
 
 /* To create a task :
  * Arguments : &task,
