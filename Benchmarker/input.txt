@@ -1,21 +1,51 @@
 name		        path		  isRT  periodicity  deadline  affinity  priority   parameters
-basicmath_large.sh	home/BrixCode/MoCoAgent/Benchmarker/bench/automotive/basicmath/	1     70           70        8                    a
-basicmath_small.sh	home/BrixCode/MoCoAgent/Benchmarker/bench/automotive/basicmath/	1     70           70        8                    a
-bitcount_large.sh  home/BrixCode/MoCoAgent/Benchmarker/bench/automotive/bitcount/ 1     70      70    8
-bitcount_small.sh  home/BrixCode/MoCoAgent/Benchmarker/bench/automotive/bitcount/ 1     70    70    8
-qsort_large.sh  home/BrixCode/MoCoAgent/Benchmarker/bench/automotive/qsort/ 1 70  70  8
-qsort_small.sh  home/BrixCode/MoCoAgent/Benchmarker/bench/automotive/qsort/ 1 70  70  8
-susan_large.sh  home/BrixCode/MoCoAgent/Benchmarker/bench/automotive/susan/ 1 70  70  8
-susan_small.sh  home/BrixCode/MoCoAgent/Benchmarker/bench/automotive/susan/ 1 70  70  8
-jpeg_large.sh home/BrixCode/MoCoAgent/Benchmarker/bench/consumer/jpeg/  1 70  8
-jpeg_small.sh home/BrixCode/MoCoAgent/Benchmarker/bench/consumer/jpeg/  1 70  8
-lame_large.sh home/BrixCode/MoCoAgent/Benchmarker/bench/consumer/lame/  1 70  8
-lame_small.sh home/BrixCode/MoCoAgent/Benchmarker/bench/consumer/lame/  1 70  8
-mad_large.sh  home/BrixCode/MoCoAgent/Benchmarker/bench/consumer/mad/ 1 70  8
-mad_small.sh  home/BrixCode/MoCoAgent/Benchmarker/bench/consumer/mad/ 1 70  8
-tiff2bw_large.sh  home/BrixCode/MoCoAgent/Benchmarker/bench/consumer/tiff2bw/ 1 70  8
-tiff2bw_small.sh  home/BrixCode/MoCoAgent/Benchmarker/bench/consumer/tiff2bw/ 1 70  8
-tiff2rgba_large.sh  home/BrixCode/MoCoAgent/Benchmarker/bench/consumer/tiff2rgba/ 1 70  8
-tiff2rgba_small.sh  home/BrixCode/MoCoAgent/Benchmarker/bench/consumer/tiff2rgba/ 1 70  8
-tiffdither_large.sh home/BrixCode/MoCoAgent/Benchmarker/bench/consumer/tiffdither/ 1  70  8
-tiffdither_small.sh home/BrixCode/MoCoAgent/Benchmarker/bench/consumer/tiffdither/  1 70  8
+basicmath_large.sh	home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/automotive/basicmath/	1     70           70        8                    a
+basicmath_small.sh	home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/automotive/basicmath/	1     70           70        8                    a
+bitcount_large.sh  home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/automotive/bitcount/ 1     70      70    8
+bitcount_small.sh  home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/automotive/bitcount/ 1     70    70    8
+qsort_large.sh  home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/automotive/qsort/ 1 70  70  8
+qsort_small.sh  home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/automotive/qsort/ 1 70  70  8
+susan_large.sh  home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/automotive/susan/ 1 70  70  8
+susan_small.sh  home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/automotive/susan/ 1 70  70  8
+jpeg_large.sh home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/consumer/jpeg/  1 70  8
+jpeg_small.sh home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/consumer/jpeg/  1 70  8
+lame_large.sh home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/consumer/lame/  1 70  8
+lame_small.sh home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/consumer/lame/  1 70  8
+mad_large.sh  home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/consumer/mad/ 1 70  8
+mad_small.sh  home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/consumer/mad/ 1 70  8
+tiff2bw_large.sh  home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/consumer/tiff2bw/ 1 70  8
+tiff2bw_small.sh  home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/consumer/tiff2bw/ 1 70  8
+tiff2rgba_large.sh  home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/consumer/tiff2rgba/ 1 70  8
+tiff2rgba_small.sh  home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/consumer/tiff2rgba/ 1 70  8
+tiffdither_large.sh home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/consumer/tiffdither/ 1  70  8
+tiffdither_small.sh home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/consumer/tiffdither/  1 70  8
+tiffmedian_large.sh home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/consumer/tiffmedian/  1 70  8
+tiffmedian_small.sh home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/consumer/tiffmedian/  1 70  8
+typeset_large.sh  home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/consumer/typeset/ 1 70  8
+typeset_small.sh  home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/consumer/typeset/ 1 70  8
+dijkstra_large.sh home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/network/dijkstra/ 1 70  8
+dijkstra_small.sh home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/network/dijkstra/ 1 70  8
+patricia_large.sh home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/network/patricia/ 1 70  8
+patricia_small.sh home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/network/patricia/ 1 70  8
+ghostscript_large.sh  home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/office/ghostscript/ 1 70  8
+ghostscript_small.sh  home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/office/ghostscript/ 1 70  8
+ispell_large.sh home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/office/ispell/  1 70  8
+ispell_small.sh home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/office/ispell/  1 70  8
+rsynth_large.sh home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/office/rsynth/  1 70  8
+rsynth_small.sh home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/office/rsynth/  1 70  8
+stringsearch_large.sh home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/office/stringsearch/  1 70  8
+stringsearch_small.sh home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/office/stringsearch/  1 70  8
+blowfish_large.sh home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/security/blowfish/  1 70  8
+blowfish_small.sh home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/security/blowfish/  1 70  8
+rijndael_large.sh home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/security/rijndael/  1 70  8
+rijndael_small.sh home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/security/rijndael/  1 70  8
+sha_large.sh  home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/security/sha/ 1 70  8
+sha_small.sh  home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/security/sha/ 1 70  8
+adpcm_large.sh  home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/telecomm/adpcm/ 1 70  8
+adpcm_small.sh  home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/telecomm/adpcm/ 1 70  8
+CRC32_large.sh  home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/telecomm/CRC32/ 1 70  8
+CRC32_small.sh  home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/telecomm/CRC32/ 1 70  8
+fft_large.sh  home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/telecomm/FFT/ 1 70  8
+fft_small.sh  home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/telecomm/FFT/ 1 70  8
+gsm_large.sh  home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/telecomm/gsm/ 1 70  8
+gsm_small.sh  home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/telecomm/gsm/ 1 70  8
