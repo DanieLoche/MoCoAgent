@@ -10,7 +10,7 @@ name		        path		  isRT  periodicity  deadline  affinity  priority
 //jpeg_large.sh /home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/consumer/jpeg/  1     70           70        8
 //jpeg_small.sh /home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/consumer/jpeg/  1     70           70        8
 // OVERFLOW lame_large.sh /home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/consumer/lame/  1     70           70        8
-// OVERFLOW lame_small.sh /home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/consumer/lame/  1     70           70        8
+lame_small.sh /home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/consumer/lame/  1     70           70        8
 // ERROR mad_large.sh  /home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/consumer/mad/ 1     70           70        8
 // ERROR mad_small.sh  /home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/consumer/mad/ 1     70           70        8
 // ERROR tiff2bw_large.sh  /home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/consumer/tiff2bw/ 1     70           70        8
@@ -37,15 +37,15 @@ name		        path		  isRT  periodicity  deadline  affinity  priority
 //stringsearch_small.sh /home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/office/stringsearch/  1     70           70        8
 //blowfish_large.sh /home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/security/blowfish/  1     70           70        8
 //blowfish_small.sh /home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/security/blowfish/  1     70           70        8
-// ERROR rijndael_large.sh /home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/security/rijndael/  1     70           70        8
-// ERROR rijndael_small.sh /home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/security/rijndael/  1     70           70        8
+// ERROR makefile rijndael_large.sh /home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/security/rijndael/  1     70           70        8
+// ERROR makefile rijndael_small.sh /home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/security/rijndael/  1     70           70        8
 //sha_large.sh  /home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/security/sha/ 1     70           70        8
 //sha_small.sh  /home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/security/sha/ 1     70           70        8
-// ERROR adpcm_large.sh  /home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/telecomm/adpcm/ 1     70           70        8
-// ERROR adpcm_small.sh  /home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/telecomm/adpcm/ 1     70           70        8
-// ERROR CRC32_large.sh  /home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/telecomm/CRC32/ 1     70           70        8
-// ERROR CRC32_small.sh  /home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/telecomm/CRC32/ 1     70           70        8
+//adpcm_large.sh  /home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/telecomm/adpcm/ 1     70           70        8
+//adpcm_small.sh  /home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/telecomm/adpcm/ 1     70           70        8
+//CRC32_large.sh  /home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/telecomm/CRC32/ 1 70  70  8
+//CRC32_small.sh  /home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/telecomm/CRC32/ 1     70           70        8
 //fft_large.sh  /home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/telecomm/FFT/ 1     70           70        8
 //fft_small.sh  /home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/telecomm/FFT/ 1     70           70        8
-// ERROR gsm_large.sh  /home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/telecomm/gsm/ 1     70           70        8
-// ERROR gsm_small.sh  /home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/telecomm/gsm/ 1     70           70        8
+//gsm_large.sh  /home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/telecomm/gsm/ 1     70           70        8
+//gsm_small.sh  /home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/telecomm/gsm/ 1     70           70        8

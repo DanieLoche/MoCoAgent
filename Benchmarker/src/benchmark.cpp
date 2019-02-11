@@ -8,7 +8,7 @@
 
 #define TARGET 10;
 #define OUTPUT_FILE "results.txt";
-
+#define MEMORY 100000000;
 using namespace std;
 long nproc;
 double sum = 0.0;
@@ -93,7 +93,8 @@ int main(int argc, char *argv[])
     for (auto& taskInfo : launcher.tasksInfosList)  {
       RT_TASK* task = new RT_TASK;
       taskInfo.task = task;
-      rt_task_create(task, taskInfo.name, 90000000, 50, 0);
+      int memory_stack = MEMORY;
+      rt_task_create(task, taskInfo.name, memory_stack, 50, 0);
       cout << "Task " << taskInfo.name << " created." << endl; cout.flush();
       launcher.set_affinity(task, 0);
       cout << "Launching task " << taskInfo.name << " ..." << endl; cout.flush();

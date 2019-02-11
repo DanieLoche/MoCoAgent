@@ -1,168 +1,208 @@
-Tâche basicmath_large.sh 
+Tâche basicmath_large.sh
 Temps d'exécution min : 695 ms
 Temps d'exécution max : 892 ms
 Temps d'exécution moyen : 648 ms
 
 ----------------------------
 
-Tâche basicmath_small.sh 
+Tâche basicmath_small.sh
 Temps d'exécution min : 57 ms
 Temps d'exécution max : 58 ms
 Temps d'exécution moyen : 57.2 ms
 
 ----------------------------
 
-Tâche bitcount_large.sh 
+Tâche bitcount_large.sh
 Temps d'exécution min : 196 ms
 Temps d'exécution max : 201 ms
 Temps d'exécution moyen : 196.8 ms
 
 ----------------------------
 
-Tâche bitcount_small.sh 
+Tâche bitcount_small.sh
 Temps d'exécution min : 47 ms
 Temps d'exécution max : 48 ms
 Temps d'exécution moyen : 47.3 ms
 
 ----------------------------
 
-Tâche qsort_large.sh 
+Tâche qsort_large.sh
 Temps d'exécution min : 137 ms
 Temps d'exécution max : 146 ms
 Temps d'exécution moyen : 138.8 ms
 
 ----------------------------
 
-Tâche qsort_small.sh 
+Tâche qsort_small.sh
 Temps d'exécution min : 43 ms
 Temps d'exécution max : 44 ms
 Temps d'exécution moyen : 43.2 ms
 
 ----------------------------
 
-Tâche susan_large.sh 
+Tâche susan_large.sh
 Temps d'exécution min : 144 ms
 Temps d'exécution max : 145 ms
 Temps d'exécution moyen : 144.8 ms
 
 ----------------------------
 
-Tâche susan_small.sh 
+Tâche susan_small.sh
 Temps d'exécution min : 43 ms
 Temps d'exécution max : 45 ms
 Temps d'exécution moyen : 44 ms
 
 ----------------------------
 
-Tâche jpeg_large.sh 
+Tâche jpeg_large.sh
 Temps d'exécution min : 76 ms
 Temps d'exécution max : 80 ms
 Temps d'exécution moyen : 76.8 ms
 
 ----------------------------
 
-Tâche jpeg_small.sh 
+Tâche jpeg_small.sh
 Temps d'exécution min : 49 ms
 Temps d'exécution max : 53 ms
 Temps d'exécution moyen : 49.5 ms
 
 ----------------------------
 
-Tâche typeset_large.sh 
+Tâche typeset_large.sh
 Temps d'exécution min : 203 ms
 Temps d'exécution max : 206 ms
 Temps d'exécution moyen : 204.1 ms
 
 ----------------------------
 
-Tâche typeset_small.sh 
+Tâche typeset_small.sh
 Temps d'exécution min : 78 ms
 Temps d'exécution max : 80 ms
 Temps d'exécution moyen : 78.3 ms
 
 ----------------------------
 
-Tâche dijkstra_large.sh 
+Tâche dijkstra_large.sh
 Temps d'exécution min : 104 ms
 Temps d'exécution max : 106 ms
 Temps d'exécution moyen : 104.6 ms
 
 ----------------------------
 
-Tâche dijkstra_small.sh 
+Tâche dijkstra_small.sh
 Temps d'exécution min : 51 ms
 Temps d'exécution max : 59 ms
 Temps d'exécution moyen : 53.3 ms
 
 ----------------------------
 
-Tâche patricia_large.sh 
+Tâche patricia_large.sh
 Temps d'exécution min : 225 ms
 Temps d'exécution max : 249 ms
 Temps d'exécution moyen : 232 ms
 
 ----------------------------
 
-Tâche patricia_small.sh 
+Tâche patricia_small.sh
 Temps d'exécution min : 67 ms
 Temps d'exécution max : 74 ms
 Temps d'exécution moyen : 69.2 ms
 
 ----------------------------
 
-Tâche stringsearch_large.sh 
+Tâche stringsearch_large.sh
 Temps d'exécution min : 37 ms
 Temps d'exécution max : 40 ms
 Temps d'exécution moyen : 38.3 ms
 
 ----------------------------
 
-Tâche stringsearch_small.sh 
+Tâche stringsearch_small.sh
 Temps d'exécution min : 36 ms
 Temps d'exécution max : 45 ms
 Temps d'exécution moyen : 37.7 ms
 
 ----------------------------
 
-Tâche blowfish_large.sh 
+Tâche blowfish_large.sh
 Temps d'exécution min : 270 ms
 Temps d'exécution max : 283 ms
 Temps d'exécution moyen : 274.7 ms
 
 ----------------------------
 
-Tâche blowfish_small.sh 
+Tâche blowfish_small.sh
 Temps d'exécution min : 59 ms
 Temps d'exécution max : 62 ms
 Temps d'exécution moyen : 60.2 ms
 
 ----------------------------
 
-Tâche sha_large.sh 
+Tâche sha_large.sh
 Temps d'exécution min : 81 ms
 Temps d'exécution max : 82 ms
 Temps d'exécution moyen : 81.9 ms
 
 ----------------------------
 
-Tâche sha_small.sh 
+Tâche sha_small.sh
 Temps d'exécution min : 41 ms
 Temps d'exécution max : 42 ms
 Temps d'exécution moyen : 41.2 ms
 
 ----------------------------
 
-Tâche fft_large.sh 
+Tâche fft_large.sh
 Temps d'exécution min : 247 ms
 Temps d'exécution max : 262 ms
 Temps d'exécution moyen : 249.6 ms
 
 ----------------------------
 
-Tâche fft_small.sh 
+Tâche fft_small.sh
 Temps d'exécution min : 66 ms
 Temps d'exécution max : 71 ms
 Temps d'exécution moyen : 68.7 ms
 
 ----------------------------
 
+Tâche adpcm_large.sh
+Temps d'exécution min : 769 ms
+Temps d'exécution max : 1428 ms
+Temps d'exécution moyen : 963.2 ms
+
+----------------------------
+
+Tâche adpcm_small.sh
+Temps d'exécution min : 77 ms
+Temps d'exécution max : 83 ms
+Temps d'exécution moyen : 79.3 ms
+
+----------------------------
+
+Tâche CRC32_large.sh
+Temps d'exécution min : 224 ms
+Temps d'exécution max : 237 ms
+Temps d'exécution moyen : 227.8 ms
+
+----------------------------
+
+Tâche CRC32_small.sh
+Temps d'exécution min : 47 ms
+Temps d'exécution max : 53 ms
+Temps d'exécution moyen : 49 ms
+
+----------------------------
+Tâche gsm_small.sh
+Temps d'exécution min : 46 ms
+Temps d'exécution max : 50 ms
+Temps d'exécution moyen : 47.2 ms
+
+----------------------------
+
+Tâche gsm_large.sh
+Temps d'exécution min : 442 ms
+Temps d'exécution max : 469 ms
+Temps d'exécution moyen : 447 ms
+
+----------------------------

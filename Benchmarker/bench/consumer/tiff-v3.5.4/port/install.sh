@@ -33,7 +33,7 @@
 # Warning, this file was automatically created by the HylaFAX configure script
 #
 # VERSION:	v3.5.4
-# DATE:		lundi 11 février 2019, 13:22:22 (UTC+0100)
+# DATE:		lundi 11 février 2019, 15:11:18 (UTC+0100)
 # TARGET:	x86_64-unknown-linux
 #
 
