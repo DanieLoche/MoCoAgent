@@ -9,12 +9,13 @@ MCAgent::MCAgent(void *arg)
   printInquireInfo();
   print_affinity(0);
 
-  std::vector<rtTaskInfosStruct>* rtTI = (std::vector<rtTaskInfosStruct>*) arg;
-  TasksInformations = rtTI;
+  systemRTInfo* sInfos = (systemRTInfo*) arg;
+  //TasksInformations = rtTI;
   displayInformations();
 
   runtimeMode = MODE_NOMINAL;
 
+  initMoCoAgent(sInfos);
 
     while(false)
     {
@@ -29,6 +30,13 @@ MCAgent::MCAgent(void *arg)
       checkTasks();
     }
 }
+
+void initMoCoAgent(std::vector<rtTaskInfosStruct>* sInfos)
+{
+  setAllDeadlines(sInfos->e2eDD);
+  setAllTasks(sInfos->rtTIs);
+}
+
 
 int MCAgent::checkTasks()
 {
@@ -62,11 +70,17 @@ void MCAgent::setAllTasks(std::vector<rtTaskInfosStruct> _TasksInfos)
 {
   for (auto& _taskInfo : _TasksInfos)
   {
-    /*
-      Parcourir toutes les tasksChains dans allTaskChain pour comparer id.
-      Si ID existe : .push_back dans taskChain
-      Sinon, push_back dans allTaskChain
-    */
+    bool idFound = FALSE;
+    for (auto& _taskChain : allTaskChain)
+    {
+      if (_taskInfo->isHardRealTime == _taskChain->id)
+      {
+        taskMonitoringStruct tms = new taskMonitoringStruct(_taskInfo);
+        _taskChain.taskChainList.push_back(tms);
+        idFound == TRUE;
+      }
+      if (idFound)  return;
+    }
   }
 }
 
@@ -108,6 +122,7 @@ taskChain::taskChain(end2endDeadlineStruct _tcDeadline)
 {
   id = _tcDeadline.id;
   end2endDeadline = _tcDeadline.deadline;
+  slackTime = 0;
 }
 
 /***********************
@@ -121,6 +136,9 @@ taskMonitoringStruct::taskMonitoringStruct(rtTaskInfosStruct rtTaskInfos)
   task = rtTaskInfos.task;
   deadline = rtTaskInfos.deadline;
   rwcet = rtTaskInfos.deadline;
+
+  isExecuted = FALSE;
+  execTime = 0;
 }
 
 int taskChain::checkTaskE2E()

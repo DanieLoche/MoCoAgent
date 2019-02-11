@@ -34,14 +34,15 @@ class MCAgent
 {
   private :
     int runtimeMode;
-    std::vector<rtTaskInfosStruct>* TasksInformations;
+    //std::vector<rtTaskInfosStruct>* TasksInformations;
     std::vector<taskChain> allTaskChain;
   public :
     MCAgent(void* arg);
 
+    void initMoCoAgent(std::vector<rtTaskInfosStruct>* sInfos);
     void displayInformations();
     int checkTasks();
     void setAllDeadlines(std::vector<end2endDeadlineStruct> _tcDeadlineStructs);
-    void setAllTasks(std::vector<rtTaskInfosStruct> _TasksInfos);
+    void setAllTasks(std::vector<rtTaskInfosStruct>* _TasksInfos);
     void setMode(int mode);
 };

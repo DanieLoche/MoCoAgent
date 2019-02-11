@@ -40,6 +40,14 @@ struct rtTaskInfosStruct
     int  affinity;
 } ;
 
+
+struct systemRTInfo
+{
+  std::vector< end2endDeadlineStruct >* e2eDD;
+  std::vector< rtTaskInfosStruct     >* rtTIs;
+}
+
+
 void printInquireInfo();
 void printTaskInfo(rtTaskInfosStruct* task);
 void print_affinity(pid_t _pid);
