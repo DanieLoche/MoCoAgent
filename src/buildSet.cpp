@@ -7,7 +7,58 @@
 
 using namespace std;
 
-std::vector<string> buildSet::distributionCrit (std::vector<string> long_task, std::vector<string> short_task, double nbr_long, double nbr_short, int crit_percent){
+buildSet::buildSet() {
+
+  // Ouverture fichier des tâches
+  std::ifstream myFile("sorted.txt");
+
+  // Test d'ouverture
+  if (!myFile.is_open())
+  {
+      exit(EXIT_FAILURE);
+  }
+
+  string name;
+  double tpsExeMoy;
+  string str;
+  std::getline(myFile, str); // skip the first line
+
+  while (std::getline(myFile, str))
+  {
+      std::istringstream iss(str);
+      if (!(iss >> name
+                >> tpsExeMoy) )
+      { cout << "FAIL !" << endl; break; } // error
+
+      // Creation liste des tâches et des temps
+      ordered_tasks.push_back(name);
+      ordered_time.push_back(tpsExeMoy);
+  }
+}
+
+std::vector<string> buildSet::distributionCrit (double nbr_long, double nbr_short, int crit_percent){
+    // Vecteur des tâches longues et courtes
+    std::vector<string> long_task;
+    std::vector<string> short_task;
+
+    // Calcul de la moyenne des temps moyens
+    double sum = 0;
+    for (int i = 0; i<ordered_time.size(); i++) {
+      sum += ordered_time[i];
+    }
+    double moy = sum/ordered_time.size();
+
+    // Répartition dans les deux listes de tâches longues et courtes
+    for (int i = 0; i<ordered_time.size(); i++) {
+      // Si le tps est en dessous de la moyenne, direction les courtes
+      if (ordered_time[i] < moy) {
+        short_task.push_back(ordered_tasks[i]);
+      }
+      // Sinon les longues
+      else {
+        long_task.push_back(ordered_tasks[i]);
+      }
+    }
 
     // Choix des tâches longues parmis toutes les tâches
     distributionLong(long_task, nbr_long);
@@ -140,12 +191,12 @@ std::vector<string> buildSet::get_uncrit_tasks() {
 
   int var_test_in; // Variable de test tâche dans les critiques ou non
 
-  for (int i = 0; i<long_choosen_task.size(); i++) {
+  for (int i = 0; i<all_crit_tasks.size(); i++) {
 
     // Parcours de l'ensemble des tâches
     var_test_in = 0;
 
-    for (int j = 0; j<all_crit_tasks.size(); j++) {
+    for (int j = 0; j<long_choosen_task.size(); j++) {
 
       // Parcours de l'ensemble des tâches critques
       if (long_choosen_task[i] == all_crit_tasks[j]) {
@@ -175,6 +226,7 @@ std::vector<rtTaskInfosStruct> buildSet::get_infos_tasks(string input_file)
   }
 
   string str;
+  double tpsExeMoy;
   std::getline(myFile, str); // skip the first line
   while (std::getline(myFile, str))
   {
@@ -182,6 +234,7 @@ std::vector<rtTaskInfosStruct> buildSet::get_infos_tasks(string input_file)
       // Attribution des infos à chaque tâches
       std::istringstream iss(str);
       if (!(iss >> taskInfo.name
+                >> tpsExeMoy
                 >> taskInfo.path
                 >> taskInfo.periodicity
                 >> taskInfo.deadline
@@ -224,7 +277,7 @@ void buildSet::buildInput() {
 
         for (auto taskInfo = list_info_task.begin(); taskInfo != list_info_task.end(); ++taskInfo) {
           // Parcours de toutes les tâches lues dans tasks.txt
-          
+
           if (uncrit_tasks[i] == taskInfo->name) {
             myFile << taskInfo->name << " " << taskInfo->path << " 0 " << taskInfo->periodicity << " " << taskInfo->deadline << " " << taskInfo->affinity << endl;
           }

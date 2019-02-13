@@ -15,13 +15,17 @@ class buildSet
     std::vector<string> long_choosen_task = std::vector<string>(0);
     std::vector<string> all_crit_tasks;
     std::vector<string> uncrit_tasks;
+    std::vector<string> ordered_tasks;
+    std::vector<double> ordered_time;
 
   public:
+
+    buildSet();
 
     std::vector<rtTaskInfosStruct> list_info_task;
 
     // Fonctions pour l'automatisation des sets de tâches
-    std::vector<string> distributionCrit(std::vector<string> long_task, std::vector<string> short_task, double nbr_long, double nbr_short, int crit_percent);
+    std::vector<string> distributionCrit(double nbr_long, double nbr_short, int crit_percent);
     // Choix des tâches critiques parmis les tâches longues et courtes choisies ^
 
     void distributionLong(std::vector<string> long_task, double nbr_long); // Choix des tâches longues

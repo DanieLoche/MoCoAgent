@@ -7,8 +7,15 @@
 #include "taskLauncher.h"
 #include "buildSet.h"
 
+
+#define EXECTIME   2e8   // execution time in ns
+#define SPINTIME   1e7   // spin time in ns
+
+
+
 long nproc;
 RT_SEM mysync;
+TaskLauncher* tasl;
 
 void printTaskInfo(rtTaskInfosStruct* task)
 {
@@ -59,23 +66,36 @@ void TaskMain(void* arg)
 
   RT_TASK_INFO curtaskinfo;
   rt_task_inquire(NULL, &curtaskinfo);
-  cout << "I am task : " << curtaskinfo.name << " of priority " << curtaskinfo.prio << endl;
-  RTIME starttime,period;
-  period = (*rtTI).periodicity*1e8 ;
-  starttime = TM_NOW ;
-  rt_task_set_periodic(NULL, starttime, period);
-  cout<<"starting at "<< (*rtTI).name<<"=" << starttime <<endl;
+
+  //cout << "I am task : " << curtaskinfo.name << " of priority " << curtaskinfo.prio << endl;
 
   MacroTask macroRT;
-  macroRT.properties = *rtTI;
+  macroRT.properties = rtTI;
   macroRT.executeRun(&mysync);
 
 }
 
+
+void my_handler(int s){
+
+  for (auto taskInfo = tasl->tasksInfosList.begin(); taskInfo != tasl->tasksInfosList.end(); ++taskInfo)
+  {
+           printf("Caught signal %s\n",taskInfo->name);
+           printf("Average runtime %f ms\n",taskInfo->average_runtime/ 1.0e6);
+           printf("Max runtime %f ms\n",taskInfo->max_runtime/ 1.0e6);
+           printf("Min runtime %f ms\n",taskInfo->min_runtime/ 1.0e6);
+           printf(" dead_line  %f ms \n",taskInfo->deadline / 1.0e6);
+           printf("Out of dead_line  %d\n",taskInfo->out_deadline);
+
+  }
+   exit(1);
+}
+
+
 int main(int argc, char* argv[])
 {
   // POUR TEST EN ATTENDANT LA LISTE D'ENTREE
-  std::vector<string> long_task;
+  /*std::vector<string> long_task;
   std::vector<string> short_task;
 
   for (int i = 0; i<10; i++) {
@@ -83,10 +103,13 @@ int main(int argc, char* argv[])
     std::string s = "exe" + std::to_string(i+1) + "S";
     long_task.push_back(l);
     short_task.push_back(s);
-  }
+  }*/
   /////////////////////////////////////////////////////
 
   rt_sem_create(&mysync,"MySemaphore",0,S_FIFO);
+
+  //rt_task_set_mode(0,XNRRB,NULL);
+
   int return_code = 0;
   nproc = get_nprocs();
   // get input file, either indicated by user as argument or default location
@@ -96,12 +119,12 @@ int main(int argc, char* argv[])
   if (argc > 1) input_file = argv[1];
   else input_file = "./input.txt";
   if (argc > 2) task_file = argv[2];
-  else task_file = "./tasks.txt";
+  else task_file = "./sorted.txt";
 
   buildSet bS;
 
   // Définition des listes comportant les tâches longue et courte
-  std::vector<string> all_crit_tasks = bS.distributionCrit(long_task, short_task, 8, 4, 80);
+  std::vector<string> all_crit_tasks = bS.distributionCrit(5, 1, 50);
 
   // Définition des tâches non critiques choisies
   std::vector<string> uncrit_tasks = bS.get_uncrit_tasks();
@@ -114,15 +137,49 @@ int main(int argc, char* argv[])
 
 
   TaskLauncher tln(input_file);
+  //tln.tasksInfos = readTasksList(input_file);
+  tln.printTasksInfos();
+  tln.runTasks();
+  tasl=&tln;
 
-  //tln.printTasksInfos();
-  //tln.runTasks();
-  //usleep(1000000);
-  //cout<<"wake up all tasks\n"<<endl;
-  //rt_sem_broadcast(&mysync);
+  //sleeping the time that all tasks will be started
+  usleep(1000000);
+  cout<<"wake up all tasks\n"<<endl;
+  rt_sem_broadcast(&mysync);
 
-  //printf("\nType CTRL-C to end this program\n\n" );
-  //pause();
+  printf("\nType CTRL-C to end this program\n\n" );
 
+  struct sigaction sigIntHandler;
+
+  sigIntHandler.sa_handler = my_handler;;
+  sigemptyset(&sigIntHandler.sa_mask);
+  sigIntHandler.sa_flags = 0;
+
+  sigaction(SIGINT, &sigIntHandler, NULL);
+
+  pause();
+
+/*  sleep(1);
+
+  cout<<"stop up all tasks\n"<<endl;
+  for (auto taskInfo = tasl->tasksInfosList.begin(); taskInfo != tasl->tasksInfosList.end(); ++taskInfo)
+  {
+
+           RT_TASK_INFO curtaskinfo;
+           rt_task_inquire(taskInfo->task, &curtaskinfo);
+           kill(curtaskinfo.pid,SIGINT);
+           printf("Caught signal killed %s\n",taskInfo->name);
+    }
+   for (auto taskInfo = tasl->tasksInfosList.begin(); taskInfo != tasl->tasksInfosList.end(); ++taskInfo)
+   {
+           printf("Caught signal %s\n",taskInfo->name);
+           printf("Average runtime %f ms\n",taskInfo->average_runtime/ 1.0e6);
+           printf("Max runtime %f ms\n",taskInfo->max_runtime/ 1.0e6);
+           printf("Min runtime %f ms\n",taskInfo->min_runtime/ 1.0e6);
+           printf(" dead_line  %f ms \n",taskInfo->deadline / 1.0e6);
+           printf("Out of dead_line  %d\n",taskInfo->out_deadline);
+
+  }
+   exit(0);*/
   return return_code;
 }
