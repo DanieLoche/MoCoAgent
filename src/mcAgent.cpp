@@ -11,7 +11,7 @@ MCAgent::MCAgent(void *arg)
 
   systemRTInfo* sInfos = (systemRTInfo*) arg;
   //TasksInformations = rtTI;
-  displayInformations();
+  displayInformations(sInfos->rtTIs);
 
   runtimeMode = MODE_NOMINAL;
 
@@ -31,10 +31,10 @@ MCAgent::MCAgent(void *arg)
     }
 }
 
-void initMoCoAgent(std::vector<rtTaskInfosStruct>* sInfos)
+void MCAgent::initMoCoAgent(systemRTInfo* sInfos)
 {
-  setAllDeadlines(sInfos->e2eDD);
-  setAllTasks(sInfos->rtTIs);
+  setAllDeadlines(*sInfos->e2eDD);
+  setAllTasks(*sInfos->rtTIs);
 }
 
 
@@ -56,11 +56,11 @@ int MCAgent::checkTasks()
 *           liste d' ID de chaines de tâche avec e2e deadline associées
 * @returns : /
 ***********************/
-void MCAgent::setAllTaskDeadlines(std::vector<end2endDeadlineStruct> _tcDeadlineStructs)
+void MCAgent::setAllDeadlines(std::vector<end2endDeadlineStruct> _tcDeadlineStructs)
 {
   for (auto& tcDeadlineStruct : _tcDeadlineStructs)
   {
-    taskChain tc = new taskChain(tcDeadlineStruct);
+    taskChain tc(tcDeadlineStruct);
     allTaskChain.push_back(tc);
   }
 }
@@ -70,14 +70,14 @@ void MCAgent::setAllTasks(std::vector<rtTaskInfosStruct> _TasksInfos)
 {
   for (auto& _taskInfo : _TasksInfos)
   {
-    bool idFound = FALSE;
+    bool idFound = 0;
     for (auto& _taskChain : allTaskChain)
     {
-      if (_taskInfo->isHardRealTime == _taskChain->id)
+      if (_taskInfo.isHardRealTime == _taskChain.id)
       {
-        taskMonitoringStruct tms = new taskMonitoringStruct(_taskInfo);
+        taskMonitoringStruct tms(_taskInfo);
         _taskChain.taskChainList.push_back(tms);
-        idFound == TRUE;
+        idFound = 1;
       }
       if (idFound)  return;
     }
@@ -101,9 +101,9 @@ void MCAgent::setMode(int mode)
 * Fonction de débug pour afficher
 * les informations de toutes les tâches reçues.
 * @params : [ vect<rtTaskInfosStruct>* TasksInformations ]
-* @returns : cout.
+* @returns : cout
 ***********************/
-void MCAgent::displayInformations()
+void MCAgent::displayInformations(std::vector<rtTaskInfosStruct>* TasksInformations)
 {
   #if VERBOSE_INFO
   for (auto &taskInfo : *TasksInformations)
@@ -120,7 +120,7 @@ void MCAgent::displayInformations()
 
 taskChain::taskChain(end2endDeadlineStruct _tcDeadline)
 {
-  id = _tcDeadline.id;
+  id = _tcDeadline.taskChainID;
   end2endDeadline = _tcDeadline.deadline;
   slackTime = 0;
 }
@@ -137,7 +137,7 @@ taskMonitoringStruct::taskMonitoringStruct(rtTaskInfosStruct rtTaskInfos)
   deadline = rtTaskInfos.deadline;
   rwcet = rtTaskInfos.deadline;
 
-  isExecuted = FALSE;
+  isExecuted = 0;
   execTime = 0;
 }
 

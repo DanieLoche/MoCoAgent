@@ -39,10 +39,11 @@ class MCAgent
   public :
     MCAgent(void* arg);
 
-    void initMoCoAgent(std::vector<rtTaskInfosStruct>* sInfos);
-    void displayInformations();
+    void initMoCoAgent(systemRTInfo* sInfos);
     int checkTasks();
     void setAllDeadlines(std::vector<end2endDeadlineStruct> _tcDeadlineStructs);
-    void setAllTasks(std::vector<rtTaskInfosStruct>* _TasksInfos);
+    void setAllTasks(std::vector<rtTaskInfosStruct> _TasksInfos);
     void setMode(int mode);
+    void displayInformations(std::vector<rtTaskInfosStruct>* TasksInformations);
+
 };
