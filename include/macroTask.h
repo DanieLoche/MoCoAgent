@@ -1,4 +1,5 @@
 #include "tools.h"
+#include <algorithm>
 
 class MacroTask
 {
@@ -18,7 +19,7 @@ class MacroTask
     int after();
 
   public :
-    rtTaskInfosStruct properties;
+    rtTaskInfosStruct* properties;
 
     MacroTask();
     void executeRun(RT_SEM* mysync);

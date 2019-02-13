@@ -9,10 +9,14 @@
 #include <vector>
 #include <algorithm>
 #include <unistd.h>
+#include <signal.h>
+#include <cstdlib>
 
 #include <alchemy/task.h>
 #include <alchemy/sem.h>
 #include <alchemy/timer.h>
+
+
 
 
 using std::string;
@@ -29,9 +33,15 @@ struct rtTaskInfosStruct
 
     bool isHardRealTime;
     int  periodicity;
-    int  deadline;
+    RTIME  deadline;
     int  affinity;
+    RTIME average_runtime;
+    RTIME max_runtime;
+    RTIME min_runtime;
+    int  out_deadline;
 } ;
+
+
 
 /* To create a task :
  * Arguments : &task,
