@@ -1,0 +1,2 @@
+name path isHRT periodicity deadline affinity
+exe1S /null 1 10 50 3

@@ -5,6 +5,7 @@
 #include "mcAgent.h"
 #include "macroTask.h"
 #include "taskLauncher.h"
+#include "buildSet.h"
 
 
 #define EXECTIME   2e8   // execution time in ns
@@ -93,6 +94,18 @@ void my_handler(int s){
 
 int main(int argc, char* argv[])
 {
+  // POUR TEST EN ATTENDANT LA LISTE D'ENTREE
+  std::vector<string> long_task;
+  std::vector<string> short_task;
+
+  for (int i = 0; i<10; i++) {
+    std::string l = "exe" + std::to_string(i+1) + "L";
+    std::string s = "exe" + std::to_string(i+1) + "S";
+    long_task.push_back(l);
+    short_task.push_back(s);
+  }
+  /////////////////////////////////////////////////////
+
   rt_sem_create(&mysync,"MySemaphore",0,S_FIFO);
 
   //rt_task_set_mode(0,XNRRB,NULL);
@@ -101,8 +114,27 @@ int main(int argc, char* argv[])
   nproc = get_nprocs();
   // get input file, either indicated by user as argument or default location
   string input_file;
+  string task_file;
+
   if (argc > 1) input_file = argv[1];
   else input_file = "./input.txt";
+  if (argc > 2) task_file = argv[2];
+  else task_file = "./tasks.txt";
+
+  buildSet bS;
+
+  // Définition des listes comportant les tâches longue et courte
+  std::vector<string> all_crit_tasks = bS.distributionCrit(long_task, short_task, 8, 4, 80);
+
+  // Définition des tâches non critiques choisies
+  std::vector<string> uncrit_tasks = bS.get_uncrit_tasks();
+
+  // Récupération infos tâches
+  std::vector<rtTaskInfosStruct> info_task = bS.get_infos_tasks(task_file);
+
+  // Edition du fichier input.txt
+  bS.buildInput();
+
 
   TaskLauncher tln(input_file);
   //tln.tasksInfos = readTasksList(input_file);

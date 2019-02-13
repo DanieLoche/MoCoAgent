@@ -1,5 +1,13 @@
-name          path      isRT  periodicity  deadline  affinity  priority   parameters
-basi0       ./basicmath_small    1     5           100         8
-basi1       ./basicmath_small    0     20           400        2
-basi2       ./basicmath_small    0     20           400        2
-//exe3        /null/    0     100          80        4
+name path isHRT periodicity deadline affinity
+exe2L /null/ 1 20 60 2
+exe3L /null/ 1 30 70 3
+exe1S /null/ 1 10 50 3
+exe10S /null/ 1 40 100 4
+exe6L /null/ 1 20 60 6
+exe4S /null/ 1 40 100 6
+exe8L /null/ 1 40 100 8
+exe1L /null/ 1 10 50 1
+exe10L /null/ 1 40 100 2
+exe4L /null/ 0 40 100 4
+exe7L /null/ 0 30 70 7
+exe7S /null/ 0 30 70 1
