@@ -35,8 +35,6 @@ void MCAgent::initMoCoAgent(systemRTInfo* sInfos)
 {
   setAllDeadlines(*sInfos->e2eDD);
   setAllTasks(*sInfos->rtTIs);
-<<<<<<< HEAD
-=======
 }
 
 
@@ -50,7 +48,6 @@ int MCAgent::checkTasks()
     }
   }
   return 0;
->>>>>>> 04353966915521c4d2abb16bb5899412d9438841
 }
 
 /***********************
@@ -79,7 +76,6 @@ void MCAgent::setAllTasks(std::vector<rtTaskInfosStruct> _TasksInfos)
 {
   for (auto& _taskInfo : _TasksInfos)
   {
-<<<<<<< HEAD
     bool idFound = 0;   // Opti. pour éviter de continuer à boucler si on a trouvé la chaine
     for (auto& _taskChain : allTaskChain)
     {
@@ -90,13 +86,6 @@ void MCAgent::setAllTasks(std::vector<rtTaskInfosStruct> _TasksInfos)
       }
       else if ( _taskInfo.isHardRealTime == _taskChain.id )
       {
-=======
-    bool idFound = 0;
-    for (auto& _taskChain : allTaskChain)
-    {
-      if (_taskInfo.isHardRealTime == _taskChain.id)
-      {
->>>>>>> 04353966915521c4d2abb16bb5899412d9438841
         taskMonitoringStruct tms(_taskInfo);
         _taskChain.taskChainList.push_back(tms);
         idFound = 1;
@@ -148,17 +137,10 @@ void MCAgent::setMode(int mode)
 /***********************
 * Fonction de débug pour afficher
 * les informations de toutes les tâches reçues.
-<<<<<<< HEAD
 * @params : [ systemRTInfo sInfos ]
 * @returns : cout
 ***********************/
 void MCAgent::displaySystemInfo(systemRTInfo* sInfos)
-=======
-* @params : [ vect<rtTaskInfosStruct>* TasksInformations ]
-* @returns : cout
-***********************/
-void MCAgent::displayInformations(std::vector<rtTaskInfosStruct>* TasksInformations)
->>>>>>> 04353966915521c4d2abb16bb5899412d9438841
 {
   #if VERBOSE_INFO
   cout << "INPUT Informations : ";
@@ -178,14 +160,11 @@ void MCAgent::displayInformations(std::vector<rtTaskInfosStruct>* TasksInformati
   }
   #endif
 
-<<<<<<< HEAD
-=======
 taskChain::taskChain(end2endDeadlineStruct _tcDeadline)
 {
   id = _tcDeadline.taskChainID;
   end2endDeadline = _tcDeadline.deadline;
   slackTime = 0;
->>>>>>> 04353966915521c4d2abb16bb5899412d9438841
 }
 
 /***********************

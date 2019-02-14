@@ -43,13 +43,8 @@ struct rtTaskInfosStruct
 
 struct systemRTInfo
 {
-<<<<<<< HEAD
   std::vector<end2endDeadlineStruct>* e2eDD;
   std::vector<rtTaskInfosStruct>* rtTIs;
-=======
-  std::vector< end2endDeadlineStruct >* e2eDD;
-  std::vector< rtTaskInfosStruct     >* rtTIs;
->>>>>>> 04353966915521c4d2abb16bb5899412d9438841
 };
 
 
