@@ -154,17 +154,17 @@ void TaskLauncher::runTasks( )
 
   for (auto& taskInfo : tasksInfosList)
   {
-      period = taskInfo.periodicity*1e8 ;
+      period = taskInfo.periodicity*1e6 ;
       rt_task_set_periodic(taskInfo.task, starttime, period);
 
       rt_task_inquire(taskInfo.task, &curtaskinfo);
       struct sched_attr para;
 
-      para.sched_policy = SCHED_RR;
+      para.sched_policy = SCHED_FIFO;
       para.sched_flags= SCHED_FLAG_RESET_ON_FORK	;
       //para.sched_runtime= 2e8;
-      //para.sched_deadline=(i+1)*3e8;
-      //para.sched_period = 1e9;
+      //para.sched_deadline=taskInfo.deadline;
+      //para.sched_period = period;
       para.sched_priority = 50 ;
       para.size=sizeof(sched_attr);
 

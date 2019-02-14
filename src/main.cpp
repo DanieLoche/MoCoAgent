@@ -84,6 +84,8 @@ void my_handler(int s){
            printf("Min runtime %f ms\n",taskInfo->min_runtime/ 1.0e6);
            printf(" dead_line  %f ms \n",taskInfo->deadline / 1.0e6);
            printf("Out of dead_line  %d\n",taskInfo->out_deadline);
+           printf("Number of executions  %d\n",taskInfo->num_of_times);
+
 
   }
    exit(1);
@@ -138,7 +140,7 @@ int main(int argc, char* argv[])
   //tln.tasksInfos = readTasksList(input_file);
   tln.printTasksInfos();
   tln.runTasks();
-  //tasl=&tln;
+  tasl=&tln;
 
   //sleeping the time that all tasks will be started
   usleep(1000000);
@@ -146,6 +148,7 @@ int main(int argc, char* argv[])
   rt_sem_broadcast(&mysync);
 
   printf("\nType CTRL-C to end this program\n\n" );
+
 
   struct sigaction sigIntHandler;
 

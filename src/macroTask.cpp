@@ -24,85 +24,59 @@ void MacroTask::proceed(RT_SEM* mysync)
   properties->max_runtime =0;
   properties->min_runtime =1e9;
   properties->out_deadline=0;
+  properties->num_of_times=0;
   Somme =0;
   //cout << "path :" << properties.path << "." << endl;
   properties->average_runtime =0;
   runtime= 0;
-  int num =0;
+  int cpt =0;
   rt_sem_p(mysync,TM_INFINITE);
 
   while (1) {
       // let the task run RUNTIME ns in steps of SPINTIME ns
       time = 0;
-     starttime = rt_timer_read();
-/*
-     while(time < EXECTIME) {
-       rt_timer_spin(SPINTIME);  // spin cpu doing nothing
-       time = time + SPINTIME;
-       cout<<"Running Task  :"<< properties->name <<"at time : "<<time<<endl ;
-       //printf("Running Task  : %s  at time : %lld \n",properties->name,time);
-     }
-     printf("End Task  : %s\n",properties->name);
-*/   char* cmd;
+      starttime = rt_timer_read();
+      /*
+      while(time < EXECTIME) {
+      rt_timer_spin(SPINTIME);  // spin cpu doing nothing
+      time = time + SPINTIME;
+      cout<<"Running Task  :"<< properties->name <<"at time : "<<time<<endl ;
+      //printf("Running Task  : %s  at time : %lld \n",properties->name,time);
+      }
+      printf("End Task  : %s\n",properties->name);
+      */   char* cmd;
       if (properties->path != "/null/")
-       {
-<<<<<<< HEAD
-         cmd = properties->path;
-         //cmd.append(properties->name);
-         system(cmd.c_str());
-=======
+      {
+          cmd = &properties->path[0u];
+          cout << properties->name << endl;
+          system(cmd);
+          cmd = "";
+      }
+      else cout << properties->name <<"Oups, no valid path found !" << endl;
 
-         cmd = &properties->path[0u];
-         cout << properties->name << endl;
-         system(cmd);
-         cout << cmd << endl;
-         cmd = "";
-         cout << cmd << endl;
->>>>>>> 2d3126efcce9ec63f1b91e8b00cea7afc7ada780
-       }
-       else cout << properties->name <<"Oups, no valid path found !" << endl;
+      endtime = rt_timer_read();
 
-     endtime = rt_timer_read();
+      runtime =  (endtime - starttime)  ;
 
-     runtime =  (endtime - starttime)  ;
+      Somme += runtime;
+      cpt += 1;
+      properties->average_runtime =Somme/cpt;
+      properties->max_runtime = std::max(runtime,properties->max_runtime );
+      properties->min_runtime = std::min(runtime,properties->min_runtime );
+      properties->num_of_times=cpt;
 
-     Somme += runtime;
-     num += 1;
-     properties->max_runtime = std::max(runtime,properties->max_runtime );
+      if(runtime <= properties->deadline ){
+          printf("Task  : %s within deadline\n",properties->name);
+      }else{
+          printf("Task  : %s out of  deadline\n",properties->name);
+          properties->out_deadline += 1;
+      }
 
-     properties->min_runtime = std::min(runtime,properties->min_runtime );
-     properties->average_runtime =Somme/num;
-
-
-     if(runtime <= properties->deadline ){
-       printf("Task  : %s within deadline\n",properties->name);
-     }else{
-       printf("Task  : %s out of  deadline\n",properties->name);
-       properties->out_deadline += 1;
-     }
-
-     rt_task_wait_period(NULL);
+      rt_task_wait_period(NULL);
 
   }
     printf("End Task  : %s\n",properties->name);
-/*
-    while(time < EXECTIME) {
-      rt_timer_spin(SPINTIME);  // spin cpu doing nothing
-      time = time + SPINTIME;
-      //cout<<"Running Task  :"<< properties.name <<"at time : "<<runtime<<endl ;
-      printf("Running Task  : %s  at time : %lld \n",properties->name,time);
-    }
-    printf("End Task  : %s\n",properties->name);
 
-*/
-      /*  if (properties.path != "/null/")
-        {
-          cmd = &properties.path[0u];
-          system(cmd);
-        }
-        else cout << properties.name <<"Oups, no valid path found !" << endl;
-
-        */
 }
 
 int MacroTask::after()
