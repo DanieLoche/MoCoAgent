@@ -151,11 +151,11 @@ void TaskLauncher::runTasks( )
       rt_task_inquire(taskInfo.task, &curtaskinfo);
       struct sched_attr para;
 
-      para.sched_policy = SCHED_FIFO;
+      para.sched_policy = SCHED_RR;
       para.sched_flags= SCHED_FLAG_RESET_ON_FORK	;
       //para.sched_runtime= 2e8;
-      //para.sched_deadline=taskInfo.deadline;
-      //para.sched_period = period;
+      //para.sched_deadline=(i+1)*3e8;
+      //para.sched_period = 1e9;
       para.sched_priority = 50 ;
       para.size=sizeof(sched_attr);
 
