@@ -50,10 +50,18 @@ class MCAgent
     std::vector<RT_TASK> bestEffortTasks;
 
     void initMoCoAgent(systemRTInfo* sInfos);
+<<<<<<< HEAD
     void setAllDeadlines(std::vector<end2endDeadlineStruct> _tcDeadlineStructs);
     void setAllTasks(std::vector<rtTaskInfosStruct> _TasksInfos);
     int checkTasks();
     void setMode(int mode);
     void displaySystemInfo(systemRTInfo* sInfos);
+=======
+    int checkTasks();
+    void setAllDeadlines(std::vector<end2endDeadlineStruct> _tcDeadlineStructs);
+    void setAllTasks(std::vector<rtTaskInfosStruct> _TasksInfos);
+    void setMode(int mode);
+    void displayInformations(std::vector<rtTaskInfosStruct>* TasksInformations);
+>>>>>>> 04353966915521c4d2abb16bb5899412d9438841
 
 };
