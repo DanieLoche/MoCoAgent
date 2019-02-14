@@ -11,8 +11,6 @@
 #define EXECTIME   2e8   // execution time in ns
 #define SPINTIME   1e7   // spin time in ns
 
-
-
 long nproc;
 RT_SEM mysync;
 TaskLauncher* tasl;
@@ -140,7 +138,7 @@ int main(int argc, char* argv[])
   //tln.tasksInfos = readTasksList(input_file);
   tln.printTasksInfos();
   tln.runTasks();
-  tasl=&tln;
+  //tasl=&tln;
 
   //sleeping the time that all tasks will be started
   usleep(1000000);

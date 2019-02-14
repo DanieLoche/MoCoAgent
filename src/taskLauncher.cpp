@@ -186,9 +186,9 @@ void TaskLauncher::set_affinity (RT_TASK* task, int _aff)
   cpu_set_t mask;
   CPU_ZERO(&mask);
   CPU_SET(_aff, &mask);
-  /*RT_TASK_INFO tsk_infos;
-  rt_task_inquire(0, &tsk_infos);*/
-  cout << "Setting affinity :" << rt_task_set_affinity(task, &mask) << endl;
+  RT_TASK_INFO curtaskinfo;
+  rt_task_inquire(task, &curtaskinfo);
+  cout << "Setting affinity for task " << curtaskinfo.name << " : CPU" << rt_task_set_affinity(task, &mask) << endl;
 }
 
 void TaskLauncher::printTasksInfos (/* std::vector<rtTaskInfosStruct> _myTasksInfos*/)

@@ -19,7 +19,7 @@ int MacroTask::before()
 
 void MacroTask::proceed(RT_SEM* mysync)
 {
-  string cmd;
+
   RTIME starttime, runtime,endtime,time,Somme;
   properties->max_runtime =0;
   properties->min_runtime =1e9;
@@ -43,12 +43,22 @@ void MacroTask::proceed(RT_SEM* mysync)
        //printf("Running Task  : %s  at time : %lld \n",properties->name,time);
      }
      printf("End Task  : %s\n",properties->name);
-*/
+*/   char* cmd;
       if (properties->path != "/null/")
        {
+<<<<<<< HEAD
          cmd = properties->path;
          //cmd.append(properties->name);
          system(cmd.c_str());
+=======
+
+         cmd = &properties->path[0u];
+         cout << properties->name << endl;
+         system(cmd);
+         cout << cmd << endl;
+         cmd = "";
+         cout << cmd << endl;
+>>>>>>> 2d3126efcce9ec63f1b91e8b00cea7afc7ada780
        }
        else cout << properties->name <<"Oups, no valid path found !" << endl;
 
