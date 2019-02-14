@@ -17,8 +17,6 @@
 #include <alchemy/timer.h>
 
 
-
-
 using std::string;
 using std::cout;
 using std::endl;

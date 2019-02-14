@@ -121,7 +121,7 @@ int main(int argc, char* argv[])
   if (argc > 2) task_file = argv[2];
   else task_file = "./sorted.txt";
 
-  /* buildSet bS;
+  buildSet bS;
 
   // Définition des listes comportant les tâches longue et courte
   std::vector<string> all_crit_tasks = bS.distributionCrit(4, 2, 50);
@@ -135,8 +135,7 @@ int main(int argc, char* argv[])
   // Edition du fichier input.txt
   bS.buildInput();
 
-  */
-  
+
   TaskLauncher tln(input_file);
   //tln.tasksInfos = readTasksList(input_file);
   tln.printTasksInfos();
