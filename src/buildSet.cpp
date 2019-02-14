@@ -201,8 +201,8 @@ std::vector<string> buildSet::get_uncrit_tasks() {
       // Parcours de l'ensemble des tâches critques
       if (long_choosen_task[i] == all_crit_tasks[j]) {
         // Si tâche est dans liste tache critique
-        break;
         var_test_in = 1;
+        break;
       }
 
     }
@@ -266,7 +266,7 @@ void buildSet::buildInput() {
           // Parcours de toutes les tâches lues dans tasks.txt
 
           if (all_crit_tasks[i] == taskInfo->name) {
-            myFile << taskInfo->name << " " << taskInfo->path << " 1 " << taskInfo->periodicity << " " << taskInfo->deadline << " " << taskInfo->affinity << endl;
+            myFile << taskInfo->name << " " << taskInfo->path << taskInfo->name  << " 1 " << taskInfo->periodicity << " " << taskInfo->deadline << " " << taskInfo->affinity << endl;
           }
         }
       }
@@ -279,7 +279,7 @@ void buildSet::buildInput() {
           // Parcours de toutes les tâches lues dans tasks.txt
 
           if (uncrit_tasks[i] == taskInfo->name) {
-            myFile << taskInfo->name << " " << taskInfo->path << " 0 " << taskInfo->periodicity << " " << taskInfo->deadline << " " << taskInfo->affinity << endl;
+            myFile << taskInfo->name << " " << taskInfo->path << taskInfo->name << " 0 " << taskInfo->periodicity << " " << taskInfo->deadline << " " << taskInfo->affinity << endl;
           }
         }
       }
