@@ -46,11 +46,6 @@ void MacroTask::proceed(RT_SEM* mysync)
 */   char* cmd;
       if (properties->path != "/null/")
        {
-<<<<<<< HEAD
-         cmd = properties->path;
-         //cmd.append(properties->name);
-         system(cmd.c_str());
-=======
 
          cmd = &properties->path[0u];
          cout << properties->name << endl;
@@ -58,7 +53,7 @@ void MacroTask::proceed(RT_SEM* mysync)
          cout << cmd << endl;
          cmd = "";
          cout << cmd << endl;
->>>>>>> 2d3126efcce9ec63f1b91e8b00cea7afc7ada780
+
        }
        else cout << properties->name <<"Oups, no valid path found !" << endl;
 

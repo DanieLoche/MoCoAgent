@@ -147,6 +147,9 @@ int main(int argc, char* argv[])
 
   printf("\nType CTRL-C to end this program\n\n" );
 
+  signal(SIGINT,my_handler);
+
+  /*
   struct sigaction sigIntHandler;
 
   sigIntHandler.sa_handler = my_handler;;
@@ -154,7 +157,7 @@ int main(int argc, char* argv[])
   sigIntHandler.sa_flags = 0;
 
   sigaction(SIGINT, &sigIntHandler, NULL);
-
+  */
   pause();
 
 
