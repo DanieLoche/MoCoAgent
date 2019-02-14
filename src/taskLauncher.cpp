@@ -28,7 +28,6 @@ std::vector<rtTaskInfosStruct> TaskLauncher::readTasksList(string input_file)
   {
       rtTaskInfosStruct taskInfo;
       std::istringstream iss(str);
-      string token;
       #if VERBOSE_ASK
       cout << "Managing line : " << str << endl;
       #endif

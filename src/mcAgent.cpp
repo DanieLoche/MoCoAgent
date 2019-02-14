@@ -11,12 +11,12 @@ MCAgent::MCAgent(void *arg)
 
   systemRTInfo* sInfos = (systemRTInfo*) arg;
   //TasksInformations = rtTI;
-  displayInformations();
+  displayInformations(sInfos->rtTIs);
 
   runtimeMode = MODE_NOMINAL;
+  displaySystemInfo(sInfos);
 
   initMoCoAgent(sInfos);
-
     while(false)
     {
       if (runtimeMode == MODE_OVERLOADED)
@@ -31,10 +31,56 @@ MCAgent::MCAgent(void *arg)
     }
 }
 
-void initMoCoAgent(std::vector<rtTaskInfosStruct>* sInfos)
+void MCAgent::initMoCoAgent(systemRTInfo* sInfos)
 {
-  setAllDeadlines(sInfos->e2eDD);
-  setAllTasks(sInfos->rtTIs);
+  setAllDeadlines(*sInfos->e2eDD);
+  setAllTasks(*sInfos->rtTIs);
+}
+
+/***********************
+* Création des différentes chaines de tâche avec e2e deadline associée
+* @params : std::vector<end2endDeadlineStruct> _tcDeadlineStructs
+*           liste d' ID de chaines de tâche avec e2e deadline associées
+* @returns : /
+***********************/
+void MCAgent::setAllDeadlines(std::vector<end2endDeadlineStruct> _tcDeadlineStructs)
+{
+  for (auto& tcDeadlineStruct : _tcDeadlineStructs)
+  {
+    taskChain tc(tcDeadlineStruct);
+    allTaskChain.push_back(tc);
+  }
+}
+
+/***********************
+* Ajout des tâches critiques aux Tasks Chains
+* Les tâches sont parcourues et ajoutées à leur groupe.
+* @params : std::vector<rtTaskInfosStruct> _TasksInfos
+*           liste des tâches d'entrée.
+* @returns : /
+***********************/
+void MCAgent::setAllTasks(std::vector<rtTaskInfosStruct> _TasksInfos)
+{
+  for (auto& _taskInfo : _TasksInfos)
+  {
+    bool idFound = 0;   // Opti. pour éviter de continuer à boucler si on a trouvé la chaine
+    for (auto& _taskChain : allTaskChain)
+    {
+      if ( !_taskChain.isHardRealTime )
+      {
+        bestEffortTasks.push_back(_taskChain.task);
+        idFound = 1;
+      }
+      else if ( _taskInfo.isHardRealTime == _taskChain.id )
+      {
+        taskMonitoringStruct tms(_taskInfo);
+        _taskChain.taskChainList.push_back(tms);
+        idFound = 1;
+      }
+
+      if (idFound) return;
+    }
+  }
 }
 
 
@@ -51,40 +97,6 @@ int MCAgent::checkTasks()
 }
 
 /***********************
-* Création des différentes chaines de tâche avec e2e deadline associée
-* @params : std::vector<end2endDeadlineStruct> _tcDeadlineStructs
-*           liste d' ID de chaines de tâche avec e2e deadline associées
-* @returns : /
-***********************/
-void MCAgent::setAllTaskDeadlines(std::vector<end2endDeadlineStruct> _tcDeadlineStructs)
-{
-  for (auto& tcDeadlineStruct : _tcDeadlineStructs)
-  {
-    taskChain tc = new taskChain(tcDeadlineStruct);
-    allTaskChain.push_back(tc);
-  }
-}
-
-
-void MCAgent::setAllTasks(std::vector<rtTaskInfosStruct> _TasksInfos)
-{
-  for (auto& _taskInfo : _TasksInfos)
-  {
-    bool idFound = FALSE;
-    for (auto& _taskChain : allTaskChain)
-    {
-      if (_taskInfo->isHardRealTime == _taskChain->id)
-      {
-        taskMonitoringStruct tms = new taskMonitoringStruct(_taskInfo);
-        _taskChain.taskChainList.push_back(tms);
-        idFound == TRUE;
-      }
-      if (idFound)  return;
-    }
-  }
-}
-
-/***********************
 * Passage du système en mode :
 * MODE_NOMINAL : Toutes les tâches passent.
 * MODE_OVERLOADED : Les tâches BE ne sont pas lancées.
@@ -94,35 +106,47 @@ void MCAgent::setAllTasks(std::vector<rtTaskInfosStruct> _TasksInfos)
 void MCAgent::setMode(int mode)
 {
   runtimeMode = mode;
+  for (auto bestEffortTask : bestEffortTasks)
+  {
+      if (runtimeMode == MODE_OVERLOADED)
+      {
+        // Pause Best Effort Tasks;
+        // Publier message pour dire à stopper ??
+      }
+      else // runtimeMode NOMINAL
+      {
+        // relancer Best Effort Tasks;
+      }
+  }
 
 }
 
 /***********************
 * Fonction de débug pour afficher
 * les informations de toutes les tâches reçues.
-* @params : [ vect<rtTaskInfosStruct>* TasksInformations ]
-* @returns : cout.
+* @params : [ systemRTInfo sInfos ]
+* @returns : cout
 ***********************/
-void MCAgent::displayInformations()
+void MCAgent::displaySystemInfo(systemRTInfo* sInfos)
 {
   #if VERBOSE_INFO
-  for (auto &taskInfo : *TasksInformations)
+  cout << "INPUT Informations : ";
+  for (auto &taskdd : *sInfos->e2edd)
   {
-      cout << "Name: " << taskInfo.name
-          << "| path: " << taskInfo.path
-          << "| is RT ? " << taskInfo.isHardRealTime
-          << "| Period: " << taskInfo.periodicity
-          << "| Deadline: " << taskInfo.deadline
-          << "| affinity: " << taskInfo.affinity << endl;
+      cout << "Chain ID : " << taskdd.taskChainID
+          << "| Deadline : " << taskdd.deadline << endl;
+  }
+  for (auto &taskParam : *sInfos->rtTIs)
+  {
+      cout << "Name: "    << taskParam.name
+          << "| path: "   << taskParam.path
+          << "| is RT ? " << taskParam.isHardRealTime
+          << "| Period: " << taskParam.periodicity
+          << "| Deadline: " << taskParam.deadline
+          << "| affinity: " << taskParam.affinity << endl;
   }
   #endif
-}
 
-taskChain::taskChain(end2endDeadlineStruct _tcDeadline)
-{
-  id = _tcDeadline.id;
-  end2endDeadline = _tcDeadline.deadline;
-  slackTime = 0;
 }
 
 /***********************
@@ -137,8 +161,15 @@ taskMonitoringStruct::taskMonitoringStruct(rtTaskInfosStruct rtTaskInfos)
   deadline = rtTaskInfos.deadline;
   rwcet = rtTaskInfos.deadline;
 
-  isExecuted = FALSE;
+  isExecuted = 0;
   execTime = 0;
+}
+
+taskChain::taskChain(end2endDeadlineStruct _tcDeadline)
+{
+  id = _tcDeadline.taskChainID;
+  end2endDeadline = _tcDeadline.deadline;
+  slackTime = 0;
 }
 
 int taskChain::checkTaskE2E()

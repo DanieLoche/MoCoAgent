@@ -3,15 +3,14 @@
 class taskMonitoringStruct
 {
   public :
+    taskMonitoringStruct(rtTaskInfosStruct rtTaskInfos);
+
     RT_TASK* task;
-    double execTime;
+    double startTime;
+    double endTime;
     double deadline;
     bool isExecuted;
     double rwcet;
-
-    taskMonitoringStruct(rtTaskInfosStruct rtTaskInfos);
-    taskMonitoringStruct(RT_TASK* t, double d, double r)
-                          { task = t; deadline = d; rwcet = r;}
 
 };
 
@@ -19,30 +18,42 @@ class taskChain
 {
   public :
     taskChain(end2endDeadlineStruct _tcDeadline);
-    taskChain(int _id, double _deadline);
 
-    int id;
-    double end2endDeadline;
-    double slackTime;
+    int id;                // static
+    double startTime;
+    double currentEndTime;
+    static double offset;  // time to trigger the Control Agent
+    static double Wmax;    // next slice max time
+    double remWCET;
+    double end2endDeadline; // static
+    //double slackTime;
     std::vector<taskMonitoringStruct> taskChainList;
 
-    void setTaskChain(std::vector<rtTaskInfosStruct> rtTasks);
     int checkTaskE2E();
+    double getExecutionTime();
+    // to do : on a le startTime, et on update le endTime après chaque exécution
+    // a voir comment... ExecutionTime = end - start.
+    double getRemWCET();
+    // to do : On parcours toutes les tâches, on somme les deadlines
+    // de toutes les tâches non exécutées.
 };
 
 class MCAgent
 {
+  public :
+    MCAgent(void* arg);
+
   private :
     int runtimeMode;
     //std::vector<rtTaskInfosStruct>* TasksInformations;
     std::vector<taskChain> allTaskChain;
-  public :
-    MCAgent(void* arg);
+    std::vector<RT_TASK> bestEffortTasks;
 
-    void initMoCoAgent(std::vector<rtTaskInfosStruct>* sInfos);
-    void displayInformations();
-    int checkTasks();
+    void initMoCoAgent(systemRTInfo* sInfos);
     void setAllDeadlines(std::vector<end2endDeadlineStruct> _tcDeadlineStructs);
-    void setAllTasks(std::vector<rtTaskInfosStruct>* _TasksInfos);
+    void setAllTasks(std::vector<rtTaskInfosStruct> _TasksInfos);
+    int checkTasks();
     void setMode(int mode);
+    void displaySystemInfo(systemRTInfo* sInfos);
+
 };

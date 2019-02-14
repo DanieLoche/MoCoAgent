@@ -24,8 +24,8 @@ using std::cin;
 struct end2endDeadlineStruct
 {
   double deadline;
-  id taskChainID;
-}
+  int taskChainID;
+};
 
 struct rtTaskInfosStruct
 {
@@ -43,9 +43,9 @@ struct rtTaskInfosStruct
 
 struct systemRTInfo
 {
-  std::vector< end2endDeadlineStruct >* e2eDD;
-  std::vector< rtTaskInfosStruct     >* rtTIs;
-}
+  std::vector<end2endDeadlineStruct>* e2eDD;
+  std::vector<rtTaskInfosStruct>* rtTIs;
+};
 
 
 void printInquireInfo();
