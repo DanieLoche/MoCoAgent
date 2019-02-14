@@ -28,7 +28,7 @@ void MacroTask::proceed(RT_SEM* mysync)
   //cout << "path :" << properties.path << "." << endl;
   properties->average_runtime =0;
   runtime= 0;
-  int num =1;
+  int num =0;
   rt_sem_p(mysync,TM_INFINITE);
 
   while (1) {
@@ -47,8 +47,7 @@ void MacroTask::proceed(RT_SEM* mysync)
       if (properties->path != "/null/")
        {
          cmd = properties->path;
-         cmd.append(" ");
-         cmd.append(properties->name);
+         //cmd.append(properties->name);
          system(cmd.c_str());
        }
        else cout << properties->name <<"Oups, no valid path found !" << endl;
@@ -58,11 +57,12 @@ void MacroTask::proceed(RT_SEM* mysync)
      runtime =  (endtime - starttime)  ;
 
      Somme += runtime;
+     num += 1;
      properties->max_runtime = std::max(runtime,properties->max_runtime );
 
      properties->min_runtime = std::min(runtime,properties->min_runtime );
      properties->average_runtime =Somme/num;
-     num += 1;
+
 
      if(runtime <= properties->deadline ){
        printf("Task  : %s within deadline\n",properties->name);

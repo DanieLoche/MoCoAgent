@@ -1,7 +1,3 @@
 name path isHRT periodicity deadline affinity
-fft_large.sh /home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/telecomm/FFT/ 1 70 70 2
-basicmath_large.sh /home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/automotive/basicmath/ 1 70 70 2
-CRC32_large.sh /home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/telecomm/CRC32/ 1 70 70 2
-adpcm_large.sh /home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/telecomm/adpcm/ 0 70 70 8
-basicmath_large.sh /home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/automotive/basicmath/ 0 70 70 2
-CRC32_large.sh /home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/telecomm/CRC32/ 0 70 70 2
+basicmath_small.sh ./basic 1 70 70 8
+adpcm_large.sh ./basicmath_small 0 70 70 8

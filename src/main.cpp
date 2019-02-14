@@ -104,7 +104,7 @@ int main(int argc, char* argv[])
     long_task.push_back(l);
     short_task.push_back(s);
   }*/
-  /////////////////////////////////////////////////////
+
 
   rt_sem_create(&mysync,"MySemaphore",0,S_FIFO);
 
@@ -124,7 +124,7 @@ int main(int argc, char* argv[])
   buildSet bS;
 
   // Définition des listes comportant les tâches longue et courte
-  std::vector<string> all_crit_tasks = bS.distributionCrit(5, 1, 50);
+  std::vector<string> all_crit_tasks = bS.distributionCrit(1, 1, 50);
 
   // Définition des tâches non critiques choisies
   std::vector<string> uncrit_tasks = bS.get_uncrit_tasks();
@@ -150,7 +150,6 @@ int main(int argc, char* argv[])
   printf("\nType CTRL-C to end this program\n\n" );
 
   struct sigaction sigIntHandler;
-<<<<<<< HEAD
 
   sigIntHandler.sa_handler = my_handler;;
   sigemptyset(&sigIntHandler.sa_mask);
@@ -160,21 +159,10 @@ int main(int argc, char* argv[])
 
   pause();
 
-/*  sleep(1);
 
-=======
-
-  sigIntHandler.sa_handler = my_handler;;
-  sigemptyset(&sigIntHandler.sa_mask);
-  sigIntHandler.sa_flags = 0;
-
-  sigaction(SIGINT, &sigIntHandler, NULL);
-
-  pause();
 
 /*  sleep(1);
 
->>>>>>> fecac55fa38b8bc35cc13d9fe1bdca90bac9fc02
   cout<<"stop up all tasks\n"<<endl;
   for (auto taskInfo = tasl->tasksInfosList.begin(); taskInfo != tasl->tasksInfosList.end(); ++taskInfo)
   {
@@ -195,82 +183,7 @@ int main(int argc, char* argv[])
 
   }
    exit(0);*/
+
+
   return return_code;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-#define include define // TOUJOURS VERROUILLER SA SESSION !!!

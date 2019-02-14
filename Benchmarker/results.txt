@@ -206,3 +206,10 @@ Temps d'exécution max : 469 ms
 Temps d'exécution moyen : 447 ms
 
 ----------------------------
+Tâche basicmath_small.sh 
+Temps d'exécution min : 42 ms
+Temps d'exécution max : 44 ms
+Temps d'exécution moyen : 42.3 ms
+
+----------------------------
+

@@ -1,6 +1,6 @@
 name		        path		  isRT  periodicity  deadline  affinity  priority
 //basicmath_large.sh	/home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/automotive/basicmath/	1     70           70        8
-//basicmath_small.sh	/home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/automotive/basicmath/	1     70           70        8
+basicmath_small.sh	/home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/automotive/basicmath/	1     70           70        8
 //bitcount_large.sh  /home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/automotive/bitcount/ 1     70           70        8
 //bitcount_small.sh  /home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/automotive/bitcount/ 1     70           70        8
 //qsort_large.sh  /home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/automotive/qsort/ 1     70           70        8
@@ -10,7 +10,7 @@ name		        path		  isRT  periodicity  deadline  affinity  priority
 //jpeg_large.sh /home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/consumer/jpeg/  1     70           70        8
 //jpeg_small.sh /home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/consumer/jpeg/  1     70           70        8
 // OVERFLOW lame_large.sh /home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/consumer/lame/  1     70           70        8
-lame_small.sh /home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/consumer/lame/  1     70           70        8
+//lame_small.sh /home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/consumer/lame/  1     70           70        8
 // ERROR mad_large.sh  /home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/consumer/mad/ 1     70           70        8
 // ERROR mad_small.sh  /home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/consumer/mad/ 1     70           70        8
 // ERROR tiff2bw_large.sh  /home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/consumer/tiff2bw/ 1     70           70        8
