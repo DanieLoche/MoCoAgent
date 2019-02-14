@@ -95,16 +95,23 @@ void Sensibility_analyser(){
 */
 int main(int argc, char* argv[])
 {
-  // POUR TEST EN ATTENDANT LA LISTE D'ENTREE
-  /*std::vector<string> long_task;
-  std::vector<string> short_task;
 
-  for (int i = 0; i<10; i++) {
-    std::string l = "exe" + std::to_string(i+1) + "L";
-    std::string s = "exe" + std::to_string(i+1) + "S";
-    long_task.push_back(l);
-    short_task.push_back(s);
-  }*/
+  string input_file;
+  string task_file;
+  string asked;
+  std::cout << "Y a-t-il deja un fichier input que vous voulez utiliser ? [Y/N]" << '\n';
+  cin >> asked;
+  if (asked == "Y"){
+    std::cout << "Quel est le nom du fichier d'entree ?" << '\n';
+    cin >> input_file;
+  }
+  else if (asked == "N") {
+    input_file = "./input.txt";
+  }
+  else {
+    std::cout << "Pas de ca chez moi c'est Y ou N batard" << '\n';
+    return 3; // 3 == mauvaise réponse du fichier en entrée
+  }
 
   rt_sem_create(&mysync,"MySemaphore",0,S_FIFO);
 
@@ -113,8 +120,7 @@ int main(int argc, char* argv[])
   int return_code = 0;
   nproc = get_nprocs();
   // get input file, either indicated by user as argument or default location
-  string input_file;
-  string task_file;
+  int var_test_arg1 = 0;
 
   if (argc > 1) input_file = argv[1];
   else input_file = "./input.txt";
@@ -124,7 +130,7 @@ int main(int argc, char* argv[])
   buildSet bS;
 
   // Définition des listes comportant les tâches longue et courte
-  std::vector<string> all_crit_tasks = bS.distributionCrit(4, 2, 50);
+  std::vector<string> all_crit_tasks = bS.distributionCrit(4, 6, 80);
 
   // Définition des tâches non critiques choisies
   std::vector<string> uncrit_tasks = bS.get_uncrit_tasks();
@@ -133,8 +139,9 @@ int main(int argc, char* argv[])
   std::vector<rtTaskInfosStruct> info_task = bS.get_infos_tasks(task_file);
 
   // Edition du fichier input.txt
-  bS.buildInput();
+  if (argc > 1);
 
+  else bS.buildInput();
 
   TaskLauncher tln(input_file);
   //tln.tasksInfos = readTasksList(input_file);

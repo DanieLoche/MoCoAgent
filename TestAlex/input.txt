@@ -1,6 +1,11 @@
 name path isHRT periodicity deadline affinity
-stringsearch_large.sh /home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/office/stringsearch/stringsearch_large.sh 1 200 200 2
+gsm_small.sh /home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/telecomm/gsm/gsm_small.sh 1 200 200 2
 adpcm_large.sh /home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/telecomm/adpcm/adpcm_large.sh 1 1500 1500 6
+jpeg_small.sh /home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/consumer/jpeg/jpeg_small.sh 1 200 200 2
 patricia_large.sh /home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/network/patricia/patricia_large.sh 1 1000 1000 2
-CRC32_large.sh /home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/telecomm/CRC32/CRC32_large.sh 0 1500 1500 2
-basicmath_large.sh /home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/automotive/basicmath/basicmath_large.sh 0 1000 1000 2
+stringsearch_small.sh /home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/office/stringsearch/stringsearch_small.sh 1 200 200 2
+basicmath_large.sh /home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/automotive/basicmath/basicmath_large.sh 1 1000 1000 2
+CRC32_large.sh /home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/telecomm/CRC32/CRC32_large.sh 1 1500 1500 2
+qsort_small.sh /home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/automotive/qsort/qsort_small.sh 1 200 200 2
+stringsearch_large.sh /home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/office/stringsearch/stringsearch_large.sh 0 200 200 2
+typeset_small.sh /home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/consumer/typeset/typeset_small.sh 0 200 200 2

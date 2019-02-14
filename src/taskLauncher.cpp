@@ -165,7 +165,7 @@ void TaskLauncher::runTasks( )
       }
 
       //Starting
-      cout << "Task " << taskInfo.name << " started.at =" << starttime <<endl;
+      cout << "Task " << taskInfo.name << " started at = " << starttime <<endl;
       /*int rep =*/ rt_task_start(taskInfo.task, TaskMain, &taskInfo);
   }
 
@@ -177,6 +177,8 @@ void TaskLauncher::set_affinity (RT_TASK* task, int _aff)
   cpu_set_t mask;
   CPU_ZERO(&mask);
   CPU_SET(_aff, &mask);
+  cout << "affinity = " << _aff << endl;
+  cout << "mask = " << mask << endl;
   RT_TASK_INFO curtaskinfo;
   rt_task_inquire(task, &curtaskinfo);
   cout << "Setting affinity for task " << curtaskinfo.name << " : CPU" << rt_task_set_affinity(task, &mask) << endl;

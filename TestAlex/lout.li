@@ -1,0 +1,36 @@
+00 Basser Lout Version 3.24 (October 2000) database index file
+00symbol 1 @BasicSetup @DocumentSetup @TheoremCounterMarker
+00symbol 10 @BasicSetup @DocumentSetup @FigureCounterMarker
+00symbol 11 @BasicSetup @DocumentSetup @TablePrefixMarker
+00symbol 12 @BasicSetup @DocumentSetup @TableCounterMarker
+00symbol 13 @BasicSetup @PageMarker
+00symbol 14 @BasicSetup @DocumentSetup @FootNoteCounterMarker
+00symbol 15 @BasicSetup @DocumentSetup @Runner
+00symbol 2 @BasicSetup @DocumentSetup @DefinitionCounterMarker
+00symbol 3 @BasicSetup @DocumentSetup @ClaimCounterMarker
+00symbol 4 @BasicSetup @DocumentSetup @PropositionCounterMarker
+00symbol 5 @BasicSetup @DocumentSetup @LemmaCounterMarker
+00symbol 6 @BasicSetup @DocumentSetup @CorollaryCounterMarker
+00symbol 7 @BasicSetup @DocumentSetup @ExampleCounterMarker
+00symbol 8 @BasicSetup @NumDispCounterMarker
+00symbol 9 @BasicSetup @DocumentSetup @FigurePrefixMarker
+1&10.2599./home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/consumer/typeset/small.lout.1	0	00001	0	1	/home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/consumer/typeset/small.lout
+10&10.3502./home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/consumer/typeset/small.lout.1	0	00010	2050	105	/home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/consumer/typeset/small.lout
+11&10.3739./home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/consumer/typeset/small.lout.1	0	00011	2202	112	/home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/consumer/typeset/small.lout
+12&10.3747./home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/consumer/typeset/small.lout.1	0	00012	2351	119	/home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/consumer/typeset/small.lout
+13&7.1067./home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/consumer/typeset/small.lout.1	0	00013	2502	126	/home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/consumer/typeset/small.lout
+13&7.1067./home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/consumer/typeset/small.lout.2	0	00016	3141	164	/home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/consumer/typeset/small.lout
+13&last.page	0	00020	3141	164	/home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/consumer/typeset/small.lout
+14&10.1381./home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/consumer/typeset/small.lout.1	0	00014	2855	151	/home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/consumer/typeset/small.lout
+14&10.1381./home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/consumer/typeset/small.lout.2	0	00017	3376	178	/home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/consumer/typeset/small.lout
+15&10.796./home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/consumer/typeset/small.lout.1	0	00019	3665	191	/home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/consumer/typeset/small.lout
+15&10.796./home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/consumer/typeset/small.lout.2	0	00015	3009	158	/home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/consumer/typeset/small.lout
+15&10.796./home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/consumer/typeset/small.lout.3	0	00018	3530	185	/home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/consumer/typeset/small.lout
+2&10.2658./home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/consumer/typeset/small.lout.1	0	00002	326	20	/home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/consumer/typeset/small.lout
+3&10.2713./home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/consumer/typeset/small.lout.1	0	00003	544	30	/home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/consumer/typeset/small.lout
+4&10.2768./home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/consumer/typeset/small.lout.1	0	00004	752	40	/home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/consumer/typeset/small.lout
+5&10.2823./home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/consumer/typeset/small.lout.1	0	00005	972	50	/home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/consumer/typeset/small.lout
+6&10.2878./home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/consumer/typeset/small.lout.1	0	00006	1180	60	/home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/consumer/typeset/small.lout
+7&10.2933./home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/consumer/typeset/small.lout.1	0	00007	1396	70	/home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/consumer/typeset/small.lout
+8&7.1249./home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/consumer/typeset/small.lout.1	0	00008	1608	80	/home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/consumer/typeset/small.lout
+9&10.3494./home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/consumer/typeset/small.lout.1	0	00009	1900	98	/home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/consumer/typeset/small.lout
