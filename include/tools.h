@@ -37,6 +37,7 @@ struct rtTaskInfosStruct
     RTIME max_runtime;
     RTIME min_runtime;
     int  out_deadline;
+    int  num_of_times;
 } ;
 
 
