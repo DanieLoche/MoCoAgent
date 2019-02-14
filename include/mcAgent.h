@@ -22,8 +22,6 @@ class taskChain
     int id;                // static
     double startTime;
     double currentEndTime;
-    static double offset;  // time to trigger the Control Agent
-    static double Wmax;    // next slice max time
     double remWCET;
     double end2endDeadline; // static
     //double slackTime;
@@ -47,7 +45,9 @@ class MCAgent
     int runtimeMode;
     //std::vector<rtTaskInfosStruct>* TasksInformations;
     std::vector<taskChain> allTaskChain;
-    std::vector<RT_TASK> bestEffortTasks;
+    std::vector<RT_TASK*> bestEffortTasks;
+    static double offset;  // time to trigger the Control Agent
+    static double Wmax;    // next slice max time
 
     void initMoCoAgent(systemRTInfo* sInfos);
     void setAllDeadlines(std::vector<end2endDeadlineStruct> _tcDeadlineStructs);

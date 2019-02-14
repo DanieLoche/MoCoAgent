@@ -11,7 +11,6 @@ MCAgent::MCAgent(void *arg)
 
   systemRTInfo* sInfos = (systemRTInfo*) arg;
   //TasksInformations = rtTI;
-  displayInformations(sInfos->rtTIs);
 
   runtimeMode = MODE_NOMINAL;
   displaySystemInfo(sInfos);
@@ -36,6 +35,7 @@ void MCAgent::initMoCoAgent(systemRTInfo* sInfos)
   setAllDeadlines(*sInfos->e2eDD);
   setAllTasks(*sInfos->rtTIs);
 }
+
 
 /***********************
 * Création des différentes chaines de tâche avec e2e deadline associée
@@ -66,9 +66,9 @@ void MCAgent::setAllTasks(std::vector<rtTaskInfosStruct> _TasksInfos)
     bool idFound = 0;   // Opti. pour éviter de continuer à boucler si on a trouvé la chaine
     for (auto& _taskChain : allTaskChain)
     {
-      if ( !_taskChain.isHardRealTime )
+      if ( !_taskInfo.isHardRealTime )
       {
-        bestEffortTasks.push_back(_taskChain.task);
+        bestEffortTasks.push_back(_taskInfo.task);
         idFound = 1;
       }
       else if ( _taskInfo.isHardRealTime == _taskChain.id )
@@ -131,7 +131,7 @@ void MCAgent::displaySystemInfo(systemRTInfo* sInfos)
 {
   #if VERBOSE_INFO
   cout << "INPUT Informations : ";
-  for (auto &taskdd : *sInfos->e2edd)
+  for (auto &taskdd : *sInfos->e2eDD)
   {
       cout << "Chain ID : " << taskdd.taskChainID
           << "| Deadline : " << taskdd.deadline << endl;
@@ -146,7 +146,12 @@ void MCAgent::displaySystemInfo(systemRTInfo* sInfos)
           << "| affinity: " << taskParam.affinity << endl;
   }
   #endif
+}
 
+taskChain::taskChain(end2endDeadlineStruct _tcDeadline)
+{
+  id = _tcDeadline.taskChainID;
+  end2endDeadline = _tcDeadline.deadline;
 }
 
 /***********************
@@ -162,14 +167,7 @@ taskMonitoringStruct::taskMonitoringStruct(rtTaskInfosStruct rtTaskInfos)
   rwcet = rtTaskInfos.deadline;
 
   isExecuted = 0;
-  execTime = 0;
-}
-
-taskChain::taskChain(end2endDeadlineStruct _tcDeadline)
-{
-  id = _tcDeadline.taskChainID;
-  end2endDeadline = _tcDeadline.deadline;
-  slackTime = 0;
+  startTime, endTime = 0;
 }
 
 int taskChain::checkTaskE2E()
