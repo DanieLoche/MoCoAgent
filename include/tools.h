@@ -9,11 +9,11 @@
 #include <fstream>
 #include <sstream>
 #include <iostream>
-#include <cobalt/stdio.h>
 #include <string>
 #include <vector>
 #include <algorithm>
 
+#include <cobalt/stdio.h>
 #include <alchemy/task.h>
 
 using std::string;

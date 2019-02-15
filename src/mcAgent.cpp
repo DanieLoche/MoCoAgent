@@ -12,13 +12,14 @@ MCAgent::MCAgent(void *arg)
   systemRTInfo* sInfos = (systemRTInfo*) arg;
   //TasksInformations = rtTI;
 
+  triggerCount = 0;
   runtimeMode = MODE_NOMINAL;
   displaySystemInfo(sInfos);
 
   initMoCoAgent(sInfos);
     while(false)
     {
-      if (runtimeMode == MODE_OVERLOADED)
+      if (runtimeMode >= MODE_OVERLOADED)
       {
 
       } else
@@ -26,7 +27,7 @@ MCAgent::MCAgent(void *arg)
       {
 
       }
-      checkTasks();
+      checkTaskChains();
     }
 }
 
@@ -74,7 +75,7 @@ void MCAgent::setAllTasks(std::vector<rtTaskInfosStruct> _TasksInfos)
       else if ( _taskInfo.isHardRealTime == _taskChain.id )
       {
         taskMonitoringStruct tms(_taskInfo);
-        _taskChain.taskChainList.push_back(tms);
+        _taskChain.taskList.push_back(tms);
         idFound = 1;
       }
 
@@ -84,14 +85,12 @@ void MCAgent::setAllTasks(std::vector<rtTaskInfosStruct> _TasksInfos)
 }
 
 
-int MCAgent::checkTasks()
+int MCAgent::checkTaskChains()
 {
   for (auto _taskChain = allTaskChain.begin(); _taskChain != allTaskChain.end(); ++_taskChain)
   {
     if (_taskChain->checkTaskE2E() )
-    {
       setMode(MODE_OVERLOADED);
-    }
   }
   return 0;
 }
@@ -105,7 +104,7 @@ int MCAgent::checkTasks()
 ***********************/
 void MCAgent::setMode(int mode)
 {
-  runtimeMode = mode;
+  runtimeMode += 1;
   for (auto bestEffortTask : bestEffortTasks)
   {
       if (runtimeMode == MODE_OVERLOADED)
@@ -154,11 +153,33 @@ taskChain::taskChain(end2endDeadlineStruct _tcDeadline)
   end2endDeadline = _tcDeadline.deadline;
 }
 
+int taskChain::checkTaskE2E()
+{
+  return (getExecutionTime() + Wmax + offset + getRemWCET() <= end2endDeadline);
+}
+
+double taskChain::getExecutionTime()
+{
+    return (currentEndTime - startTime);
+}
+
+double taskChain::getRemWCET()
+{
+  double RemWCET = 0;
+  for (auto& task : taskList)
+  {
+    if (!task.isExecuted)
+      RemWCET += task.rwcet;
+  }
+  return RemWCET;
+}
+
+
 /***********************
 * Recoit la liste des tasksInfos lues depuis l'INPUT.txt
 * Le converti avec uniquement les informations nécessaires pour le MoCoAgent
 * @params : vec<rtTaskInfosStruct> rtTasks
-* @returns : [ vector<taskMonitoringStruct> taskChainList ]
+* @returns : [ vector<taskMonitoringStruct> taskList ]
 ***********************/
 taskMonitoringStruct::taskMonitoringStruct(rtTaskInfosStruct rtTaskInfos)
 {
@@ -167,14 +188,5 @@ taskMonitoringStruct::taskMonitoringStruct(rtTaskInfosStruct rtTaskInfos)
   rwcet = rtTaskInfos.deadline;
 
   isExecuted = 0;
-  startTime, endTime = 0;
-}
-
-int taskChain::checkTaskE2E()
-{
-
-  return 0;
-
-
-  return 1;
+  startTime = 0, endTime = 0;
 }

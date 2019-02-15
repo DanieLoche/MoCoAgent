@@ -1,5 +1,8 @@
 #include "tools.h"
 
+static double offset;  // time to trigger the Control Agent
+static double Wmax;    // next slice max time
+
 class taskMonitoringStruct
 {
   public :
@@ -25,7 +28,7 @@ class taskChain
     double remWCET;
     double end2endDeadline; // static
     //double slackTime;
-    std::vector<taskMonitoringStruct> taskChainList;
+    std::vector<taskMonitoringStruct> taskList;
 
     int checkTaskE2E();
     double getExecutionTime();
@@ -43,16 +46,15 @@ class MCAgent
 
   private :
     int runtimeMode;
+    int triggerCount;
     //std::vector<rtTaskInfosStruct>* TasksInformations;
     std::vector<taskChain> allTaskChain;
     std::vector<RT_TASK*> bestEffortTasks;
-    static double offset;  // time to trigger the Control Agent
-    static double Wmax;    // next slice max time
 
     void initMoCoAgent(systemRTInfo* sInfos);
     void setAllDeadlines(std::vector<end2endDeadlineStruct> _tcDeadlineStructs);
     void setAllTasks(std::vector<rtTaskInfosStruct> _TasksInfos);
-    int checkTasks();
+    int checkTaskChains();
     void setMode(int mode);
     void displaySystemInfo(systemRTInfo* sInfos);
 
