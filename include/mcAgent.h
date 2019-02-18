@@ -23,6 +23,7 @@ class taskChain
     taskChain(end2endDeadlineStruct _tcDeadline);
 
     int id;                // static
+    int isAtRisk;
     double startTime;
     double currentEndTime;
     double remWCET;
@@ -31,12 +32,10 @@ class taskChain
     std::vector<taskMonitoringStruct> taskList;
 
     int checkTaskE2E();
+    int checkIfEnded();
+    void resetChain();
     double getExecutionTime();
-    // to do : on a le startTime, et on update le endTime après chaque exécution
-    // a voir comment... ExecutionTime = end - start.
     double getRemWCET();
-    // to do : On parcours toutes les tâches, on somme les deadlines
-    // de toutes les tâches non exécutées.
 };
 
 class MCAgent
