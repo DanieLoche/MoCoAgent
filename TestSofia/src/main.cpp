@@ -136,7 +136,7 @@ int main(int argc, char* argv[])
   bS.buildInput();
 
   */
-  
+
   TaskLauncher tln(input_file);
   //tln.tasksInfos = readTasksList(input_file);
   tln.printTasksInfos();
