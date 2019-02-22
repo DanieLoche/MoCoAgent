@@ -1,0 +1,40 @@
+
+Running summary for task adpcm_large.sh.
+Average runtime : 2205.88
+Max runtime : 6953.03 ms
+Min runtime : 748.499 ms
+Deadline :1500 ms
+Out of Deadline : 8 times
+Number of executions : 16 times
+
+Running summary for task typeset_large.sh.
+Average runtime : 2330.65
+Max runtime : 7111.05 ms
+Min runtime : 524.252 ms
+Deadline :1000 ms
+Out of Deadline : 9 times
+Number of executions : 16 times
+
+Running summary for task blowfish_large.sh.
+Average runtime : 2115.19
+Max runtime : 6822.62 ms
+Min runtime : 478.328 ms
+Deadline :1500 ms
+Out of Deadline : 9 times
+Number of executions : 17 times
+
+Running summary for task CRC32_large.sh.
+Average runtime : 2564.48
+Max runtime : 7193.97 ms
+Min runtime : 663.12 ms
+Deadline :1500 ms
+Out of Deadline : 7 times
+Number of executions : 14 times
+
+Running summary for task basicmath_large.sh.
+Average runtime : 5952.74
+Max runtime : 15060.1 ms
+Min runtime : 1000 ms
+Deadline :1000 ms
+Out of Deadline : 5 times
+Number of executions : 5 times

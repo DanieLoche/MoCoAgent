@@ -1,0 +1,56 @@
+
+Running summary for task adpcm_large.sh.
+Average runtime : 482.252
+Max runtime : 488.014 ms
+Min runtime : 476.49 ms
+Deadline :1500 ms
+Out of Deadline : 0 times
+Number of executions : 2 times
+
+Running summary for task CRC32_small.sh.
+Average runtime : 27.1374
+Max runtime : 70.6622 ms
+Min runtime : 19.9274 ms
+Deadline :200 ms
+Out of Deadline : 0 times
+Number of executions : 11 times
+
+Running summary for task patricia_large.sh.
+Average runtime : 28.9984
+Max runtime : 30.8108 ms
+Min runtime : 27.9087 ms
+Deadline :1000 ms
+Out of Deadline : 0 times
+Number of executions : 3 times
+
+Running summary for task qsort_small.sh.
+Average runtime : 35.1228
+Max runtime : 78.7653 ms
+Min runtime : 28.0057 ms
+Deadline :200 ms
+Out of Deadline : 0 times
+Number of executions : 11 times
+
+Running summary for task basicmath_large.sh.
+Average runtime : 34.2156
+Max runtime : 43.3246 ms
+Min runtime : 26.2237 ms
+Deadline :1000 ms
+Out of Deadline : 0 times
+Number of executions : 3 times
+
+Running summary for task CRC32_large.sh.
+Average runtime : 25.3319
+Max runtime : 42.3086 ms
+Min runtime : 8.35507 ms
+Deadline :1500 ms
+Out of Deadline : 0 times
+Number of executions : 2 times
+
+Running summary for task typeset_large.sh.
+Average runtime : 33.5239
+Max runtime : 39.1914 ms
+Min runtime : 25.2431 ms
+Deadline :1000 ms
+Out of Deadline : 0 times
+Number of executions : 3 times

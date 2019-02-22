@@ -6,24 +6,27 @@
 #include "macroTask.h"
 #include "taskLauncher.h"
 #include "buildSet.h"
-
+#include <mutex>
 
 #define EXECTIME   2e8   // execution time in ns
 #define SPINTIME   1e7   // spin time in ns
+#define PRINT 1
 
 long nproc;
 RT_SEM mysync;
 std::vector<ChaineInfo_Struct> list_info_chaine;
+
 TaskLauncher* tasl;
+std::mutex mutex;           // mutex for critical section
 
 void printTaskInfo(rtTaskInfosStruct* task)
 {
   cout << "Name: " << task->name
-      << "| path: " << task->path
-      << "| is RT ? " << task->isHardRealTime
-      << "| Period: " << task->periodicity
-      << "| Deadline: " << task->deadline
-      << "| affinity: " << task->affinity << endl;
+       << "| path: " << task->path
+       << "| is RT ? " << task->isHardRealTime
+       << "| Period: " << task->periodicity
+       << "| Deadline: " << task->deadline
+       << "| affinity: " << task->affinity << endl;
 }
 
 void print_affinity(pid_t _pid)
@@ -76,67 +79,135 @@ void TaskMain(void* arg)
 
 
 void my_handler(int s){
-
+  #if PRINT
+  cout << "\n------------------------------" << endl;
+  #endif
+  string out_file = "Testoutput.txt";
+  mutex.lock();
+  std::ofstream myfile;
+  myfile.open (out_file);    // TO APPEND :  //,ios_base::app);
   for (auto taskInfo = tasl->tasksInfosList.begin(); taskInfo != tasl->tasksInfosList.end(); ++taskInfo)
   {
-           printf("Caught signal %s\n",taskInfo->name);
-           printf("Average runtime %f ms\n",taskInfo->average_runtime/ 1.0e6);
-           printf("Max runtime %f ms\n",taskInfo->max_runtime/ 1.0e6);
-           printf("Min runtime %f ms\n",taskInfo->min_runtime/ 1.0e6);
-           printf(" dead_line  %f ms \n",taskInfo->deadline / 1.0e6);
-           printf("Out of dead_line  %d\n",taskInfo->out_deadline);
-           printf("Number of executions  %d\n",taskInfo->num_of_times);
 
+           myfile << "\nRunning summary for task " << taskInfo->name << ".\n";
+           myfile << "Average runtime : " << taskInfo->average_runtime/ 1.0e6 << "\n";
+           myfile << "Max runtime : " << taskInfo->max_runtime/ 1.0e6 << " ms\n";
+           myfile << "Min runtime : " << taskInfo->min_runtime/ 1.0e6 << " ms\n";
+           myfile << "Deadline :" << taskInfo->deadline / 1.0e6 << " ms\n";
+           myfile << "Out of Deadline : " << taskInfo->out_deadline << " times\n";
+           myfile << "Number of executions : " << taskInfo->num_of_times << " times\n";
+
+           #if PRINT
+           cout << "\n\nRunning summary for task" << taskInfo->name << endl;
+           cout << "Average runtime : " << taskInfo->average_runtime/ 1.0e6 << " ms" <<endl;
+           cout << "Max runtime : " << taskInfo->max_runtime/ 1.0e6 << " ms" << endl;
+           cout << "Min runtime : " << taskInfo->min_runtime/ 1.0e6 << " ms" << endl;
+           cout << "Deadline : " << taskInfo->deadline / 1.0e6 << " ms"<< endl;
+           cout << "Out of Deadline : " << taskInfo->out_deadline << " times" << endl;
+           cout << "Number of executions : " << taskInfo->num_of_times << " times" << endl;
+           #endif
 
   }
+  myfile.close();
+  mutex.unlock();
    exit(1);
 }
 
 
 int main(int argc, char* argv[])
 {
-  // POUR TEST EN ATTENDANT LA LISTE D'ENTREE
-  /*std::vector<string> long_task;
-  std::vector<string> short_task;
-
-  for (int i = 0; i<10; i++) {
-    std::string l = "exe" + std::to_string(i+1) + "L";
-    std::string s = "exe" + std::to_string(i+1) + "S";
-    long_task.push_back(l);
-    short_task.push_back(s);
-  }*/
+  system("clear");
 
 
-  rt_sem_create(&mysync,"MySemaphore",0,S_FIFO);
-
-  int return_code = 0;
-  nproc = get_nprocs();
-  // get input file, either indicated by user as argument or default location
   string input_file;
   string task_file;
-
-  if (argc > 1) input_file = argv[1];
-  else input_file = "./input.txt";
-  if (argc > 2) task_file = argv[2];
-  else task_file = "./sorted.txt";
-
-  buildSet bS;
-
-  //lecture fichier info chaine
-  bS.readChainsList( input_file, &list_info_chaine);
+  string asked;
+  int n_short = 0;
+  int n_long = 0;
+  int n_crit = 0;
+  int Build = 0;
+  int conf = 0;
+  int ordo = 0;
 
 
-  // Définition des listes comportant les tâches longue et courte
-  std::vector<string> all_crit_tasks = bS.distributionCrit(1, 1, 50);
+  // Définition fichier d'information des tâches
+  task_file = "./sorted.txt";
+	input_file = "./input.txt";
+/*
+  cout << "Y a-t-il déjà un fichier input que vous voulez utiliser ? [Y/N]" << '\n';
+  cin >> asked;
+  if ((asked == "Y") | (asked == "y") | (asked == "yes") | (asked == "YES") | (asked == "Yes")){
+    cout << "Quel est le nom du fichier d'entrée (avec l'extention .txt) ?" << '\n';
+    cin >> input_file;
+  }
+  else if ((asked == "N") | (asked == "n") | (asked == "no") | (asked == "NO") | (asked == "No")) {
+    Build = 1;
+    input_file = "./input.txt";
+    while(conf!=1){
+    cout << "Combien de tâches courtes voulez-vous ?" << '\n';
+    cin >> n_short;
+    cout << "Combien de tâches longues voulez-vous ?" << '\n';
+    cin >> n_long;
+    cout << "Quel pourcentage de tâches critique désirez vous ? (en \%)" << '\n';
+    cin >> n_crit;
+    cout << "Vous désirez :\n" << n_short << " tâches courtes, " << n_long << " tâches longues et " << n_crit << " \% de tâches critiques. Vous confirmez ? [Y/N]\n";
+    cin >> asked;
+    if ((asked == "Y") | (asked == "y") | (asked == "yes") | (asked == "YES") | (asked == "Yes")){ conf = 1;}
+    else if ((asked == "N") | (asked == "n") | (asked == "no") | (asked == "NO") | (asked == "No")) {conf = 0;}
+    }
+  }
+  else {
+    cout << "Pas de ça chez moi c'est Y ou N batard" << '\n';
+    return 3; // 3 == mauvaise réponse du fichier en entrée
+  }
+  cout << "Quel Ordonnancement désirez-vous appliquer ?\n" << "1 - Round Robin (RR)\n2 - FIFO\n3 - EDF\n\n";
+  cin >> ordo;
+  switch (ordo) {
+    case 1:
+      cout << "Round Robin sera utilisé" << endl;
+      break;
+    case 2:
+      cout << "FIFO sera utilisé" << endl;
+      break;
+    case 3:
+      cout << "EDF sera utilisé" << endl;
+      break;
+    default:
+      cout << "Saisie invalide, FIFO sera utilisé" << endl;
+      break;
+  }
+  sleep(2);
+  //rt_task_set_mode(0,XNRRB,NULL);
+*/
+  int return_code = 0;
+  nproc = get_nprocs();
 
-  // Définition des tâches non critiques choisies
-  std::vector<string> uncrit_tasks = bS.get_uncrit_tasks();
+
+  if(Build == 1){
+    cout << " Set de tâches en cours de création ..." << endl;
+    buildSet bS;
+
+    bS.readChainsList( input_file, &list_info_chaine);
+
+    // Définition des listes comportant les tâches longue et courte
+    std::vector<string> all_crit_tasks = bS.distributionCrit(n_long, n_short, n_crit);
+
+    // Définition des tâches non critiques choisies
+    std::vector<string> uncrit_tasks = bS.get_uncrit_tasks();
+
+  // Edition du fichier input.txt
+  //bS.buildInput();
 
   // Récupération infos tâches
   std::vector<rtTaskInfosStruct> info_task = bS.get_infos_tasks(task_file);
 
   // Edition du fichier input.txt
-  //bS.buildInput();
+  bS.buildInput();
+  cout << " Set de créé" << endl;
+}
+
+rt_sem_create(&mysync,"MySemaphore",0,S_FIFO);
+
 
  for(int i=0; i < (int)list_info_chaine.size();i++ ){
 
@@ -154,7 +225,6 @@ int main(int argc, char* argv[])
 
   printf("\nType CTRL-C to end this program\n\n" );
 
-
   struct sigaction sigIntHandler;
 
   sigIntHandler.sa_handler = my_handler;;
@@ -167,31 +237,6 @@ int main(int argc, char* argv[])
 
 
   pause();
-
-
-/*  sleep(1);
-
-  cout<<"stop up all tasks\n"<<endl;
-  for (auto taskInfo = tasl->tasksInfosList.begin(); taskInfo != tasl->tasksInfosList.end(); ++taskInfo)
-  {
-
-           RT_TASK_INFO curtaskinfo;
-           rt_task_inquire(taskInfo->task, &curtaskinfo);
-           kill(curtaskinfo.pid,SIGINT);
-           printf("Caught signal killed %s\n",taskInfo->name);
-    }
-   for (auto taskInfo = tasl->tasksInfosList.begin(); taskInfo != tasl->tasksInfosList.end(); ++taskInfo)
-   {
-           printf("Caught signal %s\n",taskInfo->name);
-           printf("Average runtime %f ms\n",taskInfo->average_runtime/ 1.0e6);
-           printf("Max runtime %f ms\n",taskInfo->max_runtime/ 1.0e6);
-           printf("Min runtime %f ms\n",taskInfo->min_runtime/ 1.0e6);
-           printf(" dead_line  %f ms \n",taskInfo->deadline / 1.0e6);
-           printf("Out of dead_line  %d\n",taskInfo->out_deadline);
-
-  }
-   exit(0);*/
-
 
   return return_code;
 }

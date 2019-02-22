@@ -77,3 +77,4 @@ output_*
 
 # directories
 trace-cmd/
+Benchmarker/output/

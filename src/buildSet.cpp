@@ -261,7 +261,7 @@ std::vector<string> buildSet::get_uncrit_tasks() {
 
 std::vector<rtTaskInfosStruct> buildSet::get_infos_tasks(string input_file)
 {
-  // Ouverture fichier tasks.txt pour récupérer ses infos
+  // Ouverture fichier sorted.txt pour récupérer ses infos
   std::ifstream myFile(input_file);
 
   if (!myFile.is_open())

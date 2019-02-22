@@ -172,20 +172,19 @@ void TaskLauncher::runTasks( )
 */
       struct sched_attr para;
 
-      para.sched_policy = SCHED_RR;
-      para.sched_flags= SCHED_FLAG_RESET_ON_FORK	;
-    //  para.sched_runtime= taskInfo.deadline;
-  //    para.sched_deadline=taskInfo.deadline;
-  //    para.sched_period = period;
-      para.sched_priority = 50 ;
-      para.size = sizeof(sched_attr);
-
-
+     // para.sched_policy = SCHED_FIFO;
+     // para.sched_flags= SCHED_FLAG_RESET_ON_FORK	;
+      //para.sched_runtime= taskInfo.deadline;;
+      //para.sched_deadline=taskInfo.deadline;
+      //para.sched_period = period;
+    //  para.sched_priority = 50 ;
+     // para.size=sizeof(sched_attr);
+/*
       if( sched_setattr(curtaskinfo.pid,&para,0) != 0) {
         fprintf(stderr,"error setting scheduler ... are you root? : %d \n", errno);
         exit(0);
       }
-
+*/
       //Starting
       cout << "Task " << taskInfo.name << " started at = " << starttime <<endl;
       /*int rep =*/ rt_task_start(taskInfo.task, TaskMain, &taskInfo);

@@ -1,0 +1,16 @@
+
+Running summary for task sha_large.sh.
+Average runtime : 88.0308
+Max runtime : 126.595 ms
+Min runtime : 52.2659 ms
+Deadline :200 ms
+Out of Deadline : 0 times
+Number of executions : 487 times
+
+Running summary for task patricia_small.sh.
+Average runtime : 87.9319
+Max runtime : 94.4923 ms
+Min runtime : 43.4566 ms
+Deadline :200 ms
+Out of Deadline : 0 times
+Number of executions : 487 times

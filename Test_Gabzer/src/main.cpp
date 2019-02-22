@@ -75,16 +75,30 @@ void TaskMain(void* arg)
 
 
 void my_handler(int s){
-
+  printf("\n\n------------------------------\n");
+  string out_file = "Testoutput.txt";
+  std::ofstream myfile;
+  myfile.open (out_file);    // TO APPEND :  //,ios_base::app);
   for (auto taskInfo = tasl->tasksInfosList.begin(); taskInfo != tasl->tasksInfosList.end(); ++taskInfo)
   {
-           printf("\nRunning summary for task %s\n",taskInfo->name);
-           printf("Average runtime %f ms\n",taskInfo->average_runtime/ 1.0e6);
-           printf("Max runtime %f ms\n",taskInfo->max_runtime/ 1.0e6);
-           printf("Min runtime %f ms\n",taskInfo->min_runtime/ 1.0e6);
-           printf("Deadline  %f ms \n",taskInfo->deadline / 1.0e6);
-           printf("Out of dead_line  %d\n",taskInfo->out_deadline);
+
+           printf("\n\nRunning summary for task %s.\n",taskInfo->name);
+           myfile << "\nRunning summary for task " << taskInfo->name << ".\n";
+           printf("Average runtime : %f ms\n",taskInfo->average_runtime/ 1.0e6);
+           myfile << "Average runtime : " << taskInfo->average_runtime/ 1.0e6 << "\n";
+           printf("Max runtime : %f ms\n",taskInfo->max_runtime/ 1.0e6);
+           myfile << "Max runtime : " << taskInfo->max_runtime/ 1.0e6 << " ms\n";
+           printf("Min runtime : %f ms\n",taskInfo->min_runtime/ 1.0e6);
+           myfile << "Min runtime : " << taskInfo->min_runtime/ 1.0e6 << " ms\n";
+           printf("Deadline : %f ms \n",taskInfo->deadline / 1.0e6);
+           myfile << "Deadline :" << taskInfo->deadline / 1.0e6 << " ms\n";
+           printf("Out of Deadline : ",taskInfo->out_deadline);
+           myfile << "Out of Deadline : " << taskInfo->out_deadline << " times\n";
+           printf("Number of executions : ",taskInfo->num_of_times);
+           myfile << "Number of executions : " << taskInfo->num_of_times << " times\n";
+
   }
+  myfile.close();
    exit(1);
 }
 /*
@@ -94,6 +108,7 @@ void Sensibility_analyser(){
 */
 int main(int argc, char* argv[])
 {
+  system("clear");
   // POUR TEST EN ATTENDANT LA LISTE D'ENTREE
   /*std::vector<string> long_task;
   std::vector<string> short_task;
@@ -107,34 +122,81 @@ int main(int argc, char* argv[])
 
   rt_sem_create(&mysync,"MySemaphore",0,S_FIFO);
 
+  string input_file;
+  string task_file;
+  string asked;
+  int n_short = 0;
+  int n_long = 0;
+  int n_crit = 0;
+  int Build = 0;
+  int conf = 0;
+  int ordo = 0;
+  cout << "Y a-t-il déjà un fichier input que vous voulez utiliser ? [Y/N]" << '\n';
+  cin >> asked;
+  if ((asked == "Y") | (asked == "y") | (asked == "yes") | (asked == "YES") | (asked == "Yes")){
+    cout << "Quel est le nom du fichier d'entrée (avec l'extention .txt) ?" << '\n';
+    cin >> input_file;
+  }
+  else if ((asked == "N") | (asked == "n") | (asked == "no") | (asked == "NO") | (asked == "No")) {
+    Build = 1;
+    input_file = "./input.txt";
+    task_file = "./sorted.txt";
+    while(conf!=1){
+    cout << "Combien de tâches courtes voulez-vous ?" << '\n';
+    cin >> n_short;
+    cout << "Combien de tâches longues voulez-vous ?" << '\n';
+    cin >> n_long;
+    cout << "Quel pourcentage de tâches critique désirez vous ? (en \%)" << '\n';
+    cin >> n_crit;
+    cout << "Vous désirez :\n" << n_short << " tâches courtes, " << n_long << " tâches longues et " << n_crit << " \% de tâches critiques. Vous confirmez ? [Y/N]\n";
+    cin >> asked;
+    if ((asked == "Y") | (asked == "y") | (asked == "yes") | (asked == "YES") | (asked == "Yes")){ conf = 1;}
+    else if ((asked == "N") | (asked == "n") | (asked == "no") | (asked == "NO") | (asked == "No")) {conf = 0;}
+    }
+  }
+  else {
+    cout << "Pas de ça chez moi c'est Y ou N batard" << '\n';
+    return 3; // 3 == mauvaise réponse du fichier en entrée
+  }
+  cout << "Quel Ordonnancement désirez-vous appliquer ?\n" << "1 - Round Robin (RR)\n2 - FIFO\n3 - EDF\n\n";
+  cin >> ordo;
+  switch (ordo) {
+    case 1:
+      cout << "Round Robin sera utilisé" << endl;
+      break;
+    case 2:
+      cout << "FIFO sera utilisé" << endl;
+      break;
+    case 3:
+      cout << "EDF sera utilisé" << endl;
+      break;
+    default:
+      cout << "Saisie invalide, FIFO sera utilisé" << endl;
+      break;
+  }
+  sleep(2);
   //rt_task_set_mode(0,XNRRB,NULL);
 
   int return_code = 0;
   nproc = get_nprocs();
-  // get input file, either indicated by user as argument or default location
-  string input_file;
-  string task_file;
 
-  if (argc > 1) input_file = argv[1];
-  else input_file = "./input.txt";
-  if (argc > 2) task_file = argv[2];
-  else task_file = "./sorted.txt";
+  if(Build == 1){
+    cout << " Set de tâches en cours de création ..." << endl;
+    buildSet bS;
 
-  /* buildSet bS;
+    // Définition des listes comportant les tâches longue et courte
+    std::vector<string> all_crit_tasks = bS.distributionCrit(n_short, n_long, n_crit);
 
-  // Définition des listes comportant les tâches longue et courte
-  std::vector<string> all_crit_tasks = bS.distributionCrit(4, 2, 50);
+    // Définition des tâches non critiques choisies
+    std::vector<string> uncrit_tasks = bS.get_uncrit_tasks();
 
-  // Définition des tâches non critiques choisies
-  std::vector<string> uncrit_tasks = bS.get_uncrit_tasks();
+    // Récupération infos tâches
+    std::vector<rtTaskInfosStruct> info_task = bS.get_infos_tasks(task_file);
 
-  // Récupération infos tâches
-  std::vector<rtTaskInfosStruct> info_task = bS.get_infos_tasks(task_file);
-
-  // Edition du fichier input.txt
-  bS.buildInput();
-
-  */
+    // Edition du fichier input.txt
+    bS.buildInput();
+    cout << " Set de créé" << endl;
+  }
 
   TaskLauncher tln(input_file);
   //tln.tasksInfos = readTasksList(input_file);
