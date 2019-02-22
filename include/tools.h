@@ -15,6 +15,8 @@
 
 #include <cobalt/stdio.h>
 #include <alchemy/task.h>
+#include <alchemy/buffer.h>
+#include <alchemy/event.h>
 
 using std::string;
 using std::cout;
