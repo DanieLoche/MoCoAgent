@@ -13,6 +13,7 @@
 
 long nproc;
 RT_SEM mysync;
+std::vector<ChaineInfo_Struct> list_info_chaine;
 TaskLauncher* tasl;
 
 void printTaskInfo(rtTaskInfosStruct* task)
@@ -78,11 +79,11 @@ void my_handler(int s){
 
   for (auto taskInfo = tasl->tasksInfosList.begin(); taskInfo != tasl->tasksInfosList.end(); ++taskInfo)
   {
-           printf("Running Sumary for task %s\n",taskInfo->name);
+           printf("Caught signal %s\n",taskInfo->name);
            printf("Average runtime %f ms\n",taskInfo->average_runtime/ 1.0e6);
            printf("Max runtime %f ms\n",taskInfo->max_runtime/ 1.0e6);
            printf("Min runtime %f ms\n",taskInfo->min_runtime/ 1.0e6);
-           printf("Deadline  %f ms \n",taskInfo->deadline / 1.0e6);
+           printf(" dead_line  %f ms \n",taskInfo->deadline / 1.0e6);
            printf("Out of dead_line  %d\n",taskInfo->out_deadline);
            printf("Number of executions  %d\n",taskInfo->num_of_times);
 
@@ -90,11 +91,8 @@ void my_handler(int s){
   }
    exit(1);
 }
-/*
-void Sensibility_analyser(){
 
-}
-*/
+
 int main(int argc, char* argv[])
 {
   // POUR TEST EN ATTENDANT LA LISTE D'ENTREE
@@ -108,9 +106,8 @@ int main(int argc, char* argv[])
     short_task.push_back(s);
   }*/
 
-  rt_sem_create(&mysync,"MySemaphore",0,S_FIFO);
 
-  //rt_task_set_mode(0,XNRRB,NULL);
+  rt_sem_create(&mysync,"MySemaphore",0,S_FIFO);
 
   int return_code = 0;
   nproc = get_nprocs();
@@ -123,10 +120,14 @@ int main(int argc, char* argv[])
   if (argc > 2) task_file = argv[2];
   else task_file = "./sorted.txt";
 
-  /* buildSet bS;
+  buildSet bS;
+
+  //lecture fichier info chaine
+  bS.readChainsList( input_file, &list_info_chaine);
+
 
   // Définition des listes comportant les tâches longue et courte
-  std::vector<string> all_crit_tasks = bS.distributionCrit(4, 2, 50);
+  std::vector<string> all_crit_tasks = bS.distributionCrit(1, 1, 50);
 
   // Définition des tâches non critiques choisies
   std::vector<string> uncrit_tasks = bS.get_uncrit_tasks();
@@ -135,16 +136,17 @@ int main(int argc, char* argv[])
   std::vector<rtTaskInfosStruct> info_task = bS.get_infos_tasks(task_file);
 
   // Edition du fichier input.txt
-  bS.buildInput();
+  //bS.buildInput();
 
-  */
-  
-  TaskLauncher tln(input_file);
-  //tln.tasksInfos = readTasksList(input_file);
-  tln.printTasksInfos();
-  tln.runTasks();
-  tasl=&tln;
+ for(int i=0; i < (int)list_info_chaine.size();i++ ){
 
+    TaskLauncher tln( list_info_chaine[i].Path);
+    //tln.tasksInfos = readTasksList(input_file);
+    tln.printTasksInfos();
+    tln.runTasks();
+    tasl=&tln;
+
+  }
   //sleeping the time that all tasks will be started
   usleep(1000000);
   cout<<"wake up all tasks\n"<<endl;

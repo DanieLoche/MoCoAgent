@@ -36,6 +36,50 @@ buildSet::buildSet() {
   }
 }
 
+
+void buildSet::readChainsList(string input_file,std::vector<ChaineInfo_Struct> *list_info_chaine)
+{
+  system("clear");
+  cout << "Initialising machine...\n";
+
+  std::ifstream myFile(input_file);
+  if (!myFile.is_open())
+  {
+      exit(EXIT_FAILURE);
+  }
+
+  //std::vector<rtTaskInfosStruct> myTasksInfos;
+
+  string str;
+  int num_tache ;
+  std::getline(myFile, str); // skip the first line
+  while (std::getline(myFile, str))
+  {
+      ChaineInfo_Struct chaineInfo;
+      std::istringstream iss(str);
+      string token;
+      cout << "Managing line : " << str << endl;
+      num_tache = 3;
+      if (str.substr(0,2) != "//")
+      {
+            if (!(iss >> chaineInfo.name
+                      >> chaineInfo.ChaineID
+                      >> chaineInfo.Num_tasks
+                      >> chaineInfo.Num_c_tasks))
+            { cout << "\033[1;31mFailed to read line\033[0m !" << endl; break; } // error
+
+            for (int n=0; n< chaineInfo.Num_tasks ; n++)
+            {
+              string val;
+              iss >> val;
+              chaineInfo.tasks.push_back(val);
+            }
+
+            (*list_info_chaine).push_back(chaineInfo);
+      } else cout << "line ignored." << endl;
+  }
+
+}
 std::vector<string> buildSet::distributionCrit (double nbr_long, double nbr_short, int crit_percent){
     // Vecteur des tâches longues et courtes
     std::vector<string> long_task;
@@ -43,13 +87,13 @@ std::vector<string> buildSet::distributionCrit (double nbr_long, double nbr_shor
 
     // Calcul de la moyenne des temps moyens
     double sum = 0;
-    for (int i = 0; i<ordered_time.size(); i++) {
+    for (int i = 0; i< (int)ordered_time.size(); i++) {
       sum += ordered_time[i];
     }
     double moy = sum/ordered_time.size();
 
     // Répartition dans les deux listes de tâches longues et courtes
-    for (int i = 0; i<ordered_time.size(); i++) {
+    for (int i = 0; i < (int)ordered_time.size(); i++) {
       // Si le tps est en dessous de la moyenne, direction les courtes
       if (ordered_time[i] < moy) {
         short_task.push_back(ordered_tasks[i]);
@@ -191,12 +235,12 @@ std::vector<string> buildSet::get_uncrit_tasks() {
 
   int var_test_in; // Variable de test tâche dans les critiques ou non
 
-  for (int i = 0; i<all_crit_tasks.size(); i++) {
+  for (int i = 0; i< (int)all_crit_tasks.size(); i++) {
 
     // Parcours de l'ensemble des tâches
     var_test_in = 0;
 
-    for (int j = 0; j<long_choosen_task.size(); j++) {
+    for (int j = 0; j< (int) long_choosen_task.size(); j++) {
 
       // Parcours de l'ensemble des tâches critques
       if (long_choosen_task[i] == all_crit_tasks[j]) {
@@ -259,7 +303,7 @@ void buildSet::buildInput() {
       myFile << "name path isHRT periodicity deadline affinity" << endl;
 
       // Ecriture des infos de chaque tâches critiques selectionnées
-      for (int i = 0; i<all_crit_tasks.size(); i++) {
+      for (int i = 0; i< (int)all_crit_tasks.size(); i++) {
         // Parcours des tâches critiques choisies
 
         for (auto taskInfo = list_info_task.begin(); taskInfo != list_info_task.end(); ++taskInfo) {
@@ -272,7 +316,7 @@ void buildSet::buildInput() {
       }
 
       // Ecriture des infos de chaque tâches non critiqes selectionnées
-      for (int i = 0; i<uncrit_tasks.size(); i++) {
+      for (int i = 0; i<(int)uncrit_tasks.size(); i++) {
         // Parcours des tâches critiques choisies
 
         for (auto taskInfo = list_info_task.begin(); taskInfo != list_info_task.end(); ++taskInfo) {

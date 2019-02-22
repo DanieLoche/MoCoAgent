@@ -14,8 +14,10 @@ class MacroTask
           int       deadline;
           int       affinity;
     */
+    RTIME starttime, runtime,endtime,time,Somme;
+    int cpt;
     int before();
-    void proceed(RT_SEM* mysync);
+    void proceed();
     int after();
 
   public :

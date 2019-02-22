@@ -38,8 +38,24 @@ struct rtTaskInfosStruct
     RTIME min_runtime;
     int  out_deadline;
     int  num_of_times;
+    bool Exectued ;
+    int ChaineID;
+
 } ;
 
+struct ChaineInfo_Struct
+{
+  string name ;
+  int ChaineID;
+  int Num_tasks;
+  int Path;
+  double Deadline;
+  RTIME WCET;
+  RTIME Wmax ;
+  RTIME Excution_time ;
+
+
+};
 
 
 /* To create a task :

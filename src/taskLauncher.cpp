@@ -125,16 +125,28 @@ void TaskLauncher::runTasks( )
 {
    SRTIME quant=1e7;
    SRTIME qt = rt_timer_ns2ticks(quant);
+  /* cpu_set_t mask;
+   CPU_ZERO(&mask);
+   CPU_SET(0, &mask);
+   CPU_SET(1, &mask);
+   CPU_SET(2, &mask);
+   CPU_SET(3, &mask);
+   CPU_SET(4, &mask);
+   CPU_SET(5, &mask);
+   CPU_SET(6, &mask);
+   CPU_SET(7, &mask);
+*/
+    //  rt_task_set_mode(0,XNRRB,NULL);
 
   for (auto taskInfo = tasksInfosList.begin(); taskInfo != tasksInfosList.end(); ++taskInfo)
   {
       RT_TASK* task = new RT_TASK;
       taskInfo->task = task;
-      taskInfo->deadline = taskInfo->deadline*1e6;
       rt_task_create(task, taskInfo->name, 0, 50, 0);
       cout << "Task " << taskInfo->name << " created." << endl;
       set_affinity(task, taskInfo->affinity);
-      //rt_task_slice(task,qt);
+      //cout << "Setting affinity :" << rt_task_set_affinity(taskInfo->task, &mask) << endl;
+    //  rt_task_slice(task,qt);
 
   }
 
@@ -146,18 +158,28 @@ void TaskLauncher::runTasks( )
   for (auto& taskInfo : tasksInfosList)
   {
       period = taskInfo.periodicity*1e6 ;
+      taskInfo.deadline = taskInfo.deadline*1e6;
       rt_task_set_periodic(taskInfo.task, starttime, period);
 
       rt_task_inquire(taskInfo.task, &curtaskinfo);
+
+/*
+     cout << "getting affinity :" << sched_getaffinity(curtaskinfo.pid,sizeof(cpu_set_t),&mask) << endl;
+
+
+     cout<<"nyum cpu   : "<< CPU_COUNT(&mask) <<endl;
+     cout<<" cpu   : "<< CPU_ISSET(0,&mask) << CPU_ISSET(1,&mask) <<CPU_ISSET(2,&mask) <<CPU_ISSET(3,&mask) <<CPU_ISSET(4,&mask) <<CPU_ISSET(5,&mask) << CPU_ISSET(6,&mask) << CPU_ISSET(7,&mask) <<endl;
+*/
       struct sched_attr para;
 
-      para.sched_policy = SCHED_FIFO;
+      para.sched_policy = SCHED_RR;
       para.sched_flags= SCHED_FLAG_RESET_ON_FORK	;
-      //para.sched_runtime= 2e8;
-      //para.sched_deadline=taskInfo.deadline;
-      //para.sched_period = period;
+    //  para.sched_runtime= taskInfo.deadline;
+  //    para.sched_deadline=taskInfo.deadline;
+  //    para.sched_period = period;
       para.sched_priority = 50 ;
-      para.size=sizeof(sched_attr);
+      para.size = sizeof(sched_attr);
+
 
       if( sched_setattr(curtaskinfo.pid,&para,0) != 0) {
         fprintf(stderr,"error setting scheduler ... are you root? : %d \n", errno);
@@ -177,8 +199,6 @@ void TaskLauncher::set_affinity (RT_TASK* task, int _aff)
   cpu_set_t mask;
   CPU_ZERO(&mask);
   CPU_SET(_aff, &mask);
-  cout << "affinity = " << _aff << endl;
-  cout << "mask = " << mask << endl;
   RT_TASK_INFO curtaskinfo;
   rt_task_inquire(task, &curtaskinfo);
   cout << "Setting affinity for task " << curtaskinfo.name << " : CPU" << rt_task_set_affinity(task, &mask) << endl;
