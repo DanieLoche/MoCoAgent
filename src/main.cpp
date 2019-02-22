@@ -26,7 +26,9 @@ void printTaskInfo(rtTaskInfosStruct* task)
        << "| is RT ? " << task->isHardRealTime
        << "| Period: " << task->periodicity
        << "| Deadline: " << task->deadline
-       << "| affinity: " << task->affinity << endl;
+       << "| affinity: " << task->affinity
+       << "| ChaineID: " << task->ChaineID << endl;
+
 }
 
 void print_affinity(pid_t _pid)
@@ -69,10 +71,10 @@ void TaskMain(void* arg)
   RT_TASK_INFO curtaskinfo;
   rt_task_inquire(NULL, &curtaskinfo);
 
-  //cout << "I am task : " << curtaskinfo.name << " of priority " << curtaskinfo.prio << endl;
+//  cout << "I am task : " << curtaskinfo.name << " of priority " << curtaskinfo.prio << endl;
 
   MacroTask macroRT;
-  macroRT.properties = rtTI;
+  macroRT.properties =(rtTaskInfosStruct*) arg;
   macroRT.executeRun(&mysync);
 
 }
@@ -118,103 +120,32 @@ int main(int argc, char* argv[])
 {
   system("clear");
 
-
   string input_file;
-  string task_file;
-  string asked;
-  int n_short = 0;
-  int n_long = 0;
-  int n_crit = 0;
-  int Build = 0;
-  int conf = 0;
-  int ordo = 0;
 
 
   // Définition fichier d'information des tâches
-  task_file = "./sorted.txt";
-	input_file = "./input.txt";
-/*
-  cout << "Y a-t-il déjà un fichier input que vous voulez utiliser ? [Y/N]" << '\n';
-  cin >> asked;
-  if ((asked == "Y") | (asked == "y") | (asked == "yes") | (asked == "YES") | (asked == "Yes")){
-    cout << "Quel est le nom du fichier d'entrée (avec l'extention .txt) ?" << '\n';
-    cin >> input_file;
-  }
-  else if ((asked == "N") | (asked == "n") | (asked == "no") | (asked == "NO") | (asked == "No")) {
-    Build = 1;
-    input_file = "./input.txt";
-    while(conf!=1){
-    cout << "Combien de tâches courtes voulez-vous ?" << '\n';
-    cin >> n_short;
-    cout << "Combien de tâches longues voulez-vous ?" << '\n';
-    cin >> n_long;
-    cout << "Quel pourcentage de tâches critique désirez vous ? (en \%)" << '\n';
-    cin >> n_crit;
-    cout << "Vous désirez :\n" << n_short << " tâches courtes, " << n_long << " tâches longues et " << n_crit << " \% de tâches critiques. Vous confirmez ? [Y/N]\n";
-    cin >> asked;
-    if ((asked == "Y") | (asked == "y") | (asked == "yes") | (asked == "YES") | (asked == "Yes")){ conf = 1;}
-    else if ((asked == "N") | (asked == "n") | (asked == "no") | (asked == "NO") | (asked == "No")) {conf = 0;}
-    }
-  }
-  else {
-    cout << "Pas de ça chez moi c'est Y ou N batard" << '\n';
-    return 3; // 3 == mauvaise réponse du fichier en entrée
-  }
-  cout << "Quel Ordonnancement désirez-vous appliquer ?\n" << "1 - Round Robin (RR)\n2 - FIFO\n3 - EDF\n\n";
-  cin >> ordo;
-  switch (ordo) {
-    case 1:
-      cout << "Round Robin sera utilisé" << endl;
-      break;
-    case 2:
-      cout << "FIFO sera utilisé" << endl;
-      break;
-    case 3:
-      cout << "EDF sera utilisé" << endl;
-      break;
-    default:
-      cout << "Saisie invalide, FIFO sera utilisé" << endl;
-      break;
-  }
-  sleep(2);
-  //rt_task_set_mode(0,XNRRB,NULL);
-*/
+
+	input_file = "./input_chaine.txt";
+
   int return_code = 0;
   nproc = get_nprocs();
 
 
-  if(Build == 1){
-    cout << " Set de tâches en cours de création ..." << endl;
-    buildSet bS;
+  cout << " Set de tâches en cours de création ..." << endl;
+  buildSet bS;
 
-    bS.readChainsList( input_file, &list_info_chaine);
+  bS.readChainsList( input_file, &list_info_chaine);
 
-    // Définition des listes comportant les tâches longue et courte
-    std::vector<string> all_crit_tasks = bS.distributionCrit(n_long, n_short, n_crit);
-
-    // Définition des tâches non critiques choisies
-    std::vector<string> uncrit_tasks = bS.get_uncrit_tasks();
-
-  // Edition du fichier input.txt
-  //bS.buildInput();
-
-  // Récupération infos tâches
-  std::vector<rtTaskInfosStruct> info_task = bS.get_infos_tasks(task_file);
-
-  // Edition du fichier input.txt
-  bS.buildInput();
-  cout << " Set de créé" << endl;
-}
-
-rt_sem_create(&mysync,"MySemaphore",0,S_FIFO);
+  rt_sem_create(&mysync,"MySemaphore",0,S_FIFO);
 
 
  for(int i=0; i < (int)list_info_chaine.size();i++ ){
 
-    TaskLauncher tln( list_info_chaine[i].Path);
+    TaskLauncher tln( list_info_chaine[i].Path, list_info_chaine[i].ChaineID);
     //tln.tasksInfos = readTasksList(input_file);
     tln.printTasksInfos();
     tln.runTasks();
+    tln.printTasksInfos();
     tasl=&tln;
 
   }
@@ -227,7 +158,7 @@ rt_sem_create(&mysync,"MySemaphore",0,S_FIFO);
 
   struct sigaction sigIntHandler;
 
-  sigIntHandler.sa_handler = my_handler;;
+  sigIntHandler.sa_handler = my_handler;
   sigemptyset(&sigIntHandler.sa_mask);
   sigIntHandler.sa_flags = 0;
 

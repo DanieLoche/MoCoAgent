@@ -1,2 +1,2 @@
 name            chaineID      nombredetache    Path
-chaine1             1               5         /bench/  
+chaine1             1               2         ./input.txt  

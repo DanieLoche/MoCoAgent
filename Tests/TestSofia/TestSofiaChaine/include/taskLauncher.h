@@ -9,10 +9,10 @@ class TaskLauncher
     std::vector<rtTaskInfosStruct> tasksInfosList;
 
 
-    TaskLauncher(string input_file, int ChaineID);
+    TaskLauncher(string input_file);
 
     void runTasks( );
-    std::vector<rtTaskInfosStruct> readTasksList(string, int);
+    std::vector<rtTaskInfosStruct> readTasksList(string);
 
     void set_affinity (RT_TASK* task, int _aff);
 

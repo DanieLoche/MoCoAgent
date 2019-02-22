@@ -1,6 +1,8 @@
 #ifndef TOOLS_H
 #define TOOLS_H
 
+//#define PRINT 1
+
 #include <fstream>
 #include <sstream>
 #include <iostream>
@@ -15,7 +17,8 @@
 #include <alchemy/task.h>
 #include <alchemy/sem.h>
 #include <alchemy/timer.h>
-
+#include <sys/time.h>
+#include <sys/resource.h>
 
 using std::string;
 using std::cout;
@@ -48,7 +51,7 @@ struct ChaineInfo_Struct
   string name ;
   int ChaineID;
   int Num_tasks;
-  string Path;
+  int Path;
   double Deadline;
   RTIME WCET;
   RTIME Wmax ;

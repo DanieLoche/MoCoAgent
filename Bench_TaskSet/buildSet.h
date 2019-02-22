@@ -25,11 +25,11 @@ class buildSet
     std::vector<rtTaskInfosStruct> list_info_task;
 
 
-    // Récupération des informations de chaque CHAINE
+      // Récupération des informations de chaque CHAINE
     void readChainsList(string input_file,std::vector<ChaineInfo_Struct> *list_info_chaine);
 
     // Fonctions pour l'automatisation des sets de tâches
-    /*std::vector<string> distributionCrit(double nbr_long, double nbr_short, int crit_percent);
+    std::vector<string> distributionCrit(double nbr_long, double nbr_short, int crit_percent);
     // Choix des tâches critiques parmis les tâches longues et courtes choisies ^
 
     void distributionLong(std::vector<string> long_task, double nbr_long); // Choix des tâches longues
@@ -42,7 +42,7 @@ class buildSet
     std::vector<rtTaskInfosStruct> get_infos_tasks(string input_file);
 
     // Création fichier input.txt
-    void buildInput();   */  // Toujours lancer après distributionCrit
+    void buildInput();     // Toujours lancer après distributionCrit
 };
 
 #endif

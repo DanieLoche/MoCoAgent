@@ -36,10 +36,7 @@ buildSet::buildSet() {
   }
 }
 
-/*std::vector<string> buildSet::distributionCrit (int nbr_crit){
-
-    // LES TACHES ONT ETE CHOISI DEPUIS LE INPUT_C.TXT
-    // Elles sont mis dans le vecteur : all_tasks
+std::vector<string> buildSet::distributionCrit (int nbr_crit){
 
     // Choix des tâches critques parmis toutes les tâches
     int size = all_tasks.size();
@@ -186,4 +183,3 @@ void buildSet::buildInput() {
   }
 
 }
-*/
