@@ -26,7 +26,7 @@ class buildSet
 
 
     // Récupération des informations de chaque CHAINE
-    void readChainsList(string input_file,std::vector<ChaineInfo_Struct> *list_info_chaine);
+    void readChainsList(string input_file,std::vector<end2endDeadlineStruct> *list_info_chaine);
 
     // Fonctions pour l'automatisation des sets de tâches
     /*std::vector<string> distributionCrit(double nbr_long, double nbr_short, int crit_percent);

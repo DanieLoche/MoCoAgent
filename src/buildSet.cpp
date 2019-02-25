@@ -37,7 +37,7 @@ buildSet::buildSet() {
 }
 
 
-void buildSet::readChainsList(string input_file,std::vector<ChaineInfo_Struct> *list_info_chaine)
+void buildSet::readChainsList(string input_file,std::vector<end2endDeadlineStruct> *list_info_chaine)
 {
   system("clear");
   cout << "Initialising machine...\n";
@@ -55,7 +55,7 @@ void buildSet::readChainsList(string input_file,std::vector<ChaineInfo_Struct> *
   std::getline(myFile, str); // skip the first line
   while (std::getline(myFile, str))
   {
-      ChaineInfo_Struct chaineInfo;
+      end2endDeadlineStruct chaineInfo;
       std::istringstream iss(str);
       string token;
       cout << "Managing line : " << str << endl;
@@ -63,7 +63,7 @@ void buildSet::readChainsList(string input_file,std::vector<ChaineInfo_Struct> *
       if (str.substr(0,2) != "//")
       {
             if (!(iss >> chaineInfo.name
-                      >> chaineInfo.ChaineID
+                      >> chaineInfo.taskChainID
                       >> chaineInfo.Num_tasks
                       >> chaineInfo.Path))
             { cout << "\033[1;31mFailed to read line\033[0m !" << endl; break; } // error

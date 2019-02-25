@@ -61,18 +61,18 @@ int MacroTask::after()
   }
   printf("End Task  : %s\n",properties->name);
 
-  properties->Exectued = 1;
   //ChaineInfo_Struct.Wcet_update() ;
   //ChaineInfo_Struct.Exectime.Update() ;
 
   return 0;
 }
 
-void MacroTask::executeRun(RT_SEM* mysync)
+void MacroTask::executeRun(RT_SEM* mysync,RT_BUFFER* bf)
 {
   //cout << "Running..." << endl;
+    int ret;
     mutex.lock();
-    rt_task_set_periodic(NULL, starttime, properties->periodicity*1e6);
+
     properties->max_runtime =0;
     properties->min_runtime =1e9;
     properties->out_deadline=0;
@@ -95,6 +95,11 @@ void MacroTask::executeRun(RT_SEM* mysync)
       proceed();  // execute task
 
       after();  // Inform of execution time for the mcAgent
+
+      char* msg ;
+
+      ret = rt_buffer_write(&bf , msg , 200 , 50000);
+      printf(" write buf ret : %d\n",ret);
 
       rt_task_wait_period(NULL);
 
