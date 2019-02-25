@@ -1,6 +1,0 @@
-name path isHRT periodicity deadline affinity
-adpcm_large.sh /home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/telecomm/adpcm/adpcm_large.sh 1 1500 1500 6
-typeset_large.sh /home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/consumer/typeset/typeset_large.sh 1 1000 1000 2
-blowfish_large.sh /home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/security/blowfish/blowfish_large.sh 1 1500 1500 2
-CRC32_large.sh /home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/telecomm/CRC32/CRC32_large.sh 0 1500 1500 2
-basicmath_large.sh /home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/automotive/basicmath/basicmath_large.sh 0 1000 1000 2

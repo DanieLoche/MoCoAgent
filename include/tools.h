@@ -1,6 +1,12 @@
 #ifndef TOOLS_H
 #define TOOLS_H
 
+
+#define VERBOSE_INFO  1 // Cout d'informations, démarrage, etc...
+#define VERBOSE_DEBUG 1 // Cout de débug...
+#define VERBOSE_OTHER 1 // Cout autre...
+#define VERBOSE_ASK   1 // cout explicitement demandés dans le code
+
 #include <fstream>
 #include <sstream>
 #include <iostream>
@@ -15,6 +21,9 @@
 #include <alchemy/task.h>
 #include <alchemy/sem.h>
 #include <alchemy/timer.h>
+#include <rtdm/ipc.h>
+#include <alchemy/buffer.h>
+#include <alchemy/event.h>
 
 
 using std::string;
@@ -29,27 +38,26 @@ struct rtTaskInfosStruct
     string path;
     string task_args;
 
-    bool isHardRealTime;
+    int  isHardRealTime;
     int  periodicity;
     RTIME  deadline;
     int  affinity;
+
     RTIME average_runtime;
     RTIME max_runtime;
     RTIME min_runtime;
     int  out_deadline;
     int  num_of_times;
-    bool Exectued ;
-    int ChaineID;
 
 } ;
 
-struct ChaineInfo_Struct
+struct end2endDeadlineStruct
 {
   string name ;
-  int ChaineID;
+  int taskChainID;
   int Num_tasks;
   string Path;
-  double Deadline;
+  double deadline;
   RTIME WCET;
   RTIME Wmax ;
   RTIME Excution_time ;
@@ -57,6 +65,18 @@ struct ChaineInfo_Struct
 
 };
 
+
+struct systemRTInfo
+{
+  // Toto test.
+  std::vector<end2endDeadlineStruct>* e2eDD;
+  std::vector<rtTaskInfosStruct>* rtTIs;
+};
+
+
+void printInquireInfo();
+void printTaskInfo(rtTaskInfosStruct* task);
+void print_affinity(pid_t _pid);
 
 /* To create a task :
  * Arguments : &task,
