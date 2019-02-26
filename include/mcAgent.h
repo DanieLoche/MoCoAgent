@@ -11,6 +11,7 @@ const double Wmax = 0;    // next slice max time
 struct monitoringMsg
 {
   RT_TASK* task;
+  int id;
   double startTime;   // Run-time - received
   double endTime;     // Run-time - received
   bool isExecuted;    // Run-time - computed
@@ -76,7 +77,7 @@ class MCAgent
     RT_BUFFER bf;
     RT_EVENT mode_change_flag;
     void updateTaskInfo(monitoringMsg msg);
-    
+
   private :
     int runtimeMode;    // NOMINAL or OVERLOADED
     //std::vector<rtTaskInfosStruct>* TasksInformations;

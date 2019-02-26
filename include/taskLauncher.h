@@ -4,12 +4,12 @@ class TaskLauncher
 {
   public :
     std::vector<rtTaskInfosStruct> tasksInfosList;
-
+    systemRTInfo rtInfos;
 
     TaskLauncher(string input_file);
 
     void runTasks( );
-    std::vector<rtTaskInfosStruct> readTasksList(string);
+    int readTasksList(string);
 
     void set_affinity (RT_TASK* task, int _aff);
 

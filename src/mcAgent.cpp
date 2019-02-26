@@ -176,6 +176,7 @@ void MCAgent::updateTaskInfo(monitoringMsg msg)
     }
   }
 }
+
 /***********************
 * Fonction de débug pour afficher
 * les informations de toutes les tâches reçues.

@@ -45,7 +45,6 @@ struct rtTaskInfosStruct
 
 struct systemRTInfo
 {
-  // Toto test.
   std::vector<end2endDeadlineStruct>* e2eDD;
   std::vector<rtTaskInfosStruct>* rtTIs;
 };

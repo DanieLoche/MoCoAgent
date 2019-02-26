@@ -3,11 +3,17 @@
 
 TaskLauncher::TaskLauncher(string input_file)
 {
-  tasksInfosList = readTasksList(input_file);
+  int ret = readTasksList(input_file);
+  if (ret != 0)
+  {
+    cout << "Failed to read whole file." << endl;
+    exit(EXIT_FAILURE);
+    delete this;
+  }
 }
 
 
-std::vector<rtTaskInfosStruct> TaskLauncher::readTasksList(string input_file)
+int TaskLauncher::readTasksList(string input_file)
 {
   #if VERBOSE_OTHER
   system("clear");
@@ -26,21 +32,30 @@ std::vector<rtTaskInfosStruct> TaskLauncher::readTasksList(string input_file)
   std::getline(myFile, str); // skip the first line
   while (std::getline(myFile, str))
   {
-      rtTaskInfosStruct taskInfo;
+
       std::istringstream iss(str);
       #if VERBOSE_ASK
       cout << "Managing line : " << str << endl;
       #endif
-      if (str.substr(0,2) != "//")
+      if (str.substr(0,2) == "$$")
       {
+        end2endDeadlineStruct e2e;
+        if (!(iss >> e2e.taskChainID >> e2e.taskChainID
+                  >> e2e.deadline) )
+        { cout << "FAIL !" << endl; return 10; } // error
+        rtInfos.e2eDD->push_back(e2e);
+      }
+      else if (str.substr(0,2) != "//")
+      {
+        rtTaskInfosStruct taskInfo;
         if (!(iss >> taskInfo.name
                   >> taskInfo.path
                   >> taskInfo.isHardRealTime
                   >> taskInfo.periodicity
                   >> taskInfo.deadline
                   >> taskInfo.affinity) )
-        { cout << "FAIL !" << endl; break; } // error
-        tasksInfosList.push_back(taskInfo);
+        { cout << "FAIL !" << endl; return 20; } // error
+        rtInfos.rtTIs->push_back(taskInfo);
       }
       #if VERBOSE_ASK
       else
@@ -48,7 +63,7 @@ std::vector<rtTaskInfosStruct> TaskLauncher::readTasksList(string input_file)
       #endif
   }
 
-  return tasksInfosList;
+  return 0;
 
 }
 
@@ -56,13 +71,12 @@ std::vector<rtTaskInfosStruct> TaskLauncher::readTasksList(string input_file)
 void TaskLauncher::runTasks( )
 {
 
-
   for (auto taskInfo = tasksInfosList.begin(); taskInfo != tasksInfosList.end(); ++taskInfo)
   {
       RT_TASK* task = new RT_TASK;
       taskInfo->task = task;
       rt_task_create(task, taskInfo->name, 0, 50, 0);
-      set_affinity(task, 0);
+      //set_affinity(task, 0);
       #if VERBOSE_INFO
       cout << "Task " << taskInfo->name << " created." << endl;
       #endif
