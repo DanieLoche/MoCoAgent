@@ -8,13 +8,7 @@
 const double t_RT = 0;  // time to trigger the Control Agent
 const double Wmax = 0;    // next slice max time
 
-struct monitoringMsg
-{
-  RT_TASK* task;
-  double startTime;   // Run-time - received
-  double endTime;     // Run-time - received
-  bool isExecuted;    // Run-time - computed
-};
+
 /*
 Ce qu'il me faut :
 On va assigner un ID à chaque task. Cela permet d'identifier une

@@ -2,13 +2,87 @@
 #include "sched.h"
 
 
-TaskLauncher::TaskLauncher(string input_file, int chaineID)
+#define SCHED_DEADLINE  6
+#define SCHED_FLAG_RESET_ON_FORK	0x01
+
+/* __NR_sched_setattr number */
+#ifndef __NR_sched_setattr
+#ifdef __x86_64__
+#define __NR_sched_setattr      314
+#endif
+
+#ifdef __i386__
+#define __NR_sched_setattr      351
+#endif
+
+#ifdef __arm__
+#define __NR_sched_setattr      380
+#endif
+
+#ifdef __aarch64__
+#define __NR_sched_setattr      274
+#endif
+#endif
+
+/* __NR_sched_getattr number */
+#ifndef __NR_sched_getattr
+#ifdef __x86_64__
+#define __NR_sched_getattr      315
+#endif
+
+#ifdef __i386__
+#define __NR_sched_getattr      352
+#endif
+
+#ifdef __arm__
+#define __NR_sched_getattr      381
+#endif
+
+#ifdef __aarch64__
+#define __NR_sched_getattr      275
+#endif
+#endif
+
+struct sched_attr {
+    __u32 size;
+
+    __u32 sched_policy;
+    __u64 sched_flags;
+
+    /* SCHED_NORMAL, SCHED_BATCH */
+    __s32 sched_nice;
+
+    /* SCHED_FIFO, SCHED_RR */
+    __u32 sched_priority;
+
+    /* SCHED_DEADLINE */
+    __u64 sched_runtime;
+    __u64 sched_deadline;
+    __u64 sched_period;
+};
+
+int sched_setattr(pid_t pid,
+              const struct sched_attr *attr,
+              unsigned int flags)
 {
-  tasksInfosList = readTasksList(input_file, chaineID);
+    return syscall(__NR_sched_setattr, pid, attr, flags);
+}
+
+int sched_getattr(pid_t pid,
+              struct sched_attr *attr,
+              unsigned int size,
+              unsigned int flags)
+{
+    return syscall(__NR_sched_getattr, pid, attr, size, flags);
+}
+
+TaskLauncher::TaskLauncher(string input_file)
+{
+  tasksInfosList = readTasksList(input_file);
 }
 
 
-std::vector<rtTaskInfosStruct> TaskLauncher::readTasksList(string input_file, int chaineID)
+std::vector<rtTaskInfosStruct> TaskLauncher::readTasksList(string input_file)
 {
   //system("clear");
   cout << "Initialising machine...\n";
@@ -74,7 +148,6 @@ void TaskLauncher::runTasks( )
       RT_TASK* task = new RT_TASK;
       taskInfo->task = task;
       rt_task_create(task, taskInfo->name, 0, 50, 0);
-      set_affinity(task, taskInfo->affinity);
 
       #if VERBOSE_INFO
       cout << "Task " << taskInfo->name << " created." << endl;
@@ -124,28 +197,8 @@ void TaskLauncher::runTasks( )
 
   }
 
-  #if VERBOSE_OTHER
-    cout << "Now launching the MoCoAgent ! " << endl;
-  #endif
-  RT_TASK mcAgent;
-  int rep = rt_task_create(&mcAgent, "MoCoAgent", 0, 2, 0);
-  set_affinity(&mcAgent, 3);
-
-  rt_task_start(&mcAgent, RunmcAgentMain, &tasksInfosList);
-
-
-
 }
 
-void TaskLauncher::set_affinity (RT_TASK* task, int _aff)
-{
-  cpu_set_t mask;
-  CPU_ZERO(&mask);
-  CPU_SET(_aff, &mask);
-  RT_TASK_INFO curtaskinfo;
-  rt_task_inquire(task, &curtaskinfo);
-  cout << "Setting affinity for task " << curtaskinfo.name << " : CPU" << rt_task_set_affinity(task, &mask) << endl;
-}
 
 void TaskLauncher::printTasksInfos (/* std::vector<rtTaskInfosStruct> _myTasksInfos*/)
 {

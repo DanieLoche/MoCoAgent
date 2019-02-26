@@ -35,7 +35,7 @@ struct rtTaskInfosStruct
 {
     RT_TASK* task;
     char   name[64];
-    string path;
+     string path;
     string task_args;
 
     int  isHardRealTime;
@@ -65,6 +65,13 @@ struct end2endDeadlineStruct
 
 };
 
+struct monitoringMsg
+{
+  RT_TASK* task;
+  double startTime;   // Run-time - received
+  double endTime;     // Run-time - received
+  bool isExecuted;    // Run-time - computed
+};
 
 struct systemRTInfo
 {
