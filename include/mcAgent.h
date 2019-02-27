@@ -1,3 +1,6 @@
+#ifndef MOCOAGENT_H
+#define MOCOAGENT_H
+
 #include "tools.h"
 #include <set>
 #define   TRUE    1
@@ -93,3 +96,6 @@ class MCAgent
     void displaySystemInfo(systemRTInfo* sInfos);
 
 };
+
+
+#endif

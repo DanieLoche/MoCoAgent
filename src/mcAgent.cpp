@@ -1,5 +1,10 @@
 #include "mcAgent.h"
 
+double timerMoCoAgent[128];
+int count = 0;
+
+#include "mcAgent.h"
+
 void messageReceiver(void* arg)
 {
   MCAgent* mocoAgent = (MCAgent*) arg;
@@ -28,7 +33,12 @@ MCAgent::MCAgent(void *arg)
   initMoCoAgent(sInfos);
   initComunications();
 
-  while(TRUE)
+  cout<<"Creation Message Receiver :"<<endl;
+  RT_TASK mcAgentReceiver;
+  rt_task_create(&mcAgentReceiver, "MoCoAgentReceiver", 0, 2, 0);
+  rt_task_start(&mcAgentReceiver, messageReceiver, this);
+
+  while(count < 128)
   {
     for (auto _taskChain = allTaskChain.begin(); _taskChain != allTaskChain.end(); ++_taskChain)
     {
@@ -43,7 +53,16 @@ MCAgent::MCAgent(void *arg)
         _taskChain->resetChain();
       }
     }
+    timerMoCoAgent[count] = rt_timer_read();
+    count++;
   }
+  cout << "printing execution times : " << endl;
+  cout << "Start = " <<  timerMoCoAgent[0];
+  for (count = 0; count < 128; count++)
+  {
+    cout << count << " , " << timerMoCoAgent[count] - timerMoCoAgent[0] << endl;
+  }
+  cout << "Done." << endl;
 }
 
 void MCAgent::initMoCoAgent(systemRTInfo* sInfos)
