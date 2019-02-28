@@ -1,7 +1,6 @@
 #include "taskLauncher.h"
 #include "sched.h"
 
-
 #define SCHED_DEADLINE  6
 #define SCHED_FLAG_RESET_ON_FORK	0x01
 
@@ -78,14 +77,23 @@ int sched_getattr(pid_t pid,
 
 TaskLauncher::TaskLauncher(string input_file)
 {
-  tasksInfosList = readTasksList(input_file);
+  int ret = readTasksList(input_file);
+  if (ret != 0)
+  {
+    cout << "Failed to read whole file." << endl;
+    exit(EXIT_FAILURE);
+    delete this;
+  }
 }
 
 
-std::vector<rtTaskInfosStruct> TaskLauncher::readTasksList(string input_file)
+int TaskLauncher::readTasksList(string input_file)
 {
-  //system("clear");
+  #if VERBOSE_OTHER
+  system("clear");
   cout << "Initialising machine...\n";
+  #endif
+
   std::ifstream myFile(input_file);
   if (!myFile.is_open())
   {
@@ -98,7 +106,7 @@ std::vector<rtTaskInfosStruct> TaskLauncher::readTasksList(string input_file)
   std::getline(myFile, str); // skip the first line
   while (std::getline(myFile, str))
   {
-      rtTaskInfosStruct taskInfo;
+
       std::istringstream iss(str);
       string token;
       #if VERBOSE_ASK
@@ -121,7 +129,7 @@ std::vector<rtTaskInfosStruct> TaskLauncher::readTasksList(string input_file)
       #endif
   }
 
-  return tasksInfosList;
+  return 0;
 
 }
 
@@ -202,6 +210,7 @@ void TaskLauncher::runTasks( )
 
 void TaskLauncher::printTasksInfos (/* std::vector<rtTaskInfosStruct> _myTasksInfos*/)
 {
+  #if VERBOSE_INFO
   for (auto &taskInfo : tasksInfosList)
   {
       cout << "Name: " << taskInfo.name
@@ -212,4 +221,5 @@ void TaskLauncher::printTasksInfos (/* std::vector<rtTaskInfosStruct> _myTasksIn
           << "| affinity: " << taskInfo.affinity << endl;
 
   }
+  #endif
 }

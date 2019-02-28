@@ -6,6 +6,9 @@
 extern void print_affinity(pid_t _pid);
 extern void printTaskInfo(rtTaskInfosStruct* task);
 
+extern void print_affinity(pid_t _pid);
+extern void printTaskInfo(rtTaskInfosStruct* task);
+
 MacroTask::MacroTask()
 {
 
@@ -22,6 +25,7 @@ int MacroTask::before()
   {
      printf("fail write : %s\n",properties.name);
   }
+
 
 
   return 0;

@@ -14,7 +14,6 @@
 #include "buildSet.h"
 #include <mutex>
 
-
 #define EXECTIME   2e8   // execution time in ns
 #define SPINTIME   1e7   // spin time in ns
 #define PRINT 1
@@ -41,7 +40,6 @@ void TaskMain(void* arg)
   rtTaskInfosStruct* rtTI = (rtTaskInfosStruct*) arg;
 
   printInquireInfo();
-
 
   MacroTask macroRT;
   macroRT.properties = *rtTI;
@@ -93,6 +91,7 @@ void my_handler(int s){
 int main(int argc, char* argv[])
 {
   system("clear");
+
 
   string input_file;
 
@@ -162,7 +161,6 @@ int main(int argc, char* argv[])
   return return_code;
 }
 
-
 void printInquireInfo()
 {
 #if VERBOSE_INFO
@@ -200,7 +198,6 @@ void set_affinity (RT_TASK* task, int _aff)
   rt_task_inquire(task, &curtaskinfo);
   cout << "Setting affinity for task " << curtaskinfo.name << " : CPU" << rt_task_set_affinity(task, &mask) << endl;
 }
-
 
 
 void print_affinity(pid_t _pid)

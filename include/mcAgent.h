@@ -1,3 +1,7 @@
+#ifndef MOCOAGENT_H
+#define MOCOAGENT_H
+
+
 #include "tools.h"
 #include <set>
 #define   TRUE    1
@@ -6,8 +10,7 @@
 #define   MODE_NOMINAL        0
 
 const double t_RT = 0;  // time to trigger the Control Agent
-const double Wmax = 0;    // next slice max time
-
+const double Wmax = 400;    // next slice max time
 
 /*
 Ce qu'il me faut :
@@ -86,3 +89,6 @@ class MCAgent
     void displaySystemInfo(systemRTInfo* sInfos);
 
 };
+
+
+#endif

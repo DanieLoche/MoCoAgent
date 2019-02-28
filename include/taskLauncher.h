@@ -1,12 +1,11 @@
 #include "tools.h"
 
 
-
 class TaskLauncher
 {
   public :
     std::vector<rtTaskInfosStruct> tasksInfosList;
-
+    systemRTInfo rtInfos;
 
     TaskLauncher(string input_file);
 
