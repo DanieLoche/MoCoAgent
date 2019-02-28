@@ -19,7 +19,7 @@ void do_workload(int number)
   }
 }
 
-double timerMoCoAgent[BUFFER_SIZE];
+double timerMoCoAgent[128];
 int count = 0;
 
 void messageReceiver(void* arg)
