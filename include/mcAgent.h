@@ -9,7 +9,7 @@
 #define   MODE_NOMINAL        0
 
 const double t_RT = 0;  // time to trigger the Control Agent
-const double Wmax = 0;    // next slice max time
+const double Wmax = 400;    // next slice max time
 
 struct monitoringMsg
 {

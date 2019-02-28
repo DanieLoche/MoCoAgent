@@ -1,9 +1,24 @@
 #include "mcAgent.h"
 
+void do_workload(int number)
+{
+  int j = number;
+  for (int i = 0; i < 30000; ++i)
+  {
+    //std::cout << j << " ";
+    for (int k = 0; k < 30000; k++)
+    {
+      if (k%2 == 0)
+        j = j * 17;
+      else
+        j = j / 17;
+    }
+    j = j * 42;
+  }
+}
+
 double timerMoCoAgent[128];
 int count = 0;
-
-#include "mcAgent.h"
 
 void messageReceiver(void* arg)
 {
@@ -17,16 +32,24 @@ void messageReceiver(void* arg)
 
     mocoAgent->updateTaskInfo(msg);
   }
+
 }
 
 MCAgent::MCAgent(void *arg)
 {
   printInquireInfo();
   print_affinity(0);
+/*
+  cout << "Doing workload" << endl;
+	for (int i = 2; i < 10 ; i++)
+	{
+		do_workload(i*4);
+	}
+  cout << "Workload done" << endl;
+*/
 
   systemRTInfo* sInfos = (systemRTInfo*) arg;
   //TasksInformations = rtTI;
-
   runtimeMode = MODE_NOMINAL;
   displaySystemInfo(sInfos);
 
@@ -56,19 +79,21 @@ MCAgent::MCAgent(void *arg)
     timerMoCoAgent[count] = rt_timer_read();
     count++;
   }
+
   cout << "printing execution times : " << endl;
   cout << "Start = " <<  timerMoCoAgent[0];
-  for (count = 0; count < 128; count++)
+  for (count = 1; count < 128; count++)
   {
-    cout << count << " , " << timerMoCoAgent[count] - timerMoCoAgent[0] << endl;
+    cout << count << " , " << timerMoCoAgent[count] - timerMoCoAgent[count-1] << endl;
   }
+
   cout << "Done." << endl;
 }
 
 void MCAgent::initMoCoAgent(systemRTInfo* sInfos)
 {
-  setAllDeadlines(*sInfos->e2eDD);
-  setAllTasks(*sInfos->rtTIs);
+  setAllDeadlines(sInfos->e2eDD);
+  setAllTasks(sInfos->rtTIs);
 }
 
 void MCAgent::initComunications()
@@ -204,14 +229,16 @@ void MCAgent::updateTaskInfo(monitoringMsg msg)
 ***********************/
 void MCAgent::displaySystemInfo(systemRTInfo* sInfos)
 {
+
+  cout << "Display System info" << endl;
   #if VERBOSE_INFO
   cout << "INPUT Informations : ";
-  for (auto &taskdd : *sInfos->e2eDD)
+  for (auto &taskdd : sInfos->e2eDD)
   { // Print chain params
       cout << "Chain ID : " << taskdd.taskChainID
           << "| Deadline : " << taskdd.deadline << endl;
   }
-  for (auto &taskParam : *sInfos->rtTIs)
+  for (auto &taskParam : sInfos->rtTIs)
   { // Print task Params
       cout << "Name: "    << taskParam.name
           << "| path: "   << taskParam.path
@@ -220,6 +247,8 @@ void MCAgent::displaySystemInfo(systemRTInfo* sInfos)
           << "| Deadline: " << taskParam.deadline
           << "| affinity: " << taskParam.affinity << endl;
   }
+  #else
+    cout << "OUTCH !" << endl;
   #endif
 }
 
