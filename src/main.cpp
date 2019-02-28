@@ -3,6 +3,7 @@
 #define VERBOSE_OTHER 1 // Cout autre...
 #define VERBOSE_ASK   1 // cout explicitement demandés dans le code
 
+
 #include "tools.h"
 #include <sys/sysinfo.h>
 #include "sched.h"
@@ -10,8 +11,20 @@
 #include "mcAgent.h"
 #include "macroTask.h"
 #include "taskLauncher.h"
+#include "buildSet.h"
+#include <mutex>
+
+#define EXECTIME   2e8   // execution time in ns
+#define SPINTIME   1e7   // spin time in ns
+#define PRINT 1
 
 long nproc;
+RT_SEM mysync;
+std::vector<end2endDeadlineStruct> list_info_chaine;
+std::vector<rtTaskInfosStruct> AlltasksInfosList;
+
+TaskLauncher* tasl;
+std::mutex mutex;           // mutex for critical section
 
 void RunmcAgentMain(void* arg)
 {
@@ -25,29 +38,125 @@ void RunmcAgentMain(void* arg)
 void TaskMain(void* arg)
 {
   rtTaskInfosStruct* rtTI = (rtTaskInfosStruct*) arg;
+
   printInquireInfo();
 
   MacroTask macroRT;
   macroRT.properties = *rtTI;
-  macroRT.executeRun();
-
+  if ((*rtTI).isHardRealTime == 0) {
+    macroRT.executeRun_besteffort(&mysync);
+  }
+  else {
+    macroRT.executeRun(&mysync);
+  }
 }
+
+
+void my_handler(int s){
+  #if PRINT
+  cout << "\n------------------------------" << endl;
+  #endif
+  string out_file = "Testoutput.txt";
+  mutex.lock();
+  std::ofstream myfile;
+  myfile.open (out_file);    // TO APPEND :  //,ios_base::app);
+  for (auto taskInfo = tasl->tasksInfosList.begin(); taskInfo != tasl->tasksInfosList.end(); ++taskInfo)
+  {
+
+           myfile << "\nRunning summary for task " << taskInfo->name << ".\n";
+           myfile << "Average runtime : " << taskInfo->average_runtime/ 1.0e6 << "\n";
+           myfile << "Max runtime : " << taskInfo->max_runtime/ 1.0e6 << " ms\n";
+           myfile << "Min runtime : " << taskInfo->min_runtime/ 1.0e6 << " ms\n";
+           myfile << "Deadline :" << taskInfo->deadline / 1.0e6 << " ms\n";
+           myfile << "Out of Deadline : " << taskInfo->out_deadline << " times\n";
+           myfile << "Number of executions : " << taskInfo->num_of_times << " times\n";
+
+           #if PRINT
+           cout << "\n\nRunning summary for task" << taskInfo->name << endl;
+           cout << "Average runtime : " << taskInfo->average_runtime/ 1.0e6 << " ms" <<endl;
+           cout << "Max runtime : " << taskInfo->max_runtime/ 1.0e6 << " ms" << endl;
+           cout << "Min runtime : " << taskInfo->min_runtime/ 1.0e6 << " ms" << endl;
+           cout << "Deadline : " << taskInfo->deadline / 1.0e6 << " ms"<< endl;
+           cout << "Out of Deadline : " << taskInfo->out_deadline << " times" << endl;
+           cout << "Number of executions : " << taskInfo->num_of_times << " times" << endl;
+           #endif
+
+  }
+  myfile.close();
+  mutex.unlock();
+   exit(1);
+}
+
 
 int main(int argc, char* argv[])
 {
+  system("clear");
+
+
+  string input_file;
+
+
+  // Définition fichier d'information des tâches
+
+	input_file = "./input_chaine.txt";
+
   int return_code = 0;
   nproc = get_nprocs();
-  // get input file, either indicated by user as argument or default location
-  string input_file;
-  if (argc > 1) input_file = argv[1];
-  else input_file = "./input.txt";
 
-  TaskLauncher tln(input_file);
-  //tln.tasksInfos = readTasksList(input_file);
 
-  tln.printTasksInfos();
-  tln.runTasks();
+  cout << " Set de tâches en cours de création ..." << endl;
+  buildSet bS;
 
+  bS.readChainsList( input_file, &list_info_chaine);
+
+  //Création de la sémaphore
+  rt_sem_create(&mysync,"MySemaphore",0,S_FIFO);
+
+ for(int i=0; i < (int)list_info_chaine.size();i++ ){
+
+    TaskLauncher tln( list_info_chaine[i].Path);
+    //tln.tasksInfos = readTasksList(input_file);
+    AlltasksInfosList.insert (AlltasksInfosList.end(),tln.tasksInfosList.begin(),tln.tasksInfosList.end());
+    tln.printTasksInfos();
+    tln.runTasks();
+    tln.printTasksInfos();
+    tasl=&tln;
+
+  }
+
+  #if VERBOSE_OTHER
+    cout << "Now launching the MoCoAgent ! " << endl;
+  #endif
+
+  RT_TASK mcAgent;
+  rt_task_create(&mcAgent, "MoCoAgent", 0, 2, 0);
+  set_affinity(&mcAgent, 3);
+
+  systemRTInfo ch_taks ;
+  ch_taks.rtTIs=&AlltasksInfosList;
+  ch_taks.e2eDD =&list_info_chaine;
+  rt_task_start(&mcAgent, RunmcAgentMain, &ch_taks);
+
+
+  //sleeping the time that all tasks will be started
+  usleep(1000000);
+  cout<<"wake up all tasks\n"<<endl;
+  rt_sem_broadcast(&mysync);
+
+  printf("\nType CTRL-C to end this program\n\n" );
+
+  struct sigaction sigIntHandler;
+
+  sigIntHandler.sa_handler = my_handler;
+  sigemptyset(&sigIntHandler.sa_mask);
+  sigIntHandler.sa_flags = 0;
+
+  while (1) {
+    sigaction(SIGINT, &sigIntHandler, NULL);
+  }
+
+
+  pause();
 
   return return_code;
 }
@@ -79,6 +188,17 @@ void printTaskInfo(rtTaskInfosStruct* task)
   cout << ss.rdbuf();
 #endif
 }
+
+void set_affinity (RT_TASK* task, int _aff)
+{
+  cpu_set_t mask;
+  CPU_ZERO(&mask);
+  CPU_SET(_aff, &mask);
+  RT_TASK_INFO curtaskinfo;
+  rt_task_inquire(task, &curtaskinfo);
+  cout << "Setting affinity for task " << curtaskinfo.name << " : CPU" << rt_task_set_affinity(task, &mask) << endl;
+}
+
 
 void print_affinity(pid_t _pid)
 {

@@ -1,5 +1,6 @@
 #include "tools.h"
 
+
 class TaskLauncher
 {
   public :
@@ -9,9 +10,7 @@ class TaskLauncher
     TaskLauncher(string input_file);
 
     void runTasks( );
-    int readTasksList(string);
-
-    void set_affinity (RT_TASK* task, int _aff);
+    std::vector<rtTaskInfosStruct> readTasksList(string, int);
 
     void printTasksInfos (/* std::vector<rtTaskInfosStruct> _myTasksInfos*/);
     void print_affinity(pid_t _pid);
@@ -22,3 +21,4 @@ extern void RunmcAgentMain(void *arg);
 extern void TaskMain(void* arg);
 extern void print_affinity(pid_t _pid);
 extern void printTaskInfo(rtTaskInfosStruct* task);
+extern void set_affinity (RT_TASK* task, int _aff);

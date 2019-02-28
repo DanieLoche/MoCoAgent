@@ -1,6 +1,7 @@
 #ifndef TOOLS_H
 #define TOOLS_H
 
+
 #define VERBOSE_INFO  1 // Cout d'informations, démarrage, etc...
 #define VERBOSE_DEBUG 1 // Cout de débug...
 #define VERBOSE_OTHER 1 // Cout autre...
@@ -12,11 +13,18 @@
 #include <string>
 #include <vector>
 #include <algorithm>
+#include <unistd.h>
+#include <signal.h>
+#include <cstdlib>
 
-#include <cobalt/stdio.h>
 #include <alchemy/task.h>
+#include <alchemy/sem.h>
+#include <alchemy/timer.h>
+#include <rtdm/ipc.h>
 #include <alchemy/buffer.h>
 #include <alchemy/event.h>
+
+
 
 using std::string;
 using std::cout;
@@ -33,15 +41,44 @@ struct rtTaskInfosStruct
 {
     RT_TASK* task;
     char   name[64];
-    string path;
+     string path;
     string task_args;
 
     int isHardRealTime;
+
     int  periodicity;
-    int  deadline;
+    RTIME  deadline;
     int  affinity;
+
+    RTIME average_runtime;
+    RTIME max_runtime;
+    RTIME min_runtime;
+    int  out_deadline;
+    int  num_of_times;
+
 } ;
 
+struct end2endDeadlineStruct
+{
+  string name ;
+  int taskChainID;
+  int Num_tasks;
+  string Path;
+  double deadline;
+  RTIME WCET;
+  RTIME Wmax ;
+  RTIME Excution_time ;
+
+
+};
+
+struct monitoringMsg
+{
+  RT_TASK* task;
+  double startTime;   // Run-time - received
+  double endTime;     // Run-time - received
+  bool isExecuted;    // Run-time - computed
+};
 
 struct systemRTInfo
 {

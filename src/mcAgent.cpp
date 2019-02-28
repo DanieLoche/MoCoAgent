@@ -2,23 +2,6 @@
 
 #define BUFFER_SIZE 4028
 
-void do_workload(int number)
-{
-  int j = number;
-  for (int i = 0; i < 30000; ++i)
-  {
-    //std::cout << j << " ";
-    for (int k = 0; k < 30000; k++)
-    {
-      if (k%2 == 0)
-        j = j * 17;
-      else
-        j = j / 17;
-    }
-    j = j * 42;
-  }
-}
-
 double timerMoCoAgent[128];
 int count = 0;
 
@@ -41,14 +24,6 @@ MCAgent::MCAgent(void *arg)
 {
   printInquireInfo();
   print_affinity(0);
-/*
-  cout << "Doing workload" << endl;
-	for (int i = 2; i < 10 ; i++)
-	{
-		do_workload(i*4);
-	}
-  cout << "Workload done" << endl;
-*/
 
   systemRTInfo* sInfos = (systemRTInfo*) arg;
   //TasksInformations = rtTI;
