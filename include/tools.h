@@ -36,7 +36,7 @@ struct rtTaskInfosStruct
     string path;
     string task_args;
 
-    bool isHardRealTime;
+    int isHardRealTime;
     int  periodicity;
     int  deadline;
     int  affinity;
@@ -45,8 +45,9 @@ struct rtTaskInfosStruct
 
 struct systemRTInfo
 {
-  std::vector<end2endDeadlineStruct>* e2eDD;
-  std::vector<rtTaskInfosStruct>* rtTIs;
+  // Toto test.
+  std::vector<end2endDeadlineStruct> e2eDD;
+  std::vector<rtTaskInfosStruct> rtTIs;
 };
 
 
