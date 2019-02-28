@@ -72,3 +72,9 @@ Thumbs.db
 *.exe
 *.out
 SchedulerSimulator
+*.dat
+output_*
+
+# directories
+trace-cmd/
+Benchmarker/output/

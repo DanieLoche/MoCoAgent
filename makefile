@@ -1,12 +1,12 @@
 ## COMPILER ##
-CXX = g++
+CXX = g++ -g
 RM = rm -f
 XENO_CONFIG = /usr/xenomai/bin/xeno-config
 XENO_CFLAGS = $(shell $(XENO_CONFIG) --alchemy --posix --cflags) #--skin native
 XENO_LDFLAGS = $(shell $(XENO_CONFIG) --alchemy --posix --ldflags)
 
 ## PROJECT ##
-EXEC_NAME = SchedulerSimulator.out
+EXEC_NAME = MoCoAgent.out
 INSTALL_DIR = .
 
 ## DIRECTORIES ##
