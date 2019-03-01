@@ -1,7 +1,3 @@
-#ifndef MOCOAGENT_H
-#define MOCOAGENT_H
-
-
 #include "tools.h"
 #include <set>
 #define   TRUE    1
@@ -11,6 +7,7 @@
 
 const double t_RT = 0;  // time to trigger the Control Agent
 const double Wmax = 400;    // next slice max time
+
 
 /*
 Ce qu'il me faut :
@@ -55,7 +52,7 @@ class taskChain
     double remWCET;         // Runtime - computed
     double end2endDeadline; // static
     //double slackTime;
-    std::vector<taskMonitoringStruct*> taskList;
+    std::vector<taskMonitoringStruct> taskList;
 
     int checkTaskE2E();
     int checkIfEnded();
@@ -89,6 +86,3 @@ class MCAgent
     void displaySystemInfo(systemRTInfo* sInfos);
 
 };
-
-
-#endif

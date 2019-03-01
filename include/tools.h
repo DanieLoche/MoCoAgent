@@ -10,6 +10,7 @@
 #include <fstream>
 #include <sstream>
 #include <iostream>
+#include <stdio.h>
 #include <string>
 #include <vector>
 #include <algorithm>
@@ -25,27 +26,20 @@
 #include <alchemy/event.h>
 
 
-
 using std::string;
 using std::cout;
 using std::endl;
 using std::cin;
 
-struct end2endDeadlineStruct
-{
-  double deadline;
-  int taskChainID;
-};
-
 struct rtTaskInfosStruct
 {
     RT_TASK* task;
     char   name[64];
-     string path;
+    int ID ;
+     string path_task;
     string task_args;
 
-    int isHardRealTime;
-
+    int  isHardRealTime;
     int  periodicity;
     RTIME  deadline;
     int  affinity;
@@ -65,16 +59,13 @@ struct end2endDeadlineStruct
   int Num_tasks;
   string Path;
   double deadline;
-  RTIME WCET;
-  RTIME Wmax ;
-  RTIME Excution_time ;
-
 
 };
 
 struct monitoringMsg
 {
   RT_TASK* task;
+  int ID;
   double startTime;   // Run-time - received
   double endTime;     // Run-time - received
   bool isExecuted;    // Run-time - computed
@@ -83,8 +74,8 @@ struct monitoringMsg
 struct systemRTInfo
 {
   // Toto test.
-  std::vector<end2endDeadlineStruct> e2eDD;
-  std::vector<rtTaskInfosStruct> rtTIs;
+  std::vector<end2endDeadlineStruct>* e2eDD;
+  std::vector<rtTaskInfosStruct>* rtTIs;
 };
 
 
