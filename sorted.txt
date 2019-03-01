@@ -6,7 +6,7 @@ qsort_small.sh      43.8    /home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/aut
 susan_small.sh      44      /home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/automotive/susan/       200           200       2
 bitcount_small.sh   47.3    /home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/automotive/bitcount/    200           200       2
 gsm_small.sh        47.8    /home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/telecomm/gsm/           200           200       2
-CRC38_small.sh      49      /home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/telecomm/CRC38/         200           200       2
+CRC32_small.sh      49      /home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/telecomm/CRC32/         200           200       2
 jpeg_small.sh       49.5    /home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/consumer/jpeg/          200           200       2
 dijkstra_small.sh   53.3    /home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/network/dijkstra/       200           200       2
 basicmath_small.sh  57.8    /home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/automotive/basicmath/   200           200       2

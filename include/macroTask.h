@@ -1,5 +1,6 @@
 #include "tools.h"
 #include <algorithm>
+#include <mutex>
 
 class MacroTask
 {
@@ -16,14 +17,25 @@ class MacroTask
     */
     RTIME starttime, runtime,endtime,time,Somme;
     int cpt;
+    string task_path;
+    std::mutex mutex;
+    RT_BUFFER bf;
+    RT_EVENT	event;
     int before();
+    int before_besteff();
     void proceed();
     int after();
+    int after_besteff();
 
   public :
-    rtTaskInfosStruct* properties;
+    rtTaskInfosStruct properties;
 
     MacroTask();
     void executeRun(RT_SEM* mysync);
+    void executeRun_besteffort(RT_SEM* mysync);
 
 };
+
+
+
+extern void printTaskInfo(rtTaskInfosStruct* task);

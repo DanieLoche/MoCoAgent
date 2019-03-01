@@ -1,3 +1,3 @@
-name path isHRT periodicity deadline affinity
-basicmath_small.sh /home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/automotive/basicmath/basicmath_small.sh 1 200 200 0
-adpcm_large.sh /home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/telecomm/adpcm/adpcm_large.sh 0 1500 1500 0
+name                       path isHRT periodicity deadline affinity
+basicmath_small.sh  /home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/automotive/basicmath/basicmath_small.sh 1 200 200 0
+adpcm_large.sh    /home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/telecomm/adpcm/adpcm_large.sh 1 1500 1500 0

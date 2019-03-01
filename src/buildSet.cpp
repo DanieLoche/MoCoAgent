@@ -10,7 +10,7 @@ using namespace std;
 buildSet::buildSet() {
 
   // Ouverture fichier des tâches
-  std::ifstream myFile("sorted.txt");
+  /*std::ifstream myFile("sorted.txt");
 
   // Test d'ouverture
   if (!myFile.is_open())
@@ -33,11 +33,11 @@ buildSet::buildSet() {
       // Creation liste des tâches et des temps
       ordered_tasks.push_back(name);
       ordered_time.push_back(tpsExeMoy);
-  }
+  }*/
 }
 
 
-void buildSet::readChainsList(string input_file,std::vector<ChaineInfo_Struct> *list_info_chaine)
+void buildSet::readChainsList(string input_file,std::vector<end2endDeadlineStruct> *list_info_chaine)
 {
   system("clear");
   cout << "Initialising machine...\n";
@@ -51,36 +51,29 @@ void buildSet::readChainsList(string input_file,std::vector<ChaineInfo_Struct> *
   //std::vector<rtTaskInfosStruct> myTasksInfos;
 
   string str;
-  int num_tache ;
   std::getline(myFile, str); // skip the first line
   while (std::getline(myFile, str))
   {
-      ChaineInfo_Struct chaineInfo;
+      end2endDeadlineStruct chaineInfo;
       std::istringstream iss(str);
       string token;
       cout << "Managing line : " << str << endl;
-      num_tache = 3;
       if (str.substr(0,2) != "//")
       {
             if (!(iss >> chaineInfo.name
-                      >> chaineInfo.ChaineID
+                      >> chaineInfo.taskChainID
                       >> chaineInfo.Num_tasks
-                      >> chaineInfo.Num_c_tasks))
+                      >> chaineInfo.Path
+                      >> chaineInfo.deadline ))
             { cout << "\033[1;31mFailed to read line\033[0m !" << endl; break; } // error
 
-            for (int n=0; n< chaineInfo.Num_tasks ; n++)
-            {
-              string val;
-              iss >> val;
-              chaineInfo.tasks.push_back(val);
-            }
 
             (*list_info_chaine).push_back(chaineInfo);
       } else cout << "line ignored." << endl;
   }
 
 }
-std::vector<string> buildSet::distributionCrit (double nbr_long, double nbr_short, int crit_percent){
+/*std::vector<string> buildSet::distributionCrit (double nbr_long, double nbr_short, int crit_percent){
     // Vecteur des tâches longues et courtes
     std::vector<string> long_task;
     std::vector<string> short_task;
@@ -261,7 +254,7 @@ std::vector<string> buildSet::get_uncrit_tasks() {
 
 std::vector<rtTaskInfosStruct> buildSet::get_infos_tasks(string input_file)
 {
-  // Ouverture fichier tasks.txt pour récupérer ses infos
+  // Ouverture fichier sorted.txt pour récupérer ses infos
   std::ifstream myFile(input_file);
 
   if (!myFile.is_open())
@@ -337,4 +330,4 @@ void buildSet::buildInput() {
     exit(EXIT_FAILURE);
   }
 
-}
+}*/
