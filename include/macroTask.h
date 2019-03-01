@@ -28,7 +28,7 @@ class MacroTask
     int after_besteff();
 
   public :
-    rtTaskInfosStruct properties;
+    rtTaskInfosStruct* properties;
 
     MacroTask();
     void executeRun(RT_SEM* mysync);

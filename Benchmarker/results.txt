@@ -1,0 +1,14 @@
+Tâche basicmath_small.sh 
+Temps d'exécution min : 60 ms
+Temps d'exécution max : 62 ms
+Temps d'exécution moyen : 60.7 ms
+
+----------------------------
+
+Tâche CRC32_large.sh 
+Temps d'exécution min : 225 ms
+Temps d'exécution max : 229 ms
+Temps d'exécution moyen : 226.6 ms
+
+----------------------------
+

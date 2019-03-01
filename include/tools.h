@@ -35,7 +35,8 @@ struct rtTaskInfosStruct
 {
     RT_TASK* task;
     char   name[64];
-     string path;
+    int ID ;
+     string path_task;
     string task_args;
 
     int  isHardRealTime;
@@ -58,16 +59,13 @@ struct end2endDeadlineStruct
   int Num_tasks;
   string Path;
   double deadline;
-  RTIME WCET;
-  RTIME Wmax ;
-  RTIME Excution_time ;
-
 
 };
 
 struct monitoringMsg
 {
   RT_TASK* task;
+  int ID;
   double startTime;   // Run-time - received
   double endTime;     // Run-time - received
   bool isExecuted;    // Run-time - computed

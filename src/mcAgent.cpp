@@ -6,11 +6,16 @@ void messageReceiver(void* arg)
 
   while(TRUE)
   {
-    void* _msg;
-    rt_buffer_read(&mocoAgent->bf, _msg, sizeof(monitoringMsg), TM_INFINITE);
-    monitoringMsg msg = *(monitoringMsg*) _msg;
-
+  //  void* _msg;
+    monitoringMsg msg;
+    cout<<"buffer read"<<endl;
+    rt_buffer_read(&mocoAgent->bf, &msg, sizeof(monitoringMsg), TM_INFINITE);
+    cout<<"done buffer read"<<endl;
+  //  monitoringMsg* msg = (monitoringMsg*) _msg;
+  //  monitoringMsg rmsg = *msg;
     mocoAgent->updateTaskInfo(msg);
+
+
   }
 }
 
@@ -27,26 +32,29 @@ MCAgent::MCAgent(void *arg)
 
   initMoCoAgent(sInfos);
   initComunications();
-
-  while(TRUE)
-  {
-    for (auto _taskChain = allTaskChain.begin(); _taskChain != allTaskChain.end(); ++_taskChain)
-    {
-      if ( !_taskChain->checkTaskE2E() )
+  cout<<"creation message reciever"<<endl;
+  RT_TASK mcAgentReceiver;
+  rt_task_create(&mcAgentReceiver, "MoCoAgentReceiver", 0, 2, 0);
+  rt_task_start(&mcAgentReceiver, messageReceiver, this);
+//  while(TRUE)
+ //{
+      for (auto _taskChain = allTaskChain.begin(); _taskChain != allTaskChain.end(); ++_taskChain)
       {
-        setMode(MODE_OVERLOADED);
-        _taskChain->isAtRisk = TRUE;
+        if ( !_taskChain->checkTaskE2E() )
+        {
+          setMode(MODE_OVERLOADED);
+          _taskChain->isAtRisk = TRUE;
+        }
+        if (_taskChain->isAtRisk && _taskChain->checkIfEnded())
+        {
+          setMode(MODE_NOMINAL);
+          _taskChain->resetChain();
+        }
       }
-      if (_taskChain->isAtRisk && _taskChain->checkIfEnded())
-      {
-        setMode(MODE_NOMINAL);
-        _taskChain->resetChain();
-      }
-    }
-  }
+//  }
 }
 
-void MCAgent::initMoCoAgent(systemRTInfo* sInfos)
+void MCAgent::initMoCoAgent(systemRTInfsize1o* sInfos)
 {
   setAllDeadlines(*sInfos->e2eDD);
   setAllTasks(*sInfos->rtTIs);
@@ -96,7 +104,7 @@ void MCAgent::setAllTasks(std::vector<rtTaskInfosStruct> _TasksInfos)
       else if ( _taskInfo.isHardRealTime == _taskChain.id )
       {
         taskMonitoringStruct* tms = new taskMonitoringStruct(_taskInfo);
-        _taskChain.taskList.push_back(tms);
+        _taskChain.taskList.push_back(*tms);
         idFound = 1;
       }
 
@@ -158,21 +166,37 @@ void MCAgent::setMode(int mode)
 // DES TACHE EN ORDONNANCANT LES TAKS LISTS.
 void MCAgent::updateTaskInfo(monitoringMsg msg)
 {
+  RT_TASK_INFO curtaskinfo;
+  rt_task_inquire((RT_TASK*) msg.task, &curtaskinfo);
+  cout << "I am task : " << curtaskinfo.name<<"ID :"<< msg.ID<< endl;
+
+  std::vector <taskMonitoringStruct> tk_List;
+
   for (auto& _taskChain : allTaskChain)
   {
-    for (auto& task : _taskChain.taskList)
-    {
-      if(rt_task_same(task->task, msg.task))
+    cout <<"here"<< allTaskChain.size()<< endl;
+    cout <<"size"<< _taskChain.taskList.size()<< endl;
+
+      for (auto& task : _taskChain.taskList)
       {
-        if (!msg.startTime)
-          task->startTime = msg.startTime;
-        else if (msg.isExecuted)
+        cout <<"here"<<endl;
+        cout << "ID : " <<  task.id << "start Time : " << task.startTime << endl;
+
+        rt_task_inquire(task.task, &curtaskinfo);
+        cout << "I am task 2: " << curtaskinfo.name<< endl;
+
+        if( task.id == msg.ID)
         {
-           task->endTime = msg.endTime;
-           task->isExecuted = TRUE;
+          cout << "DONE HERE " <<  endl;
+          if (!msg.startTime)
+            task.startTime = msg.startTime;
+          else if (msg.isExecuted)
+          {
+            task.endTime = msg.endTime;
+             task.isExecuted = TRUE;
+          }
+          return;
         }
-        return;
-      }
     }
   }
 }
@@ -194,17 +218,19 @@ void MCAgent::displaySystemInfo(systemRTInfo* sInfos)
   for (auto &taskParam : *sInfos->rtTIs)
   { // Print task Params
       cout << "Name: "    << taskParam.name
-          << "| path: "   << taskParam.path
+          << "| path: "   << taskParam.path_task
           << "| is RT ? " << taskParam.isHardRealTime
           << "| Period: " << taskParam.periodicity
           << "| Deadline: " << taskParam.deadline
-          << "| affinity: " << taskParam.affinity << endl;
+          << "| affinity: " << taskParam.affinity
+          << "| ID :"<< taskParam.ID << endl;
   }
   #endif
 }
 
 taskChain::taskChain(end2endDeadlineStruct _tcDeadline)
 {
+
   id = _tcDeadline.taskChainID;
   end2endDeadline = _tcDeadline.deadline;
 }
@@ -224,7 +250,7 @@ int taskChain::checkIfEnded()
   bool ended = TRUE;
   for (auto& task : taskList)
   { // only one FALSE is enough
-    ended = ended && task->isExecuted;
+    ended = ended && task.isExecuted;
   }
   if (ended) resetChain();
   return ended;
@@ -232,7 +258,7 @@ int taskChain::checkIfEnded()
 
 void taskChain::resetChain()
 {
-  for (auto& task : taskList) task->isExecuted = 0;
+  for (auto& task : taskList) task.isExecuted = 0;
   isAtRisk = FALSE;
   startTime = 0;
 }
@@ -253,8 +279,8 @@ double taskChain::getRemWCET()
   double RemWCET = 0;
   for (auto& task : taskList)
   {
-    if (!task->isExecuted)
-      RemWCET += task->rwcet;
+    if (!task.isExecuted)
+      RemWCET += task.rwcet;
   }
   return RemWCET;
 }
@@ -271,6 +297,7 @@ taskMonitoringStruct::taskMonitoringStruct(rtTaskInfosStruct rtTaskInfos)
   task = rtTaskInfos.task;
   deadline = rtTaskInfos.deadline;
   rwcet = rtTaskInfos.deadline;
+  id = rtTaskInfos.ID;
 
   isExecuted = FALSE;
   startTime = 0, endTime = 0;

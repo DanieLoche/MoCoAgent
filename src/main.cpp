@@ -21,10 +21,10 @@
 
 long nproc;
 RT_SEM mysync;
+TaskLauncher* tasl;
 std::vector<end2endDeadlineStruct> list_info_chaine;
 std::vector<rtTaskInfosStruct> AlltasksInfosList;
 
-TaskLauncher* tasl;
 std::mutex mutex;           // mutex for critical section
 
 void RunmcAgentMain(void* arg)
@@ -40,11 +40,16 @@ void TaskMain(void* arg)
 {
   rtTaskInfosStruct* rtTI = (rtTaskInfosStruct*) arg;
 
-  printInquireInfo();
+  RT_TASK_INFO curtaskinfo;
+  rt_task_inquire(NULL, &curtaskinfo);
+  print_affinity(curtaskinfo.pid);
+  cout << "I am task : " << curtaskinfo.name << " of priority " << curtaskinfo.prio << endl;
 
+  printTaskInfo(rtTI);
 
   MacroTask macroRT;
-  macroRT.properties = *rtTI;
+  macroRT.properties = rtTI;
+
   if ((*rtTI).isHardRealTime == 0) {
     macroRT.executeRun_besteffort(&mysync);
   }
@@ -59,12 +64,16 @@ void my_handler(int s){
   cout << "\n------------------------------" << endl;
   #endif
   string out_file = "Testoutput.txt";
-  mutex.lock();
+//  mutex.lock();
   std::ofstream myfile;
   myfile.open (out_file);    // TO APPEND :  //,ios_base::app);
-  for (auto taskInfo = tasl->tasksInfosList.begin(); taskInfo != tasl->tasksInfosList.end(); ++taskInfo)
-  {
 
+/* for (auto& taskInfo : AlltasksInfosList)
+  for (auto taskInfo = AlltasksInfosList.begin(); taskInfo != AlltasksInfosList.end(); ++taskInfo)
+  {
+    */
+  for (amcAgentuto taskInfo = tasl->tasksInfosList.begin(); taskInfo != tasl->tasksInfosList.end(); ++taskInfo)
+  {
            myfile << "\nRunning summary for task " << taskInfo->name << ".\n";
            myfile << "Average runtime : " << taskInfo->average_runtime/ 1.0e6 << "\n";
            myfile << "Max runtime : " << taskInfo->max_runtime/ 1.0e6 << " ms\n";
@@ -96,9 +105,7 @@ int main(int argc, char* argv[])
 
   string input_file;
 
-
   // Définition fichier d'information des tâches
-
 	input_file = "./input_chaine.txt";
 
   int return_code = 0;
@@ -113,17 +120,18 @@ int main(int argc, char* argv[])
   //Création de la sémaphore
   rt_sem_create(&mysync,"MySemaphore",0,S_FIFO);
 
- for(int i=0; i < (int)list_info_chaine.size();i++ ){
+  TaskLauncher tln;
 
-    TaskLauncher tln( list_info_chaine[i].Path);
-    //tln.tasksInfos = readTasksList(input_file);
-    AlltasksInfosList.insert (AlltasksInfosList.end(),tln.tasksInfosList.begin(),tln.tasksInfosList.end());
-    tln.printTasksInfos();
-    tln.runTasks();
-    tln.printTasksInfos();
-    tasl=&tln;
+ for(int i=0; i < (int)list_info_chaine.size(); ++i ){
 
-  }
+   tln.readTasksList(list_info_chaine[i].Path);
+}
+
+    //AlltasksInfosList.insert (AlltasksInfosList.end(),tln.tasksInfosList.begin(),tln.tasksInfosList.end());
+   tasl=&tln;
+   cout<<"AlltasksInfosList  size :"<< AlltasksInfosList.size()<<endl;
+   tln.printTasksInfos();
+   tln.runTasks();
 
   #if VERBOSE_OTHER
     cout << "Now launching the MoCoAgent ! " << endl;
@@ -134,13 +142,15 @@ int main(int argc, char* argv[])
   set_affinity(&mcAgent, 3);
 
   systemRTInfo ch_taks ;
-  ch_taks.rtTIs=&AlltasksInfosList;
+  ch_taks.rtTIs=&tln.tasksInfosList ;
   ch_taks.e2eDD =&list_info_chaine;
   rt_task_start(&mcAgent, RunmcAgentMain, &ch_taks);
 
 
+
   //sleeping the time that all tasks will be started
   usleep(1000000);
+
   cout<<"wake up all tasks\n"<<endl;
   rt_sem_broadcast(&mysync);
 
@@ -155,7 +165,6 @@ int main(int argc, char* argv[])
   while (1) {
     sigaction(SIGINT, &sigIntHandler, NULL);
   }
-
 
   pause();
 
@@ -182,11 +191,12 @@ void printTaskInfo(rtTaskInfosStruct* task)
 #if VERBOSE_INFO
   std::stringstream ss;
   ss << "Name: "       << task->name
-     << "| path: "     << task->path
+     << "| path: "     << task->path_task
      << "| is RT ? "   << task->isHardRealTime
      << "| Period: "   << task->periodicity
      << "| Deadline: " << task->deadline
-     << "| affinity: " << task->affinity << endl;
+     << "| affinity: " << task->affinity
+     << "| ID :"<< task->ID << endl;
   cout << ss.rdbuf();
 #endif
 }
@@ -198,7 +208,7 @@ void set_affinity (RT_TASK* task, int _aff)
   CPU_SET(_aff, &mask);
   RT_TASK_INFO curtaskinfo;
   rt_task_inquire(task, &curtaskinfo);
-  cout << "Setting affinity for task " << curtaskinfo.name << " : CPU" << rt_task_set_affinity(task, &mask) << endl;
+  cout << "Setting affinity for task " << curtaskinfo.name << " is ( 0 = valide) :" << rt_task_set_affinity(task, &mask) << endl;
 }
 
 
