@@ -18,13 +18,12 @@ int MacroTask::before()
   msg.ID= properties->ID;
   msg.startTime= rt_timer_read();
   msg.isExecuted =0;
-  cout << "WRITING" << properties->name << endl;
+  cout << "WRITING " << properties->name << endl;
   int ret = rt_buffer_write(&bf , &msg , sizeof(monitoringMsg) , 50000);
   if( 0 > ret)
   {
      printf("fail write : %s\n",properties->name);
   }
-  cout << " done WRITING" << properties->name << endl;
 
 
   return 0;
@@ -42,7 +41,6 @@ void MacroTask::proceed(){
 
        }
        else cout << properties->name <<"Oups, no valid path found !" << endl;
-       printf("End Task  : %s\n",properties->name);
      endtime = rt_timer_read();
 }
 
@@ -72,8 +70,7 @@ int MacroTask::after()
   msg.ID= properties->ID;
   msg.endTime= endtime;
   msg.isExecuted = 1;
-  int ret = rt_buffer_write(&bf , &msg , sizeof(monitoringMsg) , 50000);
-  if( 0 > ret)
+  if( 0 > rt_buffer_write(&bf , &msg , sizeof(monitoringMsg) , 50000))
   {
      printf("fail write : %s\n",properties->name);
   }
@@ -98,14 +95,11 @@ void MacroTask::executeRun(RT_SEM* mysync)
     cpt = 0;
     rt_sem_p(mysync,TM_INFINITE);
 
-    cout << "BINDING" << properties->name << endl;
-    ret =  rt_buffer_bind (&bf , "/monitoringTopic" ,50000);
-    if( 0 > ret)
+    if( 0 > rt_buffer_bind (&bf , "/monitoringTopic" ,50000))
     {
       rt_buffer_delete(&bf);
       printf("%s\n","fail creat");
     }
-    cout << "DONE BINDING" <<properties->name << endl;
 
     while (1) {
 
@@ -173,9 +167,7 @@ void MacroTask::executeRun_besteffort(RT_SEM* mysync)
 
     rt_sem_p(mysync,TM_INFINITE);
 
-    int ret;
-    ret = rt_event_bind( &event,"/modeChangeTopic",500000 );
-    if( 0 > ret)
+    if( 0 > rt_event_bind( &event,"/modeChangeTopic",500000 ))
     {
       rt_event_delete(&event);
       printf("fail bind event %s\n",properties->name);
