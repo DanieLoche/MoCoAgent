@@ -13,23 +13,14 @@ MacroTask::MacroTask()
 
 int MacroTask::before()
 {
-
+  starttime = rt_timer_read();
   print_affinity(0);
   return 0;
 }
 
 void MacroTask::proceed(){
-      properties->max_runtime =0;
-      properties->min_runtime =1e9;
-      properties->out_deadline=0;
-      properties->num_of_times=0;
-      Somme =0;
-      //cout << "path :" << properties.path << "." << endl;
-      properties->average_runtime =0;
-      runtime= 0;
-      cpt =0;
-      getrusage(RUSAGE_SELF,&usage);
-      starttime = rt_timer_read();
+
+      //getrusage(RUSAGE_SELF,&usage);
 
       char* cmd;
       if (properties->path != "/null/")
@@ -38,8 +29,10 @@ void MacroTask::proceed(){
          system(cmd);
        }
        else cout << properties->name <<"Oups, no valid path found !" << endl;
-       getrusage(RUSAGE_SELF,&usage);
-       endtime = rt_timer_read();
+       //getrusage(RUSAGE_SELF,&usage);
+
+
+
 }
 
 
@@ -47,6 +40,7 @@ void MacroTask::proceed(){
 
 int MacroTask::after()
 {
+   endtime = rt_timer_read();
    runtime =  (endtime - starttime)  ;
    Somme += runtime;
    cpt += 1;
@@ -73,14 +67,23 @@ int MacroTask::after()
   return 0;
 }
 
-void MacroTask::executeRun(RT_SEM* mysync)
+
+
+
+
+void MacroTask::executeRun()
 {
+   properties->max_runtime =0;
+  properties->min_runtime =1e9;
+  properties->out_deadline=0;
+  properties->num_of_times=0;
+  Somme =0;
+  //cout << "path :" << properties.path << "." << endl;
+  properties->average_runtime =0;
+  runtime= 0;
+  cpt =0;
+
   //cout << "Running..." << endl;
-
-
-    //rt_sem_p(mysync,TM_INFINITE);
-
-
 
       before(); // Check if execution allowed
 

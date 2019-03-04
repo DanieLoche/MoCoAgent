@@ -22,9 +22,8 @@ class MacroTask
 
   public :
     rtTaskInfosStruct* properties;
-    struct rusage usage;
+  //  struct rusage usage;
 
     MacroTask();
-    void executeRun(RT_SEM* mysync);
-
+    void executeRun();
 };

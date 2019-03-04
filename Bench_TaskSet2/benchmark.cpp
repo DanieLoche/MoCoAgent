@@ -7,8 +7,7 @@
 #include "taskLauncher.h"
 
 #define TARGET 10;
-#define TASKNUM 5;
-#define OUTPUT_FILE "Bench_Aquarius.txt";
+#define OUTPUT_FILE "results.txt";
 #define MEMORY 100000000;
 using namespace std;
 long nproc;
@@ -74,7 +73,7 @@ void RunmcAgentMain(void* arg)
 
 int main(int argc, char *argv[])
 {
-  char tache;
+  char tache[64];
   int return_code = 0;
   nproc = get_nprocs();
   pid = getpid();
@@ -82,47 +81,45 @@ int main(int argc, char *argv[])
   string input_file;
   string out_file = OUTPUT_FILE;
   ofstream myfile;
-  myfile.open (out_file);
-  myfile << "Task_num Min_exec Max_exec Mean_exec\n";
-
-  myfile.close();
+  myfile.open (out_file,ios_base::app);
   if (argc > 1) input_file = argv[1];
   else input_file = "./input.txt";
-  int j;
+  TaskLauncher launcher(input_file);
+  launcher.printTasksInfos();
+  RT_TASK_INFO curtaskinfo;
   int i;
-  int iteration = 2;
   int target = TARGET;
-  int task_num = TASKNUM;
-  for (j = 0 ; j<task_num ; j++){
-    TaskLauncher launcher(input_file,iteration);
-    iteration+=1;
-    launcher.printTasksInfos();
-    for (i = 0 ; i<target ; i++){
-        launcher.runTasks();
-        sleep(2);
+  for (i = 0 ; i<target ; i++){
+    for (auto& taskInfo : launcher.tasksInfosList)  {
+      RT_TASK* task = new RT_TASK;
+      taskInfo.task = task;
+      int memory_stack = MEMORY;
+      rt_task_create(task, taskInfo.name, memory_stack, 50, 0);
+      cout << "Task " << taskInfo.name << " created." << endl; cout.flush();
+      launcher.set_affinity(task, 0);
+      cout << "Launching task " << taskInfo.name << " ..." << endl; cout.flush();
+      usleep(500);
+      cout << "Task " << taskInfo.name << " started." << endl; cout.flush();
+      int rep = rt_task_start(taskInfo.task, TaskMain, &taskInfo);
+      sleep(2);
+      cout << "Task " << taskInfo.name << " stopped." << endl; cout.flush();
+      strcpy(tache,taskInfo.name);
+      int delrep = rt_task_delete(taskInfo.task);
     }
-    sum = (sum / target);
-    myfile.open (out_file,ios_base::app);
-    //myfile << "Tâche ";
-    myfile << iteration-2;
-    myfile << " ";
-    //myfile << "Temps d'exécution min : ";
-    myfile << minimum;
-    myfile << " ";
-    //myfile << " ms\n";
-    //myfile << "Temps d'exécution max : ";
-    myfile << maximum;
-    myfile << " ";
-    //myfile << " ms\n";
-    //myfile << "Temps d'exécution moyen : ";
-    myfile << sum;
-    myfile << "\n";
-    //myfile << " ms\n\n----------------------------\n\n";
-    myfile.close();
-    minimum = 10000000.0;
-    maximum = 0.0;
-    sum = 0.0;
   }
-
+  sum = (sum / target);
+  myfile << "Tâche ";
+  myfile << tache;
+  myfile << " \n";
+  myfile << "Temps d'exécution min : ";
+  myfile << minimum;
+  myfile << " ms\n";
+  myfile << "Temps d'exécution max : ";
+  myfile << maximum;
+  myfile << " ms\n";
+  myfile << "Temps d'exécution moyen : ";
+  myfile << sum;
+  myfile << " ms\n\n----------------------------\n\n";
+  myfile.close();
   return return_code;
 }

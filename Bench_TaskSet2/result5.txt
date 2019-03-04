@@ -1,0 +1,938 @@
+
+Iteration 1 sur 100
+Task susan_large.sh av. runtime 115.038 ms
+Task jpeg_large.sh av. runtime 236.105 ms
+Task CRC32_large.sh av. runtime 196.663 ms
+Task bitcount_large.sh av. runtime 166.017 ms
+Task basicmath_small.sh av. runtime 27.0824 ms
+Temps moy : 148.181ms
+
+Iteration 2 sur 100
+Task susan_large.sh av. runtime 115.069 ms
+Task jpeg_large.sh av. runtime 46.4113 ms
+Task CRC32_large.sh av. runtime 185.625 ms
+Task bitcount_large.sh av. runtime 165.95 ms
+Task basicmath_small.sh av. runtime 27.3015 ms
+Temps moy : 108.072ms
+
+Iteration 3 sur 100
+Task susan_large.sh av. runtime 161.522 ms
+Task jpeg_large.sh av. runtime 72.0715 ms
+Task CRC32_large.sh av. runtime 184.871 ms
+Task bitcount_large.sh av. runtime 163.714 ms
+Task basicmath_small.sh av. runtime 27.2688 ms
+Temps moy : 121.89ms
+
+Iteration 4 sur 100
+Task susan_large.sh av. runtime 115.163 ms
+Task jpeg_large.sh av. runtime 46.4643 ms
+Task CRC32_large.sh av. runtime 184.813 ms
+Task bitcount_large.sh av. runtime 165.78 ms
+Task basicmath_small.sh av. runtime 27.254 ms
+Temps moy : 107.895ms
+
+Iteration 5 sur 100
+Task susan_large.sh av. runtime 161.568 ms
+Task jpeg_large.sh av. runtime 72.1461 ms
+Task CRC32_large.sh av. runtime 184.769 ms
+Task bitcount_large.sh av. runtime 166.049 ms
+Task basicmath_small.sh av. runtime 27.187 ms
+Temps moy : 122.344ms
+
+Iteration 6 sur 100
+Task susan_large.sh av. runtime 114.944 ms
+Task jpeg_large.sh av. runtime 46.4132 ms
+Task CRC32_large.sh av. runtime 184.671 ms
+Task bitcount_large.sh av. runtime 165.687 ms
+Task basicmath_small.sh av. runtime 27.2348 ms
+Temps moy : 107.79ms
+
+Iteration 7 sur 100
+Task susan_large.sh av. runtime 161.362 ms
+Task jpeg_large.sh av. runtime 72.005 ms
+Task CRC32_large.sh av. runtime 185.643 ms
+Task bitcount_large.sh av. runtime 165.997 ms
+Task basicmath_small.sh av. runtime 27.2087 ms
+Temps moy : 122.443ms
+
+Iteration 8 sur 100
+Task susan_large.sh av. runtime 114.976 ms
+Task jpeg_large.sh av. runtime 46.4321 ms
+Task CRC32_large.sh av. runtime 184.631 ms
+Task bitcount_large.sh av. runtime 165.856 ms
+Task basicmath_small.sh av. runtime 27.2845 ms
+Temps moy : 107.836ms
+
+Iteration 9 sur 100
+Task susan_large.sh av. runtime 161.481 ms
+Task jpeg_large.sh av. runtime 72.1071 ms
+Task CRC32_large.sh av. runtime 185.475 ms
+Task bitcount_large.sh av. runtime 165.432 ms
+Task basicmath_small.sh av. runtime 27.3946 ms
+Temps moy : 122.378ms
+
+Iteration 10 sur 100
+Task susan_large.sh av. runtime 114.956 ms
+Task jpeg_large.sh av. runtime 46.3298 ms
+Task CRC32_large.sh av. runtime 189.523 ms
+Task bitcount_large.sh av. runtime 165.974 ms
+Task basicmath_small.sh av. runtime 27.2653 ms
+Temps moy : 108.81ms
+
+Iteration 11 sur 100
+Task susan_large.sh av. runtime 161.366 ms
+Task jpeg_large.sh av. runtime 72.0111 ms
+Task CRC32_large.sh av. runtime 185.496 ms
+Task bitcount_large.sh av. runtime 165.859 ms
+Task basicmath_small.sh av. runtime 27.1504 ms
+Temps moy : 122.376ms
+
+Iteration 12 sur 100
+Task susan_large.sh av. runtime 115.079 ms
+Task jpeg_large.sh av. runtime 46.4527 ms
+Task CRC32_large.sh av. runtime 184.66 ms
+Task bitcount_large.sh av. runtime 166.098 ms
+Task basicmath_small.sh av. runtime 27.2727 ms
+Temps moy : 107.912ms
+
+Iteration 13 sur 100
+Task susan_large.sh av. runtime 161.795 ms
+Task jpeg_large.sh av. runtime 72.2288 ms
+Task CRC32_large.sh av. runtime 185.921 ms
+Task bitcount_large.sh av. runtime 166.133 ms
+Task basicmath_small.sh av. runtime 27.3239 ms
+Temps moy : 122.681ms
+
+Iteration 14 sur 100
+Task susan_large.sh av. runtime 115.188 ms
+Task jpeg_large.sh av. runtime 46.4741 ms
+Task CRC32_large.sh av. runtime 185.567 ms
+Task bitcount_large.sh av. runtime 165.488 ms
+Task basicmath_small.sh av. runtime 27.3679 ms
+Temps moy : 108.017ms
+
+Iteration 15 sur 100
+Task susan_large.sh av. runtime 161.917 ms
+Task jpeg_large.sh av. runtime 72.2174 ms
+Task CRC32_large.sh av. runtime 185.614 ms
+Task bitcount_large.sh av. runtime 166.106 ms
+Task basicmath_small.sh av. runtime 27.2187 ms
+Temps moy : 122.615ms
+
+Iteration 16 sur 100
+Task susan_large.sh av. runtime 115.301 ms
+Task jpeg_large.sh av. runtime 46.3884 ms
+Task CRC32_large.sh av. runtime 185.627 ms
+Task bitcount_large.sh av. runtime 165.481 ms
+Task basicmath_small.sh av. runtime 27.1893 ms
+Temps moy : 107.997ms
+
+Iteration 17 sur 100
+Task susan_large.sh av. runtime 161.867 ms
+Task jpeg_large.sh av. runtime 72.192 ms
+Task CRC32_large.sh av. runtime 184.879 ms
+Task bitcount_large.sh av. runtime 166.012 ms
+Task basicmath_small.sh av. runtime 27.2109 ms
+Temps moy : 122.432ms
+
+Iteration 18 sur 100
+Task susan_large.sh av. runtime 115.23 ms
+Task jpeg_large.sh av. runtime 46.4678 ms
+Task CRC32_large.sh av. runtime 185.728 ms
+Task bitcount_large.sh av. runtime 165.708 ms
+Task basicmath_small.sh av. runtime 27.3056 ms
+Temps moy : 108.088ms
+
+Iteration 19 sur 100
+Task susan_large.sh av. runtime 161.521 ms
+Task jpeg_large.sh av. runtime 71.9946 ms
+Task CRC32_large.sh av. runtime 184.51 ms
+Task bitcount_large.sh av. runtime 166.105 ms
+Task basicmath_small.sh av. runtime 27.2523 ms
+Temps moy : 122.276ms
+
+Iteration 20 sur 100
+Task susan_large.sh av. runtime 115.076 ms
+Task jpeg_large.sh av. runtime 46.6275 ms
+Task CRC32_large.sh av. runtime 185.521 ms
+Task bitcount_large.sh av. runtime 165.603 ms
+Task basicmath_small.sh av. runtime 27.2053 ms
+Temps moy : 108.007ms
+
+Iteration 21 sur 100
+Task susan_large.sh av. runtime 161.434 ms
+Task jpeg_large.sh av. runtime 72.0508 ms
+Task CRC32_large.sh av. runtime 185.437 ms
+Task bitcount_large.sh av. runtime 166.154 ms
+Task basicmath_small.sh av. runtime 27.2504 ms
+Temps moy : 122.465ms
+
+Iteration 22 sur 100
+Task susan_large.sh av. runtime 115.084 ms
+Task jpeg_large.sh av. runtime 46.4498 ms
+Task CRC32_large.sh av. runtime 185.265 ms
+Task bitcount_large.sh av. runtime 165.974 ms
+Task basicmath_small.sh av. runtime 27.2089 ms
+Temps moy : 107.996ms
+
+Iteration 23 sur 100
+Task susan_large.sh av. runtime 161.593 ms
+Task jpeg_large.sh av. runtime 72.2062 ms
+Task CRC32_large.sh av. runtime 185.546 ms
+Task bitcount_large.sh av. runtime 165.811 ms
+Task basicmath_small.sh av. runtime 27.2228 ms
+Temps moy : 122.476ms
+
+Iteration 24 sur 100
+Task susan_large.sh av. runtime 114.947 ms
+Task jpeg_large.sh av. runtime 46.3668 ms
+Task CRC32_large.sh av. runtime 185.405 ms
+Task bitcount_large.sh av. runtime 165.9 ms
+Task basicmath_small.sh av. runtime 27.2245 ms
+Temps moy : 107.969ms
+
+Iteration 25 sur 100
+Task susan_large.sh av. runtime 166.286 ms
+Task jpeg_large.sh av. runtime 75.5691 ms
+Task CRC32_large.sh av. runtime 189.305 ms
+Task bitcount_large.sh av. runtime 166.191 ms
+Task basicmath_small.sh av. runtime 27.2157 ms
+Temps moy : 124.913ms
+
+Iteration 26 sur 100
+Task susan_large.sh av. runtime 115.085 ms
+Task jpeg_large.sh av. runtime 46.5053 ms
+Task CRC32_large.sh av. runtime 185.652 ms
+Task bitcount_large.sh av. runtime 165.851 ms
+Task basicmath_small.sh av. runtime 27.2264 ms
+Temps moy : 108.064ms
+
+Iteration 27 sur 100
+Task susan_large.sh av. runtime 115.049 ms
+Task jpeg_large.sh av. runtime 46.4712 ms
+Task CRC32_large.sh av. runtime 185.735 ms
+Task bitcount_large.sh av. runtime 166.47 ms
+Task basicmath_small.sh av. runtime 27.184 ms
+Temps moy : 108.182ms
+
+Iteration 28 sur 100
+Task susan_large.sh av. runtime 115.053 ms
+Task jpeg_large.sh av. runtime 46.4435 ms
+Task CRC32_large.sh av. runtime 184.668 ms
+Task bitcount_large.sh av. runtime 166.291 ms
+Task basicmath_small.sh av. runtime 27.2251 ms
+Temps moy : 107.936ms
+
+Iteration 29 sur 100
+Task susan_large.sh av. runtime 115.305 ms
+Task jpeg_large.sh av. runtime 46.5488 ms
+Task CRC32_large.sh av. runtime 185.725 ms
+Task bitcount_large.sh av. runtime 165.941 ms
+Task basicmath_small.sh av. runtime 27.3098 ms
+Temps moy : 108.166ms
+
+Iteration 30 sur 100
+Task susan_large.sh av. runtime 115.125 ms
+Task jpeg_large.sh av. runtime 46.3992 ms
+Task CRC32_large.sh av. runtime 185.599 ms
+Task bitcount_large.sh av. runtime 165.818 ms
+Task basicmath_small.sh av. runtime 27.3082 ms
+Temps moy : 108.05ms
+
+Iteration 31 sur 100
+Task susan_large.sh av. runtime 115.428 ms
+Task jpeg_large.sh av. runtime 46.5086 ms
+Task CRC32_large.sh av. runtime 184.863 ms
+Task bitcount_large.sh av. runtime 165.964 ms
+Task basicmath_small.sh av. runtime 27.2955 ms
+Temps moy : 108.012ms
+
+Iteration 32 sur 100
+Task susan_large.sh av. runtime 115.168 ms
+Task jpeg_large.sh av. runtime 46.4115 ms
+Task CRC32_large.sh av. runtime 185.631 ms
+Task bitcount_large.sh av. runtime 165.75 ms
+Task basicmath_small.sh av. runtime 27.3853 ms
+Temps moy : 108.069ms
+
+Iteration 33 sur 100
+Task susan_large.sh av. runtime 114.959 ms
+Task jpeg_large.sh av. runtime 46.3193 ms
+Task CRC32_large.sh av. runtime 184.493 ms
+Task bitcount_large.sh av. runtime 166.249 ms
+Task basicmath_small.sh av. runtime 27.2357 ms
+Temps moy : 107.851ms
+
+Iteration 34 sur 100
+Task susan_large.sh av. runtime 115.01 ms
+Task jpeg_large.sh av. runtime 46.4814 ms
+Task CRC32_large.sh av. runtime 185.455 ms
+Task bitcount_large.sh av. runtime 166.057 ms
+Task basicmath_small.sh av. runtime 27.2635 ms
+Temps moy : 108.053ms
+
+Iteration 35 sur 100
+Task susan_large.sh av. runtime 115.157 ms
+Task jpeg_large.sh av. runtime 46.9178 ms
+Task CRC32_large.sh av. runtime 184.62 ms
+Task bitcount_large.sh av. runtime 165.747 ms
+Task basicmath_small.sh av. runtime 27.2554 ms
+Temps moy : 107.94ms
+
+Iteration 36 sur 100
+Task susan_large.sh av. runtime 115.21 ms
+Task jpeg_large.sh av. runtime 46.428 ms
+Task CRC32_large.sh av. runtime 184.637 ms
+Task bitcount_large.sh av. runtime 166.341 ms
+Task basicmath_small.sh av. runtime 27.3393 ms
+Temps moy : 107.991ms
+
+Iteration 37 sur 100
+Task susan_large.sh av. runtime 115.127 ms
+Task jpeg_large.sh av. runtime 46.4712 ms
+Task CRC32_large.sh av. runtime 184.685 ms
+Task bitcount_large.sh av. runtime 166.118 ms
+Task basicmath_small.sh av. runtime 27.2311 ms
+Temps moy : 107.926ms
+
+Iteration 38 sur 100
+Task susan_large.sh av. runtime 115.151 ms
+Task jpeg_large.sh av. runtime 46.4052 ms
+Task CRC32_large.sh av. runtime 184.832 ms
+Task bitcount_large.sh av. runtime 166.482 ms
+Task basicmath_small.sh av. runtime 27.2185 ms
+Temps moy : 108.018ms
+
+Iteration 39 sur 100
+Task susan_large.sh av. runtime 115.102 ms
+Task jpeg_large.sh av. runtime 46.4198 ms
+Task CRC32_large.sh av. runtime 185.344 ms
+Task bitcount_large.sh av. runtime 165.902 ms
+Task basicmath_small.sh av. runtime 27.1876 ms
+Temps moy : 107.991ms
+
+Iteration 40 sur 100
+Task susan_large.sh av. runtime 115.142 ms
+Task jpeg_large.sh av. runtime 46.4394 ms
+Task CRC32_large.sh av. runtime 184.968 ms
+Task bitcount_large.sh av. runtime 166.287 ms
+Task basicmath_small.sh av. runtime 27.2633 ms
+Temps moy : 108.02ms
+
+Iteration 41 sur 100
+Task susan_large.sh av. runtime 115.041 ms
+Task jpeg_large.sh av. runtime 46.3953 ms
+Task CRC32_large.sh av. runtime 184.652 ms
+Task bitcount_large.sh av. runtime 165.825 ms
+Task basicmath_small.sh av. runtime 27.2153 ms
+Temps moy : 107.826ms
+
+Iteration 42 sur 100
+Task susan_large.sh av. runtime 114.961 ms
+Task jpeg_large.sh av. runtime 46.4365 ms
+Task CRC32_large.sh av. runtime 184.604 ms
+Task bitcount_large.sh av. runtime 165.959 ms
+Task basicmath_small.sh av. runtime 27.1548 ms
+Temps moy : 107.823ms
+
+Iteration 43 sur 100
+Task susan_large.sh av. runtime 115.06 ms
+Task jpeg_large.sh av. runtime 46.7471 ms
+Task CRC32_large.sh av. runtime 185.519 ms
+Task bitcount_large.sh av. runtime 165.558 ms
+Task basicmath_small.sh av. runtime 27.2112 ms
+Temps moy : 108.019ms
+
+Iteration 44 sur 100
+Task susan_large.sh av. runtime 115.101 ms
+Task jpeg_large.sh av. runtime 46.4109 ms
+Task CRC32_large.sh av. runtime 184.465 ms
+Task bitcount_large.sh av. runtime 166.124 ms
+Task basicmath_small.sh av. runtime 27.1731 ms
+Temps moy : 107.855ms
+
+Iteration 45 sur 100
+Task susan_large.sh av. runtime 114.946 ms
+Task jpeg_large.sh av. runtime 46.4284 ms
+Task CRC32_large.sh av. runtime 185.531 ms
+Task bitcount_large.sh av. runtime 165.575 ms
+Task basicmath_small.sh av. runtime 27.2255 ms
+Temps moy : 107.941ms
+
+Iteration 46 sur 100
+Task susan_large.sh av. runtime 115.095 ms
+Task jpeg_large.sh av. runtime 46.4137 ms
+Task CRC32_large.sh av. runtime 185.504 ms
+Task bitcount_large.sh av. runtime 165.78 ms
+Task basicmath_small.sh av. runtime 27.1955 ms
+Temps moy : 107.998ms
+
+Iteration 47 sur 100
+Task susan_large.sh av. runtime 115.044 ms
+Task jpeg_large.sh av. runtime 46.9319 ms
+Task CRC32_large.sh av. runtime 185.486 ms
+Task bitcount_large.sh av. runtime 165.707 ms
+Task basicmath_small.sh av. runtime 27.1945 ms
+Temps moy : 108.073ms
+
+Iteration 48 sur 100
+Task susan_large.sh av. runtime 114.959 ms
+Task jpeg_large.sh av. runtime 46.3437 ms
+Task CRC32_large.sh av. runtime 184.724 ms
+Task bitcount_large.sh av. runtime 165.574 ms
+Task basicmath_small.sh av. runtime 27.2015 ms
+Temps moy : 107.761ms
+
+Iteration 49 sur 100
+Task susan_large.sh av. runtime 114.826 ms
+Task jpeg_large.sh av. runtime 46.5111 ms
+Task CRC32_large.sh av. runtime 184.684 ms
+Task bitcount_large.sh av. runtime 166.038 ms
+Task basicmath_small.sh av. runtime 27.191 ms
+Temps moy : 107.85ms
+
+Iteration 50 sur 100
+Task susan_large.sh av. runtime 115.022 ms
+Task jpeg_large.sh av. runtime 46.6045 ms
+Task CRC32_large.sh av. runtime 184.521 ms
+Task bitcount_large.sh av. runtime 165.759 ms
+Task basicmath_small.sh av. runtime 27.2212 ms
+Temps moy : 107.826ms
+
+Iteration 51 sur 100
+Task susan_large.sh av. runtime 115.098 ms
+Task jpeg_large.sh av. runtime 46.3923 ms
+Task CRC32_large.sh av. runtime 184.696 ms
+Task bitcount_large.sh av. runtime 166.309 ms
+Task basicmath_small.sh av. runtime 27.5669 ms
+Temps moy : 108.012ms
+
+Iteration 52 sur 100
+Task susan_large.sh av. runtime 114.873 ms
+Task jpeg_large.sh av. runtime 46.4299 ms
+Task CRC32_large.sh av. runtime 185.499 ms
+Task bitcount_large.sh av. runtime 165.524 ms
+Task basicmath_small.sh av. runtime 27.216 ms
+Temps moy : 107.908ms
+
+Iteration 53 sur 100
+Task susan_large.sh av. runtime 115.053 ms
+Task jpeg_large.sh av. runtime 46.6903 ms
+Task CRC32_large.sh av. runtime 184.504 ms
+Task bitcount_large.sh av. runtime 166.158 ms
+Task basicmath_small.sh av. runtime 27.1787 ms
+Temps moy : 107.917ms
+
+Iteration 54 sur 100
+Task susan_large.sh av. runtime 114.97 ms
+Task jpeg_large.sh av. runtime 46.3728 ms
+Task CRC32_large.sh av. runtime 184.609 ms
+Task bitcount_large.sh av. runtime 165.849 ms
+Task basicmath_small.sh av. runtime 27.1933 ms
+Temps moy : 107.799ms
+
+Iteration 55 sur 100
+Task susan_large.sh av. runtime 114.962 ms
+Task jpeg_large.sh av. runtime 46.4907 ms
+Task CRC32_large.sh av. runtime 185.506 ms
+Task bitcount_large.sh av. runtime 166.675 ms
+Task basicmath_small.sh av. runtime 27.2435 ms
+Temps moy : 108.176ms
+
+Iteration 56 sur 100
+Task susan_large.sh av. runtime 115.176 ms
+Task jpeg_large.sh av. runtime 46.5048 ms
+Task CRC32_large.sh av. runtime 185.522 ms
+Task bitcount_large.sh av. runtime 165.533 ms
+Task basicmath_small.sh av. runtime 27.2543 ms
+Temps moy : 107.998ms
+
+Iteration 57 sur 100
+Task susan_large.sh av. runtime 115.011 ms
+Task jpeg_large.sh av. runtime 46.3351 ms
+Task CRC32_large.sh av. runtime 185.71 ms
+Task bitcount_large.sh av. runtime 166.033 ms
+Task basicmath_small.sh av. runtime 27.2561 ms
+Temps moy : 108.069ms
+
+Iteration 58 sur 100
+Task susan_large.sh av. runtime 114.942 ms
+Task jpeg_large.sh av. runtime 46.3829 ms
+Task CRC32_large.sh av. runtime 185.553 ms
+Task bitcount_large.sh av. runtime 165.691 ms
+Task basicmath_small.sh av. runtime 27.2184 ms
+Temps moy : 107.958ms
+
+Iteration 59 sur 100
+Task susan_large.sh av. runtime 115.179 ms
+Task jpeg_large.sh av. runtime 46.4902 ms
+Task CRC32_large.sh av. runtime 185.501 ms
+Task bitcount_large.sh av. runtime 166.073 ms
+Task basicmath_small.sh av. runtime 27.1679 ms
+Temps moy : 108.082ms
+
+Iteration 60 sur 100
+Task susan_large.sh av. runtime 114.95 ms
+Task jpeg_large.sh av. runtime 46.3877 ms
+Task CRC32_large.sh av. runtime 185.446 ms
+Task bitcount_large.sh av. runtime 165.625 ms
+Task basicmath_small.sh av. runtime 27.171 ms
+Temps moy : 107.916ms
+
+Iteration 61 sur 100
+Task susan_large.sh av. runtime 114.903 ms
+Task jpeg_large.sh av. runtime 46.499 ms
+Task CRC32_large.sh av. runtime 184.582 ms
+Task bitcount_large.sh av. runtime 165.473 ms
+Task basicmath_small.sh av. runtime 27.2343 ms
+Temps moy : 107.738ms
+
+Iteration 62 sur 100
+Task susan_large.sh av. runtime 114.991 ms
+Task jpeg_large.sh av. runtime 46.3946 ms
+Task CRC32_large.sh av. runtime 185.511 ms
+Task bitcount_large.sh av. runtime 166.092 ms
+Task basicmath_small.sh av. runtime 27.1839 ms
+Temps moy : 108.035ms
+
+Iteration 63 sur 100
+Task susan_large.sh av. runtime 115.061 ms
+Task jpeg_large.sh av. runtime 46.4385 ms
+Task CRC32_large.sh av. runtime 184.624 ms
+Task bitcount_large.sh av. runtime 165.454 ms
+Task basicmath_small.sh av. runtime 27.1935 ms
+Temps moy : 107.754ms
+
+Iteration 64 sur 100
+Task susan_large.sh av. runtime 114.919 ms
+Task jpeg_large.sh av. runtime 46.4046 ms
+Task CRC32_large.sh av. runtime 184.731 ms
+Task bitcount_large.sh av. runtime 165.994 ms
+Task basicmath_small.sh av. runtime 27.1843 ms
+Temps moy : 107.846ms
+
+Iteration 65 sur 100
+Task susan_large.sh av. runtime 114.994 ms
+Task jpeg_large.sh av. runtime 46.4589 ms
+Task CRC32_large.sh av. runtime 185.402 ms
+Task bitcount_large.sh av. runtime 165.727 ms
+Task basicmath_small.sh av. runtime 27.201 ms
+Temps moy : 107.957ms
+
+Iteration 66 sur 100
+Task susan_large.sh av. runtime 114.94 ms
+Task jpeg_large.sh av. runtime 46.8844 ms
+Task CRC32_large.sh av. runtime 185.315 ms
+Task bitcount_large.sh av. runtime 166.165 ms
+Task basicmath_small.sh av. runtime 27.2933 ms
+Temps moy : 108.12ms
+
+Iteration 67 sur 100
+Task susan_large.sh av. runtime 114.979 ms
+Task jpeg_large.sh av. runtime 46.3526 ms
+Task CRC32_large.sh av. runtime 185.375 ms
+Task bitcount_large.sh av. runtime 166.007 ms
+Task basicmath_small.sh av. runtime 27.1547 ms
+Temps moy : 107.974ms
+
+Iteration 68 sur 100
+Task susan_large.sh av. runtime 114.957 ms
+Task jpeg_large.sh av. runtime 46.3731 ms
+Task CRC32_large.sh av. runtime 185.394 ms
+Task bitcount_large.sh av. runtime 165.442 ms
+Task basicmath_small.sh av. runtime 27.2059 ms
+Temps moy : 107.874ms
+
+Iteration 69 sur 100
+Task susan_large.sh av. runtime 114.965 ms
+Task jpeg_large.sh av. runtime 46.3518 ms
+Task CRC32_large.sh av. runtime 185.48 ms
+Task bitcount_large.sh av. runtime 166.071 ms
+Task basicmath_small.sh av. runtime 27.1788 ms
+Temps moy : 108.009ms
+
+Iteration 70 sur 100
+Task susan_large.sh av. runtime 115.024 ms
+Task jpeg_large.sh av. runtime 46.4122 ms
+Task CRC32_large.sh av. runtime 184.463 ms
+Task bitcount_large.sh av. runtime 165.782 ms
+Task basicmath_small.sh av. runtime 27.5125 ms
+Temps moy : 107.839ms
+
+Iteration 71 sur 100
+Task susan_large.sh av. runtime 115.028 ms
+Task jpeg_large.sh av. runtime 46.2936 ms
+Task CRC32_large.sh av. runtime 184.725 ms
+Task bitcount_large.sh av. runtime 166.006 ms
+Task basicmath_small.sh av. runtime 27.2617 ms
+Temps moy : 107.863ms
+
+Iteration 72 sur 100
+Task susan_large.sh av. runtime 115.029 ms
+Task jpeg_large.sh av. runtime 46.4824 ms
+Task CRC32_large.sh av. runtime 185.467 ms
+Task bitcount_large.sh av. runtime 165.763 ms
+Task basicmath_small.sh av. runtime 27.1929 ms
+Temps moy : 107.987ms
+
+Iteration 73 sur 100
+Task susan_large.sh av. runtime 114.868 ms
+Task jpeg_large.sh av. runtime 46.3464 ms
+Task CRC32_large.sh av. runtime 184.605 ms
+Task bitcount_large.sh av. runtime 165.958 ms
+Task basicmath_small.sh av. runtime 27.236 ms
+Temps moy : 107.803ms
+
+Iteration 74 sur 100
+Task susan_large.sh av. runtime 115.027 ms
+Task jpeg_large.sh av. runtime 46.3806 ms
+Task CRC32_large.sh av. runtime 185.471 ms
+Task bitcount_large.sh av. runtime 165.657 ms
+Task basicmath_small.sh av. runtime 27.237 ms
+Temps moy : 107.955ms
+
+Iteration 75 sur 100
+Task susan_large.sh av. runtime 114.979 ms
+Task jpeg_large.sh av. runtime 46.4626 ms
+Task CRC32_large.sh av. runtime 185.522 ms
+Task bitcount_large.sh av. runtime 165.885 ms
+Task basicmath_small.sh av. runtime 27.3012 ms
+Temps moy : 108.03ms
+
+Iteration 76 sur 100
+Task susan_large.sh av. runtime 114.962 ms
+Task jpeg_large.sh av. runtime 46.3272 ms
+Task CRC32_large.sh av. runtime 185.524 ms
+Task bitcount_large.sh av. runtime 166.038 ms
+Task basicmath_small.sh av. runtime 27.1915 ms
+Temps moy : 108.009ms
+
+Iteration 77 sur 100
+Task susan_large.sh av. runtime 114.997 ms
+Task jpeg_large.sh av. runtime 46.4197 ms
+Task CRC32_large.sh av. runtime 184.651 ms
+Task bitcount_large.sh av. runtime 165.821 ms
+Task basicmath_small.sh av. runtime 27.2435 ms
+Temps moy : 107.826ms
+
+Iteration 78 sur 100
+Task susan_large.sh av. runtime 114.981 ms
+Task jpeg_large.sh av. runtime 46.3677 ms
+Task CRC32_large.sh av. runtime 184.623 ms
+Task bitcount_large.sh av. runtime 165.99 ms
+Task basicmath_small.sh av. runtime 27.2136 ms
+Temps moy : 107.835ms
+
+Iteration 79 sur 100
+Task susan_large.sh av. runtime 114.947 ms
+Task jpeg_large.sh av. runtime 46.3567 ms
+Task CRC32_large.sh av. runtime 184.641 ms
+Task bitcount_large.sh av. runtime 165.794 ms
+Task basicmath_small.sh av. runtime 27.2265 ms
+Temps moy : 107.793ms
+
+Iteration 80 sur 100
+Task susan_large.sh av. runtime 115.072 ms
+Task jpeg_large.sh av. runtime 46.3962 ms
+Task CRC32_large.sh av. runtime 184.57 ms
+Task bitcount_large.sh av. runtime 165.945 ms
+Task basicmath_small.sh av. runtime 27.1304 ms
+Temps moy : 107.823ms
+
+Iteration 81 sur 100
+Task susan_large.sh av. runtime 114.974 ms
+Task jpeg_large.sh av. runtime 46.8635 ms
+Task CRC32_large.sh av. runtime 184.697 ms
+Task bitcount_large.sh av. runtime 165.792 ms
+Task basicmath_small.sh av. runtime 27.2306 ms
+Temps moy : 107.912ms
+
+Iteration 82 sur 100
+Task susan_large.sh av. runtime 114.922 ms
+Task jpeg_large.sh av. runtime 46.3985 ms
+Task CRC32_large.sh av. runtime 185.446 ms
+Task bitcount_large.sh av. runtime 165.766 ms
+Task basicmath_small.sh av. runtime 27.2075 ms
+Temps moy : 107.948ms
+
+Iteration 83 sur 100
+Task susan_large.sh av. runtime 114.945 ms
+Task jpeg_large.sh av. runtime 46.2731 ms
+Task CRC32_large.sh av. runtime 186.013 ms
+Task bitcount_large.sh av. runtime 166.417 ms
+Task basicmath_small.sh av. runtime 27.1458 ms
+Temps moy : 108.159ms
+
+Iteration 84 sur 100
+Task susan_large.sh av. runtime 114.877 ms
+Task jpeg_large.sh av. runtime 46.3783 ms
+Task CRC32_large.sh av. runtime 184.617 ms
+Task bitcount_large.sh av. runtime 165.789 ms
+Task basicmath_small.sh av. runtime 27.6937 ms
+Temps moy : 107.871ms
+
+Iteration 85 sur 100
+Task susan_large.sh av. runtime 114.98 ms
+Task jpeg_large.sh av. runtime 46.3975 ms
+Task CRC32_large.sh av. runtime 184.628 ms
+Task bitcount_large.sh av. runtime 165.944 ms
+Task basicmath_small.sh av. runtime 27.225 ms
+Temps moy : 107.835ms
+
+Iteration 86 sur 100
+Task susan_large.sh av. runtime 114.982 ms
+Task jpeg_large.sh av. runtime 46.3729 ms
+Task CRC32_large.sh av. runtime 184.502 ms
+Task bitcount_large.sh av. runtime 165.852 ms
+Task basicmath_small.sh av. runtime 27.241 ms
+Temps moy : 107.79ms
+
+Iteration 87 sur 100
+Task susan_large.sh av. runtime 115.037 ms
+Task jpeg_large.sh av. runtime 46.413 ms
+Task CRC32_large.sh av. runtime 184.646 ms
+Task bitcount_large.sh av. runtime 166.065 ms
+Task basicmath_small.sh av. runtime 27.1764 ms
+Temps moy : 107.868ms
+
+Iteration 88 sur 100
+Task susan_large.sh av. runtime 115.043 ms
+Task jpeg_large.sh av. runtime 46.4218 ms
+Task CRC32_large.sh av. runtime 184.764 ms
+Task bitcount_large.sh av. runtime 165.831 ms
+Task basicmath_small.sh av. runtime 27.2378 ms
+Temps moy : 107.86ms
+
+Iteration 89 sur 100
+Task susan_large.sh av. runtime 115.01 ms
+Task jpeg_large.sh av. runtime 46.4086 ms
+Task CRC32_large.sh av. runtime 185.349 ms
+Task bitcount_large.sh av. runtime 166.388 ms
+Task basicmath_small.sh av. runtime 27.2283 ms
+Temps moy : 108.077ms
+
+Iteration 90 sur 100
+Task susan_large.sh av. runtime 114.994 ms
+Task jpeg_large.sh av. runtime 46.4342 ms
+Task CRC32_large.sh av. runtime 185.469 ms
+Task bitcount_large.sh av. runtime 166.102 ms
+Task basicmath_small.sh av. runtime 27.187 ms
+Temps moy : 108.037ms
+
+Iteration 91 sur 100
+Task susan_large.sh av. runtime 114.977 ms
+Task jpeg_large.sh av. runtime 46.3784 ms
+Task CRC32_large.sh av. runtime 184.666 ms
+Task bitcount_large.sh av. runtime 165.45 ms
+Task basicmath_small.sh av. runtime 27.2002 ms
+Temps moy : 107.734ms
+
+Iteration 92 sur 100
+Task susan_large.sh av. runtime 115.043 ms
+Task jpeg_large.sh av. runtime 46.5193 ms
+Task CRC32_large.sh av. runtime 185.46 ms
+Task bitcount_large.sh av. runtime 166.079 ms
+Task basicmath_small.sh av. runtime 27.1518 ms
+Temps moy : 108.051ms
+
+Iteration 93 sur 100
+Task susan_large.sh av. runtime 114.959 ms
+Task jpeg_large.sh av. runtime 46.4708 ms
+Task CRC32_large.sh av. runtime 185.603 ms
+Task bitcount_large.sh av. runtime 165.939 ms
+Task basicmath_small.sh av. runtime 27.2448 ms
+Temps moy : 108.043ms
+
+Iteration 94 sur 100
+Task susan_large.sh av. runtime 115.408 ms
+Task jpeg_large.sh av. runtime 46.3975 ms
+Task CRC32_large.sh av. runtime 185.679 ms
+Task bitcount_large.sh av. runtime 166.047 ms
+Task basicmath_small.sh av. runtime 27.1738 ms
+Temps moy : 108.141ms
+
+Iteration 95 sur 100
+Task susan_large.sh av. runtime 115.066 ms
+Task jpeg_large.sh av. runtime 46.427 ms
+Task CRC32_large.sh av. runtime 185.699 ms
+Task bitcount_large.sh av. runtime 166.092 ms
+Task basicmath_small.sh av. runtime 27.2026 ms
+Temps moy : 108.097ms
+
+Iteration 96 sur 100
+Task susan_large.sh av. runtime 114.939 ms
+Task jpeg_large.sh av. runtime 46.4278 ms
+Task CRC32_large.sh av. runtime 185.55 ms
+Task bitcount_large.sh av. runtime 166.063 ms
+Task basicmath_small.sh av. runtime 27.236 ms
+Temps moy : 108.043ms
+
+Iteration 97 sur 100
+Task susan_large.sh av. runtime 114.976 ms
+Task jpeg_large.sh av. runtime 46.428 ms
+Task CRC32_large.sh av. runtime 185.684 ms
+Task bitcount_large.sh av. runtime 165.829 ms
+Task basicmath_small.sh av. runtime 27.1759 ms
+Temps moy : 108.019ms
+
+Iteration 98 sur 100
+Task susan_large.sh av. runtime 115.027 ms
+Task jpeg_large.sh av. runtime 46.6003 ms
+Task CRC32_large.sh av. runtime 184.689 ms
+Task bitcount_large.sh av. runtime 165.882 ms
+Task basicmath_small.sh av. runtime 27.2218 ms
+Temps moy : 107.884ms
+
+Iteration 99 sur 100
+Task susan_large.sh av. runtime 114.974 ms
+Task jpeg_large.sh av. runtime 46.3956 ms
+Task CRC32_large.sh av. runtime 184.835 ms
+Task bitcount_large.sh av. runtime 165.945 ms
+Task basicmath_small.sh av. runtime 27.1803 ms
+Temps moy : 107.866ms
+
+Iteration 100 sur 100
+Task susan_large.sh av. runtime 115.039 ms
+Task jpeg_large.sh av. runtime 46.3929 ms
+Task CRC32_large.sh av. runtime 185.509 ms
+Task bitcount_large.sh av. runtime 166.174 ms
+Task basicmath_small.sh av. runtime 27.2087 ms
+Temps moy : 108.065ms
+---------------------------------
+Temps moy total: 550.615ms
+Done Bench
+
+Iteration 1 sur 100
+Task susan_large.sh av. runtime 114.134 ms
+Task jpeg_large.sh av. runtime 45.7012 ms
+Task CRC32_large.sh av. runtime 184.818 ms
+Task bitcount_large.sh av. runtime 165.536 ms
+Task basicmath_small.sh av. runtime 26.8822 ms
+Temps moy : 107.414ms
+
+Iteration 2 sur 100
+Task susan_large.sh av. runtime 114.516 ms
+Task jpeg_large.sh av. runtime 46.3372 ms
+Task CRC32_large.sh av. runtime 184.985 ms
+Task bitcount_large.sh av. runtime 165.46 ms
+Task basicmath_small.sh av. runtime 26.8954 ms
+Temps moy : 107.639ms
+
+Iteration 3 sur 100
+Task susan_large.sh av. runtime 114.62 ms
+Task jpeg_large.sh av. runtime 45.969 ms
+Task CRC32_large.sh av. runtime 184.145 ms
+Task bitcount_large.sh av. runtime 166.204 ms
+Task basicmath_small.sh av. runtime 26.8781 ms
+Temps moy : 107.563ms
+
+Iteration 4 sur 100
+Task susan_large.sh av. runtime 114.469 ms
+Task jpeg_large.sh av. runtime 46.1473 ms
+Task CRC32_large.sh av. runtime 184.111 ms
+Task bitcount_large.sh av. runtime 166.169 ms
+Task basicmath_small.sh av. runtime 26.8613 ms
+Temps moy : 107.552ms
+
+Iteration 5 sur 100
+Task susan_large.sh av. runtime 114.452 ms
+Task jpeg_large.sh av. runtime 46.0762 ms
+Task CRC32_large.sh av. runtime 184.8 ms
+Task bitcount_large.sh av. runtime 165.677 ms
+Task basicmath_small.sh av. runtime 26.8493 ms
+Temps moy : 107.571ms
+
+Iteration 6 sur 100
+Task susan_large.sh av. runtime 114.592 ms
+Task jpeg_large.sh av. runtime 45.894 ms
+Task CRC32_large.sh av. runtime 184.085 ms
+Task bitcount_large.sh av. runtime 165.878 ms
+Task basicmath_small.sh av. runtime 26.9348 ms
+Temps moy : 107.477ms
+
+Iteration 7 sur 100
+Task susan_large.sh av. runtime 114.472 ms
+Task jpeg_large.sh av. runtime 45.8676 ms
+Task CRC32_large.sh av. runtime 183.984 ms
+Task bitcount_large.sh av. runtime 165.03 ms
+Task basicmath_small.sh av. runtime 26.8317 ms
+Temps moy : 107.237ms
+
+Iteration 8 sur 100
+Task susan_large.sh av. runtime 114.561 ms
+Task jpeg_large.sh av. runtime 46.1397 ms
+Task CRC32_large.sh av. runtime 184.012 ms
+Task bitcount_large.sh av. runtime 165.652 ms
+Task basicmath_small.sh av. runtime 26.9377 ms
+Temps moy : 107.46ms
+
+Iteration 9 sur 100
+Task susan_large.sh av. runtime 114.484 ms
+Task jpeg_large.sh av. runtime 45.8672 ms
+Task CRC32_large.sh av. runtime 184.841 ms
+Task bitcount_large.sh av. runtime 165.917 ms
+Task basicmath_small.sh av. runtime 26.8699 ms
+Temps moy : 107.596ms
+
+Iteration 10 sur 100
+Task susan_large.sh av. runtime 114.447 ms
+Task jpeg_large.sh av. runtime 45.8886 ms
+Task CRC32_large.sh av. runtime 184.178 ms
+Task bitcount_large.sh av. runtime 166.174 ms
+Task basicmath_small.sh av. runtime 26.8666 ms
+Temps moy : 107.511ms
+
+Iteration 11 sur 100
+Task susan_large.sh av. runtime 114.499 ms
+Task jpeg_large.sh av. runtime 45.914 ms
+Task CRC32_large.sh av. runtime 184.132 ms
+Task bitcount_large.sh av. runtime 165.288 ms
+Task basicmath_small.sh av. runtime 26.8891 ms
+Temps moy : 107.344ms
+
+Iteration 12 sur 100
+Task susan_large.sh av. runtime 114.502 ms
+Task jpeg_large.sh av. runtime 46.1896 ms
+Task CRC32_large.sh av. runtime 185.139 ms
+Task bitcount_large.sh av. runtime 165.247 ms
+Task basicmath_small.sh av. runtime 26.8569 ms
+Temps moy : 107.587ms
+
+Iteration 13 sur 100
+Task susan_large.sh av. runtime 114.423 ms
+Task jpeg_large.sh av. runtime 45.8987 ms
+Task CRC32_large.sh av. runtime 184.003 ms
+Task bitcount_large.sh av. runtime 165.547 ms
+Task basicmath_small.sh av. runtime 26.8467 ms
+Temps moy : 107.344ms
+
+Iteration 14 sur 100
+Task susan_large.sh av. runtime 114.382 ms
+Task jpeg_large.sh av. runtime 45.8515 ms
+Task CRC32_large.sh av. runtime 185.02 ms
+Task bitcount_large.sh av. runtime 165.205 ms
+Task basicmath_small.sh av. runtime 26.8803 ms
+Temps moy : 107.468ms
+
+Iteration 15 sur 100
+Task susan_large.sh av. runtime 114.269 ms
+Task jpeg_large.sh av. runtime 45.8815 ms
+Task CRC32_large.sh av. runtime 184.833 ms
+Task bitcount_large.sh av. runtime 164.767 ms
+Task basicmath_small.sh av. runtime 26.9007 ms
+Temps moy : 107.33ms
+
+Iteration 16 sur 100
+Task susan_large.sh av. runtime 114.481 ms
+Task jpeg_large.sh av. runtime 46.0657 ms
+Task CRC32_large.sh av. runtime 184.246 ms
+Task bitcount_large.sh av. runtime 165.306 ms
+Task basicmath_small.sh av. runtime 26.8653 ms
+Temps moy : 107.393ms
+
+Iteration 17 sur 100
+Task susan_large.sh av. runtime 114.496 ms
+Task jpeg_large.sh av. runtime 45.8939 ms
+Task CRC32_large.sh av. runtime 183.962 ms
+Task bitcount_large.sh av. runtime 165.598 ms
+Task basicmath_small.sh av. runtime 26.9185 ms

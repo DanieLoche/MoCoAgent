@@ -110,7 +110,7 @@ std::vector<rtTaskInfosStruct> TaskLauncher::readTasksList(string input_file)
                   >> taskInfo.isHardRealTime
                   >> taskInfo.periodicity
                   >> taskInfo.deadline
-                  >> taskInfo.affinity) )   //IL EST ECRIRE 2 FOIS DANS LE TERMINAL (ICI ET printTaskInfo)
+                  >> taskInfo.affinity) )
         { cout << "\033[1;31mFailed to read line\033[0m !" << endl; break; } // error
         tasksInfosList.push_back(taskInfo);
       } else cout << "line ignored." << endl;
@@ -173,16 +173,16 @@ void TaskLauncher::runTasks( )
      cout<<"nyum cpu   : "<< CPU_COUNT(&mask) <<endl;
      cout<<" cpu   : "<< CPU_ISSET(0,&mask) << CPU_ISSET(1,&mask) <<CPU_ISSET(2,&mask) <<CPU_ISSET(3,&mask) <<CPU_ISSET(4,&mask) <<CPU_ISSET(5,&mask) << CPU_ISSET(6,&mask) << CPU_ISSET(7,&mask) <<endl;
 */
-      struct sched_attr para;
+    /*  struct sched_attr para;
 
-     // para.sched_policy = SCHED_FIFO;
-     // para.sched_flags= SCHED_FLAG_RESET_ON_FORK	;
-      //para.sched_runtime= taskInfo.deadline;;
-      //para.sched_deadline=taskInfo.deadline;
+      para.sched_policy = SCHED_FIFO;
+      para.sched_flags= SCHED_FLAG_RESET_ON_FORK	;
+      para.sched_runtime= taskInfo.deadline;;
+      para.sched_deadline=taskInfo.deadline;
       //para.sched_period = period;
-    //  para.sched_priority = 50 ;
-     // para.size=sizeof(sched_attr);
-/*
+      para.sched_priority = 50 ;
+      para.size=sizeof(sched_attr);
+
       if( sched_setattr(curtaskinfo.pid,&para,0) != 0) {
         fprintf(stderr,"error setting scheduler ... are you root? : %d \n", errno);
         exit(0);

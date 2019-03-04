@@ -58,6 +58,7 @@ void RunmcAgentMain(void* arg)
 }
 
 string output_file;
+long cmp;
 void TaskMain(void* arg)
 {
   output_file = "res.txt";
@@ -69,12 +70,14 @@ void TaskMain(void* arg)
   MacroTask macroRT;
   macroRT.properties = rtTI;
   macroRT.executeRun(&mysync);
+  //il y a une seule repetition. pas de average_runtime (num_of_times = 1)
   cout << "Task " << macroRT.properties->name << " av. runtime " << macroRT.properties->average_runtime/1e6 << " ms" << endl;
   myfile << macroRT.properties->name << " " << curtaskinfo.stat.csw << " " << curtaskinfo.stat.xsc << " " << curtaskinfo.stat.xtime << " " << macroRT.usage.ru_ixrss << " " << macroRT.usage.ru_idrss << "\n";
-  int time = curtaskinfo.stat.xtime;
-  total_task += time;
-  cout << time << endl;
   myfile.close();
+  int time = curtaskinfo.stat.xtime;
+  cout << time << endl;
+  total_task += time; //macroRT.properties->average_runtime/1e6;
+  cmp += 1;
   #ifdef PRINT
   cout << "Data saved for task" << macroRT.properties->name << endl;
   #endif
@@ -99,12 +102,13 @@ int main(int argc, char* argv[])
   TaskLauncher tln(input_file);
   tln.printTasksInfos();
 
-  for (int j=0; j < target; j++){
+  for (int j=1; j < target+1; j++){
     total_task =0;
+    cmp = 0;
     //for(int i=0; i < (int)list_info_chaine.size();i++ ){
-    rt_sem_create(&mysync,"MySemaphore",0,S_FIFO);
+    //rt_sem_create(&mysync,"MySemaphore",0,S_FIFO);
 
-      cout << endl << "Itération " << j << " sur " << target << endl;
+      cout << endl << "Iteration " << j << " sur " << target << endl;
 
       tln.runTasks();
       //tasl=&tln;
@@ -115,9 +119,9 @@ int main(int argc, char* argv[])
     #ifdef PRINT
     cout<<"wake up all tasks\n"<<endl;
     #endif
-    rt_sem_broadcast(&mysync);
-    cout << "Temps moy : " << total_task/1e3 << "ms"<<endl;
-
+    //rt_sem_broadcast(&mysync);
+    cout << "Temps moy : " << total_task/cmp << "ms"<<endl;
+            //it writes the last time value of the last task
     sleep(1);
     sum+=total_task;
   }
