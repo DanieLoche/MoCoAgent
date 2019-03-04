@@ -2,13 +2,13 @@
 #include "sched.h"
 #include "tools.h"
 
-TaskLauncher::TaskLauncher(string input_file)
+TaskLauncher::TaskLauncher(string input_file,int iteration)
 {
-  tasksInfosList = readTasksList(input_file);
+  tasksInfosList = readTasksList(input_file,iteration);
 }
 
 
-std::vector<rtTaskInfosStruct> TaskLauncher::readTasksList(string input_file)
+std::vector<rtTaskInfosStruct> TaskLauncher::readTasksList(string input_file,int iteration)
 {
   system("clear");
   cout << "Initialising machine..." << endl; cout.flush();
@@ -21,51 +21,32 @@ std::vector<rtTaskInfosStruct> TaskLauncher::readTasksList(string input_file)
   //std::vector<rtTaskInfosStruct> myTasksInfos;
 
   string str;
-  std::getline(myFile, str); // skip the first line
-  while (std::getline(myFile, str))
-  {
-      rtTaskInfosStruct taskInfo;
-      std::istringstream iss(str);
-      string token;
-      cout << "Managing line : " << str << endl; cout.flush();
-      if (str.substr(0,2) != "//")
-      {
-        if (!(iss >> taskInfo.name
-                  >> taskInfo.path
-                  >> taskInfo.isHardRealTime
-                  >> taskInfo.periodicity
-                  >> taskInfo.deadline
-                  >> taskInfo.affinity) )
-        { cout << "FAIL !" << endl; cout.flush(); break; } // error
-        tasksInfosList.push_back(taskInfo);
-      } else cout << "line ignored." << endl; cout.flush();
+  int i;
+  for (i=0 ; i<iteration ; i++){
+    std::getline(myFile, str); // skip lines
   }
+  rtTaskInfosStruct taskInfo;
+  std::istringstream iss(str);
+  string token;
+  cout << "Managing line : " << str << endl; cout.flush();
+  if (str.substr(0,2) != "//")
+  {
+    if (!(iss >> taskInfo.name
+              >> taskInfo.path
+              >> taskInfo.isHardRealTime
+              >> taskInfo.periodicity
+              >> taskInfo.deadline
+              >> taskInfo.affinity))
+    { cout << "FAIL !" << endl; cout.flush();} // error
+    tasksInfosList.push_back(taskInfo);
+    } else cout << "line ignored." << endl; cout.flush();
 
   return tasksInfosList;
-
 }
 
 
 void TaskLauncher::runTasks( )
 {
- /*
-  cout << "Now launching the MoCoAgent ! " << endl;
-
-  RT_TASK mcAgent;
-  int rep = rt_task_create(&mcAgent, "MoCoAgent", 0, 2, 0);
-  set_affinity(&mcAgent, 3);
-
-  rt_task_start(&mcAgent, RunmcAgentMain, 0);
-  */
-  /*for (auto taskInfo = tasksInfosList.begin(); taskInfo != tasksInfosList.end(); ++taskInfo)
-  {
-      RT_TASK* task = new RT_TASK;
-      taskInfo->task = task;
-      rt_task_create(task, taskInfo->name, 0, 50, 0);
-      cout << "Task " << taskInfo->name << " created." << endl; cout.flush();
-      set_affinity(task, 0);
-
-  } */
 
 for (auto& taskInfo : tasksInfosList)  {
       RT_TASK* task = new RT_TASK;

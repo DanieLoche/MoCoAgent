@@ -40,7 +40,6 @@ int MacroTask::after()
 
   this->set_time(1);
   this->compute_time();
-  //raise(SIGUSR1);
   return 0;
 }
 
