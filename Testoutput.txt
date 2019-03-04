@@ -1,16 +1,16 @@
 
 Running summary for task basicmath_small.sh.
-Average runtime : 92.0009
-Max runtime : 480.408 ms
-Min runtime : 17.9508 ms
+Average runtime : 241.955
+Max runtime : 4931.34 ms
+Min runtime : 18.0103 ms
 Deadline :200 ms
-Out of Deadline : 2 times
-Number of executions : 13 times
+Out of Deadline : 28 times
+Number of executions : 122 times
 
 Running summary for task adpcm_large.sh.
-Average runtime : 524.354
-Max runtime : 542.682 ms
-Min runtime : 503.663 ms
+Average runtime : 1578.08
+Max runtime : 8804.66 ms
+Min runtime : 510.491 ms
 Deadline :1500 ms
-Out of Deadline : 0 times
-Number of executions : 3 times
+Out of Deadline : 3 times
+Number of executions : 20 times

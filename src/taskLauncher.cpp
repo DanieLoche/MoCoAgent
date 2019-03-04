@@ -149,7 +149,7 @@ void TaskLauncher::runTasks( )
       taskInfo->task = task;
       taskInfo->ID = number_task_created ;
       number_task_created = number_task_created + 1 ;
-      taskInfo->deadline = taskInfo->deadline*1e6;
+
       int rep =rt_task_create(task, taskInfo->name, 0, 50, 0);
       if( 0 > rep)
       {
@@ -175,7 +175,7 @@ void TaskLauncher::runTasks( )
   for (auto& taskInfo : tasksInfosList)
   {
       taskInfo.deadline = taskInfo.deadline*1e6;
-      rt_task_set_periodic(NULL, starttime, taskInfo.periodicity*1e6);
+      rt_task_set_periodic(taskInfo.task, starttime, taskInfo.periodicity*1e6);
       rt_task_inquire(taskInfo.task, &curtaskinfo);
 /*
      cout << "getting affinity :" << sched_getaffinity(curtaskinfo.pid,sizeof(cpu_set_t),&mask) << endl;
@@ -183,11 +183,11 @@ void TaskLauncher::runTasks( )
      cout<<" cpu   : "<< CPU_ISSET(0,&mask) << CPU_ISSET(1,&mask) <<CPU_ISSET(2,&mask) <<CPU_ISSET(3,&mask) <<CPU_ISSET(4,&mask) <<CPU_ISSET(5,&mask) << CPU_ISSET(6,&mask) << CPU_ISSET(7,&mask) <<endl;
       */
       struct sched_attr para;
-      para.sched_policy = SCHED_FIFO;
+      para.sched_policy = SCHED_RR;
       para.sched_flags= SCHED_FLAG_RESET_ON_FORK	;
       //para.sched_runtime= taskInfo.deadline;;
       //para.sched_deadline=taskInfo.deadline;
-      //para.sched_period = period;
+      para.sched_period = taskInfo.periodicity*1e6;
       para.sched_priority = 50 ;
       para.size=sizeof(sched_attr);
 

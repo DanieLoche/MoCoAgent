@@ -71,10 +71,11 @@ Thumbs.db
 *.dll
 *.exe
 *.out
+*.txt
 SchedulerSimulator
 *.dat
 output_*
 
 # directories
 trace-cmd/
-Benchmarker/output/
+Benchmarker/

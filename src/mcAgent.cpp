@@ -8,11 +8,9 @@ void messageReceiver(void* arg)
   {
   //  void* _msg;
     monitoringMsg msg;
-    cout<<"buffer read"<<endl;
+  //  cout<<"buffer read"<<endl;
     rt_buffer_read(&mocoAgent->bf, &msg, sizeof(monitoringMsg), TM_INFINITE);
-    cout<<"done buffer read"<<endl;
-  //  monitoringMsg* msg = (monitoringMsg*) _msg;
-  //  monitoringMsg rmsg = *msg;
+  //  cout<<"done buffer read"<<endl;
     mocoAgent->updateTaskInfo(msg);
 
 
@@ -34,7 +32,7 @@ MCAgent::MCAgent(void *arg)
   initComunications();
 
   RT_TASK mcAgentReceiver;
-  rt_task_create(&mcAgentReceiver, "MoCoAgentReceiver", 0, 2, 0);
+  rt_task_create(&mcAgentReceiver, "MoCoAgentReceiver", 0, 99, 0);
   rt_task_start(&mcAgentReceiver, messageReceiver, this);
   while(TRUE)
   {
@@ -169,28 +167,18 @@ void MCAgent::setMode(int mode)
 // DES TACHE EN ORDONNANCANT LES TAKS LISTS.
 void MCAgent::updateTaskInfo(monitoringMsg msg)
 {
-  RT_TASK_INFO curtaskinfo;
+/*  RT_TASK_INFO curtaskinfo;
   rt_task_inquire((RT_TASK*) msg.task, &curtaskinfo);
   cout << "I am task : " << curtaskinfo.name<<"ID :"<< msg.ID<< endl;
-
+*/
   std::vector <taskMonitoringStruct> tk_List;
 
   for (auto& _taskChain : allTaskChain)
   {
-    cout <<"here"<< allTaskChain.size()<< endl;
-    cout <<"size"<< _taskChain.taskList.size()<< endl;
-
       for (auto& task : _taskChain.taskList)
       {
-        cout <<"here"<<endl;
-        cout << "ID : " <<  task.id << "start Time : " << task.startTime << endl;
-
-        rt_task_inquire(task.task, &curtaskinfo);
-        cout << "I am task 2: " << curtaskinfo.name<< endl;
-
         if( task.id == msg.ID)
         {
-          cout << "DONE HERE " <<  endl;
           if (!msg.startTime)
             task.startTime = msg.startTime;
           else if (msg.isExecuted)
