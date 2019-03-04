@@ -10,8 +10,8 @@ TaskLauncher::TaskLauncher(string input_file,int iteration)
 
 std::vector<rtTaskInfosStruct> TaskLauncher::readTasksList(string input_file,int iteration)
 {
-  system("clear");
-  cout << "Initialising machine..." << endl; cout.flush();
+  //system("clear");
+  cout << "Launching task "; cout.flush();
   std::ifstream myFile(input_file);
   if (!myFile.is_open())
   {
@@ -28,7 +28,7 @@ std::vector<rtTaskInfosStruct> TaskLauncher::readTasksList(string input_file,int
   rtTaskInfosStruct taskInfo;
   std::istringstream iss(str);
   string token;
-  cout << "Managing line : " << str << endl; cout.flush();
+  //cout << "Managing line : " << str << endl; cout.flush();
   if (str.substr(0,2) != "//")
   {
     if (!(iss >> taskInfo.name
@@ -39,6 +39,7 @@ std::vector<rtTaskInfosStruct> TaskLauncher::readTasksList(string input_file,int
               >> taskInfo.affinity))
     { cout << "FAIL !" << endl; cout.flush();} // error
     tasksInfosList.push_back(taskInfo);
+    cout << taskInfo.name << endl;
     } else cout << "line ignored." << endl; cout.flush();
 
   return tasksInfosList;
@@ -52,7 +53,7 @@ for (auto& taskInfo : tasksInfosList)  {
       RT_TASK* task = new RT_TASK;
       taskInfo.task = task;
       rt_task_create(task, taskInfo.name, 0, 50, 0);
-      cout << "Task " << taskInfo.name << " created." << endl; cout.flush();
+      //cout << "Task " << taskInfo.name << " created." << endl; cout.flush();
       set_affinity(task, 0);
       /*
       RT_TASK_INFO rti;
@@ -63,8 +64,8 @@ for (auto& taskInfo : tasksInfosList)  {
 
   for (auto& taskInfo : tasksInfosList)
   {
-      cout << "Task " << taskInfo.name << " started." << endl; cout.flush();
-      cout << "Task " << taskInfo.task << " ready." << endl;
+      //cout << "Task " << taskInfo.name << " started." << endl; cout.flush();
+      //cout << "Task " << taskInfo.task << " ready." << endl;
       int rep = rt_task_start(taskInfo.task, TaskMain, &taskInfo);
   }
 
@@ -72,8 +73,8 @@ for (auto& taskInfo : tasksInfosList)  {
 
   for (auto& taskInfo : tasksInfosList)
   {
-    cout << "Task " << taskInfo.name << " stopped." << endl; cout.flush();
-    cout << "Task " << taskInfo.task << " stopped." << endl;
+    //cout << "Task " << taskInfo.name << " stopped." << endl; cout.flush();
+    //cout << "Task " << taskInfo.task << " stopped." << endl;
     int delrep = rt_task_delete(taskInfo.task);
   }
 
@@ -86,7 +87,7 @@ void TaskLauncher::set_affinity (RT_TASK* task, int _aff)
   CPU_SET(_aff, &mask);
   /*RT_TASK_INFO tsk_infos;
   rt_task_inquire(0, &tsk_infos);*/
-  cout << "Setting affinity :" << rt_task_set_affinity(task, &mask) << endl; cout.flush();
+  //cout << "Setting affinity :" << rt_task_set_affinity(task, &mask) << endl; cout.flush();
 }
 
 void TaskLauncher::printTasksInfos (/* std::vector<rtTaskInfosStruct> _myTasksInfos*/)

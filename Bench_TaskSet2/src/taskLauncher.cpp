@@ -121,7 +121,7 @@ std::vector<rtTaskInfosStruct> TaskLauncher::readTasksList(string input_file)
 }
 
 
-void TaskLauncher::runTasks( )
+void TaskLauncher::runTasks()
 {
    SRTIME quant=1e7;
    SRTIME qt = rt_timer_ns2ticks(quant);

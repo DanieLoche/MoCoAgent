@@ -28,7 +28,6 @@ void printTaskInfo(rtTaskInfosStruct* task)
 void print_affinity(pid_t _pid)
 {
     cpu_set_t mask;
-    long i;
 
     if (sched_getaffinity(_pid, sizeof(cpu_set_t), &mask) == -1) {
         perror("sched_getaffinity");
@@ -36,10 +35,10 @@ void print_affinity(pid_t _pid)
     } else {
         RT_TASK_INFO curtaskinfo;
         rt_task_inquire(NULL, &curtaskinfo);
-        cout << "Affinity of thread " << curtaskinfo.pid << " = ";
-        for (i = 0; i < nproc; i++)
-            cout << CPU_ISSET(i, &mask);
-        cout << endl; cout.flush();
+        //cout << "Affinity of thread " << curtaskinfo.pid << " = ";
+        //for (i = 0; i < nproc; i++)
+        //    cout << CPU_ISSET(i, &mask);
+        //cout << endl; cout.flush();
     }
 }
 
@@ -50,7 +49,7 @@ void TaskMain(void* arg)
   RT_TASK_INFO curtaskinfo;
   rt_task_inquire(NULL, &curtaskinfo);
 
-  cout << "I am task : " << curtaskinfo.name << " of priority " << curtaskinfo.prio << endl; cout.flush();
+  //cout << "I am task : " << curtaskinfo.name << " of priority " << curtaskinfo.prio << endl; cout.flush();
   MacroTask *macroRT = new MacroTask;
 
   macroRT->properties = rtTI;
@@ -65,7 +64,6 @@ void TaskMain(void* arg)
 
 int main(int argc, char *argv[])
 {
-  char tache;
   int return_code = 0;
   nproc = get_nprocs();
   pid = getpid();
@@ -78,7 +76,7 @@ int main(int argc, char *argv[])
 
   myfile.close();
   if (argc > 1) input_file = argv[1];
-  else input_file = "./input2.txt";
+  else input_file = "./input.txt";
   int j;
   int i;
   int iteration = 2;
@@ -87,8 +85,9 @@ int main(int argc, char *argv[])
   for (j = 0 ; j<task_num ; j++){
     TaskLauncher launcher(input_file,iteration);
     iteration+=1;
-    launcher.printTasksInfos();
+    //launcher.printTasksInfos();
     for (i = 0 ; i<target ; i++){
+        cout << "Running... " << i << " out of " << target << endl;
         launcher.runTasks();
         sleep(2);
     }

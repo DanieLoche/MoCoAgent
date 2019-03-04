@@ -6,7 +6,7 @@ XENO_CFLAGS = $(shell $(XENO_CONFIG) --alchemy --posix --cflags) #--skin native
 XENO_LDFLAGS = $(shell $(XENO_CONFIG) --alchemy --posix --ldflags)
 
 ## PROJECT ##
-EXEC_NAME = SchedulerSimulator.out
+EXEC_NAME = Bench
 INSTALL_DIR = .
 
 ## DIRECTORIES ##
