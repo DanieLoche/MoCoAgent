@@ -20,15 +20,12 @@ int MacroTask::before()
 
 void MacroTask::proceed()
 {
-
+  char* cmd;
   cout << "path :" << properties->path << "." << endl; cout.flush();
   if (properties->path != "/null/")
   {
-    char* cmd;
     cmd = &properties->path[0u];
-    strcat(cmd,properties->name);
     system(cmd);
-    //cmd = "";
   }
   else
   {

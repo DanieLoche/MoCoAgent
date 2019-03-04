@@ -87,7 +87,6 @@ int main(int argc, char *argv[])
 
 
   int return_code = 0;
-  nproc = get_nprocs();
 
   int target = TARGET;
   TaskLauncher tln(input_file);

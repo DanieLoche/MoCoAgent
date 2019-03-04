@@ -78,7 +78,7 @@ int main(int argc, char *argv[])
 
   myfile.close();
   if (argc > 1) input_file = argv[1];
-  else input_file = "./input.txt";
+  else input_file = "./input2.txt";
   int j;
   int i;
   int iteration = 2;
