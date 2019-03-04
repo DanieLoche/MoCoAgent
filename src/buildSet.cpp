@@ -9,6 +9,7 @@ using namespace std;
 
 buildSet::buildSet() {
 
+
   // Ouverture fichier des tâches
   /*std::ifstream myFile("sorted.txt");
 
@@ -37,7 +38,7 @@ buildSet::buildSet() {
 }
 
 
-void buildSet::readChainsList(string input_file,std::vector<ChaineInfo_Struct> *list_info_chaine)
+void buildSet::readChainsList(string input_file,std::vector<end2endDeadlineStruct> *list_info_chaine)
 {
   system("clear");
   cout << "Initialising machine...\n";
@@ -51,21 +52,20 @@ void buildSet::readChainsList(string input_file,std::vector<ChaineInfo_Struct> *
   //std::vector<rtTaskInfosStruct> myTasksInfos;
 
   string str;
-  int num_tache ;
   std::getline(myFile, str); // skip the first line
   while (std::getline(myFile, str))
   {
-      ChaineInfo_Struct chaineInfo;
+      end2endDeadlineStruct chaineInfo;
       std::istringstream iss(str);
       string token;
       cout << "Managing line : " << str << endl;
-      num_tache = 3;
       if (str.substr(0,2) != "//")
       {
             if (!(iss >> chaineInfo.name
-                      >> chaineInfo.ChaineID
+                      >> chaineInfo.taskChainID
                       >> chaineInfo.Num_tasks
-                      >> chaineInfo.Path))
+                      >> chaineInfo.Path
+                      >> chaineInfo.deadline ))
             { cout << "\033[1;31mFailed to read line\033[0m !" << endl; break; } // error
 
 

@@ -1,3 +1,9 @@
+#define VERBOSE_INFO  1 // Cout d'informations, démarrage, etc...
+#define VERBOSE_DEBUG 1 // Cout de débug...
+#define VERBOSE_OTHER 1 // Cout autre...
+#define VERBOSE_ASK   1 // cout explicitement demandés dans le code
+
+
 #include "tools.h"
 #include <sys/sysinfo.h>
 #include "sched.h"
@@ -14,53 +20,18 @@
 
 long nproc;
 RT_SEM mysync;
-std::vector<ChaineInfo_Struct> list_info_chaine;
+std::vector<end2endDeadlineStruct> list_info_chaine;
+std::vector<rtTaskInfosStruct> AlltasksInfosList;
 
 TaskLauncher* tasl;
 std::mutex mutex;           // mutex for critical section
 
-void printTaskInfo(rtTaskInfosStruct* task)
-{
-  cout << "Name: " << task->name
-       << "| path: " << task->path
-       << "| is RT ? " << task->isHardRealTime
-       << "| Period: " << task->periodicity
-       << "| Deadline: " << task->deadline
-       << "| affinity: " << task->affinity
-       << "| ChaineID: " << task->ChaineID << endl;
-
-}
-
-void print_affinity(pid_t _pid)
-{
-    cpu_set_t mask;
-    long i;
-
-    if (sched_getaffinity(_pid, sizeof(cpu_set_t), &mask) == -1) {
-        perror("sched_getaffinity");
-        assert(false);
-    } else {
-        RT_TASK_INFO curtaskinfo;
-        rt_task_inquire(NULL, &curtaskinfo);
-        cout << "Affinity of thread " << curtaskinfo.pid << " = ";
-        for (i = 0; i < nproc; i++)
-            cout << CPU_ISSET(i, &mask);
-        cout << endl;
-        /* using printf
-        printf("sched_getaffinity = ");
-        for (i = 0; i < nproc; i++) {
-            printf("%d ", CPU_ISSET(i, &mask));
-        }
-        printf("\n");
-        */
-    }
-
-}
-
 void RunmcAgentMain(void* arg)
 {
-  cout << "MoCoAgent running ?!" << endl;
   MCAgent mcAgent(arg);
+
+  printInquireInfo();
+
 }
 
 
@@ -70,13 +41,20 @@ void TaskMain(void* arg)
 
   RT_TASK_INFO curtaskinfo;
   rt_task_inquire(NULL, &curtaskinfo);
+  print_affinity(curtaskinfo.pid);
+  cout << "I am task : " << curtaskinfo.name << " of priority " << curtaskinfo.prio << endl;
 
-//  cout << "I am task : " << curtaskinfo.name << " of priority " << curtaskinfo.prio << endl;
+  printTaskInfo(rtTI);
 
   MacroTask macroRT;
-  macroRT.properties =(rtTaskInfosStruct*) arg;
-  macroRT.executeRun(&mysync);
+  macroRT.properties = rtTI;
 
+  if ((*rtTI).isHardRealTime == 0) {
+    macroRT.executeRun_besteffort(&mysync);
+  }
+  else {
+    macroRT.executeRun(&mysync);
+  }
 }
 
 
@@ -120,6 +98,7 @@ int main(int argc, char* argv[])
 {
   system("clear");
 
+
   string input_file;
 
 
@@ -136,21 +115,40 @@ int main(int argc, char* argv[])
 
   bS.readChainsList( input_file, &list_info_chaine);
 
+  //Création de la sémaphore
   rt_sem_create(&mysync,"MySemaphore",0,S_FIFO);
 
+  TaskLauncher tln;
 
- for(int i=0; i < (int)list_info_chaine.size();i++ ){
+ for(int i=0; i < (int)list_info_chaine.size(); ++i ){
 
-    TaskLauncher tln( list_info_chaine[i].Path, list_info_chaine[i].ChaineID);
-    //tln.tasksInfos = readTasksList(input_file);
-    tln.printTasksInfos();
-    tln.runTasks();
-    tln.printTasksInfos();
-    tasl=&tln;
+   tln.readTasksList(list_info_chaine[i].Path);
+}
 
-  }
+    //AlltasksInfosList.insert (AlltasksInfosList.end(),tln.tasksInfosList.begin(),tln.tasksInfosList.end());
+   tasl=&tln;
+  // cout<<"AlltasksInfosList  size :"<< AlltasksInfosList.size()<<endl;
+   tln.printTasksInfos();
+   tln.runTasks();
+
+  #if VERBOSE_OTHER
+    cout << "Now launching the MoCoAgent ! " << endl;
+  #endif
+
+  RT_TASK mcAgent;
+  rt_task_create(&mcAgent, "MoCoAgent", 0, 2, 0);
+  set_affinity(&mcAgent, 3);
+
+  systemRTInfo ch_taks ;
+  ch_taks.rtTIs=tln.tasksInfosList ;
+  ch_taks.e2eDD =list_info_chaine;
+  rt_task_start(&mcAgent, RunmcAgentMain, &ch_taks);
+
+
+
   //sleeping the time that all tasks will be started
   usleep(1000000);
+
   cout<<"wake up all tasks\n"<<endl;
   rt_sem_broadcast(&mysync);
 
@@ -166,8 +164,81 @@ int main(int argc, char* argv[])
     sigaction(SIGINT, &sigIntHandler, NULL);
   }
 
-
   pause();
 
   return return_code;
+}
+
+void printInquireInfo()
+{
+#if VERBOSE_INFO
+  RT_TASK_INFO curtaskinfo;
+  rt_task_inquire(NULL, &curtaskinfo);
+  std::stringstream ss;
+  ss << "I am task : " << curtaskinfo.name
+     << " (PID : " << curtaskinfo.pid << "), of priority "
+     << curtaskinfo.prio << endl
+     << "On CPU : " << curtaskinfo.stat.cpu << endl;
+
+  cout << ss.rdbuf();
+#endif
+}
+
+void printTaskInfo(rtTaskInfosStruct* task)
+{
+#if VERBOSE_INFO
+  std::stringstream ss;
+  ss << "Name: "       << task->name
+     << "| path: "     << task->path_task
+     << "| is RT ? "   << task->isHardRealTime
+     << "| Period: "   << task->periodicity
+     << "| Deadline: " << task->deadline
+     << "| affinity: " << task->affinity
+     << "| ID :"<< task->ID << endl;
+  cout << ss.rdbuf();
+#endif
+}
+
+void set_affinity (RT_TASK* task, int _aff)
+{
+  cpu_set_t mask;
+  CPU_ZERO(&mask);
+  CPU_SET(_aff, &mask);
+  RT_TASK_INFO curtaskinfo;
+  rt_task_inquire(task, &curtaskinfo);
+  cout << "Setting affinity for task " << curtaskinfo.name << " is ( 0 = valide) :" << rt_task_set_affinity(task, &mask) << endl;
+}
+
+void print_affinity(pid_t _pid)
+{
+#if VERBOSE_INFO
+  int pid = _pid;
+  if (!_pid)
+  {
+   RT_TASK_INFO curtaskinfo;
+   rt_task_inquire(NULL, &curtaskinfo);
+   pid = curtaskinfo.pid;
+  }
+  cpu_set_t mask;
+
+  if (sched_getaffinity(_pid, sizeof(cpu_set_t), &mask) == -1) {
+      perror("sched_getaffinity");
+      assert(false);
+  } else {
+    long i;
+    std::stringstream ss;
+    ss << "Affinity of thread " << pid << " = ";
+    for (i = 0; i < nproc; i++)
+        ss << CPU_ISSET(i, &mask);
+    ss << endl;
+    cout << ss.rdbuf();
+    /* using printf
+    printf("sched_getaffinity = ");
+    for (i = 0; i < nproc; i++) {
+        printf("%d ", CPU_ISSET(i, &mask));
+    }
+    printf("\n");
+    */
+  }
+#endif
 }

@@ -41,7 +41,7 @@ void MacroTask::proceed(){
 int MacroTask::after()
 {
    endtime = rt_timer_read();
-   runtime =  (endtime - starttime)  ;
+   runtime =  (endtime - starttime);
    Somme += runtime;
    cpt += 1;
    properties->average_runtime = Somme/cpt;

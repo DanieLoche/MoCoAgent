@@ -884,3 +884,84 @@ Temps moy : 277.367ms
 Iteration 5 sur 100
 Task bitcount_small.sh runtime: 16.8672 ms
 Task gsm_large.sh runtime: 387.77 ms
+
+Iteration 1 sur 100
+Task bitcount_small.sh runtime: 16.7899 ms
+Task gsm_large.sh runtime: 5.1133 ms
+Task basicmath_large.sh runtime: 664.952 ms
+Task stringsearch_large.sh runtime: 4.95275 ms
+Temps moy : 172.952ms
+
+Iteration 2 sur 100
+Task bitcount_small.sh runtime: 16.7672 ms
+Task gsm_large.sh runtime: 5.02792 ms
+Task basicmath_large.sh runtime: 672.296 ms
+Task stringsearch_large.sh runtime: 5.0438 ms
+Temps moy : 174.784ms
+
+Iteration 3 sur 100
+Task bitcount_small.sh runtime: 16.7511 ms
+Task gsm_large.sh runtime: 5.01325 ms
+Task basicmath_large.sh runtime: 669.415 ms
+Task stringsearch_large.sh runtime: 4.95862 ms
+Temps moy : 174.034ms
+
+Iteration 4 sur 100
+Task bitcount_small.sh runtime: 16.9404 ms
+Task gsm_large.sh runtime: 5.05229 ms
+Task basicmath_large.sh runtime: 688.244 ms
+Task stringsearch_large.sh runtime: 4.99923 ms
+Temps moy : 178.809ms
+
+Iteration 5 sur 100
+Task bitcount_small.sh runtime: 16.8049 ms
+Task gsm_large.sh runtime: 5.00646 ms
+Task basicmath_large.sh runtime: 670.719 ms
+Task stringsearch_large.sh runtime: 5.01476 ms
+Temps moy : 174.386ms
+
+Iteration 6 sur 100
+Task bitcount_small.sh runtime: 5.01366 ms
+Task gsm_large.sh runtime: 4.98089 ms
+Task basicmath_large.sh runtime: 4.96524 ms
+Task stringsearch_large.sh runtime: 4.97762 ms
+Temps moy : 4.98435ms
+
+Iteration 7 sur 100
+Task bitcount_small.sh runtime: 5.03646 ms
+Task gsm_large.sh runtime: 4.97022 ms
+Task basicmath_large.sh runtime: 4.94854 ms
+Task stringsearch_large.sh runtime: 4.91835 ms
+Temps moy : 4.96839ms
+
+Iteration 8 sur 100
+
+Iteration 1 sur 100
+Task bitcount_small.sh runtime: 5.1792 ms
+Task gsm_large.sh runtime: 5.03876 ms
+Task basicmath_large.sh runtime: 4.99718 ms
+Task stringsearch_large.sh runtime: 5.39033 ms
+Temps moy : 5.15137ms
+
+Iteration 2 sur 100
+Task bitcount_small.sh runtime: 5.10149 ms
+Task gsm_large.sh runtime: 5.00894 ms
+Task basicmath_large.sh runtime: 5.00719 ms
+Task stringsearch_large.sh runtime: 4.93336 ms
+Temps moy : 5.01274ms
+
+Iteration 3 sur 100
+Task bitcount_small.sh runtime: 5.08448 ms
+Task gsm_large.sh runtime: 4.99512 ms
+Task basicmath_large.sh runtime: 5.02545 ms
+Task stringsearch_large.sh runtime: 5.05507 ms
+Temps moy : 5.04003ms
+
+Iteration 4 sur 100
+Task bitcount_small.sh runtime: 5.06698 ms
+Task gsm_large.sh runtime: 4.93494 ms
+Task basicmath_large.sh runtime: 5.02667 ms
+Task stringsearch_large.sh runtime: 4.99618 ms
+Temps moy : 5.00619ms
+
+Iteration 5 sur 100
