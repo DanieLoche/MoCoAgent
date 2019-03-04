@@ -71,6 +71,7 @@ Thumbs.db
 *.dll
 *.exe
 *.out
+*.txt
 SchedulerSimulator
 *.dat
 output_*

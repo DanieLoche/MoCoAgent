@@ -41,7 +41,7 @@ void MacroTask::proceed(){
 int MacroTask::after()
 {
    endtime = rt_timer_read();
-   runtime =  (endtime - starttime)  ;
+   runtime =  (endtime - starttime);
    Somme += runtime;
    cpt += 1;
    properties->average_runtime = Somme/cpt;
@@ -78,14 +78,20 @@ void MacroTask::executeRun()
   properties->out_deadline=0;
   properties->num_of_times=0;
   Somme =0;
+  //cout << "path :" << properties.path << "." << endl;
   properties->average_runtime =0;
   runtime= 0;
   cpt =0;
+
+  //cout << "Running..." << endl;
 
       before(); // Check if execution allowed
 
       proceed();  // execute task
 
       after();  // Inform of execution time for the mcAgent
+
+      //rt_task_wait_period(NULL);
+
 
 }

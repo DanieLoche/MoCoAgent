@@ -21,14 +21,11 @@ int MacroTask::before()
   msg.ID= properties->ID;
   msg.startTime= rt_timer_read();
   msg.isExecuted =0;
-  cout << "WRITING" << properties->name << endl;
   int ret = rt_buffer_write(&bf , &msg , sizeof(monitoringMsg) , 50000);
   if( 0 > ret)
   {
      printf("fail write : %s\n",properties->name);
   }
-  cout << " done WRITING" << properties->name << endl;
-
 
   return 0;
 }
@@ -109,7 +106,6 @@ void MacroTask::executeRun(RT_SEM* mysync)
       rt_buffer_delete(&bf);
       printf("%s\n","fail creat");
     }
-    cout << "DONE BINDING" <<properties->name << endl;
 
     while (1) {
 

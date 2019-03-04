@@ -6,7 +6,11 @@ XENO_CFLAGS = $(shell $(XENO_CONFIG) --alchemy --posix --cflags) #--skin native
 XENO_LDFLAGS = $(shell $(XENO_CONFIG) --alchemy --posix --ldflags)
 
 ## PROJECT ##
+<<<<<<< HEAD:Benchmarker/makefile
 EXEC_NAME = Bench
+=======
+EXEC_NAME = Benchmarker
+>>>>>>> e214e1c524bc5fdb87404fa95b6c5644091e6c41:Bench_TaskSet2/makefile
 INSTALL_DIR = .
 
 ## DIRECTORIES ##
