@@ -9,6 +9,7 @@ using namespace std;
 
 buildSet::buildSet() {
 
+
   // Ouverture fichier des tâches
   /*std::ifstream myFile("sorted.txt");
 

@@ -14,7 +14,6 @@
 #include "buildSet.h"
 #include <mutex>
 
-
 #define EXECTIME   2e8   // execution time in ns
 #define SPINTIME   1e7   // spin time in ns
 #define PRINT 1
@@ -34,6 +33,7 @@ void RunmcAgentMain(void* arg)
   printInquireInfo();
 
 }
+
 
 
 void TaskMain(void* arg)
@@ -72,7 +72,7 @@ void my_handler(int s){
   for (auto taskInfo = AlltasksInfosList.begin(); taskInfo != AlltasksInfosList.end(); ++taskInfo)
   {
     */
-  for (amcAgentuto taskInfo = tasl->tasksInfosList.begin(); taskInfo != tasl->tasksInfosList.end(); ++taskInfo)
+  for ( auto taskInfo = tasl->tasksInfosList.begin(); taskInfo != tasl->tasksInfosList.end(); ++taskInfo)
   {
            myfile << "\nRunning summary for task " << taskInfo->name << ".\n";
            myfile << "Average runtime : " << taskInfo->average_runtime/ 1.0e6 << "\n";
