@@ -801,3 +801,106 @@ Temps moy : 67.1304ms
 ---------------------------------
 Temps moy total: 337.661ms
 Done Bench
+
+Iteration 1 sur 100
+Task bitcount_small.sh runtime: 17.3816 ms
+Task CRC32_large.sh runtime: 185.529 ms
+Task basicmath_small.sh runtime: 28.7237 ms
+Task dijkstra_large.sh runtime: 114.315 ms
+Task blowfish_small.sh runtime: 134.079 ms
+Temps moy : 96.0058ms
+
+Iteration 2 sur 100
+Task bitcount_small.sh runtime: 17.1747 ms
+Task CRC32_large.sh runtime: 188.755 ms
+Task dijkstra_large.sh runtime: 79.6333 ms
+Task blowfish_small.sh runtime: 32.0078 ms
+Task basicmath_small.sh runtime: 29.2057 ms
+Temps moy : 69.3552ms
+
+Iteration 3 sur 100
+Task bitcount_small.sh runtime: 17.1679 ms
+Task CRC32_large.sh runtime: 185.267 ms
+Task dijkstra_large.sh runtime: 77.0537 ms
+Task blowfish_small.sh runtime: 30.029 ms
+Task basicmath_small.sh runtime: 27.3681 ms
+Temps moy : 67.3772ms
+
+Iteration 4 sur 100
+Task bitcount_small.sh runtime: 18.0245 ms
+Task CRC32_large.sh runtime: 171.473 ms
+Task dijkstra_large.sh runtime: 77.151 ms
+Task blowfish_small.sh runtime: 31.4672 ms
+Task basicmath_small.sh runtime: 27.7075 ms
+
+Iteration 1 sur 100
+Task bitcount_small.sh runtime: 17.1151 ms
+Task CRC32_large.sh runtime: 191.35 ms
+Task dijkstra_large.sh runtime: 76.7499 ms
+Task blowfish_small.sh runtime: 29.7596 ms
+Task basicmath_small.sh runtime: 27.1712 ms
+Temps moy : 68.4291ms
+
+Iteration 2 sur 100
+Task bitcount_small.sh runtime: 17.1776 ms
+Task CRC32_large.sh runtime: 184.937 ms
+Task dijkstra_large.sh runtime: 76.6759 ms
+Task blowfish_small.sh runtime: 29.8035 ms
+Task basicmath_small.sh runtime: 27.1237 ms
+Temps moy : 67.1435ms
+
+Iteration 3 sur 100
+Task bitcount_small.sh runtime: 17.1312 ms
+Task CRC32_large.sh runtime: 189.704 ms
+Task dijkstra_large.sh runtime: 76.6889 ms
+Task blowfish_small.sh runtime: 29.725 ms
+Task basicmath_small.sh runtime: 27.0718 ms
+Temps moy : 68.0642ms
+
+Iteration 4 sur 100
+Task bitcount_small.sh runtime: 17.2269 ms
+Task CRC32_large.sh runtime: 185.237 ms
+Task dijkstra_large.sh runtime: 76.9895 ms
+Task blowfish_small.sh runtime: 30.0379 ms
+Task basicmath_small.sh runtime: 27.3101 ms
+
+Iteration 1 sur 100
+Task bitcount_small.sh runtime: 17.3112 ms
+Task CRC32_large.sh runtime: 184.516 ms
+Task dijkstra_large.sh runtime: 76.4222 ms
+Task blowfish_small.sh runtime: 29.6256 ms
+Task basicmath_small.sh runtime: 27.2213 ms
+Temps moy : 67.0192ms
+
+Iteration 2 sur 100
+Task bitcount_small.sh runtime: 17.222 ms
+Task CRC32_large.sh runtime: 185.111 ms
+Task dijkstra_large.sh runtime: 76.9536 ms
+Task blowfish_small.sh runtime: 29.7492 ms
+Task basicmath_small.sh runtime: 27.1107 ms
+Temps moy : 67.2293ms
+
+Iteration 3 sur 100
+
+Iteration 1 sur 100
+Task bitcount_small.sh runtime: 17.3431 ms
+Task CRC32_large.sh runtime: 185.499 ms
+Task dijkstra_large.sh runtime: 76.6409 ms
+Task blowfish_small.sh runtime: 29.7118 ms
+Task basicmath_small.sh runtime: 27.0826 ms
+Temps moy : 67.2554ms
+
+Iteration 2 sur 100
+Task bitcount_small.sh runtime: 17.1281 ms
+Task CRC32_large.sh runtime: 185.357 ms
+Task dijkstra_large.sh runtime: 76.4698 ms
+Task blowfish_small.sh runtime: 29.718 ms
+Task basicmath_small.sh runtime: 27.0372 ms
+Temps moy : 67.142ms
+
+Iteration 3 sur 100
+Task bitcount_small.sh runtime: 17.7298 ms
+Task CRC32_large.sh runtime: 186.937 ms
+Task dijkstra_large.sh runtime: 77.4185 ms
+Task blowfish_small.sh runtime: 29.8013 ms
+Task basicmath_small.sh runtime: 27.0537 ms

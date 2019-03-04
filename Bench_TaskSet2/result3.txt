@@ -801,3 +801,110 @@ Temps moy : 91.4122ms
 ---------------------------------
 Temps moy total: 459.641ms
 Done Bench
+
+Iteration 1 sur 100
+Task bitcount_small.sh runtime: 16.9953 ms
+Task CRC32_large.sh runtime: 186.326 ms
+Task blowfish_small.sh runtime: 30.9359 ms
+Task basicmath_small.sh runtime: 27.4074 ms
+Task patricia_large.sh runtime: 258.023 ms
+Temps moy : 103.938ms
+
+Iteration 2 sur 100
+Task bitcount_small.sh runtime: 17.1349 ms
+Task CRC32_large.sh runtime: 186.628 ms
+Task patricia_large.sh runtime: 196.814 ms
+Task blowfish_small.sh runtime: 29.848 ms
+Task basicmath_small.sh runtime: 27.1078 ms
+Temps moy : 91.5065ms
+
+Iteration 3 sur 100
+Task bitcount_small.sh runtime: 17.1766 ms
+Task CRC32_large.sh runtime: 186.532 ms
+Task patricia_large.sh runtime: 196.72 ms
+Task blowfish_small.sh runtime: 29.9548 ms
+Task basicmath_small.sh runtime: 27.2524 ms
+Temps moy : 91.5273ms
+
+Iteration 4 sur 100
+Task bitcount_small.sh runtime: 17.3688 ms
+Task CRC32_large.sh runtime: 192.65 ms
+Task patricia_large.sh runtime: 197.679 ms
+Task blowfish_small.sh runtime: 30.2836 ms
+Task basicmath_small.sh runtime: 27.193 ms
+Temps moy : 93.0349ms
+
+Iteration 5 sur 100
+Task bitcount_small.sh runtime: 17.4791 ms
+Task CRC32_large.sh runtime: 186.91 ms
+Task patricia_large.sh runtime: 197.091 ms
+Task blowfish_small.sh runtime: 30.1252 ms
+Task basicmath_small.sh runtime: 27.1586 ms
+Temps moy : 91.7528ms
+
+Iteration 6 sur 100
+
+Iteration 1 sur 100
+Task bitcount_small.sh runtime: 17.4902 ms
+Task CRC32_large.sh runtime: 186.125 ms
+Task patricia_large.sh runtime: 196.864 ms
+Task blowfish_small.sh runtime: 29.7752 ms
+Task basicmath_small.sh runtime: 27.0994 ms
+Temps moy : 91.4707ms
+
+Iteration 2 sur 100
+Task bitcount_small.sh runtime: 17.1383 ms
+Task CRC32_large.sh runtime: 186.069 ms
+Task patricia_large.sh runtime: 196.489 ms
+Task blowfish_small.sh runtime: 29.9052 ms
+Task basicmath_small.sh runtime: 27.1077 ms
+Temps moy : 91.3417ms
+
+Iteration 3 sur 100
+Task bitcount_small.sh runtime: 17.0857 ms
+Task CRC32_large.sh runtime: 186.189 ms
+Task patricia_large.sh runtime: 197.529 ms
+Task blowfish_small.sh runtime: 29.8152 ms
+Task basicmath_small.sh runtime: 27.1306 ms
+Temps moy : 91.55ms
+
+Iteration 4 sur 100
+Task bitcount_small.sh runtime: 17.1139 ms
+Task CRC32_large.sh runtime: 187.131 ms
+Task patricia_large.sh runtime: 196.76 ms
+Task blowfish_small.sh runtime: 29.8026 ms
+Task basicmath_small.sh runtime: 27.1342 ms
+Temps moy : 91.5885ms
+
+Iteration 5 sur 100
+Task bitcount_small.sh runtime: 17.1501 ms
+Task CRC32_large.sh runtime: 186.688 ms
+Task patricia_large.sh runtime: 197.251 ms
+Task blowfish_small.sh runtime: 29.8831 ms
+Task basicmath_small.sh runtime: 27.1 ms
+Temps moy : 91.6145ms
+
+Iteration 6 sur 100
+
+Iteration 1 sur 100
+Task bitcount_small.sh runtime: 17.178 ms
+Task CRC32_large.sh runtime: 185.573 ms
+Task patricia_large.sh runtime: 196.153 ms
+Task blowfish_small.sh runtime: 29.7557 ms
+Task basicmath_small.sh runtime: 27.0535 ms
+Temps moy : 91.1427ms
+
+Iteration 2 sur 100
+Task bitcount_small.sh runtime: 17.0977 ms
+Task CRC32_large.sh runtime: 185.6 ms
+Task patricia_large.sh runtime: 196.456 ms
+Task blowfish_small.sh runtime: 29.8782 ms
+Task basicmath_small.sh runtime: 27.121 ms
+Temps moy : 91.2306ms
+
+Iteration 3 sur 100
+Task bitcount_small.sh runtime: 17.1844 ms
+Task CRC32_large.sh runtime: 185.627 ms
+Task patricia_large.sh runtime: 197.284 ms
+Task blowfish_small.sh runtime: 29.8707 ms
+Task basicmath_small.sh runtime: 27.157 ms

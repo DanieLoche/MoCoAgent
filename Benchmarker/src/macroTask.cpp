@@ -20,13 +20,15 @@ int MacroTask::before()
 
 void MacroTask::proceed()
 {
-  char* cmd;
-  cout << "path :" << properties.path << "." << endl; cout.flush();
-  if (properties.path != "/null/")
+
+  cout << "path :" << properties->path << "." << endl; cout.flush();
+  if (properties->path != "/null/")
   {
-    cmd = &properties.path[0u];
-    strcat(cmd,properties.name);
+    char* cmd;
+    cmd = &properties->path[0u];
+    strcat(cmd,properties->name);
     system(cmd);
+    //cmd = "";
   }
   else
   {
@@ -78,9 +80,4 @@ void MacroTask::compute_time()
 double MacroTask::get_execution_time()
 {
   return execution_time_ms;
-}
-
-void MacroTask::set_main_pid(pid_t pid)
-{
-  main_pid = pid;
 }

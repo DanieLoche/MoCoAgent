@@ -19,10 +19,15 @@ class MacroTask
     int before();
     void proceed();
     int after();
-
+    double execution_time_ms;
+    RTIME start_time_ms;
+    RTIME end_time_ms;
   public :
     rtTaskInfosStruct* properties;
   //  struct rusage usage;
+    double get_execution_time();
+    void compute_time();
+    void set_time(int input);
 
     MacroTask();
     void executeRun();

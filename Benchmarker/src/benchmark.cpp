@@ -1,13 +1,11 @@
 #include "tools.h"
 #include <sys/sysinfo.h>
 
-
-#include "mcAgent.h"
 #include "macroTask.h"
 #include "taskLauncher.h"
 
-#define TARGET 10;
-#define TASKNUM 5;
+#define TARGET 100;
+#define TASKNUM 30;
 #define OUTPUT_FILE "Bench_Aquarius.txt";
 #define MEMORY 100000000;
 using namespace std;
@@ -55,8 +53,7 @@ void TaskMain(void* arg)
   cout << "I am task : " << curtaskinfo.name << " of priority " << curtaskinfo.prio << endl; cout.flush();
   MacroTask *macroRT = new MacroTask;
 
-  macroRT->properties = *rtTI;
-  macroRT->set_main_pid(pid);
+  macroRT->properties = rtTI;
 
   macroRT->executeRun();
   exec_time = macroRT->get_execution_time();
@@ -64,12 +61,6 @@ void TaskMain(void* arg)
   if (exec_time<minimum) minimum = exec_time;
   if (exec_time > maximum) maximum = exec_time;
   kill(curtaskinfo.pid, SIGINT);
-}
-
-void RunmcAgentMain(void* arg)
-{
-  cout << "MoCoAgent running ?!" << endl; cout.flush();
-  MCAgent mcAgent(arg);
 }
 
 int main(int argc, char *argv[])
