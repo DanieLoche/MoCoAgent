@@ -14,7 +14,7 @@ class TaskLauncher
     TaskLauncher(string input_file);
 
     void runTasks( );
-    std::vector<rtTaskInfosStruct> readTasksList(string);
+    int readTasksList(string);
 
     void printTasksInfos (/* std::vector<rtTaskInfosStruct> _myTasksInfos*/);
     void print_affinity(pid_t _pid);

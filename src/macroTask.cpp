@@ -6,6 +6,9 @@
 extern void print_affinity(pid_t _pid);
 extern void printTaskInfo(rtTaskInfosStruct* task);
 
+extern void print_affinity(pid_t _pid);
+extern void printTaskInfo(rtTaskInfosStruct* task);
+
 MacroTask::MacroTask()
 {
 
@@ -92,13 +95,14 @@ void MacroTask::executeRun(RT_SEM* mysync)
     properties->out_deadline=0;
     properties->num_of_times=0;
     Somme =0;
-    //cout << "path :" << properties.path << "." << endl;
+    cout << "path 1:" << properties->path_task << "." << endl;
     properties->average_runtime =0;
     runtime= 0;
-    cpt = 0;
+    cpt =0;
+
+
     rt_sem_p(mysync,TM_INFINITE);
 
-    cout << "BINDING" << properties->name << endl;
     ret =  rt_buffer_bind (&bf , "/monitoringTopic" ,50000);
     if( 0 > ret)
     {
@@ -173,13 +177,6 @@ void MacroTask::executeRun_besteffort(RT_SEM* mysync)
 
     rt_sem_p(mysync,TM_INFINITE);
 
-    int ret;
-    ret = rt_event_bind( &event,"/modeChangeTopic",500000 );
-    if( 0 > ret)
-    {
-      rt_event_delete(&event);
-      printf("fail bind event %s\n",properties->name);
-    }
 
     while (1) {
 

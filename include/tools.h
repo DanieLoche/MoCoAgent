@@ -10,7 +10,6 @@
 #include <fstream>
 #include <sstream>
 #include <iostream>
-#include <stdio.h>
 #include <string>
 #include <vector>
 #include <algorithm>
@@ -30,6 +29,8 @@ using std::string;
 using std::cout;
 using std::endl;
 using std::cin;
+
+
 
 struct rtTaskInfosStruct
 {
@@ -71,11 +72,13 @@ struct monitoringMsg
   bool isExecuted;    // Run-time - computed
 };
 
+
+
 struct systemRTInfo
 {
   // Toto test.
-  std::vector<end2endDeadlineStruct>* e2eDD;
-  std::vector<rtTaskInfosStruct>* rtTIs;
+  std::vector<end2endDeadlineStruct> e2eDD;
+  std::vector<rtTaskInfosStruct> rtTIs;
 };
 
 

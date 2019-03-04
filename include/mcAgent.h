@@ -60,7 +60,9 @@ class taskChain
     double getExecutionTime();
     double getRemWCET();
 
-    bool operator <(const taskChain& tc) const {return (id < tc.id);}
+    //bool operator <(const taskChain& tc) const {return (id < tc.id);}
+
+    void displayTasks();
 };
 
 class MCAgent
@@ -84,5 +86,5 @@ class MCAgent
     int checkTaskChains();
     void setMode(int mode);
     void displaySystemInfo(systemRTInfo* sInfos);
-
+    void displayChains();
 };

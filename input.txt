@@ -1,3 +1,17 @@
 name                       path isHRT periodicity deadline affinity
 basicmath_small.sh  /home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/automotive/basicmath/basicmath_small.sh 1 200 200 0
 adpcm_large.sh    /home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/telecomm/adpcm/adpcm_large.sh 1 1500 1500 0
+<<<<<<< HEAD
+=======
+
+//$$  1 500
+//$$  2 400
+//exe1        /null/    1     100          10        1
+//exe2        /null/    1     200          20        1
+//exe3        /null/    1     300          30        1
+//exe4        /null/    2     400          40        2
+//exe5        /null/    2     500          50        2
+//exe6        /null/    0     600          60        2
+//exe7        /null/    0     700          70        3
+//exe8        /null/    0     800          80        3
+>>>>>>> 40a6f735f8f2ba4bc70c36019dfcd9920e0b70fc

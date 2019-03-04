@@ -20,10 +20,10 @@
 
 long nproc;
 RT_SEM mysync;
-TaskLauncher* tasl;
 std::vector<end2endDeadlineStruct> list_info_chaine;
 std::vector<rtTaskInfosStruct> AlltasksInfosList;
 
+TaskLauncher* tasl;
 std::mutex mutex;           // mutex for critical section
 
 void RunmcAgentMain(void* arg)
@@ -33,7 +33,6 @@ void RunmcAgentMain(void* arg)
   printInquireInfo();
 
 }
-
 
 
 void TaskMain(void* arg)
@@ -64,16 +63,12 @@ void my_handler(int s){
   cout << "\n------------------------------" << endl;
   #endif
   string out_file = "Testoutput.txt";
-//  mutex.lock();
+  mutex.lock();
   std::ofstream myfile;
   myfile.open (out_file);    // TO APPEND :  //,ios_base::app);
+  for (auto taskInfo = tasl->tasksInfosList.begin(); taskInfo != tasl->tasksInfosList.end(); ++taskInfo)
+  {
 
-/* for (auto& taskInfo : AlltasksInfosList)
-  for (auto taskInfo = AlltasksInfosList.begin(); taskInfo != AlltasksInfosList.end(); ++taskInfo)
-  {
-    */
-  for ( auto taskInfo = tasl->tasksInfosList.begin(); taskInfo != tasl->tasksInfosList.end(); ++taskInfo)
-  {
            myfile << "\nRunning summary for task " << taskInfo->name << ".\n";
            myfile << "Average runtime : " << taskInfo->average_runtime/ 1.0e6 << "\n";
            myfile << "Max runtime : " << taskInfo->max_runtime/ 1.0e6 << " ms\n";
@@ -103,9 +98,12 @@ int main(int argc, char* argv[])
 {
   system("clear");
 
+
   string input_file;
 
+
   // Définition fichier d'information des tâches
+
 	input_file = "./input_chaine.txt";
 
   int return_code = 0;
@@ -129,7 +127,7 @@ int main(int argc, char* argv[])
 
     //AlltasksInfosList.insert (AlltasksInfosList.end(),tln.tasksInfosList.begin(),tln.tasksInfosList.end());
    tasl=&tln;
-   cout<<"AlltasksInfosList  size :"<< AlltasksInfosList.size()<<endl;
+  // cout<<"AlltasksInfosList  size :"<< AlltasksInfosList.size()<<endl;
    tln.printTasksInfos();
    tln.runTasks();
 
@@ -142,8 +140,8 @@ int main(int argc, char* argv[])
   set_affinity(&mcAgent, 3);
 
   systemRTInfo ch_taks ;
-  ch_taks.rtTIs=&tln.tasksInfosList ;
-  ch_taks.e2eDD =&list_info_chaine;
+  ch_taks.rtTIs=tln.tasksInfosList ;
+  ch_taks.e2eDD =list_info_chaine;
   rt_task_start(&mcAgent, RunmcAgentMain, &ch_taks);
 
 
@@ -171,7 +169,6 @@ int main(int argc, char* argv[])
   return return_code;
 }
 
-
 void printInquireInfo()
 {
 #if VERBOSE_INFO
@@ -182,6 +179,7 @@ void printInquireInfo()
      << " (PID : " << curtaskinfo.pid << "), of priority "
      << curtaskinfo.prio << endl
      << "On CPU : " << curtaskinfo.stat.cpu << endl;
+
   cout << ss.rdbuf();
 #endif
 }
@@ -210,8 +208,6 @@ void set_affinity (RT_TASK* task, int _aff)
   rt_task_inquire(task, &curtaskinfo);
   cout << "Setting affinity for task " << curtaskinfo.name << " is ( 0 = valide) :" << rt_task_set_affinity(task, &mask) << endl;
 }
-
-
 
 void print_affinity(pid_t _pid)
 {

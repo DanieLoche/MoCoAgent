@@ -32,12 +32,12 @@ MCAgent::MCAgent(void *arg)
 
   initMoCoAgent(sInfos);
   initComunications();
-  cout<<"creation message reciever"<<endl;
+
   RT_TASK mcAgentReceiver;
   rt_task_create(&mcAgentReceiver, "MoCoAgentReceiver", 0, 2, 0);
   rt_task_start(&mcAgentReceiver, messageReceiver, this);
-//  while(TRUE)
- //{
+  while(TRUE)
+  {
       for (auto _taskChain = allTaskChain.begin(); _taskChain != allTaskChain.end(); ++_taskChain)
       {
         if ( !_taskChain->checkTaskE2E() )
@@ -51,13 +51,15 @@ MCAgent::MCAgent(void *arg)
           _taskChain->resetChain();
         }
       }
-//  }
+      rt_task_yield();
+   }
 }
 
-void MCAgent::initMoCoAgent(systemRTInfsize1o* sInfos)
+void MCAgent::initMoCoAgent(systemRTInfo* sInfos)
 {
-  setAllDeadlines(*sInfos->e2eDD);
-  setAllTasks(*sInfos->rtTIs);
+  setAllDeadlines(sInfos->e2eDD);
+  setAllTasks(sInfos->rtTIs);
+  displayChains();
 }
 
 void MCAgent::initComunications()
@@ -77,8 +79,8 @@ void MCAgent::setAllDeadlines(std::vector<end2endDeadlineStruct> _tcDeadlineStru
 {
   for (auto& tcDeadlineStruct : _tcDeadlineStructs)
   {
-    taskChain tc(tcDeadlineStruct);
-    allTaskChain.push_back(tc);
+    taskChain* tc = new taskChain(tcDeadlineStruct);
+    allTaskChain.push_back(*tc);
   }
 }
 
@@ -103,12 +105,13 @@ void MCAgent::setAllTasks(std::vector<rtTaskInfosStruct> _TasksInfos)
       }
       else if ( _taskInfo.isHardRealTime == _taskChain.id )
       {
+        cout << "Adding a HRT task" << endl;
         taskMonitoringStruct* tms = new taskMonitoringStruct(_taskInfo);
         _taskChain.taskList.push_back(*tms);
         idFound = 1;
       }
+      if (idFound) break;
 
-      if (idFound) return;
     }
   }
 }
@@ -210,12 +213,12 @@ void MCAgent::displaySystemInfo(systemRTInfo* sInfos)
 {
   #if VERBOSE_INFO
   cout << "INPUT Informations : ";
-  for (auto &taskdd : *sInfos->e2eDD)
+  for (auto &taskdd : sInfos->e2eDD)
   { // Print chain params
       cout << "Chain ID : " << taskdd.taskChainID
           << "| Deadline : " << taskdd.deadline << endl;
   }
-  for (auto &taskParam : *sInfos->rtTIs)
+  for (auto &taskParam : sInfos->rtTIs)
   { // Print task Params
       cout << "Name: "    << taskParam.name
           << "| path: "   << taskParam.path_task
@@ -228,6 +231,17 @@ void MCAgent::displaySystemInfo(systemRTInfo* sInfos)
   #endif
 }
 
+void MCAgent::displayChains()
+{
+  for (auto& chain : allTaskChain)
+  {
+    cout << "Chain #" << chain.id << " with deadline = " << chain.end2endDeadline << endl;
+    chain.displayTasks();
+  }
+}
+
+//////////////////////////////////////////
+/////////// TASK CHAIN CLASS /////////////
 taskChain::taskChain(end2endDeadlineStruct _tcDeadline)
 {
 
@@ -285,6 +299,17 @@ double taskChain::getRemWCET()
   return RemWCET;
 }
 
+void taskChain::displayTasks()
+{
+  cout << "Task list : " << endl;
+  for (auto& task : taskList)
+  {
+    cout << "    - Task ID #" << task.id << "proper deadline = " << task.deadline << endl;
+  }
+}
+
+/////////////////////////////////////////////////
+//////////// TASK MONITORING STRUCTURE //////////
 
 /***********************
 * Recoit la liste des tasksInfos lues depuis l'INPUT.txt
