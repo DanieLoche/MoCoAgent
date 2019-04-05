@@ -97,17 +97,12 @@ TaskLauncher::TaskLauncher(string input_file)
 
 int TaskLauncher::readTasksList(string input_file)
 {
-  #if VERBOSE_OTHER
-  system("clear");
-  cout << "Initialising machine...\n";
-  #endif
 
   std::ifstream myFile(input_file);
   if (!myFile.is_open())
   {
       exit(EXIT_FAILURE);
   }
-
   //std::vector<rtTaskInfosStruct> myTasksInfos;
 
   string str;
@@ -117,18 +112,23 @@ int TaskLauncher::readTasksList(string input_file)
       rtTaskInfosStruct taskInfo;
       std::istringstream iss(str);
       string token;
-      #if VERBOSE_ASK
+      char ext[64] = "RT_";
+      #if VERBOSE_INFO
       cout << "Managing line : " << str << endl;
       #endif
       if (str.substr(0,2) != "//")
       {
-        if (!(iss >> taskInfo.name
+        char name[60];
+        if (!(iss >> name
                   >> taskInfo.path_task
                   >> taskInfo.isHardRealTime
                   >> taskInfo.periodicity
                   >> taskInfo.deadline
-                  >> taskInfo.affinity  ) )
+                  >> taskInfo.affinity ) )
         { cout << "\033[1;31mFailed to read line\033[0m !" << endl; break; } // error
+        strncat(ext, name, 64);
+        strcpy(taskInfo.name,ext);
+        printTaskInfo(&taskInfo);
         tasksInfosList.push_back(taskInfo);
       }
       #if VERBOSE_ASK
@@ -143,29 +143,33 @@ int TaskLauncher::readTasksList(string input_file)
 
 void TaskLauncher::runTasks( )
 {
+  #if VERBOSE_INFO
+  cout << endl << "CREATING TASKS : " << endl;
+  #endif
   for (auto taskInfo = tasksInfosList.begin(); taskInfo != tasksInfosList.end(); ++taskInfo)
   {
       RT_TASK* task = new RT_TASK;
       taskInfo->task = task;
-      taskInfo->ID = number_task_created ;
-      number_task_created = number_task_created + 1 ;
-
+      taskInfo->ID = ++number_task_created ;
+      #if VERBOSE_INFO
+      cout << "Creating Task " << taskInfo->name << "." << endl;
+      #endif
       int rep =rt_task_create(task, taskInfo->name, 0, 50, 0);
       if( 0 > rep)
       {
         printf("fail creat task %s\n",taskInfo->name);
       }
 
-
-      #if VERBOSE_INFO
-      cout << "Task " << taskInfo->name << " created." << endl;
-      #endif
       set_affinity(task, taskInfo->affinity);
 
       //cout << "Setting affinity :" << rt_task_set_affinity(taskInfo->task, &mask) << endl;
     //  rt_task_slice(task,qt);
 
   }
+
+  #if VERBOSE_INFO
+  cout << endl << "STARTING TASKS : " << endl;
+  #endif
 
    //Periodicity
   RTIME starttime;
@@ -174,7 +178,7 @@ void TaskLauncher::runTasks( )
 
   for (auto& taskInfo : tasksInfosList)
   {
-      taskInfo.deadline = taskInfo.deadline*1e6;
+      taskInfo.deadline = taskInfo.deadline;
       rt_task_set_periodic(taskInfo.task, starttime, taskInfo.periodicity*1e6);
       rt_task_inquire(taskInfo.task, &curtaskinfo);
 /*
@@ -210,8 +214,8 @@ void TaskLauncher::runTasks( )
 
 }
 
-
-void TaskLauncher::printTasksInfos (/* std::vector<rtTaskInfosStruct> _myTasksInfos*/)
+/*
+void TaskLauncher::printTasksInfos ( ) // std::vector<rtTaskInfosStruct> _myTasksInfos)
 {
   #if VERBOSE_INFO
   for (auto &taskInfo : tasksInfosList)
@@ -227,3 +231,4 @@ void TaskLauncher::printTasksInfos (/* std::vector<rtTaskInfosStruct> _myTasksIn
   }
   #endif
 }
+*/

@@ -6,7 +6,7 @@
 
 #define TARGET 100;
 #define TASKNUM 30;
-#define OUTPUT_FILE "Bench_Aquarius.txt";
+#define OUTPUT_FILE "Bench_Pyxis.txt";
 #define MEMORY 100000000;
 using namespace std;
 long nproc;
