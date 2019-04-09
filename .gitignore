@@ -74,8 +74,10 @@ Thumbs.db
 *.txt
 SchedulerSimulator
 *.dat
-output_*
 
 # directories
 trace-cmd/
 bench/
+
+# Output files
+*output*
