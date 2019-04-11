@@ -5,8 +5,8 @@
 #define   MODE_OVERLOADED     1
 #define   MODE_NOMINAL        0
 
-const double t_RT = 0;  // time to trigger the Control Agent
-const double Wmax = 400;    // next slice max time
+const RTIME t_RT = 0*1.0e6;  // time to trigger the Control Agent
+const RTIME Wmax = 400*1.0e6;    // next slice max time
 
 
 /*
@@ -31,11 +31,11 @@ class taskMonitoringStruct
 
     RT_TASK* task;
     int id;
-    double startTime;   // Run-time - received
-    double endTime;     // Run-time - received
+    RTIME startTime;   // Run-time - received
+    RTIME endTime;     // Run-time - received
     bool isExecuted;    // Run-time - computed
-    double deadline;    // Static
-    double rwcet;       // Static
+    RTIME deadline;    // Static
+    RTIME rwcet;       // Static
 
     //bool operator <(const taskMonitoringStruct& tms) const {return (id < tms.id);}
 };
@@ -47,18 +47,18 @@ class taskChain
 
     int id;                 // static
     bool isAtRisk;          // Runtime - deduced
-    double startTime;       // Runtime - deduced
-    double currentEndTime;  // Runtime - deduced
-    double remWCET;         // Runtime - computed
-    double end2endDeadline; // static
+    RTIME startTime;       // Runtime - deduced
+    RTIME currentEndTime;  // Runtime - deduced
+    RTIME remWCET;         // Runtime - computed
+    RTIME end2endDeadline; // static
     //double slackTime;
     std::vector<taskMonitoringStruct> taskList;
 
     int checkTaskE2E();
     int checkIfEnded();
     void resetChain();
-    double getExecutionTime();
-    double getRemWCET();
+    RTIME getExecutionTime();
+    RTIME getRemWCET();
 
     //bool operator <(const taskChain& tc) const {return (id < tc.id);}
 
@@ -68,7 +68,7 @@ class taskChain
 class MCAgent
 {
   public :
-    MCAgent(void* arg);
+    MCAgent(systemRTInfo* sInfos);
     RT_BUFFER bf;
     RT_EVENT mode_change_flag;
     void updateTaskInfo(monitoringMsg msg);

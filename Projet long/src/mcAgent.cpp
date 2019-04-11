@@ -17,12 +17,10 @@ void messageReceiver(void* arg)
   }
 }
 
-MCAgent::MCAgent(void *arg)
+MCAgent::MCAgent(systemRTInfo* sInfos)
 {
-  printInquireInfo();
-  print_affinity(0);
-
-  systemRTInfo* sInfos = (systemRTInfo*) arg;
+  //printInquireInfo();
+  //print_affinity(0);
   //TasksInformations = rtTI;
 
   runtimeMode = MODE_NOMINAL;
@@ -34,6 +32,9 @@ MCAgent::MCAgent(void *arg)
   RT_TASK mcAgentReceiver;
   rt_task_create(&mcAgentReceiver, "MoCoAgentReceiver", 0, 99, 0);
   rt_task_start(&mcAgentReceiver, messageReceiver, this);
+  #if VERBOSE_INFO
+    cout << "MoCoAgent Ready." << endl;
+  #endif
   while(TRUE)
   {
       for (auto _taskChain = allTaskChain.begin(); _taskChain != allTaskChain.end(); ++_taskChain)
@@ -75,6 +76,9 @@ void MCAgent::initCommunications()
 ***********************/
 void MCAgent::setAllDeadlines(std::vector<end2endDeadlineStruct> _tcDeadlineStructs)
 {
+  #if VERBOSE_INFO
+  cout << "[MoCoAgent] : setting deadlines." << endl;
+  #endif
   for (auto& tcDeadlineStruct : _tcDeadlineStructs)
   {
     taskChain* tc = new taskChain(tcDeadlineStruct);
@@ -91,6 +95,9 @@ void MCAgent::setAllDeadlines(std::vector<end2endDeadlineStruct> _tcDeadlineStru
 ***********************/
 void MCAgent::setAllTasks(std::vector<rtTaskInfosStruct> _TasksInfos)
 {
+  #if VERBOSE_INFO
+  cout << "[MoCoAgent] : setting tasks." << endl;
+  #endif
   for (auto& _taskInfo : _TasksInfos)
   {
     bool idFound = 0;   // Opti. pour éviter de continuer à boucler si on a trouvé la chaine
@@ -196,6 +203,7 @@ void MCAgent::updateTaskInfo(monitoringMsg msg)
     }
   }
 }
+
 /***********************
 * Fonction de débug pour afficher
 * les informations de toutes les tâches reçues.
@@ -205,21 +213,21 @@ void MCAgent::updateTaskInfo(monitoringMsg msg)
 void MCAgent::displaySystemInfo(systemRTInfo* sInfos)
 {
   #if VERBOSE_INFO
-  cout << "INPUT Informations : ";
+  cout << "INPUT Informations : " << endl;
   for (auto &taskdd : sInfos->e2eDD)
   { // Print chain params
       cout << "Chain ID : " << taskdd.taskChainID
-          << "| Deadline : " << taskdd.deadline << endl;
+          << "| Deadline : " << taskdd.deadline /1.0e6 << endl;
   }
   for (auto &taskParam : sInfos->rtTIs)
   { // Print task Params
       cout << "Name: "    << taskParam.name
           << "| path: "   << taskParam.path_task
           << "| is RT ? " << taskParam.isHardRealTime
-          << "| Period: " << taskParam.periodicity
-          << "| Deadline: " << taskParam.deadline
+          << "| Period: " << taskParam.periodicity /1.0e6
+          << "| Deadline: " << taskParam.deadline /1.0e6
           << "| affinity: " << taskParam.affinity
-          << "| ID :"<< taskParam.ID << endl;
+          << "| ID :"<< taskParam.id << endl;
   }
   #endif
 }
@@ -229,7 +237,7 @@ void MCAgent::displayChains()
   for (auto& chain : allTaskChain)
   {
     #if VERBOSE_ASK
-      cout << "Chain #" << chain.id << " with deadline = " << chain.end2endDeadline << endl;
+      cout << "Chain #" << chain.id << " with deadline = " << chain.end2endDeadline/1.0e6 << endl;
     #endif
     chain.displayTasks();
   }
@@ -272,7 +280,7 @@ void taskChain::resetChain()
   startTime = 0;
 }
 
-double taskChain::getExecutionTime()
+RTIME taskChain::getExecutionTime()
 {
     return (currentEndTime - startTime);
 }
@@ -283,7 +291,7 @@ double taskChain::getExecutionTime()
 * @params : /
 * @returns : RTIME RemWCET
 ***********************/
-double taskChain::getRemWCET()
+RTIME taskChain::getRemWCET()
 {
   double RemWCET = 0;
   for (auto& task : taskList)
@@ -296,11 +304,11 @@ double taskChain::getRemWCET()
 
 void taskChain::displayTasks()
 {
-  #if VERBOSE_ASK
+  #if VERBOSE_INFO
     cout << "Task list : " << endl;
     for (auto& task : taskList)
     {
-      cout << "    - Task ID #" << task.id << "proper deadline = " << task.deadline << endl;
+      cout << "    - Task ID #" << task.id << " - deadline = " << task.deadline/1.0e6 << endl;
     }
   #endif
 }
@@ -319,7 +327,7 @@ taskMonitoringStruct::taskMonitoringStruct(rtTaskInfosStruct rtTaskInfos)
   task = rtTaskInfos.task;
   deadline = rtTaskInfos.deadline;
   rwcet = rtTaskInfos.deadline;
-  id = rtTaskInfos.ID;
+  id = rtTaskInfos.id;
 
   isExecuted = FALSE;
   startTime = 0, endTime = 0;

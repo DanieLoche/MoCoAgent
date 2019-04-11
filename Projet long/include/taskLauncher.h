@@ -1,21 +1,21 @@
 #include "tools.h"
-
-
+#include "dataLogger.h"
 
 class TaskLauncher
 {
-
   private :
-  int number_task_created ;
+    int cptNumberTasks ;
+    systemRTInfo taskSetInfos;
+    std::vector<DataLogger*> tasksLogsList;
   public :
-    std::vector<rtTaskInfosStruct> tasksInfosList;
-
     TaskLauncher();
-    TaskLauncher(string input_file);
 
-    void runTasks( );
-    int readTasksList(string);
+    void runTasks();
+    void runAgent();
+    void readChainsList(string);
+    int  readTasksList();
 
+    void saveData();
     void printTasksInfos (/* std::vector<rtTaskInfosStruct> _myTasksInfos*/);
     void print_affinity(pid_t _pid);
 

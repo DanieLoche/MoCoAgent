@@ -14,6 +14,8 @@ class TaskLauncher
     TaskLauncher(string input_file);
 
     void runTasks( );
+    void runAgent();
+    void readChainsList(string, std::vector<end2endDeadlineStruct>*);
     int readTasksList(string);
 
     void printTasksInfos (/* std::vector<rtTaskInfosStruct> _myTasksInfos*/);

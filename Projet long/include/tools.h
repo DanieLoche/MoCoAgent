@@ -1,11 +1,12 @@
 #ifndef TOOLS_H
 #define TOOLS_H
 
+#define     SCHED_POLICY        SCHED_RR
 
-#define VERBOSE_INFO  1 // Cout d'informations, démarrage, etc...
-#define VERBOSE_DEBUG 1 // Cout de débug...
-#define VERBOSE_OTHER 1 // Cout autre...
-#define VERBOSE_ASK   1 // cout explicitement demandés dans le code
+#define     VERBOSE_INFO        1 // Cout d'informations, démarrage, etc...
+#define     VERBOSE_DEBUG       0 // Cout de débug...
+#define     VERBOSE_OTHER       0 // Cout autre...
+#define     VERBOSE_ASK         0 // cout explicitement demandés dans le code
 
 #include <fstream>
 #include <sstream>
@@ -20,7 +21,6 @@
 #include <alchemy/task.h>
 #include <alchemy/sem.h>
 #include <alchemy/timer.h>
-#include <rtdm/ipc.h>
 #include <alchemy/buffer.h>
 #include <alchemy/event.h>
 
@@ -30,28 +30,31 @@ using std::cout;
 using std::endl;
 using std::cin;
 
-
-
+/*
+struct logData
+{
+  struct timeLog
+  {
+    RTIME timestamp;
+    RTIME duration;
+  } timeLogs[8000];
+  int cptOutOfDeadline;
+  int cptExecutions;
+};
+*/
 struct rtTaskInfosStruct
 {
-    RT_TASK* task;
-    char   name[64];
-    int ID ;
-     string path_task;
-    string task_args;
+    char name[32];
+    char path_task[128];
 
     int  isHardRealTime;
-    int  periodicity;
-    double  deadline;
+    RTIME  periodicity;
+    RTIME  deadline;
     int  affinity;
+    int id;
 
-    RTIME average_runtime;
-    RTIME max_runtime;
-    RTIME min_runtime;
-    int  out_deadline;
-    int  num_of_times;
-
-} ;
+    RT_TASK* task;
+};
 
 struct end2endDeadlineStruct
 {
@@ -59,19 +62,17 @@ struct end2endDeadlineStruct
   int taskChainID;
   int Num_tasks;
   string Path;
-  double deadline;
-
+  RTIME deadline;
 };
 
 struct monitoringMsg
 {
   RT_TASK* task;
   int ID;
-  double startTime;   // Run-time - received
-  double endTime;     // Run-time - received
+  RTIME startTime;   // Run-time - received
+  RTIME endTime;     // Run-time - received
   bool isExecuted;    // Run-time - computed
 };
-
 
 
 struct systemRTInfo
@@ -84,6 +85,7 @@ struct systemRTInfo
 void printInquireInfo();
 void printTaskInfo(rtTaskInfosStruct* task);
 void print_affinity(pid_t _pid);
+
 
 /* To create a task :
  * Arguments : &task,
