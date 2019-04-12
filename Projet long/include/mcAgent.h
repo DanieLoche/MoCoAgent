@@ -1,5 +1,6 @@
 #include "tools.h"
-#include <set>
+#include <array>
+
 #define   TRUE    1
 #define   FALSE   0
 #define   MODE_OVERLOADED     1
@@ -29,11 +30,11 @@ class taskMonitoringStruct
   public :
     taskMonitoringStruct(rtTaskInfosStruct rtTaskInfos);
 
-    RT_TASK* task;
+    RT_TASK* tache;
     int id;
     RTIME startTime;   // Run-time - received
     RTIME endTime;     // Run-time - received
-    bool isExecuted;    // Run-time - computed
+    bool isExecuted;   // Run-time - computed
     RTIME deadline;    // Static
     RTIME rwcet;       // Static
 
@@ -44,9 +45,13 @@ class taskChain
 {
   public :
     taskChain(end2endDeadlineStruct _tcDeadline);
+    int cptAnticipatedMisses;
+    int cptOutOfDeadline;
+    int cptExecutions;
+    std::array<RTIME, 2048> chainExecutionTime;
 
-    int id;                 // static
-    bool isAtRisk;          // Runtime - deduced
+    int id;                // static
+    bool isAtRisk;         // Runtime - deduced
     RTIME startTime;       // Runtime - deduced
     RTIME currentEndTime;  // Runtime - deduced
     RTIME remWCET;         // Runtime - computed

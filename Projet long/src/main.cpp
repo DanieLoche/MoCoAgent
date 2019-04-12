@@ -122,12 +122,12 @@ int main(int argc, char* argv[])
 
     if (enableAgent)
     {
-      sleep(2);
+      sleep(1);
       tln.runAgent();
     }
 
     //sleeping the time that all tasks will be started
-    sleep(3);
+    sleep(2);
     cout << "Wake up all tasks." << endl;
     rt_sem_broadcast(&mysync);
 

@@ -1,7 +1,9 @@
 #include "dataLogger.h"
 
+#include <iomanip>
 DataLogger::DataLogger(rtTaskInfosStruct* taskInfos)
 {
+  task = taskInfos->task;
   strcpy(name, taskInfos->name);
   id = taskInfos->id;
   isHardRealTime = taskInfos->isHardRealTime;
@@ -24,11 +26,6 @@ RTIME DataLogger::logExec( )
 {
   execLogs[cptExecutions].duration = rt_timer_read() - execLogs[cptExecutions].timestamp;
 
-  /*cout << " timestamp : " << execLogs[cptExecutions].timestamp  << endl
-      << " duration : " << execLogs[cptExecutions].duration     << endl
-      << " deadline : " << deadline             << endl
-      << " Execution n_" << cptExecutions       << endl;
-  usleep(500000);*/
   if(execLogs[cptExecutions].duration > deadline )
   {
     #if VERBOSE_ASK
@@ -70,16 +67,21 @@ void DataLogger::saveData(string file)
     if (_dur < min_runtime) min_runtime = _dur;
     else if (_dur > max_runtime) max_runtime = _dur;
   }
+
   average_runtime = somme / cptExecutions;
+  RT_TASK_INFO cti;
+  rt_task_inquire(task, &cti);
 
  #if VERBOSE_INFO
- cout << "\nRunning summary for task " << name << ".\n"
-      << "Average runtime : "      << average_runtime / 1.0e6 << " ms\n"
-      << "Max runtime : "          << max_runtime / 1.0e6     << " ms\n"
-      << "Min runtime : "          << min_runtime / 1.0e6     << " ms\n"
-      << "Deadline :"              << deadline / 1.0e6        << " ms\n"
-      << "Out of Deadline : "      << cptOutOfDeadline        << " times\n"
-      << "Number of executions : " << cptExecutions << " times\n";
+ cout << "\nRunning summary for task " << name << ". (" << cti.pid << ", " << cti.prio << ", " << cti.name << ")" << endl
+      << "Deadline : " << deadline / 1.0e6 << " ms.  Missed |  Executions " << endl
+      << "                    " << std::setw(6) <<  cptOutOfDeadline << " | " << cptExecutions << " times" << endl
+      << "Primary Mode execution time - " << cti.stat.xtime/1.0e6 << " ms. Timeouts : " << cti.stat.timeout << endl
+      << "  MIN  " << " | " << "  AVG  " << " | " << "  MAX" << endl
+      << min_runtime / 1.0e6 << " | " << average_runtime / 1.0e6 << " | " << max_runtime / 1.0e6 << " runtimes (ms)" << endl
+      << "   Mode Switches - " << cti.stat.msw << endl
+      << "Context Switches - " << cti.stat.csw << endl
+      << "Cobalt Sys calls - " << cti.stat.xsc << endl;
  #endif
 
 

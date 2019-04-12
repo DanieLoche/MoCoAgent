@@ -13,6 +13,7 @@ struct timeLog
 class DataLogger
 {
   private :
+    RT_TASK* task;
     char name[32];
     int id;
     int  isHardRealTime;

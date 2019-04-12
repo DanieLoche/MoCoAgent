@@ -47,11 +47,12 @@ struct rtTaskInfosStruct
     char name[32];
     char path_task[128];
 
-    int  isHardRealTime;
-    RTIME  periodicity;
-    RTIME  deadline;
-    int  affinity;
+    int isHardRealTime;
     int id;
+    int affinity;
+    int priority;
+    RTIME  wcet;
+    RTIME  deadline;
 
     RT_TASK* task;
 };

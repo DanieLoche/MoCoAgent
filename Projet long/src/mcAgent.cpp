@@ -12,8 +12,6 @@ void messageReceiver(void* arg)
     rt_buffer_read(&mocoAgent->bf, &msg, sizeof(monitoringMsg), TM_INFINITE);
   //  cout<<"done buffer read"<<endl;
     mocoAgent->updateTaskInfo(msg);
-
-
   }
 }
 
@@ -43,6 +41,8 @@ MCAgent::MCAgent(systemRTInfo* sInfos)
         {
           setMode(MODE_OVERLOADED);
           _taskChain->isAtRisk = TRUE;
+          _taskChain->cptAnticipatedMisses++;
+
         }
         if (_taskChain->isAtRisk && _taskChain->checkIfEnded())
         {
@@ -134,12 +134,14 @@ int MCAgent::checkTaskChains()
     if ( _taskChain->checkTaskE2E() )
     {
       setMode(MODE_OVERLOADED);
-      _taskChain->isAtRisk = 1;
+      _taskChain->isAtRisk = TRUE;
+      _taskChain->cptAnticipatedMisses++;
       tasksID = _taskChain->id;
     }
   }
   return tasksID;
 }
+
 
 /***********************
 * Passage du système en mode :
@@ -150,11 +152,10 @@ int MCAgent::checkTaskChains()
 ***********************/
 void MCAgent::setMode(int mode)
 {
-  /*
+
   #if VERBOSE_DEBUG
     cout << "MoCoAgent Triggered to mode " << mode << "!" << endl;
   #endif
-
   runtimeMode += 2*mode - 1;  // NOMINAL : -1 ; OVERLOADED : +1
   if (runtimeMode == MODE_OVERLOADED)
   { // Pause Best Effort Tasks;
@@ -172,7 +173,7 @@ void MCAgent::setMode(int mode)
       rt_task_resume(bestEffortTask);
     }
   }
-  */
+
 }
 
 // METHODE A OPTIMISER SUR LE PARCOURS
@@ -191,13 +192,13 @@ void MCAgent::updateTaskInfo(monitoringMsg msg)
       {
         if( task.id == msg.ID)
         {
-          if (!msg.startTime)
-            task.startTime = msg.startTime;
-          else if (msg.isExecuted)
+          if (msg.isExecuted)
           {
             task.endTime = msg.endTime;
-             task.isExecuted = TRUE;
+            task.isExecuted = TRUE;
+            _taskChain.currentEndTime = std::max(_taskChain.currentEndTime, task.endTime);
           }
+          else task.startTime = msg.startTime;
           return;
         }
     }
@@ -224,7 +225,7 @@ void MCAgent::displaySystemInfo(systemRTInfo* sInfos)
       cout << "Name: "    << taskParam.name
           << "| path: "   << taskParam.path_task
           << "| is RT ? " << taskParam.isHardRealTime
-          << "| Period: " << taskParam.periodicity /1.0e6
+          << "| WCET: " << taskParam.wcet /1.0e6
           << "| Deadline: " << taskParam.deadline /1.0e6
           << "| affinity: " << taskParam.affinity
           << "| ID :"<< taskParam.id << endl;
@@ -247,9 +248,11 @@ void MCAgent::displayChains()
 /////////// TASK CHAIN CLASS /////////////
 taskChain::taskChain(end2endDeadlineStruct _tcDeadline)
 {
-
   id = _tcDeadline.taskChainID;
   end2endDeadline = _tcDeadline.deadline;
+  cptOutOfDeadline = 0;
+  cptAnticipatedMisses = 0;
+  chainExecutionTime = {0};
 }
 
 /***********************
@@ -259,7 +262,9 @@ taskChain::taskChain(end2endDeadlineStruct _tcDeadline)
 ***********************/
 int taskChain::checkTaskE2E()
 {
-  return (getExecutionTime() + Wmax + t_RT + getRemWCET() <= end2endDeadline);
+  int miss = (getExecutionTime() + Wmax + t_RT + getRemWCET() <= end2endDeadline);
+  if (miss) cptAnticipatedMisses++;
+  return (miss);
 }
 
 int taskChain::checkIfEnded()
@@ -269,12 +274,19 @@ int taskChain::checkIfEnded()
   { // only one FALSE is enough
     ended = ended && task.isExecuted;
   }
-  if (ended) resetChain();
+  if (ended)
+  {
+    resetChain();
+    RTIME execTime = getExecutionTime();
+    if (execTime > end2endDeadline) cptOutOfDeadline++;
+    chainExecutionTime[cptExecutions++] = execTime;
+  }
   return ended;
 }
 
 void taskChain::resetChain()
 {
+  currentEndTime = 0;
   for (auto& task : taskList) task.isExecuted = 0;
   isAtRisk = FALSE;
   startTime = 0;
@@ -324,9 +336,9 @@ void taskChain::displayTasks()
 ***********************/
 taskMonitoringStruct::taskMonitoringStruct(rtTaskInfosStruct rtTaskInfos)
 {
-  task = rtTaskInfos.task;
+  tache = rtTaskInfos.task;
   deadline = rtTaskInfos.deadline;
-  rwcet = rtTaskInfos.deadline;
+  rwcet = rtTaskInfos.wcet;
   id = rtTaskInfos.id;
 
   isExecuted = FALSE;

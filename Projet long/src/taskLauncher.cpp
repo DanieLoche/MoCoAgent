@@ -75,12 +75,13 @@ int TaskLauncher::readTasksList()
           if (!(iss >> name
                     >> taskInfo->path_task
                     >> taskInfo->isHardRealTime
-                    >> taskInfo->periodicity
+                    >> taskInfo->wcet
                     >> taskInfo->deadline
-                    >> taskInfo->affinity ) )
+                    >> taskInfo->affinity
+                    >> taskInfo->priority ) )
           { cout << "\033[1;31mFailed to read line\033[0m !" << endl; break; } // error
           taskInfo->deadline *= 1.0e6;
-          taskInfo->periodicity *= 1.0e6;
+          taskInfo->wcet *= 1.0e6;
           strncat(ext, name, 64);
           strcpy(taskInfo->name,ext);
           taskInfo->id = ++cptNumberTasks;
@@ -102,26 +103,26 @@ void TaskLauncher::runTasks()
   #if VERBOSE_INFO
   cout << endl << "CREATING TASKS : " << endl;
   #endif
-  for (auto taskInfo = taskSetInfos.rtTIs.begin(); taskInfo != taskSetInfos.rtTIs.end(); ++taskInfo)
-  {
-      RT_TASK* task = new RT_TASK;
-      taskInfo->task = task;
-      #if VERBOSE_INFO
-      cout << "Creating Task " << taskInfo->name << "." << endl;
-      #endif
+    for (auto taskInfo = taskSetInfos.rtTIs.begin(); taskInfo != taskSetInfos.rtTIs.end(); ++taskInfo)
+    {
+        RT_TASK* task = new RT_TASK;
+        taskInfo->task = task;
+        #if VERBOSE_INFO
+        cout << "Creating Task " << taskInfo->name << "." << endl;
+        #endif
 
-      if(rt_task_create(task, taskInfo->name, 0, 50, 0) < 0)
-      {
-        printf("Failed to create task %s\n",taskInfo->name);
-      }
-      else
-      {
-        set_affinity(task, taskInfo->affinity);
-      }
-    //cout << "Setting affinity :" << rt_task_set_affinity(taskInfo->task, &mask) << endl;
-    //  rt_task_slice(task,qt);
+        if(rt_task_create(task, taskInfo->name, 0, taskInfo->priority, 0) < 0)
+        {
+          printf("Failed to create task %s\n",taskInfo->name);
+        }
+        else
+        {
+          set_affinity(task, taskInfo->affinity);
+        }
+      //cout << "Setting affinity :" << rt_task_set_affinity(taskInfo->task, &mask) << endl;
+      //  rt_task_slice(task,qt);
 
-  }
+    }
 
   //tasksLogsList = new DataLogger*[cptNumberTasks];
 
@@ -129,48 +130,46 @@ void TaskLauncher::runTasks()
   cout << endl << "STARTING TASKS : " << endl;
   #endif
 
-   //Periodicity
-  RTIME starttime = TM_NOW ;
-  RT_TASK_INFO curtaskinfo;
+     //Periodicity
+    RTIME starttime = TM_NOW ;
+    RT_TASK_INFO curtaskinfo;
 
-  for (auto& taskInfo : taskSetInfos.rtTIs)
-  {
-      rt_task_set_periodic(taskInfo.task, starttime, taskInfo.periodicity);
-      rt_task_inquire(taskInfo.task, &curtaskinfo);
+    for (auto& taskInfo : taskSetInfos.rtTIs)
+    {
+        rt_task_set_periodic(taskInfo.task, starttime, taskInfo.deadline);
+        rt_task_inquire(taskInfo.task, &curtaskinfo);
 
-      struct sched_attr para;
-      para.sched_policy = SCHED_POLICY;
-      para.sched_flags= 0;
-      //para.sched_runtime= taskInfo.deadline;;
-      //para.sched_deadline=taskInfo.deadline;
-      para.sched_period = taskInfo.periodicity;
-      para.sched_priority = 50 ;
-      para.size=sizeof(sched_attr);
+        struct sched_attr para;
+        para.sched_policy = SCHED_POLICY;
+        para.sched_flags= 0;
+        //para.sched_runtime = taskInfo.deadline;;
+        //para.sched_deadline = taskInfo.deadline;
+        para.sched_period = taskInfo.deadline;
+        para.sched_priority = taskInfo.priority;
+        para.size=sizeof(sched_attr);
 
-      if( sched_setattr(curtaskinfo.pid,&para,0) != 0) {
-        fprintf(stderr,"error setting scheduler ... are you root? : %d \n", errno);
-        exit(0);
-      }
+        if( sched_setattr(curtaskinfo.pid, &para, 0) != 0)
+        {
+          fprintf(stderr,"error setting scheduler ... are you root? : %d \n", errno);
+          exit(0);
+        }
 
-      DataLogger* dlog = new DataLogger(&taskInfo);
-      taskRTInfo* _taskRTInfo = new taskRTInfo;
-      _taskRTInfo->taskLog = dlog;
-      _taskRTInfo->rtTI = &taskInfo;
-      if( rt_task_start(taskInfo.task, TaskMain, _taskRTInfo) < 0)
-      {
-        printf("Failed to start task %s\n",taskInfo.name);
-      }
-      else
-      {
-        #if VERBOSE_INFO
-        cout << "Task " << taskInfo.name << " running." << endl;
-        #endif
-        tasksLogsList.push_back(dlog);
-      }
-
-  }
-
-
+        DataLogger* dlog = new DataLogger(&taskInfo);
+        taskRTInfo* _taskRTInfo = new taskRTInfo;
+        _taskRTInfo->taskLog = dlog;
+        _taskRTInfo->rtTI = &taskInfo;
+        if( rt_task_start(taskInfo.task, TaskMain, _taskRTInfo) < 0)
+        {
+          printf("Failed to start task %s\n",taskInfo.name);
+        }
+        else
+        {
+          #if VERBOSE_INFO
+          cout << "Task " << taskInfo.name << " running." << endl;
+          #endif
+          tasksLogsList.push_back(dlog);
+        }
+    }
 }
 
 void TaskLauncher::runAgent()
@@ -211,7 +210,7 @@ void TaskLauncher::printTasksInfos ( ) // std::vector<rtTaskInfosStruct> _myTask
       cout << "Name: " << taskInfo.name
           << "| path: " << taskInfo.path_task
           << "| is RT ? " << taskInfo.isHardRealTime
-          << "| Period: " << taskInfo.periodicity/1.0e6
+          << "| Period: " << taskInfo.wcet/1.0e6
           << "| Deadline: " << taskInfo.deadline/1.0e6
           << "| affinity: " << taskInfo.affinity
           << "| ID :"<< taskInfo.id << endl;
