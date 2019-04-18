@@ -46,7 +46,7 @@ struct rtTaskInfosStruct
 {
     char name[32];
     char path_task[128];
-
+    string arguments;
     int isHardRealTime;
     int id;
     int affinity;
@@ -61,7 +61,6 @@ struct end2endDeadlineStruct
 {
   string name ;
   int taskChainID;
-  int Num_tasks;
   string Path;
   RTIME deadline;
 };

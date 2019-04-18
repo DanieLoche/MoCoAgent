@@ -33,7 +33,6 @@ void TaskLauncher::readChainsList(string input_file)
       {
             if (!(iss >> chaineInfo.name
                       >> chaineInfo.taskChainID
-                      >> chaineInfo.Num_tasks
                       >> chaineInfo.Path
                       >> chaineInfo.deadline ))
             { cout << "\033[1;31mFailed to read line\033[0m !" << endl; break; } // error
@@ -80,6 +79,7 @@ int TaskLauncher::readTasksList()
                     >> taskInfo->affinity
                     >> taskInfo->priority ) )
           { cout << "\033[1;31mFailed to read line\033[0m !" << endl; break; } // error
+          getline(iss , taskInfo->arguments);
           taskInfo->deadline *= 1.0e6;
           taskInfo->wcet *= 1.0e6;
           strncat(ext, name, 64);

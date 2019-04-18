@@ -25,12 +25,16 @@ SRC_FILES = $(shell find $(SRC_DIR) -name "*.cpp")
 SRC_DIRS = $(shell find . -name "*.cpp" | dirname {} | sort | uniq | sed 's/\/$(SRC_DIR)//g')
 # OBJ_FILES = $(patsubst %.cpp, %.o, $(SRC_FILES))
 OBJ_FILES = $(patsubst $(SRC_DIR)/%.cpp, $(OBJ_DIR)/%.o, $(SRC_FILES))
+OUT_FILES = $(shell find ./bench/output/ -name "*.*")
 
 ## TARGETS ##
 all : $(EXEC_NAME)
 
 clean :
 	$(RM) $(OBJ_FILES)
+
+cleanout :
+	$(RM) $(OUT_FILES)
 
 $(EXEC_NAME) : $(OBJ_FILES)
 	mkdir -p $(OBJ_DIR)

@@ -64,7 +64,6 @@ void buildSet::readChainsList(string input_file,std::vector<end2endDeadlineStruc
       {
             if (!(iss >> chaineInfo.name
                       >> chaineInfo.taskChainID
-                      >> chaineInfo.Num_tasks
                       >> chaineInfo.Path
                       >> chaineInfo.deadline ))
             { cout << "\033[1;31mFailed to read line\033[0m !" << endl; break; } // error
