@@ -77,7 +77,7 @@ SchedulerSimulator
 
 # directories
 trace-cmd/
-bench/
+#bench/
 
 # Output files
 *output*
