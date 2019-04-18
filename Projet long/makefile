@@ -35,6 +35,7 @@ clean :
 $(EXEC_NAME) : $(OBJ_FILES)
 	mkdir -p $(OBJ_DIR)
 	$(CXX) $(CXXFLAGS) -o $(EXEC_NAME) $(OBJ_FILES) $(LDFLAGS)
+	find . -name \*.gch -type f -exec rm -f {} +
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
 	$(CXX) $(CXXFLAGS) $(INCLUDES) -o $@ -c $<

@@ -3,7 +3,6 @@
 // #define VERBOSE_OTHER 1 // Cout autre...
 // #define VERBOSE_ASK   1 // cout explicitement demandés dans le code
 
-
 #include "tools.h"
 #include <sys/sysinfo.h>
 #include "sched.h"
@@ -11,160 +10,137 @@
 #include "mcAgent.h"
 #include "macroTask.h"
 #include "taskLauncher.h"
-#include "buildSet.h"
+//#include "buildSet.h"
 #include <mutex>
 
 #define EXECTIME   2e8   // execution time in ns
 #define SPINTIME   1e7   // spin time in ns
-#define PRINT 1
 
 long nproc;
 RT_SEM mysync;
-std::vector<end2endDeadlineStruct> list_info_chaine;
-std::vector<rtTaskInfosStruct> AlltasksInfosList;
 
 TaskLauncher* tasl;
 std::mutex mutex;           // mutex for critical section
 
 void RunmcAgentMain(void* arg)
 {
-  MCAgent mcAgent(arg);
-
-  printInquireInfo();
-
+  systemRTInfo* sInfos = (systemRTInfo*) arg;
+  //printTaskInfo(&sInfos->rtTIs[0]);
+  MCAgent mcAgent(sInfos);
 }
 
 
 void TaskMain(void* arg)
 {
-  rtTaskInfosStruct* rtTI = (rtTaskInfosStruct*) arg;
-
-  RT_TASK_INFO curtaskinfo;
-  rt_task_inquire(NULL, &curtaskinfo);
-  print_affinity(curtaskinfo.pid);
-  #if VERBOSE_OTHER
-  cout << "I am task : " << curtaskinfo.name << " of priority " << curtaskinfo.prio << endl;
-  #endif
-  printTaskInfo(rtTI);
-
-  MacroTask macroRT;
-  macroRT.properties = rtTI;
-
-  if ((*rtTI).isHardRealTime == 0) {
-    macroRT.executeRun_besteffort(&mysync);
+  taskRTInfo* _taskRTInfo = (taskRTInfo*) arg;
+  MacroTask macroRT(_taskRTInfo);
+  rt_sem_p(&mysync,TM_INFINITE);
+  if (_taskRTInfo->rtTI->isHardRealTime == 0) {
+    macroRT.executeRun_besteffort();
   }
   else {
-    macroRT.executeRun(&mysync);
+    macroRT.executeRun();
   }
-
-
 }
 
 
-void my_handler(int s){
-  #if PRINT
+void endOfExpeHandler(int s){
+  #if VERBOSE_INFO
   cout << "\n------------------------------" << endl;
   #endif
-  string out_file = "Testoutput.txt";
   mutex.lock();
-  std::ofstream myfile;
-  myfile.open (out_file);    // TO APPEND :  //,ios_base::app);
-  for (auto taskInfo = tasl->tasksInfosList.begin(); taskInfo != tasl->tasksInfosList.end(); ++taskInfo)
-  {
-
-           myfile << "\nRunning summary for task " << taskInfo->name << ".\n";
-           myfile << "Average runtime : " << taskInfo->average_runtime/ 1.0e6 << "\n";
-           myfile << "Max runtime : " << taskInfo->max_runtime/ 1.0e6 << " ms\n";
-           myfile << "Min runtime : " << taskInfo->min_runtime/ 1.0e6 << " ms\n";
-           myfile << "Deadline :" << taskInfo->deadline << " ms\n";
-           myfile << "Out of Deadline : " << taskInfo->out_deadline << " times\n";
-           myfile << "Number of executions : " << taskInfo->num_of_times << " times\n";
-
-           #if VERBOSE_INFO
-           cout << "\n\nRunning summary for task" << taskInfo->name << endl;
-           cout << "Average runtime : " << taskInfo->average_runtime/ 1.0e6 << " ms" <<endl;
-           cout << "Max runtime : " << taskInfo->max_runtime/ 1.0e6 << " ms" << endl;
-           cout << "Min runtime : " << taskInfo->min_runtime/ 1.0e6 << " ms" << endl;
-           cout << "Deadline : " << taskInfo->deadline << " ms"<< endl;
-           cout << "Out of Deadline : " << taskInfo->out_deadline << " times" << endl;
-           cout << "Number of executions : " << taskInfo->num_of_times << " times" << endl;
-           #endif
-
-  }
-  myfile.close();
+  tasl->saveData();
   mutex.unlock();
+
    exit(1);
 }
 
 
 int main(int argc, char* argv[])
 {
-  system("clear");
+    system("clear");
+    int return_code = 0;
+    nproc = get_nprocs();
 
-  // Définition fichier d'information des tâches
-  string input_file = "./input_chaine.txt";
+    struct sigaction sigIntHandler;
 
-  int return_code = 0;
-  nproc = get_nprocs();
-
-  cout << "Hey, press a key to start (PID: " << getpid() << ")!" << endl;
-  cin.get();
-  #if VERBOSE_INFO
-  cout << " Generating Task Set ..." << endl;
-  #endif
-  buildSet bS;
-  bS.readChainsList( input_file, &list_info_chaine);
-
-  //Création de la sémaphore
-  rt_sem_create(&mysync,"MySemaphore",0,S_FIFO);
-
-  TaskLauncher tln;
-
-  for(int i=0; i < (int)list_info_chaine.size(); ++i )
-  {
-      tln.readTasksList(list_info_chaine[i].Path);
-  }
-
-  //AlltasksInfosList.insert (AlltasksInfosList.end(),tln.tasksInfosList.begin(),tln.tasksInfosList.end());
-   tasl=&tln;
-  // cout<<"AlltasksInfosList  size :"<< AlltasksInfosList.size()<<endl;
-   //tln.printTasksInfos();
-   tln.runTasks();
-
-
-  #if VERBOSE_INFO
-    cout << "Now launching the MoCoAgent ! " << endl;
-  #endif
-
-  RT_TASK mcAgent;
-  rt_task_create(&mcAgent, "MoCoAgent", 0, 2, 0);
-  set_affinity(&mcAgent, 3);
-
-  systemRTInfo ch_taks ;
-  ch_taks.rtTIs=tln.tasksInfosList ;
-  ch_taks.e2eDD =list_info_chaine;
-  rt_task_start(&mcAgent, RunmcAgentMain, &ch_taks);
-
-
-  //sleeping the time that all tasks will be started
-  usleep(1000000);
-
-  cout << "Wake up all tasks." << endl;
-  rt_sem_broadcast(&mysync);
-
-  printf("\nType CTRL-C to end this program\n\n" );
-
-  struct sigaction sigIntHandler;
-
-  sigIntHandler.sa_handler = my_handler;
-  sigemptyset(&sigIntHandler.sa_mask);
-  sigIntHandler.sa_flags = 0;
-
-  while (1) {
+    sigIntHandler.sa_handler = endOfExpeHandler;
+    sigIntHandler.sa_flags = 0;
+    sigemptyset(&sigIntHandler.sa_mask);
     sigaction(SIGINT, &sigIntHandler, NULL);
-  }
 
-  pause();
+
+    bool enableAgent = TRUE;
+    long expeDuration = 0;
+    string input_chains = "./input_chaine.txt";
+    // Définition fichier d'information des tâches
+    // [MoCoAgent Activation] [Experiment duration] [input file : task chains]
+    if (argc > 1)
+    { // setting enableAgent boolean
+      std::stringstream ss(argv[1]);
+      if(!(ss >> std::boolalpha >> enableAgent)) {
+        printf("Error, %s is not an bool", argv[1]);
+        return EXIT_FAILURE;
+      }
+      if (argc > 2)
+      { // setting expeDuration in seconds
+        if(sscanf(argv[2], "%ld", &expeDuration) != 1) {
+          printf("Error, %s is not an int", argv[2]);
+          return EXIT_FAILURE;
+        }
+        if (argc > 3)
+        {
+          input_chains = argv[3];
+        }
+      }
+    }
+    else {
+      cout << "Missing arguments. Format should be : " << endl
+          << "[MoCoAgent Activation] [Experiment duration]"
+          << "[input file : task chains]" << endl;
+          cout << "if set to \"-\", default values are : " << endl
+          << enableAgent << "  |   " << "no end time" << "   |   " << input_chains << "   |   " << endl;
+          return 0;
+        }
+
+    cout << "Hey, press a key to start (PID: " << getpid() << ")!" << endl;
+    cin.get();
+
+    rt_sem_create(&mysync,"Start Experiment",0,S_FIFO);
+
+    TaskLauncher tln;
+
+    #if VERBOSE_INFO
+    cout << " Generating Task Set ..." << endl;
+    #endif
+    tln.readChainsList(input_chains);
+    tln.readTasksList();
+
+    tln.printTasksInfos();
+
+    tln.runTasks();
+
+    if (enableAgent)
+    {
+      sleep(1);
+      tln.runAgent();
+    }
+
+    //sleeping the time that all tasks will be started
+    sleep(2);
+    cout << "Wake up all tasks." << endl;
+    rt_sem_broadcast(&mysync);
+
+    printf("\nType Ctrl + C to end this program\n\n" );
+//    string ss;
+//    while (ss != "STOP") cin >> ss;
+
+    tasl=&tln;
+
+    //while (1) {    }
+    if (expeDuration) sleep(expeDuration);
+    else pause();
+    endOfExpeHandler(0);
 
   return return_code;
 }
@@ -186,7 +162,7 @@ void printInquireInfo()
 
 void printTaskInfo(rtTaskInfosStruct* task)
 {
-#if VERBOSE_INFO
+#if VERBOSE_DEBUG
   std::stringstream ss;
   ss << "Name: "       << task->name
      << "| path: "     << task->path_task
@@ -194,7 +170,7 @@ void printTaskInfo(rtTaskInfosStruct* task)
      << "| Period: "   << task->periodicity
      << "| Deadline: " << task->deadline
      << "| affinity: " << task->affinity
-     << "| ID :"       << task->ID
+     << "| ID :"       << task->id
      << endl;
   cout << ss.rdbuf();
 #endif
@@ -207,12 +183,18 @@ void set_affinity (RT_TASK* task, int _aff)
   CPU_SET(_aff, &mask);
   RT_TASK_INFO curtaskinfo;
   rt_task_inquire(task, &curtaskinfo);
-  cout << "Setting affinity for task " << curtaskinfo.name << " : " << rt_task_set_affinity(task, &mask) << endl;
+  if (rt_task_set_affinity(task, &mask))
+  {
+    cout << "Error while setting affinity for task " << curtaskinfo.name << endl;
+  }
+    #if VERBOSE_ASK
+    cout << "Setting affinity for task " << curtaskinfo.name << " : " << _aff << endl;
+    #endif
 }
 
 void print_affinity(pid_t _pid)
 {
-#if VERBOSE_INFO
+#if VERBOSE_ASK
   int pid = _pid;
   if (!_pid)
   {

@@ -1,0 +1,37 @@
+name;WCET;path;deadline;affinity;parameter
+basicmath_small.sh;57.8;./bench/basicmath_small;289;2;>null
+basicmath_large.sh;648;./bench/basicmath_large;3240;2;>null
+bitcount_small.sh;47.3;./bench/bitcnts;237;2;75000 >null
+bitcount_large.sh;196.8;./bench/bitcnts;984;2;1125000 >null
+qsort_small.sh;43.8;./bench/qsort_small;219;2;./bench/qsort/input_small.dat > null
+qsort_large.sh;138.8;./bench/qsort_large;694;2;./bench/qsort/input_large.dat > null
+susan_small_smooth;44;./bench/susan_bin;220;2;./bench/susan/input_small.pgm ./bench/output/susan_output_small.smoothing.pgm -s
+susan_small_edges;44;./bench/susan_bin;220;2;./bench/susan/input_small.pgm ./bench/output/susan_output_small.edges.pgm -e
+susan_small_corners;44;./bench/susan_bin;220;2;./bench/susan/input_small.pgm ./bench/output/susan_output_small.corners.pgm -c
+susan_large_smooth;145;./bench/susan_bin;725;2;./bench/susan/input_large.pgm ./bench/output/susan_output_large.smoothing.pgm -s
+susan_large_edges;145;./bench/susan_bin;725;2;./bench/susan/input_large.pgm ./bench/output/susan_output_large.edges.pgm -e
+susan_large_corners;145;./bench/susan_bin;725;2;./bench/susan/input_large.pgm ./bench/output/susan_output_large.corners.pgm -c
+jpeg_small;49.5;./bench/jpeg_small.sh;248;2;0
+jpeg_large;76.8;./bench/jpeg_large.sh;384;2;0
+typeset_small;78.3;./bench/typeset_small.sh;392;2;0
+typeset_large;804.1;./bench/typeset_large.sh;4021;2;0
+dijkstra_small;53.3;./bench/dijkstra_small;267;2;./bench/dijkstra/input.dat > ./bench/output/dijk_output_small.dat
+dijkstra_large;104.6;./bench/dijkstra_large;523;2;./bench/dijkstra/input.dat > ./bench/output/dijk_output_large.dat
+patricia_small;69.8;./bench/patricia/;349;2;./bench/patricia/small.udp > ./bench/output/pat_output_large.txt
+patricia_large;838;./bench/patricia/;4190;2;./bench/patricia/large.udp >./bench/output/pat_output_large.txt
+stringsearch_large;38.3;./bench/search_large;192;2;> null
+stringsearch_small;37.7;./bench/search_small;189;2;> null
+blowfish_small;60.8;./bench/blowfish_small;304;2;0
+blowfish_large;874.7;./bench/blowfish_large;4374;2;0
+sha_small;41.8;./bench/sha;209;2;./bench/sha/input_small.asc > ./bench/output/sha_output_small.txt
+sha_large;81.9;./bench/sha/;410;2;./bench/sha/input_large.asc > ./bench/output/sha_output_large.txt
+adpcm_small;79.3;./bench/adpcm_small.sh;397;2;0
+adpcm_large;963.8;./bench/adpcm_large.sh;4819;2;0
+CRC32_small;49;./bench/crc;245;2;./bench/data/small.pcm > ./bench/output/crc_output_small.txt
+CRC32_large;887.8;./bench/crc;4439;2;./bench/data/large.pcm > ./bench/output/crc_output_large.txt
+fft_small;68.7;./bench/fft;344;2;8 32768 > ./bench/output/fft_output_small.txt
+fft_large;849.6;./bench/fft;4248;2;8 32768 > ./bench/output/fft_output_large.txt
+fft_small;68.7;./bench/fft;344;2;8 32768 -i > ./bench/output/ffti_output_small.inv.txt
+fft_large;849.6;./bench/fft;4248;2;8 32768 -i > ./bench/output/ffti_output_large.inv.txt
+gsm_small;47.8;./bench/gsm_small.sh;239;2;0
+gsm_large;447;./bench/gsm_large.sh;2235;2;0

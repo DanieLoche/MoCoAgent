@@ -1,26 +1,32 @@
 #include "tools.h"
+#include "dataLogger.h"
 #include <algorithm>
 #include <mutex>
 
 class MacroTask
 {
   protected :
-    /* rtTaskInfosStruct :
-          RT_TASK*  task;
-          char      name[64];
-          string    path;
-          string    task_args;
-          bool      isHardRealTime;
-          int       periodicity;
-          int       deadline;
-          int       affinity;
+    /* struct rtTaskInfosStruct
+    {
+        char name[64];
+        char path_task[128];
+        int  isHardRealTime;
+        RTIME  periodicity;
+        RTIME  deadline;
+        int affinity;
+        int ID;
+        RT_TASK* task;
+    } ;
     */
-    RTIME starttime, runtime,endtime,time,Somme;
-    int cpt;
-    string task_path;
-    std::mutex mutex;
+    rtTaskInfosStruct* properties;
+    DataLogger* dataLogs;
+
     RT_BUFFER bf;
     RT_EVENT	event;
+    bool MoCoIsAlive;
+
+    monitoringMsg msg ;
+
     int before_besteff();
     void proceed();
     int after_besteff();
@@ -28,11 +34,9 @@ class MacroTask
     int after();
 
   public :
-    rtTaskInfosStruct* properties;
-
-    MacroTask();
-    void executeRun(RT_SEM* mysync);
-    void executeRun_besteffort(RT_SEM* mysync);
+    MacroTask(taskRTInfo*);
+    void executeRun();
+    void executeRun_besteffort();
 
 };
 
