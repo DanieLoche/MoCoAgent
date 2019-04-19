@@ -1,12 +1,13 @@
 #include "tools.h"
-#include <array>
+//#include <array>
+//#include <
 
 #define   TRUE    1
 #define   FALSE   0
 #define   MODE_OVERLOADED     1
 #define   MODE_NOMINAL        0
 
-const RTIME t_RT = 0*1.0e6;  // time to trigger the Control Agent
+const RTIME t_RT = 000*1.0e6;  // time to trigger the Control Agent
 const RTIME Wmax = 400*1.0e6;    // next slice max time
 
 
@@ -27,28 +28,35 @@ currentTime =
 */
 class taskMonitoringStruct
 {
+  private :
+    RT_MUTEX* mtx_taskStatus;
+    bool isExecuted;   // Run-time - computed
+
   public :
     taskMonitoringStruct(rtTaskInfosStruct rtTaskInfos);
 
     RT_TASK* tache;
     int id;
-    RTIME startTime;   // Run-time - received
-    RTIME endTime;     // Run-time - received
-    bool isExecuted;   // Run-time - computed
+    //RTIME endTime;     // Run-time - received
     RTIME deadline;    // Static
     RTIME rwcet;       // Static
 
+    void setState(bool state);
+    bool getState();
     //bool operator <(const taskMonitoringStruct& tms) const {return (id < tms.id);}
 };
 
+
+#include "dataLogger.h"
 class taskChain
 {
   public :
     taskChain(end2endDeadlineStruct _tcDeadline);
+    DataLogger* logger;
     int cptAnticipatedMisses;
-    int cptOutOfDeadline;
-    int cptExecutions;
-    std::array<RTIME, 2048> chainExecutionTime;
+    //int cptOutOfDeadline;
+    //int cptExecutions;
+    //std::array<RTIME, 2048> chainExecutionTime;
 
     int id;                // static
     bool isAtRisk;         // Runtime - deduced
@@ -59,8 +67,8 @@ class taskChain
     //double slackTime;
     std::vector<taskMonitoringStruct> taskList;
 
-    int checkTaskE2E();
-    int checkIfEnded();
+    bool checkTaskE2E();
+    bool checkIfEnded();
     void resetChain();
     RTIME getExecutionTime();
     RTIME getRemWCET();
@@ -77,6 +85,7 @@ class MCAgent
     RT_BUFFER bf;
     RT_EVENT mode_change_flag;
     void updateTaskInfo(monitoringMsg msg);
+    void saveData(string);
 
   private :
     int runtimeMode;    // NOMINAL or OVERLOADED
@@ -88,7 +97,7 @@ class MCAgent
     void initCommunications();
     void setAllDeadlines(std::vector<end2endDeadlineStruct> _tcDeadlineStructs);
     void setAllTasks(std::vector<rtTaskInfosStruct> _TasksInfos);
-    int checkTaskChains();
+    //int checkTaskChains();
     void setMode(int mode);
     void displaySystemInfo(systemRTInfo* sInfos);
     void displayChains();

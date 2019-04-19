@@ -1,5 +1,6 @@
 #include "mcAgent.h"
 
+
 void messageReceiver(void* arg)
 {
   MCAgent* mocoAgent = (MCAgent*) arg;
@@ -24,30 +25,22 @@ MCAgent::MCAgent(systemRTInfo* sInfos)
   runtimeMode = MODE_NOMINAL;
   displaySystemInfo(sInfos);
 
-  initMoCoAgent(sInfos);
   initCommunications();
+  initMoCoAgent(sInfos);
 
-  RT_TASK mcAgentReceiver;
-  rt_task_create(&mcAgentReceiver, "MoCoAgentReceiver", 0, 99, 0);
-  rt_task_start(&mcAgentReceiver, messageReceiver, this);
   #if VERBOSE_INFO
     cout << "MoCoAgent Ready." << endl;
   #endif
+
   while(TRUE)
   {
       for (auto _taskChain = allTaskChain.begin(); _taskChain != allTaskChain.end(); ++_taskChain)
       {
-        if ( !_taskChain->checkTaskE2E() )
+        if ( _taskChain->checkTaskE2E() )
         {
-          setMode(MODE_OVERLOADED);
           _taskChain->isAtRisk = TRUE;
           _taskChain->cptAnticipatedMisses++;
-
-        }
-        if (_taskChain->isAtRisk && _taskChain->checkIfEnded())
-        {
-          setMode(MODE_NOMINAL);
-          _taskChain->resetChain();
+          setMode(MODE_OVERLOADED);
         }
       }
       rt_task_yield();
@@ -59,6 +52,10 @@ void MCAgent::initMoCoAgent(systemRTInfo* sInfos)
   setAllDeadlines(sInfos->e2eDD);
   setAllTasks(sInfos->rtTIs);
   displayChains();
+
+  RT_TASK mcAgentReceiver;
+  rt_task_create(&mcAgentReceiver, "MoCoAgentReceiver", 0, 99, 0);
+  rt_task_start(&mcAgentReceiver, messageReceiver, this);
 }
 
 void MCAgent::initCommunications()
@@ -100,22 +97,19 @@ void MCAgent::setAllTasks(std::vector<rtTaskInfosStruct> _TasksInfos)
   #endif
   for (auto& _taskInfo : _TasksInfos)
   {
-    bool idFound = 0;   // Opti. pour éviter de continuer à boucler si on a trouvé la chaine
+    if ( !_taskInfo.isHardRealTime )
+    {
+      bestEffortTasks.push_back(_taskInfo.task);
+      return;
+    }
     for (auto& _taskChain : allTaskChain)
     {
-      if ( !_taskInfo.isHardRealTime )
-      {
-        bestEffortTasks.push_back(_taskInfo.task);
-        idFound = 1;
-      }
-      else if ( _taskInfo.isHardRealTime == _taskChain.id )
+      if ( _taskInfo.isHardRealTime == _taskChain.id )
       {
         taskMonitoringStruct* tms = new taskMonitoringStruct(_taskInfo);
         _taskChain.taskList.push_back(*tms);
-        idFound = 1;
+        return;
       }
-      if (idFound) break;
-
     }
   }
 }
@@ -126,6 +120,7 @@ void MCAgent::setAllTasks(std::vector<rtTaskInfosStruct> _TasksInfos)
 * @params : /
 * @returns : int tasksID
 ***********************/
+/*
 int MCAgent::checkTaskChains()
 {
   int tasksID = 0;
@@ -141,7 +136,7 @@ int MCAgent::checkTaskChains()
   }
   return tasksID;
 }
-
+*/
 
 /***********************
 * Passage du système en mode :
@@ -180,12 +175,10 @@ void MCAgent::setMode(int mode)
 // DES TACHE EN ORDONNANCANT LES TAKS LISTS.
 void MCAgent::updateTaskInfo(monitoringMsg msg)
 {
-/*  RT_TASK_INFO curtaskinfo;
-  rt_task_inquire((RT_TASK*) msg.task, &curtaskinfo);
-  cout << "I am task : " << curtaskinfo.name<<"ID :"<< msg.ID<< endl;
-*/
-  std::vector <taskMonitoringStruct> tk_List;
-
+  /*  RT_TASK_INFO curtaskinfo;
+    rt_task_inquire((RT_TASK*) msg.task, &curtaskinfo);
+    cout << "I am task : " << curtaskinfo.name<<"ID :"<< msg.ID<< endl;
+  */
   for (auto& _taskChain : allTaskChain)
   {
       for (auto& task : _taskChain.taskList)
@@ -194,11 +187,16 @@ void MCAgent::updateTaskInfo(monitoringMsg msg)
         {
           if (msg.isExecuted)
           {
-            task.endTime = msg.endTime;
-            task.isExecuted = TRUE;
-            _taskChain.currentEndTime = std::max(_taskChain.currentEndTime, task.endTime);
+            //task.endTime = msg.time;
+            task.setState(TRUE);
+            _taskChain.currentEndTime = std::max(_taskChain.currentEndTime, msg.time);
+            if (_taskChain.checkIfEnded() && _taskChain.isAtRisk) setMode(MODE_NOMINAL);
           }
-          else task.startTime = msg.startTime;
+          else if (_taskChain.startTime == 0)
+          {
+            _taskChain.startTime = msg.time;
+            _taskChain.logger->logStart(msg.time);
+          }
           return;
         }
     }
@@ -250,9 +248,12 @@ taskChain::taskChain(end2endDeadlineStruct _tcDeadline)
 {
   id = _tcDeadline.taskChainID;
   end2endDeadline = _tcDeadline.deadline;
-  cptOutOfDeadline = 0;
+  logger = new DataLogger(&_tcDeadline);
+  //cptOutOfDeadline = 0;
   cptAnticipatedMisses = 0;
-  chainExecutionTime = {0};
+  startTime = 0;
+  currentEndTime = 0;
+  //chainExecutionTime = {0};
 }
 
 /***********************
@@ -260,41 +261,49 @@ taskChain::taskChain(end2endDeadlineStruct _tcDeadline)
 * @params : [ systemRTInfo sInfos ]
 * @returns : 1 if OK ; 0 if RISK
 ***********************/
-int taskChain::checkTaskE2E()
+bool taskChain::checkTaskE2E()
 {
-  int miss = (getExecutionTime() + Wmax + t_RT + getRemWCET() <= end2endDeadline);
-  if (miss) cptAnticipatedMisses++;
+  bool miss = (getExecutionTime() + Wmax + t_RT + getRemWCET() > end2endDeadline);
+  //if (miss) cptAnticipatedMisses++;
   return (miss);
 }
 
-int taskChain::checkIfEnded()
+bool taskChain::checkIfEnded()
 {
   bool ended = TRUE;
   for (auto& task : taskList)
   { // only one FALSE is enough
-    ended = ended && task.isExecuted;
+    ended = ended && task.getState();
   }
   if (ended)
   {
     resetChain();
-    RTIME execTime = getExecutionTime();
-    if (execTime > end2endDeadline) cptOutOfDeadline++;
-    chainExecutionTime[cptExecutions++] = execTime;
+    logger->logExec(currentEndTime);
+    //RTIME execTime = getExecutionTime();
+    //if (execTime > end2endDeadline) cptOutOfDeadline++;
+    //chainExecutionTime[cptExecutions++] = execTime;
   }
   return ended;
 }
 
 void taskChain::resetChain()
 {
-  currentEndTime = 0;
-  for (auto& task : taskList) task.isExecuted = 0;
-  isAtRisk = FALSE;
+  for (auto& task : taskList)
+  {
+    task.setState(0);
+    //task.endTime = 0;
+  }
+  if (isAtRisk)
+  {
+     isAtRisk = FALSE;
+  }
   startTime = 0;
+  currentEndTime = 0;
 }
 
 RTIME taskChain::getExecutionTime()
 {
-    return (currentEndTime - startTime);
+    return (rt_timer_read() - startTime);
 }
 
 /***********************
@@ -308,7 +317,7 @@ RTIME taskChain::getRemWCET()
   double RemWCET = 0;
   for (auto& task : taskList)
   {
-    if (!task.isExecuted)
+    if (!task.getState())
       RemWCET += task.rwcet;
   }
   return RemWCET;
@@ -341,6 +350,16 @@ taskMonitoringStruct::taskMonitoringStruct(rtTaskInfosStruct rtTaskInfos)
   rwcet = rtTaskInfos.wcet;
   id = rtTaskInfos.id;
 
-  isExecuted = FALSE;
-  startTime = 0, endTime = 0;
+  setState(FALSE);
+  //endTime = 0;
+
+  rt_mutex_create(mtx_taskStatus, NULL);
+}
+
+bool taskMonitoringStruct::getState()
+{
+  rt_mutex_acquire(mtx_taskStatus, TM_INFINITE);
+  bool state = isExecuted;
+  rt_mutex_release(mtx_taskStatus);
+  return state;
 }

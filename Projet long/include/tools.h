@@ -23,6 +23,7 @@
 #include <alchemy/timer.h>
 #include <alchemy/buffer.h>
 #include <alchemy/event.h>
+#include <alchemy/mutex.h>
 
 
 using std::string;
@@ -59,7 +60,7 @@ struct rtTaskInfosStruct
 
 struct end2endDeadlineStruct
 {
-  string name ;
+  char name[32];
   int taskChainID;
   string Path;
   RTIME deadline;
@@ -69,8 +70,7 @@ struct monitoringMsg
 {
   RT_TASK* task;
   int ID;
-  RTIME startTime;   // Run-time - received
-  RTIME endTime;     // Run-time - received
+  RTIME time;   // Run-time - received
   bool isExecuted;    // Run-time - computed
 };
 

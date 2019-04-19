@@ -23,8 +23,7 @@ MacroTask::MacroTask(taskRTInfo* _taskRTInfo)
 
    msg.task       = properties->task;
    msg.ID         = properties->id;
-   msg.endTime    = 0;
-   msg.startTime  = 0;
+   msg.time    = 0;
    msg.isExecuted = 0;
 
    MoCoIsAlive = 1;
@@ -36,7 +35,7 @@ int MacroTask::before()
 {
   dataLogs->logStart();
 
-  msg.startTime= rt_timer_read();
+  msg.time= rt_timer_read();
   msg.isExecuted =0;
   if(MoCoIsAlive && (rt_buffer_write(&bf , &msg , sizeof(monitoringMsg) , 50000) < 0))
   {
@@ -60,14 +59,14 @@ void MacroTask::proceed()
 
 int MacroTask::after()
 {
-  RTIME _dur = dataLogs->logExec();
+  RTIME time = dataLogs->logExec();
 
   #if VERBOSE_ASK
   rt_printf("End Task  : %s\n",properties->name);
   #endif
 
   monitoringMsg msg ;
-  msg.endTime= _dur;
+  msg.time= time;
   msg.isExecuted = 1;
   if(MoCoIsAlive && (rt_buffer_write(&bf , &msg , sizeof(monitoringMsg) , 50000) < 0))
   {

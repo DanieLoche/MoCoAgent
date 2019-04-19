@@ -10,12 +10,13 @@ class TaskLauncher
   public :
     TaskLauncher();
 
+    void createTasks();
     void runTasks();
     void runAgent();
     void readChainsList(string);
     int  readTasksList();
 
-    void saveData();
+    void saveData(string);
     void printTasksInfos (/* std::vector<rtTaskInfosStruct> _myTasksInfos*/);
     void print_affinity(pid_t _pid);
 

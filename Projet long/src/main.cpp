@@ -20,13 +20,14 @@ long nproc;
 RT_SEM mysync;
 
 TaskLauncher* tasl;
-std::mutex mutex;           // mutex for critical section
+MCAgent* mca;
+string inputFile = "input_chaine.txt", outputFile = "ExpeOutput.csv2";
 
 void RunmcAgentMain(void* arg)
 {
   systemRTInfo* sInfos = (systemRTInfo*) arg;
   //printTaskInfo(&sInfos->rtTIs[0]);
-  MCAgent mcAgent(sInfos);
+  mca = new MCAgent(sInfos);
 }
 
 
@@ -48,9 +49,9 @@ void endOfExpeHandler(int s){
   #if VERBOSE_INFO
   cout << "\n------------------------------" << endl;
   #endif
-  mutex.lock();
-  tasl->saveData();
-  mutex.unlock();
+  tasl->saveData(outputFile);
+  sleep (3);
+  mca->saveData("chain_"+outputFile);
 
    exit(1);
 }

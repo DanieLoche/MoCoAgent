@@ -97,8 +97,7 @@ int TaskLauncher::readTasksList()
 
 }
 
-
-void TaskLauncher::runTasks()
+void TaskLauncher::createTasks()
 {
   #if VERBOSE_INFO
   cout << endl << "CREATING TASKS : " << endl;
@@ -125,7 +124,10 @@ void TaskLauncher::runTasks()
     }
 
   //tasksLogsList = new DataLogger*[cptNumberTasks];
+}
 
+void TaskLauncher::runTasks()
+{
   #if VERBOSE_INFO
   cout << endl << "STARTING TASKS : " << endl;
   #endif
@@ -187,20 +189,19 @@ void TaskLauncher::runAgent()
 
 }
 
-void TaskLauncher::saveData()
+void TaskLauncher::saveData(string file)
 {
-  string out_file = "ExpeOutput.csv2";
   std::ofstream myFile;
-  myFile.open (out_file);    // TO APPEND :  //,ios_base::app);
+  myFile.open (file);    // TO APPEND :  //,ios_base::app);
   myFile << "timestamp ; name ; ID ; HRT ; deadline ; duration ; affinity \n";
   myFile.close();
   for (auto& taskLog : tasksLogsList)
   {
-      taskLog->saveData(out_file);
+      taskLog->saveData(file);
   }
 
 }
-
+ 
 void TaskLauncher::printTasksInfos ( ) // std::vector<rtTaskInfosStruct> _myTasksInfos)
 {
   #if VERBOSE_INFO

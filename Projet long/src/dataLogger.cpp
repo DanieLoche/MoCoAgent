@@ -1,6 +1,23 @@
 #include "dataLogger.h"
 
 #include <iomanip>
+
+DataLogger::DataLogger(end2endDeadlineStruct* chainInfos)
+{
+  task = NULL;
+  strcpy(name, chainInfos->name);
+  id = chainInfos->taskChainID;
+  isHardRealTime = 0;
+  affinity = 0;
+  deadline = chainInfos->deadline;
+
+  cptOutOfDeadline = 0;
+  cptExecutions = 0;
+  execLogs = {0};
+//cout << "Init of task logger for task " << name << " is okay." << endl;
+
+}
+
 DataLogger::DataLogger(rtTaskInfosStruct* taskInfos)
 {
   task = taskInfos->task;
@@ -17,14 +34,20 @@ DataLogger::DataLogger(rtTaskInfosStruct* taskInfos)
 
 }
 
-void DataLogger::logStart()
+void DataLogger::logStart(RTIME startTime)
 {
-  execLogs[cptExecutions].timestamp = rt_timer_read();
+  execLogs[cptExecutions].timestamp = startTime;
 }
 
-RTIME DataLogger::logExec( )
+
+RTIME DataLogger::logStart()
 {
-  execLogs[cptExecutions].duration = rt_timer_read() - execLogs[cptExecutions].timestamp;
+  return (execLogs[cptExecutions].timestamp = rt_timer_read());
+}
+
+RTIME DataLogger::logExec(RTIME endTime)
+{
+  execLogs[cptExecutions].duration = endTime - execLogs[cptExecutions].timestamp;
 
   if(execLogs[cptExecutions].duration > deadline )
   {
@@ -39,6 +62,26 @@ RTIME DataLogger::logExec( )
   }
   cptExecutions++;
   return execLogs[cptExecutions - 1].duration;
+}
+
+RTIME DataLogger::logExec( )
+{
+  RTIME _logTime = rt_timer_read();
+  execLogs[cptExecutions].duration = _logTime - execLogs[cptExecutions].timestamp;
+
+  if(execLogs[cptExecutions].duration > deadline )
+  {
+    #if VERBOSE_ASK
+    rt_printf("[  \033[1;31mERROR\033[0m  ] Task : \033[1;31m%s\033[0m - \033[1;36m%.2f ms\033[0m\n",name,execLogs[cptExecutions].duration/1e6);
+    #endif
+    cptOutOfDeadline++;
+  }else{
+    #if VERBOSE_ASK
+      rt_printf("[ \033[1;32mPERFECT\033[0m ] Task : \033[1;32m%s\033[0m - \033[1;36m%.2f ms\033[0m\n",name,execLogs[cptExecutions].duration/1e6);
+    #endif
+  }
+  cptExecutions++;
+  return _logTime;
 }
 
 void DataLogger::saveData(string file)

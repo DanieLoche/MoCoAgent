@@ -16,19 +16,21 @@ class DataLogger
     RT_TASK* task;
     char name[32];
     int id;
-    int  isHardRealTime;
+    int isHardRealTime;
     int affinity;
     RTIME deadline;
 
   public :
-    DataLogger();
+    DataLogger(end2endDeadlineStruct*);
     DataLogger(rtTaskInfosStruct*);
 
     std::array<timeLog, 4096> execLogs;
     int cptOutOfDeadline;
     int cptExecutions;
 
-    void logStart();
+    void logStart(RTIME );
+    RTIME logStart();
+    RTIME logExec(RTIME );
     RTIME logExec();
     void saveData(string);
 };
