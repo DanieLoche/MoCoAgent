@@ -39,7 +39,7 @@ MCAgent::MCAgent(systemRTInfo* sInfos)
         if ( _taskChain->checkTaskE2E() )
         {
           _taskChain->isAtRisk = TRUE;
-          _taskChain->cptAnticipatedMisses++;
+          _taskChain->logger->cptAnticipatedMisses++;
           setMode(MODE_OVERLOADED);
         }
       }
@@ -104,7 +104,7 @@ void MCAgent::setAllTasks(std::vector<rtTaskInfosStruct> _TasksInfos)
     }
     for (auto& _taskChain : allTaskChain)
     {
-      if ( _taskInfo.isHardRealTime == _taskChain.id )
+      if ( _taskInfo.isHardRealTime == _taskChain.chainID )
       {
         taskMonitoringStruct* tms = new taskMonitoringStruct(_taskInfo);
         _taskChain.taskList.push_back(*tms);
@@ -120,7 +120,7 @@ void MCAgent::setAllTasks(std::vector<rtTaskInfosStruct> _TasksInfos)
 * @params : /
 * @returns : int tasksID
 ***********************/
-/*
+/* USELESS ?
 int MCAgent::checkTaskChains()
 {
   int tasksID = 0;
@@ -203,6 +203,29 @@ void MCAgent::updateTaskInfo(monitoringMsg msg)
   }
 }
 
+void MCAgent::saveData(string output)
+{
+    std::ofstream myFile;
+    myFile.open (output);    // TO APPEND :  //,ios_base::app);
+    myFile << "timestamp ; Chain ; ID ; HRT ; deadline ; duration ; affinity \n";
+    myFile.close();
+    for (auto& _taskChain : allTaskChain)
+    {
+        _taskChain.logger->saveData(output);
+    }
+
+    RT_TASK_INFO cti;
+    rt_task_inquire(0, &cti);
+    cout << " Monitoring and Control Agent Stats : " << "\n"
+          << "Primary Mode execution time - " << cti.stat.xtime/1.0e6 << " ms. Timeouts : " << cti.stat.timeout << "\n"
+          << "   Mode Switches - " << cti.stat.msw << "\n"
+          << "Context Switches - " << cti.stat.csw << "\n"
+          << "Cobalt Sys calls - " << cti.stat.xsc
+          << endl;
+
+
+}
+
 /***********************
 * Fonction de débug pour afficher
 * les informations de toutes les tâches reçues.
@@ -215,45 +238,48 @@ void MCAgent::displaySystemInfo(systemRTInfo* sInfos)
   cout << "INPUT Informations : " << endl;
   for (auto &taskdd : sInfos->e2eDD)
   { // Print chain params
-      cout << "Chain ID : " << taskdd.taskChainID
-          << "| Deadline : " << taskdd.deadline /1.0e6 << endl;
+      cout << "|- Chain: " << taskdd.name
+           << " ‾|- ID      : " << taskdd.taskChainID
+           << "  |- Deadline: " << taskdd.deadline /1.0e6
+           << "  |- Path    : " << taskdd.Path
+           << endl;
   }
   for (auto &taskParam : sInfos->rtTIs)
   { // Print task Params
-      cout << "Name: "    << taskParam.name
-          << "| path: "   << taskParam.path_task
-          << "| is RT ? " << taskParam.isHardRealTime
-          << "| WCET: " << taskParam.wcet /1.0e6
-          << "| Deadline: " << taskParam.deadline /1.0e6
-          << "| affinity: " << taskParam.affinity
-          << "| ID :"<< taskParam.id << endl;
+      cout << "  |- Task    : "  << taskParam.name            << "\n"
+           << "   ‾‾|- ID      : " << taskParam.id               << "\n"
+           << "     |- Deadline: " << taskParam.deadline /1.0e6  << "\n"
+           << "     |- WCET    : " << taskParam.wcet /1.0e6      << "\n"
+           << "     |- affinity: " << taskParam.affinity         << "\n"
+           << "     |- RealTime: " << taskParam.isHardRealTime   << "\n"
+           << "     |- path    : " << taskParam.path_task        << "\n"
+           << endl;
   }
   #endif
 }
 
 void MCAgent::displayChains()
 {
+  #if VERBOSE_ASK
   for (auto& chain : allTaskChain)
-  {
-    #if VERBOSE_ASK
-      cout << "Chain #" << chain.id << " with deadline = " << chain.end2endDeadline/1.0e6 << endl;
-    #endif
-    chain.displayTasks();
+  { // Print chain params
+      cout << "|- Chain #" << chain.chainID << " - " << chain.name
+           << "  |- Deadline: " << chain.end2endDeadline /1.0e6
+           << endl;
+      chain.displayTasks();
   }
+  #endif
 }
 
 //////////////////////////////////////////
 /////////// TASK CHAIN CLASS /////////////
 taskChain::taskChain(end2endDeadlineStruct _tcDeadline)
 {
-  id = _tcDeadline.taskChainID;
+  chainID = _tcDeadline.taskChainID;
   end2endDeadline = _tcDeadline.deadline;
-  logger = new DataLogger(&_tcDeadline);
-  //cptOutOfDeadline = 0;
-  cptAnticipatedMisses = 0;
+  logger = new ChainDataLogger(&_tcDeadline);
   startTime = 0;
   currentEndTime = 0;
-  //chainExecutionTime = {0};
 }
 
 /***********************
@@ -326,11 +352,18 @@ RTIME taskChain::getRemWCET()
 void taskChain::displayTasks()
 {
   #if VERBOSE_INFO
-    cout << "Task list : " << endl;
-    for (auto& task : taskList)
-    {
-      cout << "    - Task ID #" << task.id << " - deadline = " << task.deadline/1.0e6 << endl;
-    }
+  cout << "Task list : " << endl;
+  for (auto &_task : taskList)
+  { // Print task Params
+      RT_TASK_INFO xenoInfos;
+      rt_task_inquire(_task.xenoTask, &xenoInfos);
+      cout << "  |- Task    : "  << xenoInfos.name            << "\n"
+           << "   ‾‾|- ID      : " << _task.id               << "\n"
+           << "     |- Deadline: " << _task.deadline /1.0e6  << "\n"
+           << "     |- WCET    : " << _task.rwcet /1.0e6     << "\n"
+           << "     |- Priority: " << xenoInfos.prio         << "\n"
+           << endl;
+  }
   #endif
 }
 
@@ -345,7 +378,7 @@ void taskChain::displayTasks()
 ***********************/
 taskMonitoringStruct::taskMonitoringStruct(rtTaskInfosStruct rtTaskInfos)
 {
-  tache = rtTaskInfos.task;
+  xenoTask = rtTaskInfos.task;
   deadline = rtTaskInfos.deadline;
   rwcet = rtTaskInfos.wcet;
   id = rtTaskInfos.id;
@@ -354,6 +387,13 @@ taskMonitoringStruct::taskMonitoringStruct(rtTaskInfosStruct rtTaskInfos)
   //endTime = 0;
 
   rt_mutex_create(mtx_taskStatus, NULL);
+}
+
+void taskMonitoringStruct::setState(bool state)
+{
+  rt_mutex_acquire(mtx_taskStatus, TM_INFINITE);
+  isExecuted = state;
+  rt_mutex_release(mtx_taskStatus);
 }
 
 bool taskMonitoringStruct::getState()

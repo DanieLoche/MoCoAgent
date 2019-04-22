@@ -21,8 +21,8 @@ MacroTask::MacroTask(taskRTInfo* _taskRTInfo)
    cout << "I am task : " << curtaskinfo.name << " of priority " << curtaskinfo.prio << endl;
    #endif
 
-   msg.task       = properties->task;
-   msg.ID         = properties->id;
+   msg.task    = properties->task;
+   msg.ID      = properties->id;
    msg.time    = 0;
    msg.isExecuted = 0;
 
@@ -37,9 +37,9 @@ int MacroTask::before()
 
   msg.time= rt_timer_read();
   msg.isExecuted =0;
-  if(MoCoIsAlive && (rt_buffer_write(&bf , &msg , sizeof(monitoringMsg) , 50000) < 0))
+  if(MoCoIsAlive && (rt_buffer_write(&bf , &msg , sizeof(monitoringMsg) , 100000) < 0))
   {
-     MoCoIsAlive = 0;
+     //MoCoIsAlive = 0;
      rt_printf("[%s] : failed to write BEFORE monitoring message to buffer.\n",properties->name);
   }
 
@@ -68,7 +68,7 @@ int MacroTask::after()
   monitoringMsg msg ;
   msg.time= time;
   msg.isExecuted = 1;
-  if(MoCoIsAlive && (rt_buffer_write(&bf , &msg , sizeof(monitoringMsg) , 50000) < 0))
+  if(MoCoIsAlive && (rt_buffer_write(&bf , &msg , sizeof(monitoringMsg) , 100000) < 0))
   {
      MoCoIsAlive = 0;
      rt_printf("[%s] : failed to write AFTER monitoring message to buffer.\n",properties->name);
@@ -81,7 +81,7 @@ int MacroTask::after()
 
 void MacroTask::executeRun()
   {
-    if( rt_buffer_bind (&bf , "/monitoringTopic" ,50000) < 0)
+    if( rt_buffer_bind (&bf , "/monitoringTopic", 100000) < 0)
     {
       rt_buffer_delete(&bf);
       rt_printf("%s\n","Failed to link to Monitoring Buffer");

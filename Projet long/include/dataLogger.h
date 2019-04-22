@@ -12,17 +12,14 @@ struct timeLog
 
 class DataLogger
 {
-  private :
-    RT_TASK* task;
+  protected :
     char name[32];
     int id;
-    int isHardRealTime;
     int affinity;
     RTIME deadline;
 
   public :
-    DataLogger(end2endDeadlineStruct*);
-    DataLogger(rtTaskInfosStruct*);
+    DataLogger();
 
     std::array<timeLog, 4096> execLogs;
     int cptOutOfDeadline;
@@ -32,30 +29,34 @@ class DataLogger
     RTIME logStart();
     RTIME logExec(RTIME );
     RTIME logExec();
+    virtual void saveData(string) = 0;
+};
+
+class TaskDataLogger : public DataLogger
+{
+  public :
+    RT_TASK* task;
+    int isHardRealTime;
+
+    TaskDataLogger(rtTaskInfosStruct*);
     void saveData(string);
+
+};
+
+class ChainDataLogger : public DataLogger
+{
+  public :
+    int cptAnticipatedMisses;
+
+    ChainDataLogger(end2endDeadlineStruct*);
+    void saveData(string);
+
 };
 
 struct taskRTInfo
 {
   rtTaskInfosStruct* rtTI;
-  DataLogger* taskLog;
+  TaskDataLogger* taskLog;
 };
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 #endif

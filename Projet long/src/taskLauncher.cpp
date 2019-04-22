@@ -156,7 +156,7 @@ void TaskLauncher::runTasks()
           exit(0);
         }
 
-        DataLogger* dlog = new DataLogger(&taskInfo);
+        TaskDataLogger* dlog = new TaskDataLogger(&taskInfo);
         taskRTInfo* _taskRTInfo = new taskRTInfo;
         _taskRTInfo->taskLog = dlog;
         _taskRTInfo->rtTI = &taskInfo;
@@ -201,7 +201,7 @@ void TaskLauncher::saveData(string file)
   }
 
 }
- 
+
 void TaskLauncher::printTasksInfos ( ) // std::vector<rtTaskInfosStruct> _myTasksInfos)
 {
   #if VERBOSE_INFO

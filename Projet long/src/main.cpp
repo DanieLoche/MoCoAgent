@@ -51,7 +51,7 @@ void endOfExpeHandler(int s){
   #endif
   tasl->saveData(outputFile);
   sleep (3);
-  mca->saveData("chain_"+outputFile);
+  mca->saveData("MCAgent_"+outputFile);
 
    exit(1);
 }
@@ -73,9 +73,8 @@ int main(int argc, char* argv[])
 
     bool enableAgent = TRUE;
     long expeDuration = 0;
-    string input_chains = "./input_chaine.txt";
     // Définition fichier d'information des tâches
-    // [MoCoAgent Activation] [Experiment duration] [input file : task chains]
+    // [MoCoAgent Activation] [Experiment duration] [input file : task chains] [outputfile]
     if (argc > 1)
     { // setting enableAgent boolean
       std::stringstream ss(argv[1]);
@@ -91,7 +90,11 @@ int main(int argc, char* argv[])
         }
         if (argc > 3)
         {
-          input_chains = argv[3];
+          inputFile = argv[3];
+          if (argc > 4)
+          {
+            outputFile = argv[4];
+          }
         }
       }
     }
@@ -100,7 +103,7 @@ int main(int argc, char* argv[])
           << "[MoCoAgent Activation] [Experiment duration]"
           << "[input file : task chains]" << endl;
           cout << "if set to \"-\", default values are : " << endl
-          << enableAgent << "  |   " << "no end time" << "   |   " << input_chains << "   |   " << endl;
+          << enableAgent << "  |   " << "no end time" << "   |   " << inputFile << "   |   " << endl;
           return 0;
         }
 
@@ -114,7 +117,7 @@ int main(int argc, char* argv[])
     #if VERBOSE_INFO
     cout << " Generating Task Set ..." << endl;
     #endif
-    tln.readChainsList(input_chains);
+    tln.readChainsList(inputFile);
     tln.readTasksList();
 
     tln.printTasksInfos();

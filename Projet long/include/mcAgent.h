@@ -35,7 +35,7 @@ class taskMonitoringStruct
   public :
     taskMonitoringStruct(rtTaskInfosStruct rtTaskInfos);
 
-    RT_TASK* tache;
+    RT_TASK* xenoTask;
     int id;
     //RTIME endTime;     // Run-time - received
     RTIME deadline;    // Static
@@ -52,18 +52,18 @@ class taskChain
 {
   public :
     taskChain(end2endDeadlineStruct _tcDeadline);
-    DataLogger* logger;
+    ChainDataLogger* logger;
     int cptAnticipatedMisses;
     //int cptOutOfDeadline;
     //int cptExecutions;
     //std::array<RTIME, 2048> chainExecutionTime;
-
-    int id;                // static
-    bool isAtRisk;         // Runtime - deduced
+    char name[32];
+    int chainID;                // static
+    RTIME end2endDeadline; // static
     RTIME startTime;       // Runtime - deduced
     RTIME currentEndTime;  // Runtime - deduced
     RTIME remWCET;         // Runtime - computed
-    RTIME end2endDeadline; // static
+    bool isAtRisk;         // Runtime - deduced
     //double slackTime;
     std::vector<taskMonitoringStruct> taskList;
 
@@ -72,8 +72,6 @@ class taskChain
     void resetChain();
     RTIME getExecutionTime();
     RTIME getRemWCET();
-
-    //bool operator <(const taskChain& tc) const {return (id < tc.id);}
 
     void displayTasks();
 };

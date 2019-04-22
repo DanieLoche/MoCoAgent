@@ -19,7 +19,7 @@ class MacroTask
     } ;
     */
     rtTaskInfosStruct* properties;
-    DataLogger* dataLogs;
+    TaskDataLogger* dataLogs;
 
     RT_BUFFER bf;
     RT_EVENT	event;
