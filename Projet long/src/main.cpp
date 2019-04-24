@@ -51,13 +51,19 @@ void endOfExpeHandler(int s){
   #if VERBOSE_INFO
   cout << "\n------------------------------" << endl;
   #endif
+  cout << "Changing mode to OFF." << endl;
+  mca->setMode(0); // Stop Mo Co Agent verification
+  cout << "Stopping Tasks." << endl;
+  tln->stopTasks(1);
+  cout << "Saving tasks data..." << endl;
   tln->saveData(outputFile);
   if (enableAgent)
   {
      sleep (3);
+     cout << "Saving Agent data..." << endl;
      mca->saveData("MCAgent_"+outputFile);
   }
-   exit(1);
+   exit(0);
 }
 
 
@@ -117,7 +123,7 @@ int main(int argc, char* argv[])
                { // SCHEDULING POLICY
                   std::stringstream ss(argv[5]);
                   string _schedMode = ss.str();
-                  if (_schedMode == "FIFO") tln->schedPolicy = SCHED_FIFO;
+                  if (_schedMode == "FIFO")     tln->schedPolicy = SCHED_FIFO;
                   else if  (_schedMode == "RM") tln->schedPolicy = SCHED_RM;
                   else if  (_schedMode == "RR") tln->schedPolicy = SCHED_RR;
                   else if  (_schedMode == "EDF") tln->schedPolicy = SCHED_RM;
@@ -161,6 +167,7 @@ int main(int argc, char* argv[])
    //while (1) {    }
    if (expeDuration) sleep(expeDuration);
    else pause();
+   cout << "End of Experimentation." << endl;
    endOfExpeHandler(0);
 
    return 0;
@@ -189,7 +196,7 @@ void printInquireInfo(RT_TASK* task)
 
 void printTaskInfo(rtTaskInfosStruct* task)
 {
-#if VERBOSE_DEBUG
+#if VERBOSE_OTHER
   std::stringstream ss;
   ss << "Name: "       << task->name
      << "| path: "     << task->path_task

@@ -1,11 +1,10 @@
 #include "tools.h"
 //#include <array>
-//#include <
 
 #define   TRUE    1
 #define   FALSE   0
 #define   MODE_OVERLOADED     1
-#define   MODE_NOMINAL        0
+#define   MODE_NOMINAL        -1
 
 const RTIME t_RT = 000*1.0e6;  // time to trigger the Control Agent
 const RTIME Wmax = 400*1.0e6;    // next slice max time
@@ -83,6 +82,7 @@ class MCAgent
     RT_BUFFER bf;
     RT_EVENT mode_change_flag;
     void updateTaskInfo(monitoringMsg msg);
+    void setMode(int mode);
     void saveData(string);
 
   private :
@@ -96,7 +96,6 @@ class MCAgent
     void setAllDeadlines(std::vector<end2endDeadlineStruct> _tcDeadlineStructs);
     void setAllTasks(std::vector<rtTaskInfosStruct> _TasksInfos);
     //int checkTaskChains();
-    void setMode(int mode);
     void displaySystemInfo(systemRTInfo* sInfos);
     void displayChains();
 };

@@ -4,12 +4,6 @@
 #define SPINTIME   1e7   // spin time in ns
 
 
-extern void print_affinity(pid_t _pid);
-extern void printTaskInfo(rtTaskInfosStruct* task);
-
-extern void print_affinity(pid_t _pid);
-extern void printTaskInfo(rtTaskInfosStruct* task);
-
 MacroTask::MacroTask(taskRTInfo* _taskRTInfo)
 {
    properties = _taskRTInfo->rtTI;
@@ -33,9 +27,7 @@ MacroTask::MacroTask(taskRTInfo* _taskRTInfo)
 
 int MacroTask::before()
 {
-  dataLogs->logStart();
-
-  msg.time= rt_timer_read();
+  msg.time = dataLogs->logStart();
   msg.isExecuted =0;
   if(MoCoIsAlive && (rt_buffer_write(&bf , &msg , sizeof(monitoringMsg) , 100000) < 0))
   {
@@ -59,14 +51,11 @@ void MacroTask::proceed()
 
 int MacroTask::after()
 {
-  RTIME time = dataLogs->logExec();
-
-  #if VERBOSE_ASK
+  #if VERBOSE_OTHER
   rt_printf("End Task  : %s\n",properties->name);
   #endif
 
-  monitoringMsg msg ;
-  msg.time= time;
+  msg.time = dataLogs->logExec();
   msg.isExecuted = 1;
   if(MoCoIsAlive && (rt_buffer_write(&bf , &msg , sizeof(monitoringMsg) , 100000) < 0))
   {
@@ -114,7 +103,7 @@ int MacroTask::before_besteff()
 {
   dataLogs->logStart();
   unsigned int flag;
-  rt_event_wait(&event,sizeof(flag), &flag ,	EV_PRIO,TM_NONBLOCK) 	;
+  rt_event_wait(&event, sizeof(flag), &flag ,	EV_PRIO,TM_NONBLOCK) 	;
   //cout << "Task BE " << properties->name << " not executed." << endl;
   return 0;
 }
@@ -122,7 +111,7 @@ int MacroTask::before_besteff()
 int MacroTask::after_besteff()
 {
     dataLogs->logExec();
-    #if VERBOSE_ASK
+    #if VERBOSE_OTHER
     rt_printf("End Task  : %s\n",properties->name);
     #endif
 

@@ -46,7 +46,7 @@ RTIME DataLogger::logStart()
   return (execLogs[cptExecutions].timestamp = rt_timer_read());
 }
 
-RTIME DataLogger::logExec(RTIME endTime)
+void DataLogger::logExec(RTIME endTime)
 {
   execLogs[cptExecutions].duration = endTime - execLogs[cptExecutions].timestamp;
 
@@ -62,7 +62,7 @@ RTIME DataLogger::logExec(RTIME endTime)
     #endif
   }
   cptExecutions++;
-  return execLogs[cptExecutions - 1].duration;
+  //return execLogs[cptExecutions - 1].duration;
 }
 
 RTIME DataLogger::logExec( )
@@ -164,8 +164,12 @@ void ChainDataLogger::saveData(string file)
   average_runtime = somme / cptExecutions;
   #if VERBOSE_INFO
   cout << "\nRunning summary for Chain " << name << ". ( " << id << " )" << "\n"
-       << "Deadline : " << deadline / 1.0e6     << " ms." << " Anticipated Misses" << " | "                  <<   " Missed "     << " | " << " Chain loops " << "\n"
-       << "                    "         << std::setw(10) <<  cptAnticipatedMisses << " | " << std::setw(10) << cptOutOfDeadline << " | " << cptExecutions << " times" << "\n"
+       << "Deadline : " << deadline / 1.0e6     << " ms." << " Anticipated Misses" << " | "
+       <<   " Missed "     << " | " << " Chain loops " << "\n"
+
+       << "                    "         << std::setw(10) <<  cptAnticipatedMisses << " | "
+       << std::setw(10) << cptOutOfDeadline << " | " << cptExecutions << " times" << "\n"
+
        <<         "  MIN  "   << " | " <<        "  AVG  "        << " | " <<      "  MAX"        << "\n"
        << min_runtime / 1.0e6 << " | " << average_runtime / 1.0e6 << " | " << max_runtime / 1.0e6 << " runtimes (ms)"
        << endl;

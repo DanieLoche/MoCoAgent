@@ -210,31 +210,16 @@ void TaskLauncher::runAgent()
 
 }
 
-void TaskLauncher::rt_task_affinity (RT_TASK* task, int _aff, int mode)
-{ // mode 0 : replace | mode 1 : add | mode -1 : remove
-  cpu_set_t mask;
-  if (mode == 0) { CPU_ZERO(&mask); CPU_SET(_aff, &mask); }
-  else if (mode > 1) CPU_SET(_aff, &mask);
-  else if (mode < -1) CPU_CLR(_aff, &mask);
-
-  RT_TASK_INFO curtaskinfo;
-  rt_task_inquire(task, &curtaskinfo);
-
-  if (int ret = rt_task_set_affinity(task, &mask))
-  {
-    cout << "Error while setting (" << mode << ") affinity for task "
-         << curtaskinfo.name << " to CPU " << _aff << ": " <<  ret << "."<< endl;
-  }
-    #if VERBOSE_ASK
-    if (mode == 0) cout << "Switched affinity for task " << curtaskinfo.name << " = CPU " << _aff << endl;
-    else if (mode == 1) cout << "Added affinity for task " << curtaskinfo.name << " +CPU " << _aff << endl;
-    else if (mode == -1) cout << "Removed affinity for task " << curtaskinfo.name << " -CPU " << _aff << endl;
-    #endif
-}
-
 void TaskLauncher::stopTasks(bool val)
 {
-
+   if (val) for (auto& task : taskSetInfos.rtTIs)
+   {
+      rt_task_suspend(task.task);
+   }
+   else for (auto& task : taskSetInfos.rtTIs)
+   {
+      rt_task_resume(task.task);
+   }
 }
 
 void TaskLauncher::saveData(string file)
@@ -248,6 +233,28 @@ void TaskLauncher::saveData(string file)
       taskLog->saveData(file);
    }
 
+}
+
+void TaskLauncher::rt_task_affinity (RT_TASK* task, int _aff, int mode)
+{ // mode 0 : replace | mode 1 : add | mode -1 : remove
+   cpu_set_t mask;
+   if (mode == 0) { CPU_ZERO(&mask); CPU_SET(_aff, &mask); }
+   else if (mode > 1) CPU_SET(_aff, &mask);
+   else if (mode < -1) CPU_CLR(_aff, &mask);
+
+   RT_TASK_INFO curtaskinfo;
+   rt_task_inquire(task, &curtaskinfo);
+
+   if (int ret = rt_task_set_affinity(task, &mask))
+   {
+      cout << "Error while setting (" << mode << ") affinity for task "
+      << curtaskinfo.name << " to CPU " << _aff << ": " <<  ret << "."<< endl;
+   }
+   #if VERBOSE_ASK
+   if (mode == 0) cout << "Switched affinity for task " << curtaskinfo.name << " = CPU " << _aff << endl;
+   else if (mode == 1) cout << "Added affinity for task " << curtaskinfo.name << " +CPU " << _aff << endl;
+   else if (mode == -1) cout << "Removed affinity for task " << curtaskinfo.name << " -CPU " << _aff << endl;
+   #endif
 }
 
 void TaskLauncher::printTasksInfos ( ) // std::vector<rtTaskInfosStruct> _myTasksInfos)

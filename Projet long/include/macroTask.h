@@ -39,6 +39,12 @@ class MacroTask
 
 };
 
+extern void print_affinity(pid_t _pid);
+extern void printTaskInfo(rtTaskInfosStruct* task);
+
+extern void print_affinity(pid_t _pid);
+extern void printTaskInfo(rtTaskInfosStruct* task);
+
 /*
 class MacroTaskBestEffort : public MacroTask
 {

@@ -27,7 +27,7 @@ class DataLogger
 
     void logStart(RTIME );
     RTIME logStart();
-    RTIME logExec(RTIME );
+    void logExec(RTIME );
     RTIME logExec();
     virtual void saveData(string) = 0;
 };
