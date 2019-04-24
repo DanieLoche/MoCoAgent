@@ -52,7 +52,7 @@ void MCAgent::initMoCoAgent(systemRTInfo* sInfos)
   setAllDeadlines(sInfos->e2eDD);
   setAllTasks(sInfos->rtTIs);
   displayChains();
-
+  sleep(1);
   RT_TASK mcAgentReceiver;
   rt_task_create(&mcAgentReceiver, "MoCoAgentReceiver", 0, 99, 0);
   rt_task_start(&mcAgentReceiver, messageReceiver, this);
@@ -97,16 +97,20 @@ void MCAgent::setAllTasks(std::vector<rtTaskInfosStruct> _TasksInfos)
   #endif
   for (auto& _taskInfo : _TasksInfos)
   {
+    cout << " Adding task " << _taskInfo.name << " (" << _taskInfo.isHardRealTime << ")." << endl;
+    printInquireInfo(_taskInfo.task);
     if ( !_taskInfo.isHardRealTime )
     {
+      cout << "Adding to BE list." << endl;
       bestEffortTasks.push_back(_taskInfo.task);
       return;
     }
-    for (auto& _taskChain : allTaskChain)
+    else for (auto& _taskChain : allTaskChain)
     {
       if ( _taskInfo.isHardRealTime == _taskChain.chainID )
       {
-        taskMonitoringStruct* tms = new taskMonitoringStruct(_taskInfo);
+         cout << "Adding to HRT chain " << _taskChain.chainID << "." << endl;
+        taskMonitoringStruct* tms = new taskMonitoringStruct(&_taskInfo);
         _taskChain.taskList.push_back(*tms);
         return;
       }
@@ -148,7 +152,7 @@ int MCAgent::checkTaskChains()
 void MCAgent::setMode(int mode)
 {
 
-  #if VERBOSE_DEBUG
+  #if VERBOSE_DEBUG // ==1?"OVERLOADED":"NOMINAL"
     cout << "MoCoAgent Triggered to mode " << mode << "!" << endl;
   #endif
   runtimeMode += 2*mode - 1;  // NOMINAL : -1 ; OVERLOADED : +1
@@ -238,21 +242,21 @@ void MCAgent::displaySystemInfo(systemRTInfo* sInfos)
   cout << "INPUT Informations : " << endl;
   for (auto &taskdd : sInfos->e2eDD)
   { // Print chain params
-      cout << "|- Chain: " << taskdd.name
-           << " ‾|- ID      : " << taskdd.taskChainID
-           << "  |- Deadline: " << taskdd.deadline /1.0e6
-           << "  |- Path    : " << taskdd.Path
+      cout << "|- Chain: " << taskdd.name       << "\n"
+           << " ‾|- ID      : " << taskdd.taskChainID       << "\n"
+           << "   |- Deadline: " << taskdd.deadline /1.0e6   << "\n"
+           << "   |- Path    : " << taskdd.Path             // << "\n"
            << endl;
   }
   for (auto &taskParam : sInfos->rtTIs)
   { // Print task Params
       cout << "  |- Task    : "  << taskParam.name            << "\n"
-           << "   ‾‾|- ID      : " << taskParam.id               << "\n"
+           << "   ‾|- ID      : " << taskParam.id               << "\n"
            << "     |- Deadline: " << taskParam.deadline /1.0e6  << "\n"
            << "     |- WCET    : " << taskParam.wcet /1.0e6      << "\n"
            << "     |- affinity: " << taskParam.affinity         << "\n"
            << "     |- RealTime: " << taskParam.isHardRealTime   << "\n"
-           << "     |- path    : " << taskParam.path_task        << "\n"
+           << "     |- path    : " << taskParam.path_task      //  << "\n"
            << endl;
   }
   #endif
@@ -261,10 +265,11 @@ void MCAgent::displaySystemInfo(systemRTInfo* sInfos)
 void MCAgent::displayChains()
 {
   #if VERBOSE_ASK
+  cout << "Displaying MoCoAgent Database : " << "\n";
   for (auto& chain : allTaskChain)
   { // Print chain params
       cout << "|- Chain #" << chain.chainID << " - " << chain.name
-           << "  |- Deadline: " << chain.end2endDeadline /1.0e6
+           << "  |- Deadline: " << chain.end2endDeadline /1.0e6 << " ms."
            << endl;
       chain.displayTasks();
   }
@@ -275,11 +280,12 @@ void MCAgent::displayChains()
 /////////// TASK CHAIN CLASS /////////////
 taskChain::taskChain(end2endDeadlineStruct _tcDeadline)
 {
-  chainID = _tcDeadline.taskChainID;
-  end2endDeadline = _tcDeadline.deadline;
-  logger = new ChainDataLogger(&_tcDeadline);
-  startTime = 0;
-  currentEndTime = 0;
+   strcpy(name, _tcDeadline.name);
+   chainID = _tcDeadline.taskChainID;
+   end2endDeadline = _tcDeadline.deadline;
+   logger = new ChainDataLogger(&_tcDeadline);
+   startTime = 0;
+   currentEndTime = 0;
 }
 
 /***********************
@@ -369,37 +375,41 @@ void taskChain::displayTasks()
 
 /////////////////////////////////////////////////
 //////////// TASK MONITORING STRUCTURE //////////
-
+/////////////////////////////////////////////////
 /***********************
 * Recoit la liste des tasksInfos lues depuis l'INPUT.txt
 * Le converti avec uniquement les informations nécessaires pour le MoCoAgent
 * @params : vec<rtTaskInfosStruct> rtTasks
 * @returns : [ vector<taskMonitoringStruct> taskList ]
 ***********************/
-taskMonitoringStruct::taskMonitoringStruct(rtTaskInfosStruct rtTaskInfos)
+taskMonitoringStruct::taskMonitoringStruct(rtTaskInfosStruct* rtTaskInfos)
 {
-  xenoTask = rtTaskInfos.task;
-  deadline = rtTaskInfos.deadline;
-  rwcet = rtTaskInfos.wcet;
-  id = rtTaskInfos.id;
+   xenoTask = rtTaskInfos->task;
+   deadline = rtTaskInfos->deadline;
+   rwcet = rtTaskInfos->wcet;
+   id = rtTaskInfos->id;
 
-  setState(FALSE);
-  //endTime = 0;
+   setState(FALSE);
+   //endTime = 0;
 
-  rt_mutex_create(mtx_taskStatus, NULL);
+   rt_mutex_create(&mtx_taskStatus,
+                  strncat(rtTaskInfos->name,
+                           "taskStatusMTX",
+                           sizeof(rtTaskInfos->name)+sizeof("taskStatusMTX")));
+
 }
 
 void taskMonitoringStruct::setState(bool state)
 {
-  rt_mutex_acquire(mtx_taskStatus, TM_INFINITE);
+  rt_mutex_acquire(&mtx_taskStatus, TM_INFINITE);
   isExecuted = state;
-  rt_mutex_release(mtx_taskStatus);
+  rt_mutex_release(&mtx_taskStatus);
 }
 
 bool taskMonitoringStruct::getState()
 {
-  rt_mutex_acquire(mtx_taskStatus, TM_INFINITE);
+  rt_mutex_acquire(&mtx_taskStatus, TM_INFINITE);
   bool state = isExecuted;
-  rt_mutex_release(mtx_taskStatus);
+  rt_mutex_release(&mtx_taskStatus);
   return state;
 }

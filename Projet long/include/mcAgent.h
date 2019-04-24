@@ -29,11 +29,11 @@ currentTime =
 class taskMonitoringStruct
 {
   private :
-    RT_MUTEX* mtx_taskStatus;
+    RT_MUTEX mtx_taskStatus;
     bool isExecuted;   // Run-time - computed
 
   public :
-    taskMonitoringStruct(rtTaskInfosStruct rtTaskInfos);
+    taskMonitoringStruct(rtTaskInfosStruct* rtTaskInfos);
 
     RT_TASK* xenoTask;
     int id;

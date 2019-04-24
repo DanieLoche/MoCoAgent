@@ -1,7 +1,6 @@
 #include "tools.h"
 #include "dataLogger.h"
 #include <algorithm>
-#include <mutex>
 
 class MacroTask
 {
@@ -51,4 +50,5 @@ class MacroTaskBestEffort : public MacroTask
     int after();
 };
 */
-extern void printTaskInfo(rtTaskInfosStruct* task);
+
+//extern void printTaskInfo(rtTaskInfosStruct* task);
