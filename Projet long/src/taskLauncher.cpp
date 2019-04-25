@@ -6,6 +6,7 @@
 
 TaskLauncher::TaskLauncher()
 {
+   enableAgent = 0;
    cptNumberTasks =0;
    schedPolicy = SCHED_FIFO;
 }
@@ -200,30 +201,46 @@ void TaskLauncher::runAgent()
    #if VERBOSE_INFO
    cout << endl << "LAUNCHING MoCoAgent." << endl;
    #endif
+   if( rt_task_create(&mcAgent, "MoCoAgent", 0, 2, 0))
+      cout << "Error creating Monitoring and Control Agent" << endl;
+   else
+   {
+      enableAgent = 1;
+      rt_task_affinity(&mcAgent, 3, 0);
 
-   RT_TASK mcAgent;
-   rt_task_create(&mcAgent, "MoCoAgent", 0, 2, 0);
-   rt_task_affinity(&mcAgent, 3, 0);
-
-   //  systemRTInfo ch_taks ;
-   rt_task_start(&mcAgent, RunmcAgentMain, &taskSetInfos);
+      //  systemRTInfo ch_taks ;
+      rt_task_start(&mcAgent, RunmcAgentMain, &taskSetInfos);
+   }
 
 }
 
 void TaskLauncher::stopTasks(bool val)
 {
-   if (val) for (auto& task : taskSetInfos.rtTIs)
+   if (val)
    {
-      rt_task_suspend(task.task);
+      rt_task_suspend(&mcAgent);
+      for (auto& task : taskSetInfos.rtTIs)
+      {
+         rt_task_suspend(task.task);
+      }
    }
-   else for (auto& task : taskSetInfos.rtTIs)
+   else
    {
-      rt_task_resume(task.task);
+      rt_task_resume(&mcAgent);
+      for (auto& task : taskSetInfos.rtTIs)
+      {
+         rt_task_resume(task.task);
+      }
    }
 }
 
 void TaskLauncher::saveData(string file)
 {
+   cout << "Stopping Tasks." << endl;
+   stopTasks(1);
+   sleep (1);
+   cout << "Saving tasks data..." << endl;
+
    std::ofstream myFile;
    myFile.open (file);    // TO APPEND :  //,ios_base::app);
    myFile << "timestamp ; name ; ID ; HRT ; deadline ; duration ; affinity \n";
@@ -232,7 +249,15 @@ void TaskLauncher::saveData(string file)
    {
       taskLog->saveData(file);
    }
-
+/*
+   if (enableAgent)
+   {
+     sleep (1);
+     cout << "\nSaving Agent data..." << endl;
+     mca->saveData("MCAgent_"+file);
+     sleep (1);
+   }
+*/
 }
 
 void TaskLauncher::rt_task_affinity (RT_TASK* task, int _aff, int mode)

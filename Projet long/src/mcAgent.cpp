@@ -33,18 +33,22 @@ MCAgent::MCAgent(systemRTInfo* sInfos)
   #endif
 
   while(TRUE)
-  {   if (runtimeMode)
-      for (auto _taskChain = allTaskChain.begin(); _taskChain != allTaskChain.end(); ++_taskChain)
-      {
-        if ( _taskChain->checkTaskE2E() && !_taskChain->isAtRisk)
+  {
+     if (runtimeMode)
+     {
+        for (auto _taskChain = allTaskChain.begin(); _taskChain != allTaskChain.end(); ++_taskChain)
         {
-          _taskChain->isAtRisk = TRUE;
-          _taskChain->logger->cptAnticipatedMisses++;
-          setMode(MODE_OVERLOADED);
+           if ( _taskChain->checkTaskE2E() && !_taskChain->isAtRisk)
+           {
+             _taskChain->isAtRisk = TRUE;
+             _taskChain->logger->cptAnticipatedMisses++;
+             setMode(MODE_OVERLOADED);
+           }
         }
-      }
-      rt_task_yield();
+     }
+   rt_task_yield();
    }
+
 }
 
 void MCAgent::initMoCoAgent(systemRTInfo* sInfos)
@@ -60,9 +64,9 @@ void MCAgent::initMoCoAgent(systemRTInfo* sInfos)
 
 void MCAgent::initCommunications()
 {
-  rt_buffer_create(&bf, "/monitoringTopic", 10*sizeof(monitoringMsg), B_FIFO);
-  // u_int flagMask = 0;
-  rt_event_create(&mode_change_flag, "/modeChangeTopic", 0, EV_PRIO);
+   rt_buffer_create(&bf, "/monitoringTopic", 10*sizeof(monitoringMsg), B_FIFO);
+   // u_int flagMask = 0;
+   rt_event_create(&mode_change_flag, "/modeChangeTopic", 0, EV_PRIO);
 }
 
 /***********************
@@ -155,40 +159,49 @@ int MCAgent::checkTaskChains()
 void MCAgent::setMode(int mode)
 {
    cout << "[MONITORING & CONTROL AGENT] Change mode to " << mode << ". " << endl;
-   if (!mode) {runtimeMode = 0; return; }
-   int newMode = runtimeMode + 2*mode; // NOMINAL : -1 and less ; OVERLOADED : +1 and more
-   //runtimeMode += 2*mode;
-   if (newMode >= MODE_OVERLOADED && runtimeMode <= MODE_NOMINAL)
-   { // Pause Best Effort Tasks sur front montant changement de mode.
-      rt_event_signal(&mode_change_flag, 1);
-      for (auto& bestEffortTask : bestEffortTasks)
-      {   // Publier message pour dire à stopper
-         rt_task_suspend(bestEffortTask);
+   if (!mode)  runtimeMode = mode;
+   else
+   {
+      int newMode = runtimeMode + 2*mode; // NOMINAL : -1 and less ; OVERLOADED : +1 and more
+      //runtimeMode += 2*mode;
+      if (newMode >= MODE_OVERLOADED && runtimeMode <= MODE_NOMINAL)
+      { // Pause Best Effort Tasks sur front montant changement de mode.
+         rt_event_signal(&mode_change_flag, 1);
+         for (auto& bestEffortTask : bestEffortTasks)
+         {   // Publier message pour dire à stopper
+            if (rt_task_suspend(bestEffortTask))
+            {
+               cout << "Failed to stop task ";
+               printInquireInfo(bestEffortTask);
+            }
+         }
+         cout << "Stopped BE tasks." << endl;
       }
-   }
-   else if (newMode <= MODE_NOMINAL && runtimeMode >= MODE_OVERLOADED)
-   { // runtimeMode NOMINAL
-      rt_event_signal(&mode_change_flag, 0);
-      for (auto& bestEffortTask : bestEffortTasks)
-      {  // relancer Best Effort Tasks;
-         rt_task_resume(bestEffortTask);
+      else if (newMode <= MODE_NOMINAL && runtimeMode >= MODE_OVERLOADED)
+      { // runtimeMode NOMINAL
+         rt_event_signal(&mode_change_flag, 0);
+         for (auto& bestEffortTask : bestEffortTasks)
+         {  // relancer Best Effort Tasks;
+            rt_task_resume(bestEffortTask);
+         }
+         cout << "Re-started BE tasks." << endl;
       }
+      runtimeMode = newMode;
+      #if VERBOSE_DEBUG // ==1?"OVERLOADED":"NOMINAL"
+      cout << "MoCoAgent Triggered to mode " << ((mode>0)?"OVERLOADED":"NOMINAL") << "!" << endl;
+      #endif
    }
-   runtimeMode = newMode;
-   #if VERBOSE_DEBUG // ==1?"OVERLOADED":"NOMINAL"
-   cout << "MoCoAgent Triggered to mode " << ((mode>0)?"OVERLOADED":"NOMINAL") << "!" << endl;
-   #endif
 }
 
 // METHODE OPTIMISABLE SUR LE PARCOURS
 // DES TACHE EN TRIANT LES TAKS LISTS.
 void MCAgent::updateTaskInfo(monitoringMsg msg)
 {
-  RT_TASK_INFO curtaskinfo;
-    rt_task_inquire((RT_TASK*) msg.task, &curtaskinfo);
-    //cout << "Update from task : " << curtaskinfo.name<<" ("<< msg.ID << ") - " << msg.isExecuted << " T=" << msg.time/1e6 << endl;
-
-  for (auto& _taskChain : allTaskChain)
+   // RT_TASK_INFO curtaskinfo;
+   // rt_task_inquire((RT_TASK*) msg.task, &curtaskinfo);
+   // cout << "Update from task : " << curtaskinfo.name<<" ("<< msg.ID << ") - " << msg.isExecuted << " T=" << msg.time/1e6 << endl;
+   if (msg.ID == -1 && !msg.isExecuted && !msg.time) setMode(0);
+   else for (auto& _taskChain : allTaskChain)
   {
       for (auto& task : _taskChain.taskList)
       {
@@ -216,7 +229,7 @@ void MCAgent::saveData(string output)
 {
    RT_TASK_INFO cti;
    rt_task_inquire(0, &cti);
-   cout << " Monitoring and Control Agent Stats : " << "\n"
+   cout << "\n Monitoring and Control Agent Stats : " << "\n"
         << "Primary Mode execution time - " << cti.stat.xtime/1.0e6 << " ms. Timeouts : " << cti.stat.timeout << "\n"
         << "   Mode Switches - " << cti.stat.msw << "\n"
         << "Context Switches - " << cti.stat.csw << "\n"
@@ -227,7 +240,7 @@ void MCAgent::saveData(string output)
     myFile.open (output);    // TO APPEND :  //,ios_base::app);
     myFile << "timestamp ; Chain ; ID ; HRT ; deadline ; duration ; affinity \n";
     myFile.close();
-    for (auto& _taskChain : allTaskChain)
+    for (auto _taskChain : allTaskChain)
     {
         _taskChain.logger->saveData(output);
     }

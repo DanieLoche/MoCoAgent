@@ -86,16 +86,16 @@ class MCAgent
     void saveData(string);
 
   private :
-    int runtimeMode;    // NOMINAL or OVERLOADED
-    //std::vector<rtTaskInfosStruct>* TasksInformations;
-    std::vector<taskChain> allTaskChain;
-    std::vector<RT_TASK*> bestEffortTasks;
+      int runtimeMode;    // NOMINAL or OVERLOADED
+      //std::vector<rtTaskInfosStruct>* TasksInformations;
+      std::vector<taskChain> allTaskChain;
+      std::vector<RT_TASK*> bestEffortTasks;
 
-    void initMoCoAgent(systemRTInfo* sInfos);
-    void initCommunications();
-    void setAllDeadlines(std::vector<end2endDeadlineStruct> _tcDeadlineStructs);
-    void setAllTasks(std::vector<rtTaskInfosStruct> _TasksInfos);
-    //int checkTaskChains();
-    void displaySystemInfo(systemRTInfo* sInfos);
-    void displayChains();
+      void initMoCoAgent(systemRTInfo* sInfos);
+      void initCommunications();
+      void setAllDeadlines(std::vector<end2endDeadlineStruct> _tcDeadlineStructs);
+      void setAllTasks(std::vector<rtTaskInfosStruct> _TasksInfos);
+      //int checkTaskChains();
+      void displaySystemInfo(systemRTInfo* sInfos);
+      void displayChains();
 };

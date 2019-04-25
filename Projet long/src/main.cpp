@@ -51,17 +51,13 @@ void endOfExpeHandler(int s){
   #if VERBOSE_INFO
   cout << "\n------------------------------" << endl;
   #endif
-  cout << "Changing mode to OFF." << endl;
-  mca->setMode(0); // Stop Mo Co Agent verification
-  cout << "Stopping Tasks." << endl;
-  tln->stopTasks(1);
-  cout << "Saving tasks data..." << endl;
   tln->saveData(outputFile);
   if (enableAgent)
   {
-     sleep (3);
-     cout << "Saving Agent data..." << endl;
+     sleep (1);
+     cout << "\nSaving Agent data..." << endl;
      mca->saveData("MCAgent_"+outputFile);
+     sleep (1);
   }
    exit(0);
 }
@@ -178,17 +174,15 @@ void printInquireInfo(RT_TASK* task)
 #if VERBOSE_INFO
    RT_TASK_INFO curtaskinfo;
    int ret = 0;
-   if (task == NULL) cout << "Task in NULL !! F**k !" << endl; //task = rt_task_self();
    if ((ret = rt_task_inquire(task, &curtaskinfo)))
    {  cout << ret;
-      if (ret == -EINVAL) cout << " - Invalid Task Descriptor or invalid Prio." << endl;
-      if (ret == -EPERM) cout << " - Task is NULL, and service called from invalid context." << endl;
+      if (ret == -EINVAL) cout << "\n - Invalid Task Descriptor or invalid Prio." << endl;
+      if (ret == -EPERM) cout << "\n - Task is NULL, and service called from invalid context." << endl;
    } else {
    std::stringstream ss;
-   ss << "I am task : " << curtaskinfo.name
-     << " (PID : " << curtaskinfo.pid << "), of priority "
-     << curtaskinfo.prio
-     << " - on CPU : " << curtaskinfo.stat.cpu << endl;
+   ss << "[ " << curtaskinfo.name
+     << " ] (PID : " << curtaskinfo.pid << "), of priority "
+     << curtaskinfo.prio << endl;
    cout << ss.rdbuf();
    }
 #endif

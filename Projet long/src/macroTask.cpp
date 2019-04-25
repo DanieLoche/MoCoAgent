@@ -8,13 +8,17 @@ MacroTask::MacroTask(taskRTInfo* _taskRTInfo)
 {
    properties = _taskRTInfo->rtTI;
    dataLogs = _taskRTInfo->taskLog;
+   printTaskInfo(_taskRTInfo->rtTI);
+
+   printInquireInfo(_taskRTInfo->rtTI->task);
+   /*
    RT_TASK_INFO curtaskinfo;
    rt_task_inquire(NULL, &curtaskinfo);
    print_affinity(curtaskinfo.pid);
    #if VERBOSE_OTHER
    cout << "I am task : " << curtaskinfo.name << " of priority " << curtaskinfo.prio << endl;
    #endif
-
+   */
    msg.task    = properties->task;
    msg.ID      = properties->id;
    msg.time    = 0;
@@ -22,20 +26,18 @@ MacroTask::MacroTask(taskRTInfo* _taskRTInfo)
 
    MoCoIsAlive = 1;
 
-  printTaskInfo(_taskRTInfo->rtTI);
 }
 
 int MacroTask::before()
 {
-  msg.time = dataLogs->logStart();
-  msg.isExecuted =0;
-  if(MoCoIsAlive && (rt_buffer_write(&bf , &msg , sizeof(monitoringMsg) , 100000) < 0))
-  {
+   msg.time = dataLogs->logStart();
+   msg.isExecuted =0;
+   if(MoCoIsAlive && (rt_buffer_write(&bf , &msg , sizeof(monitoringMsg) , 100000) < 0))
+   {
      //MoCoIsAlive = 0;
      rt_printf("[%s] : failed to write BEFORE monitoring message to buffer.\n",properties->name);
-  }
-
-  return 0;
+   }
+   return 0;
 }
 
 void MacroTask::proceed()
