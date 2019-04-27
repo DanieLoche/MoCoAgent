@@ -44,11 +44,11 @@ void MacroTask::proceed()
 {
       // let the task run RUNTIME ns in steps of SPINTIME ns
       char* cmd;
-//      if (std::string path(properties->path_task) != "/null/")  {
-         cmd = &properties->path_task[0u];
-         system(cmd);
-//       }
-//       else cout << properties->name <<"Oups, no valid path found !" << endl;
+//    if (std::string path(properties->path_task) != "/null/")  {
+      cmd = &properties->path_task[0u];
+      system(cmd);
+//    }
+//    else cout << properties->name <<"Oups, no valid path found !" << endl;
 }
 
 int MacroTask::after()

@@ -7,6 +7,7 @@
 TaskLauncher::TaskLauncher()
 {
    enableAgent = 0;
+   //triggerSaveAgent = 0;
    cptNumberTasks =0;
    schedPolicy = SCHED_FIFO;
 }
@@ -206,6 +207,10 @@ void TaskLauncher::runAgent()
    else
    {
       enableAgent = 1;
+      bool trigA = new bool();
+      trigA = 0;
+      triggerSaveAgent = trigA;
+      taskSetInfos.triggerSave = &triggerSaveAgent;
       rt_task_affinity(&mcAgent, 3, 0);
 
       //  systemRTInfo ch_taks ;
@@ -218,7 +223,7 @@ void TaskLauncher::stopTasks(bool val)
 {
    if (val)
    {
-      rt_task_suspend(&mcAgent);
+      if (enableAgent) rt_task_suspend(&mcAgent);
       for (auto& task : taskSetInfos.rtTIs)
       {
          rt_task_suspend(task.task);
@@ -226,7 +231,7 @@ void TaskLauncher::stopTasks(bool val)
    }
    else
    {
-      rt_task_resume(&mcAgent);
+      if (enableAgent) rt_task_resume(&mcAgent);
       for (auto& task : taskSetInfos.rtTIs)
       {
          rt_task_resume(task.task);
@@ -243,21 +248,38 @@ void TaskLauncher::saveData(string file)
 
    std::ofstream myFile;
    myFile.open (file);    // TO APPEND :  //,ios_base::app);
-   myFile << "timestamp ; name ; ID ; HRT ; deadline ; duration ; affinity \n";
+   myFile << "timestamp ; name ; ID ; HRT ; deadline ; affinity ; duration \n";
    myFile.close();
    for (auto& taskLog : tasksLogsList)
    {
       taskLog->saveData(file);
    }
-/*
+
+   //RT_BUFFER* bf = new RT_BUFFER;
    if (enableAgent)
    {
+      /*
+      if( rt_buffer_bind (bf , "/monitoringTopic", 100000) < 0)
+      {
+        cout << "TASK LAUNCHER : failed to link to Monitoring Buffer" << endl;
+      }
+      */
+     triggerSaveAgent = 1;
+     rt_task_resume(&mcAgent);
+     /*
+     monitoringMsg msg = {NULL, 0, 0, 0};
+     if (rt_buffer_write(bf, &msg, sizeof(msg), 500*1e6))
+     {
+        cout << "TASK LAUNCHER : failed to write monitoring message to MoCo.\n" << endl;
+     }
+     */
      sleep (1);
      cout << "\nSaving Agent data..." << endl;
-     mca->saveData("MCAgent_"+file);
-     sleep (1);
+
+     //mca->saveData("MCAgent_"+file);
+     //sleep (1);
    }
-*/
+
 }
 
 void TaskLauncher::rt_task_affinity (RT_TASK* task, int _aff, int mode)

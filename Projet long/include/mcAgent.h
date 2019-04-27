@@ -86,9 +86,10 @@ class MCAgent
     void saveData(string);
 
   private :
+      bool* triggerSave;
       int runtimeMode;    // NOMINAL or OVERLOADED
       //std::vector<rtTaskInfosStruct>* TasksInformations;
-      std::vector<taskChain> allTaskChain;
+      std::vector<taskChain*> allTaskChain;
       std::vector<RT_TASK*> bestEffortTasks;
 
       void initMoCoAgent(systemRTInfo* sInfos);

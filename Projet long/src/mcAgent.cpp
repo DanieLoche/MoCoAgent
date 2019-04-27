@@ -36,7 +36,7 @@ MCAgent::MCAgent(systemRTInfo* sInfos)
   {
      if (runtimeMode)
      {
-        for (auto _taskChain = allTaskChain.begin(); _taskChain != allTaskChain.end(); ++_taskChain)
+        for (auto& _taskChain : allTaskChain)
         {
            if ( _taskChain->checkTaskE2E() && !_taskChain->isAtRisk)
            {
@@ -46,6 +46,12 @@ MCAgent::MCAgent(systemRTInfo* sInfos)
            }
         }
      }
+     if (*triggerSave)
+     {
+        saveData("ExpeOutput.csv");
+        pause();
+     }
+
    rt_task_yield();
    }
 
@@ -53,6 +59,7 @@ MCAgent::MCAgent(systemRTInfo* sInfos)
 
 void MCAgent::initMoCoAgent(systemRTInfo* sInfos)
 {
+  triggerSave = sInfos->triggerSave;
   setAllDeadlines(sInfos->e2eDD);
   setAllTasks(sInfos->rtTIs);
   displayChains();
@@ -85,7 +92,7 @@ void MCAgent::setAllDeadlines(std::vector<end2endDeadlineStruct> _tcDeadlineStru
       if (tcDeadlineStruct.taskChainID)
       {
          taskChain* tc = new taskChain(tcDeadlineStruct);
-         allTaskChain.push_back(*tc);
+         allTaskChain.push_back(tc);
       }
    }
 }
@@ -114,11 +121,11 @@ void MCAgent::setAllTasks(std::vector<rtTaskInfosStruct> _TasksInfos)
     }
     else for (auto& _taskChain : allTaskChain)
     {
-      if ( _taskInfo.isHardRealTime == _taskChain.chainID )
+      if ( _taskInfo.isHardRealTime == _taskChain->chainID )
       {
-         cout << "Adding to HRT chain " << _taskChain.chainID << "." << endl;
+         cout << "Adding to HRT chain " << _taskChain->chainID << "." << endl;
         taskMonitoringStruct* tms = new taskMonitoringStruct(&_taskInfo);
-        _taskChain.taskList.push_back(*tms);
+        _taskChain->taskList.push_back(*tms);
         break;
       }
     }
@@ -162,9 +169,7 @@ void MCAgent::setMode(int mode)
    if (!mode)  runtimeMode = mode;
    else
    {
-      int newMode = runtimeMode + 2*mode; // NOMINAL : -1 and less ; OVERLOADED : +1 and more
-      //runtimeMode += 2*mode;
-      if (newMode >= MODE_OVERLOADED && runtimeMode <= MODE_NOMINAL)
+      if (mode >= MODE_OVERLOADED && runtimeMode <= MODE_NOMINAL)
       { // Pause Best Effort Tasks sur front montant changement de mode.
          rt_event_signal(&mode_change_flag, 1);
          for (auto& bestEffortTask : bestEffortTasks)
@@ -177,7 +182,7 @@ void MCAgent::setMode(int mode)
          }
          cout << "Stopped BE tasks." << endl;
       }
-      else if (newMode <= MODE_NOMINAL && runtimeMode >= MODE_OVERLOADED)
+      else if (mode <= MODE_NOMINAL && runtimeMode >= MODE_OVERLOADED)
       { // runtimeMode NOMINAL
          rt_event_signal(&mode_change_flag, 0);
          for (auto& bestEffortTask : bestEffortTasks)
@@ -186,7 +191,7 @@ void MCAgent::setMode(int mode)
          }
          cout << "Re-started BE tasks." << endl;
       }
-      runtimeMode = newMode;
+      runtimeMode = mode;
       #if VERBOSE_DEBUG // ==1?"OVERLOADED":"NOMINAL"
       cout << "MoCoAgent Triggered to mode " << ((mode>0)?"OVERLOADED":"NOMINAL") << "!" << endl;
       #endif
@@ -200,10 +205,9 @@ void MCAgent::updateTaskInfo(monitoringMsg msg)
    // RT_TASK_INFO curtaskinfo;
    // rt_task_inquire((RT_TASK*) msg.task, &curtaskinfo);
    // cout << "Update from task : " << curtaskinfo.name<<" ("<< msg.ID << ") - " << msg.isExecuted << " T=" << msg.time/1e6 << endl;
-   if (msg.ID == -1 && !msg.isExecuted && !msg.time) setMode(0);
-   else for (auto& _taskChain : allTaskChain)
+  for (auto& _taskChain : allTaskChain)
   {
-      for (auto& task : _taskChain.taskList)
+      for (auto& task : _taskChain->taskList)
       {
         if( task.id == msg.ID)
         {
@@ -211,13 +215,13 @@ void MCAgent::updateTaskInfo(monitoringMsg msg)
           {
             //task.endTime = msg.time;
             task.setState(TRUE);
-            _taskChain.currentEndTime = std::max(_taskChain.currentEndTime, msg.time);
-            if (_taskChain.checkIfEnded() && _taskChain.isAtRisk) setMode(MODE_NOMINAL);
+            _taskChain->currentEndTime = std::max(_taskChain->currentEndTime, msg.time);
+            if (_taskChain->checkIfEnded() && _taskChain->isAtRisk) setMode(MODE_NOMINAL);
           }
-          else if (_taskChain.startTime == 0)
+          else if (_taskChain->startTime == 0)
           {
-            _taskChain.startTime = msg.time;
-            _taskChain.logger->logStart(msg.time);
+            _taskChain->startTime = msg.time;
+            _taskChain->logger->logStart(msg.time);
           }
           return;
         }
@@ -238,11 +242,11 @@ void MCAgent::saveData(string output)
 
     std::ofstream myFile;
     myFile.open (output);    // TO APPEND :  //,ios_base::app);
-    myFile << "timestamp ; Chain ; ID ; HRT ; deadline ; duration ; affinity \n";
+    myFile << "timestamp ; Chain ; ID ; HRT ; deadline ; affinity ; duration \n";
     myFile.close();
     for (auto _taskChain : allTaskChain)
     {
-        _taskChain.logger->saveData(output);
+        _taskChain->logger->saveData(output);
     }
 
 }
@@ -255,6 +259,8 @@ void MCAgent::saveData(string output)
 ***********************/
 void MCAgent::displaySystemInfo(systemRTInfo* sInfos)
 {
+   cout << "\n I RECEIVED TRIGGER BOOLEAN " << *(sInfos->triggerSave) << endl;
+   sleep(1);
   #if VERBOSE_INFO
   cout << "INPUT Informations : " << endl;
   for (auto &taskdd : sInfos->e2eDD)

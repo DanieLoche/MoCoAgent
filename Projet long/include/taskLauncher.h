@@ -9,6 +9,7 @@ class TaskLauncher
       std::vector<DataLogger*> tasksLogsList;
       RT_TASK mcAgent;
       bool enableAgent;
+      bool triggerSaveAgent;
 
       void rt_task_affinity (RT_TASK* task, int _aff, int mode);
 

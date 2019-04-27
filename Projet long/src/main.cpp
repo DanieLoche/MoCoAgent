@@ -48,17 +48,12 @@ void TaskMain(void* arg)
 }
 
 void endOfExpeHandler(int s){
-  #if VERBOSE_INFO
-  cout << "\n------------------------------" << endl;
-  #endif
-  tln->saveData(outputFile);
-  if (enableAgent)
-  {
-     sleep (1);
-     cout << "\nSaving Agent data..." << endl;
-     mca->saveData("MCAgent_"+outputFile);
-     sleep (1);
-  }
+   #if VERBOSE_INFO
+   cout << "\n------------------------------" << endl;
+   #endif
+   tln->saveData(outputFile);
+
+   sleep(2);
    exit(0);
 }
 
@@ -152,7 +147,7 @@ int main(int argc, char* argv[])
    }
 
    //sleeping the time that all tasks will be started
-   sleep(2);
+   sleep(3);
    cout << "Wake up all tasks." << endl;
    rt_sem_broadcast(&mysync);
 
