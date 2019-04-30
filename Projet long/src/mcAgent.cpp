@@ -48,7 +48,7 @@ MCAgent::MCAgent(systemRTInfo* sInfos)
      }
      if (*triggerSave)
      {
-        saveData("ExpeOutput.csv");
+        saveData();
         pause();
      }
 
@@ -59,14 +59,15 @@ MCAgent::MCAgent(systemRTInfo* sInfos)
 
 void MCAgent::initMoCoAgent(systemRTInfo* sInfos)
 {
-  triggerSave = sInfos->triggerSave;
-  setAllDeadlines(sInfos->e2eDD);
-  setAllTasks(sInfos->rtTIs);
-  displayChains();
-  sleep(1);
-  RT_TASK mcAgentReceiver;
-  rt_task_create(&mcAgentReceiver, "MoCoAgentReceiver", 0, 99, 0);
-  rt_task_start(&mcAgentReceiver, messageReceiver, this);
+   outputFileName = sInfos->outputFileName;
+   triggerSave = sInfos->triggerSave;
+   setAllDeadlines(sInfos->e2eDD);
+   setAllTasks(sInfos->rtTIs);
+   displayChains();
+   sleep(1);
+   RT_TASK mcAgentReceiver;
+   rt_task_create(&mcAgentReceiver, "MoCoAgentReceiver", 0, 99, 0);
+   rt_task_start(&mcAgentReceiver, messageReceiver, this);
 }
 
 void MCAgent::initCommunications()
@@ -229,7 +230,7 @@ void MCAgent::updateTaskInfo(monitoringMsg msg)
   }
 }
 
-void MCAgent::saveData(string output)
+void MCAgent::saveData()
 {
    RT_TASK_INFO cti;
    rt_task_inquire(0, &cti);
@@ -240,13 +241,9 @@ void MCAgent::saveData(string output)
         << "Cobalt Sys calls - " << cti.stat.xsc
         << endl;
 
-    std::ofstream myFile;
-    myFile.open (output);    // TO APPEND :  //,ios_base::app);
-    myFile << "timestamp ; Chain ; ID ; HRT ; deadline ; affinity ; duration \n";
-    myFile.close();
     for (auto _taskChain : allTaskChain)
     {
-        _taskChain->logger->saveData(output);
+        _taskChain->logger->saveData(outputFileName);
     }
 
 }

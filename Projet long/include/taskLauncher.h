@@ -9,13 +9,13 @@ class TaskLauncher
       std::vector<DataLogger*> tasksLogsList;
       RT_TASK mcAgent;
       bool enableAgent;
-      bool triggerSaveAgent;
+      bool triggerSave;
 
       void rt_task_affinity (RT_TASK* task, int _aff, int mode);
 
    public :
       int schedPolicy;
-      TaskLauncher();
+      TaskLauncher(string outputFileName);
       void readChainsList(string);
       int  readTasksList();
       void createTasks();

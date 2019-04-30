@@ -99,6 +99,7 @@ struct systemRTInfo
   std::vector<end2endDeadlineStruct> e2eDD;
   std::vector<rtTaskInfosStruct> rtTIs;
   bool* triggerSave;
+  string outputFileName;
 };
 
 void printInquireInfo(RT_TASK*);

@@ -83,9 +83,9 @@ class MCAgent
     RT_EVENT mode_change_flag;
     void updateTaskInfo(monitoringMsg msg);
     void setMode(int mode);
-    void saveData(string);
 
   private :
+      string outputFileName;
       bool* triggerSave;
       int runtimeMode;    // NOMINAL or OVERLOADED
       //std::vector<rtTaskInfosStruct>* TasksInformations;
@@ -99,4 +99,5 @@ class MCAgent
       //int checkTaskChains();
       void displaySystemInfo(systemRTInfo* sInfos);
       void displayChains();
+      void saveData( );
 };

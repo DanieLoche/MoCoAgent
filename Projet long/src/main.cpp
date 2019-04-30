@@ -69,8 +69,6 @@ int main(int argc, char* argv[])
    sigemptyset(&sigIntHandler.sa_mask);
    sigaction(SIGINT, &sigIntHandler, NULL);
 
-   tln = new TaskLauncher();
-
    // Définition fichier d'information des tâches
    // [MoCoAgent Activation] [Experiment duration] [input file : task chains] [outputfile]
    //// "--" to set everything as default.
@@ -126,6 +124,8 @@ int main(int argc, char* argv[])
 
    cout << "Hey, press a key to start (PID: " << getpid() << ")!" << endl;
    cin.get();
+
+   tln = new TaskLauncher(outputFile);
 
    rt_sem_create(&mysync,"Start Experiment",0,S_FIFO);
 

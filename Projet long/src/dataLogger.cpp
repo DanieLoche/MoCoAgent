@@ -146,6 +146,8 @@ void ChainDataLogger::saveData(string file)
   RTIME min_runtime = 1.e9;
   double somme = 0;
 
+  myFile << "timestamp ; Chain ; ID ; deadline ; affinity ; duration \n";
+
   for (int i = 0; i < cptExecutions; i++)
   {
     RTIME _dur = execLogs[i].duration;

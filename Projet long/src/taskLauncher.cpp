@@ -4,12 +4,18 @@
 #include "dataLogger.h"
 
 
-TaskLauncher::TaskLauncher()
+TaskLauncher::TaskLauncher(string outputFileName)
 {
    enableAgent = 0;
    //triggerSaveAgent = 0;
    cptNumberTasks =0;
    schedPolicy = SCHED_FIFO;
+
+   bool trigA = new bool();
+   trigA = 0;
+   triggerSave = trigA;
+   taskSetInfos.triggerSave = &triggerSave;
+   taskSetInfos.outputFileName = "MoCoLogs_" + outputFileName;
 }
 
 void TaskLauncher::readChainsList(string input_file)
@@ -207,10 +213,6 @@ void TaskLauncher::runAgent()
    else
    {
       enableAgent = 1;
-      bool trigA = new bool();
-      trigA = 0;
-      triggerSaveAgent = trigA;
-      taskSetInfos.triggerSave = &triggerSaveAgent;
       rt_task_affinity(&mcAgent, 3, 0);
 
       //  systemRTInfo ch_taks ;
@@ -255,29 +257,12 @@ void TaskLauncher::saveData(string file)
       taskLog->saveData(file);
    }
 
-   //RT_BUFFER* bf = new RT_BUFFER;
    if (enableAgent)
    {
-      /*
-      if( rt_buffer_bind (bf , "/monitoringTopic", 100000) < 0)
-      {
-        cout << "TASK LAUNCHER : failed to link to Monitoring Buffer" << endl;
-      }
-      */
-     triggerSaveAgent = 1;
+     triggerSave = 1;
      rt_task_resume(&mcAgent);
-     /*
-     monitoringMsg msg = {NULL, 0, 0, 0};
-     if (rt_buffer_write(bf, &msg, sizeof(msg), 500*1e6))
-     {
-        cout << "TASK LAUNCHER : failed to write monitoring message to MoCo.\n" << endl;
-     }
-     */
-     sleep (1);
      cout << "\nSaving Agent data..." << endl;
-
-     //mca->saveData("MCAgent_"+file);
-     //sleep (1);
+     sleep (1);
    }
 
 }
