@@ -32,30 +32,34 @@ MCAgent::MCAgent(systemRTInfo* sInfos)
     cout << "MoCoAgent Ready." << endl;
   #endif
 
-  while(TRUE)
-  {
+}
+
+void MCAgent::execute()
+{
+   while(TRUE)
+   {
      if (runtimeMode)
      {
-        for (auto& _taskChain : allTaskChain)
-        {
-           if ( _taskChain->checkTaskE2E() && !_taskChain->isAtRisk)
-           {
+         for (auto& _taskChain : allTaskChain)
+         {
+            if ( _taskChain->checkTaskE2E() && !_taskChain->isAtRisk)
+            {
              _taskChain->isAtRisk = TRUE;
              _taskChain->logger->cptAnticipatedMisses++;
              setMode(MODE_OVERLOADED);
-           }
-        }
+            }
+         }
      }
      if (*triggerSave)
      {
-        saveData();
-        pause();
+         saveData();
+         pause();
      }
 
-   rt_task_yield();
-   }
-
+    rt_task_yield();
+    }
 }
+
 
 void MCAgent::initMoCoAgent(systemRTInfo* sInfos)
 {
@@ -166,7 +170,7 @@ int MCAgent::checkTaskChains()
 ***********************/
 void MCAgent::setMode(int mode)
 {
-   cout << "[MONITORING & CONTROL AGENT] Change mode to " << mode << ". " << endl;
+   //cout << "[MONITORING & CONTROL AGENT] Change mode to " << ((mode>0)?"OVERLOADED":"NOMINAL") << ". " << endl;
    if (!mode)  runtimeMode = mode;
    else
    {
@@ -177,7 +181,9 @@ void MCAgent::setMode(int mode)
          {   // Publier message pour dire à stopper
             if (rt_task_suspend(bestEffortTask))
             {
+               #if VERBOSE_DEBUG // ==1?"OVERLOADED":"NOMINAL"
                cout << "Failed to stop task ";
+               #endif
                printInquireInfo(bestEffortTask);
             }
          }
@@ -190,10 +196,13 @@ void MCAgent::setMode(int mode)
          {  // relancer Best Effort Tasks;
             rt_task_resume(bestEffortTask);
          }
+         #if VERBOSE_DEBUG // ==1?"OVERLOADED":"NOMINAL"
          cout << "Re-started BE tasks." << endl;
+         #endif
+
       }
       runtimeMode = mode;
-      #if VERBOSE_DEBUG // ==1?"OVERLOADED":"NOMINAL"
+      #if VERBOSE_ASK // ==1?"OVERLOADED":"NOMINAL"
       cout << "MoCoAgent Triggered to mode " << ((mode>0)?"OVERLOADED":"NOMINAL") << "!" << endl;
       #endif
    }
@@ -217,12 +226,19 @@ void MCAgent::updateTaskInfo(monitoringMsg msg)
             //task.endTime = msg.time;
             task.setState(TRUE);
             _taskChain->currentEndTime = std::max(_taskChain->currentEndTime, msg.time);
-            if (_taskChain->checkIfEnded() && _taskChain->isAtRisk) setMode(MODE_NOMINAL);
+            if (_taskChain->checkIfEnded())
+            {
+               //cout << "Logged chain end at : " << _taskChain->currentEndTime/1.0e6 << endl;
+               _taskChain->logger->logExec(_taskChain->currentEndTime);
+               if (_taskChain->isAtRisk) setMode(MODE_NOMINAL);
+               _taskChain->resetChain();
+            }
           }
           else if (_taskChain->startTime == 0)
           {
             _taskChain->startTime = msg.time;
             _taskChain->logger->logStart(msg.time);
+            //cout << "Logged chain start at : " << msg.time/1.0e6 << endl;
           }
           return;
         }
@@ -234,7 +250,7 @@ void MCAgent::saveData()
 {
    RT_TASK_INFO cti;
    rt_task_inquire(0, &cti);
-   cout << "\n Monitoring and Control Agent Stats : " << "\n"
+   cout << "\n Monitoring and Control Agent Stats : \n"
         << "Primary Mode execution time - " << cti.stat.xtime/1.0e6 << " ms. Timeouts : " << cti.stat.timeout << "\n"
         << "   Mode Switches - " << cti.stat.msw << "\n"
         << "Context Switches - " << cti.stat.csw << "\n"
@@ -334,14 +350,7 @@ bool taskChain::checkIfEnded()
   { // only one FALSE is enough
     ended = ended & task.getState();
   }
-  if (ended)
-  {
-    resetChain();
-    logger->logExec(currentEndTime);
-    //RTIME execTime = getExecutionTime();
-    //if (execTime > end2endDeadline) cptOutOfDeadline++;
-    //chainExecutionTime[cptExecutions++] = execTime;
-  }
+
   return ended;
 }
 
@@ -352,10 +361,7 @@ inline void taskChain::resetChain()
     task.setState(FALSE);
     //task.endTime = 0;
   }
-  if (isAtRisk)
-  {
-     isAtRisk = FALSE;
-  }
+  if (isAtRisk) isAtRisk = FALSE;
   startTime = 0;
   currentEndTime = 0;
 }

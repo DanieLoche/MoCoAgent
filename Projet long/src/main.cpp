@@ -32,6 +32,8 @@ void RunmcAgentMain(void* arg)
   systemRTInfo* sInfos = (systemRTInfo*) arg;
   //printTaskInfo(&sInfos->rtTIs[0]);
   mca = new MCAgent(sInfos);
+  rt_sem_p(&mysync,TM_INFINITE);
+  mca->execute();
 }
 
 void TaskMain(void* arg)
@@ -47,13 +49,17 @@ void TaskMain(void* arg)
   }
 }
 
+bool HandleOnce = false;
 void endOfExpeHandler(int s){
-   #if VERBOSE_INFO
-   cout << "\n------------------------------" << endl;
-   #endif
-   tln->saveData(outputFile);
-
-   sleep(2);
+   if (!HandleOnce)
+   {
+      HandleOnce = true;
+      #if VERBOSE_INFO
+      cout << "\n------------------------------" << endl;
+      #endif
+      tln->saveData(outputFile);
+   }
+      sleep(2);
    exit(0);
 }
 
@@ -147,7 +153,7 @@ int main(int argc, char* argv[])
    }
 
    //sleeping the time that all tasks will be started
-   sleep(3);
+   sleep(4);
    cout << "Wake up all tasks." << endl;
    rt_sem_broadcast(&mysync);
 

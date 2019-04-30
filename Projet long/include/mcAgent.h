@@ -82,7 +82,7 @@ class MCAgent
     RT_BUFFER bf;
     RT_EVENT mode_change_flag;
     void updateTaskInfo(monitoringMsg msg);
-    void setMode(int mode);
+    void execute();
 
   private :
       string outputFileName;
@@ -94,6 +94,7 @@ class MCAgent
 
       void initMoCoAgent(systemRTInfo* sInfos);
       void initCommunications();
+      void setMode(int mode);
       void setAllDeadlines(std::vector<end2endDeadlineStruct> _tcDeadlineStructs);
       void setAllTasks(std::vector<rtTaskInfosStruct> _TasksInfos);
       //int checkTaskChains();

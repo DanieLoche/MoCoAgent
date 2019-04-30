@@ -16,7 +16,7 @@ ChainDataLogger::ChainDataLogger(end2endDeadlineStruct* chainInfos)
   cptOutOfDeadline = 0;
   cptExecutions = 0;
   execLogs = {0};
-//cout << "Init of task logger for task " << name << " is okay." << endl;
+ //cout << "Init of Chains logger is okay." << endl;
 }
 
 TaskDataLogger::TaskDataLogger(rtTaskInfosStruct* taskInfos)
@@ -48,21 +48,26 @@ RTIME DataLogger::logStart()
 
 void DataLogger::logExec(RTIME endTime)
 {
-  execLogs[cptExecutions].duration = endTime - execLogs[cptExecutions].timestamp;
+   if (execLogs[cptExecutions].timestamp)
+   {
+      execLogs[cptExecutions].duration = endTime - execLogs[cptExecutions].timestamp;
 
-  if(execLogs[cptExecutions].duration > deadline )
-  {
-    #if VERBOSE_ASK
-    rt_printf("[  \033[1;31mERROR\033[0m  ] Task : \033[1;31m%s\033[0m - \033[1;36m%.2f ms\033[0m\n",name,execLogs[cptExecutions].duration/1e6);
-    #endif
-    cptOutOfDeadline++;
-  }else{
-    #if VERBOSE_ASK
-      rt_printf("[ \033[1;32mPERFECT\033[0m ] Task : \033[1;32m%s\033[0m - \033[1;36m%.2f ms\033[0m\n",name,execLogs[cptExecutions].duration/1e6);
-    #endif
-  }
-  cptExecutions++;
-  //return execLogs[cptExecutions - 1].duration;
+      if(execLogs[cptExecutions].duration > deadline )
+      {
+        #if VERBOSE_ASK
+        rt_printf("[  \033[1;31mERROR\033[0m  ] Task : \033[1;31m%s\033[0m - \033[1;36m%.2f ms\033[0m\n",name,execLogs[cptExecutions].duration/1e6);
+        #endif
+        cptOutOfDeadline++;
+      }else{
+        #if VERBOSE_ASK
+          rt_printf("[ \033[1;32mPERFECT\033[0m ] Task : \033[1;32m%s\033[0m - \033[1;36m%.2f ms\033[0m\n",name,execLogs[cptExecutions].duration/1e6);
+        #endif
+      }
+      cptExecutions++;
+      //return execLogs[cptExecutions - 1].duration;
+   }
+   else cout << "Warning : Exec not logged as timestamp was not set yet." << endl;
+
 }
 
 RTIME DataLogger::logExec( )
@@ -137,43 +142,47 @@ void TaskDataLogger::saveData(string file)
 
 void ChainDataLogger::saveData(string file)
 {
-  std::ofstream myFile;
-  myFile.open (file, std::ios::app);    // TO APPEND :  //,ios_base::app);
+   RTIME average_runtime = 0;
+   RTIME max_runtime = 0;
+   RTIME min_runtime = 1.e9;
+   RTIME sommeTime = 0;
 
-  //myFile << "timestamp ; name ; ID ; HRT ; deadline ; duration ; affinity \n";
-  RTIME average_runtime = 0;
-  RTIME max_runtime = 0;
-  RTIME min_runtime = 1.e9;
-  double somme = 0;
+   std::ofstream myFile;
+   myFile.open (file, std::ios::app);    // TO APPEND :  //,ios_base::app);
 
-  myFile << "timestamp ; Chain ; ID ; deadline ; affinity ; duration \n";
+   myFile << std::setw(12) << "timestamp" << " ; "
+          << std::setw(10) << "Chain"     << " ; "
+          << std::setw(2) << "ID"        << " ; "
+          << std::setw(10) << "deadline"  << " ; "
+          << std::setw(8)  << "affinity"  << " ; "
+          << std::setw(20) << "duration"  << "\n";
 
-  for (int i = 0; i < cptExecutions; i++)
-  {
-    RTIME _dur = execLogs[i].duration;
+   for (int i = 0; i < cptExecutions; i++)
+   {
+      RTIME _dur = execLogs[i].duration;
 
-    myFile << execLogs[i].timestamp << " ; "
-           << name           << " ; "
-           << id             << " ; "
-           << deadline       << " ; "
-           << affinity       << " ; "
-           << _dur           << "\n";
-    somme += _dur;
-    if (_dur < min_runtime) min_runtime = _dur;
-    else if (_dur > max_runtime) max_runtime = _dur;
-  }
+      myFile << std::setw(12) << execLogs[i].timestamp << " ; "
+             << std::setw(10) << name                  << " ; "
+             << std::setw(2)  << id                    << " ; "
+             << std::setw(10) << deadline              << " ; "
+             << std::setw(8)  << affinity              << " ; "
+             << std::setw(10) << _dur                  << "\n";
+      sommeTime += _dur;
+      if (_dur < min_runtime) min_runtime = _dur;
+      else if (_dur > max_runtime) max_runtime = _dur;
+   }
 
-  average_runtime = somme / cptExecutions;
+  average_runtime = sommeTime / cptExecutions;
   #if VERBOSE_INFO
   cout << "\nRunning summary for Chain " << name << ". ( " << id << " )" << "\n"
        << "Deadline : " << deadline / 1.0e6     << " ms." << " Anticipated Misses" << " | "
        <<   " Missed "     << " | " << " Chain loops " << "\n"
 
-       << "                    "         << std::setw(10) <<  cptAnticipatedMisses << " | "
+       << "                  "         << std::setw(20) <<  cptAnticipatedMisses << " | "
        << std::setw(10) << cptOutOfDeadline << " | " << cptExecutions << " times" << "\n"
 
        <<         "  MIN  "   << " | " <<        "  AVG  "        << " | " <<      "  MAX"        << "\n"
-       << min_runtime / 1.0e6 << " | " << average_runtime / 1.0e6 << " | " << max_runtime / 1.0e6 << " runtimes (ms)"
+       << std::setw(7) << min_runtime / 1.0e6 << " | " << average_runtime / 1.0e6 << " | " << max_runtime / 1.0e6 << " runtimes (ms)"
        << endl;
   #endif
 
