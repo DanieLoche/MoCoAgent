@@ -78,14 +78,14 @@ int TaskLauncher::readTasksList()
          {
             char name[60];
             if (!(iss >> name
-                      >> taskInfo->path_task
                       >> taskInfo->isHardRealTime
                       >> taskInfo->wcet
+                      >> taskInfo->path_task
                       >> taskInfo->deadline
-                      >> taskInfo->affinity
-                      >> taskInfo->priority ) )
+                      >> taskInfo->affinity ) )
                { cout << "\033[1;31mFailed to read line\033[0m !" << endl; break; } // error
             getline(iss , taskInfo->arguments);
+            if (schedPolicy != SCHED_RM) taskInfo->priority = 50;
             taskInfo->deadline *= 1.0e6;
             taskInfo->wcet *= 1.0e6;
             strncat(ext, name, 64);
@@ -98,6 +98,7 @@ int TaskLauncher::readTasksList()
          else cout << "line ignored." << endl;
          #endif
       }
+      
       if (schedPolicy == SCHED_RM)
       { // Changer les niveaux de priorité si on schedule en RM.
          cout << "Updating task informations to use Rate-Monotinic Scheduling." << endl;
