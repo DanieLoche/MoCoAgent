@@ -1,4 +1,4 @@
 name            chaineID      nombredetache    Path           deadline
 chaine1             1               5        ./input1.txt       3000
-chaine2            1               2        ./input.txt        1500
+//chaine2            1               2        ./input.txt        1500
 

@@ -1,0 +1,6 @@
+name 		        path 									isHRT 	periodicity deadline affinity
+SDP_bitcount_S   47.3     ./bench/bitcnts              237        2        75000 > ./bench/output/output_btcnt_small.txt
+SDP_fft_S        /home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/telecomm/FFT/fft_small.sh           	      1	  200           200       1
+SDP_CRC32_L      /home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/telecomm/CRC32/CRC32_large.sh         	    1	  1500          1500      1
+SDP_basicmath_S  /home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/automotive/basicmath/basicmath_small.sh   	1	  200           200       1
+SDP_qsort_L      /home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/automotive/qsort/qsort_large.sh       	    1	  300           300       1

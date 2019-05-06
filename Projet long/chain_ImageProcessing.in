@@ -1,0 +1,6 @@
+name 			path 									isHRT 	periodicity 	deadline 	affinity
+IP_susan_L      	/home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/automotive/susan/susan_large.sh           1 	300           	300       	6
+IP_jpeg_L       	/home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/consumer/jpeg/jpeg_large.sh               1 	200           	200       	6
+IP_CRC32_L      	/home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/telecomm/CRC32/CRC32_large.sh             1 	1500           	1500       	6
+IP_bitcount_L   	/home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/automotive/bitcount/bitcount_large.sh     1	300           	300       	6
+IP_basicmath_S  	/home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/automotive/basicmath/basicmath_small.sh   1 	200           	200       	6

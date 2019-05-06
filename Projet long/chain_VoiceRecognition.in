@@ -1,0 +1,5 @@
+name 			path 									isHRT 	periodicity 	deadline 	affinity
+VR_bitcount_S   	/home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/automotive/bitcount/bitcount_small.sh         1 	200           	200       	5
+VR_gsm_L        	/home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/telecomm/gsm/gsm_large.sh                     1	1000          	1000      	5
+VR_basicmath_L  	/home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/automotive/basicmath/basicmath_large.sh       1 	1000          	1000      	5
+VR_stringsearch_L 	/home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/office/stringsearch/stringsearch_large.sh   1 	200           	200       	5
