@@ -1,6 +1,9 @@
-name 			path 									isHRT 	periodicity 	deadline 	affinity
-IP_susan_L      	/home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/automotive/susan/susan_large.sh           1 	300           	300       	6
-IP_jpeg_L       	/home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/consumer/jpeg/jpeg_large.sh               1 	200           	200       	6
-IP_CRC32_L      	/home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/telecomm/CRC32/CRC32_large.sh             1 	1500           	1500       	6
-IP_bitcount_L   	/home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/automotive/bitcount/bitcount_large.sh     1	300           	300       	6
-IP_basicmath_S  	/home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/automotive/basicmath/basicmath_small.sh   1 	200           	200       	6
+name 		            meanET   path 						       wcet      affinity  arguments
+IP_susan_L_smooth    50      ./bench/susan_bin            250        2         ./bench/susan/input_large.pgm ./bench/output/susan_output_large.smoothing.pgm -s
+IP_susan_L_edges     50      ./bench/susan_bin            250        2         ./bench/susan/input_large.pgm ./bench/output/susan_output_large.edges.pgm -e
+IP_susan_L_corners   44      ./bench/susan_bin            240        2         ./bench/susan/input_large.pgm ./bench/output/susan_output_large.corners.pgm -c
+IP_jpeg_L       	   77      ./bench/jpeg_large.sh        384        2
+IP_adpcm_S           79      ./bench/adpcm_small.sh       397        2
+IP_bitcount_L        197 	  ./bench/bitcnts              984        2         1125000 > ./bench/output/output_btcnt_large.txt
+IP_basicmath_S  	   58      ./bench/basicmath_small      289        2         > ./bench/output/output_basicmath_small.txt
+IP_dijkstra_S        53      ./bench/dijkstra_small       267        2         ./bench/dijkstra/input.dat > ./bench/output/dijk_output_small.dat

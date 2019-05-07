@@ -1,6 +1,6 @@
-name 		        path 									isHRT 	periodicity deadline affinity
-SDP_bitcount_S   47.3     ./bench/bitcnts              237        2        75000 > ./bench/output/output_btcnt_small.txt
-SDP_fft_S        /home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/telecomm/FFT/fft_small.sh           	      1	  200           200       1
-SDP_CRC32_L      /home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/telecomm/CRC32/CRC32_large.sh         	    1	  1500          1500      1
-SDP_basicmath_S  /home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/automotive/basicmath/basicmath_small.sh   	1	  200           200       1
-SDP_qsort_L      /home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/automotive/qsort/qsort_large.sh       	    1	  300           300       1
+name 		        meanET         path 							    wcet      affinity  arguments
+SDP_bitcount_S   47           ./bench/bitcnts              237        1        75000 > ./bench/output/output_btcnt_small.txt
+SDP_fft_S        69           ./bench/fft                  344        1         8 32768 > ./bench/output/fft_output_small.txt
+SDP_CRC32_L      888          ./bench/crc                  4439       1         ./bench/data/large.pcm > ./bench/output/crc_output_large.txt
+SDP_basicmath_S  58           ./bench/basicmath_small      289        1         > ./bench/output/output_basicmath_small.txt
+SDP_qsort_L      139          ./bench/qsort_large          694        1         ./bench/qsort/input_large.dat >  ./bench/output/output_qsort_large.txt

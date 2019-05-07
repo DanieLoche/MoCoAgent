@@ -1,3 +1,3 @@
 #!/bin/sh
-/home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/telecomm/adpcm/bin/rawcaudio < /home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/telecomm/adpcm/data/small.pcm > /home/danlo/BrixCode/MoCoAgent/Benchmarker/output/output_small.adpcm
-/home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/telecomm/adpcm/bin/rawdaudio < /home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/telecomm/adpcm/data/small.adpcm > /home/danlo/BrixCode/MoCoAgent/Benchmarker/output/output_small.pcm
+./bench/adpcm/adpcm_rawcaudio < ./bench/adpcm/small.pcm > ./bench/output/output_small.adpcm
+./bench/adpcm/adpcm_rawdaudio < ./bench/adpcm/small.adpcm > ./bench/output/output_small.pcm

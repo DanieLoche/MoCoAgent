@@ -1,6 +1,6 @@
-name 		    path 									isHRT 	periodicity 	deadline 	affinity
-DE_bitcount_S   /home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/automotive/bitcount/bitcount_small.sh    	1	  200           	200       	4
-DE_CRC32_L      /home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/telecomm/CRC32/CRC32_large.sh         	    1	  1500           	1500       	4
-DE_patricia_L   /home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/network/patricia/patricia_large.sh       	1	  1000          	1000      	4
-DE_blowfish_S   /home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/security/blowfish/blowfish_small.sh      	1	  200           	200       	4
-DE_basicmath_S  /home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/automotive/basicmath/basicmath_small.sh   	1	  200           	200       	4
+name 		        meanET   path 							    wcet      affinity  arguments
+DE_bitcount_S    47       ./bench/bitcnts              237        0         75000 > ./bench/output/output_btcnt_small.txt
+DE_CRC32_S       49       ./bench/crc                  245        0         ./bench/data/small.pcm > ./bench/output/crc_output_small.txt
+DE_patricia_L    838      ./bench/patricia_bin         4190       0         ./bench/patricia/large.udp > ./bench/output/pat_output_large.txt
+DE_blowfish_S    61       ./bench/blowfish_small.sh    304        0
+DE_basicmath_S   58       ./bench/basicmath_small      289        0         > ./bench/output/output_basicmath_small.txt
