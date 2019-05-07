@@ -26,7 +26,7 @@ TaskDataLogger::TaskDataLogger(rtTaskInfosStruct* taskInfos)
   id = taskInfos->id;
   isHardRealTime = taskInfos->isHardRealTime;
   affinity = taskInfos->affinity;
-  deadline = taskInfos->deadline;
+  deadline = taskInfos->periodicity;
 
   cptOutOfDeadline = 0;
   cptExecutions = 0;

@@ -25,6 +25,7 @@ class MacroTask
     bool MoCoIsAlive;
 
     monitoringMsg msg ;
+    char* cmd;
 
     int before_besteff();
     void proceed();

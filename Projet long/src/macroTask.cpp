@@ -19,6 +19,10 @@ MacroTask::MacroTask(taskRTInfo* _taskRTInfo)
    cout << "I am task : " << curtaskinfo.name << " of priority " << curtaskinfo.prio << endl;
    #endif
    */
+   string chain = std::string(properties->path_task) + " " + properties->arguments;
+   cmd = &chain[0u];
+   //cmd = &properties->arguments[0u];
+
    msg.task    = properties->task;
    msg.ID      = properties->id;
    msg.time    = 0;
@@ -43,9 +47,9 @@ int MacroTask::before()
 void MacroTask::proceed()
 {
       // let the task run RUNTIME ns in steps of SPINTIME ns
-      char* cmd;
+      //char* cmd;
 //    if (std::string path(properties->path_task) != "/null/")  {
-      cmd = &properties->path_task[0u];
+      //cmd = &properties->arguments[0u];
       system(cmd);
 //    }
 //    else cout << properties->name <<"Oups, no valid path found !" << endl;

@@ -26,6 +26,7 @@ MCAgent* mca;
 bool enableAgent = TRUE;
 long expeDuration = 0;
 string inputFile = "input_chaine.txt", outputFile = "ExpeOutput.csv2";
+int schedMode = SCHED_FIFO, cpuFactor = 1;
 
 void RunmcAgentMain(void* arg)
 {
@@ -76,7 +77,7 @@ int main(int argc, char* argv[])
    sigaction(SIGINT, &sigIntHandler, NULL);
 
    // Définition fichier d'information des tâches
-   // [MoCoAgent Activation] [Experiment duration] [input file : task chains] [outputfile]
+   // [MoCoAgent Activation] [Experiment duration] [cpuFactor%] [input file : task chains] [outputfile] [sched policy]
    //// "--" to set everything as default.
    if (argc > 1)
    {
@@ -84,11 +85,11 @@ int main(int argc, char* argv[])
       if (ss.str() == "-h" || ss.str() == "help" || ss.str() == "--help")
       { // HELP message
          cout  << "Format should be : " << endl
-               << argv[0] << " [MoCoAgent Activation] " << " | " << " [duration] " << " | "
+               << argv[0] << " [MoCoAgent Activation] " << " | " << " [duration] " << " | " << "[wcet %]" << " | "
                << std::setw(inputFile.length()) << "[input file]" << " | "
                << std::setw(outputFile.length()) << "[output file]" << '\n';
          cout  << std::boolalpha << "Default using \"-\" : "
-               << std::setw(11) << enableAgent << std::setw(11) << " | " << "No end time." << " | "
+               << std::setw(11) << enableAgent << std::setw(11) << " | " << "No end time." << " | " << " 100 %  "
                << std::setw(inputFile.length()) << inputFile << " | "
                << std::setw(outputFile.length()) << outputFile << endl;
          return 0;
@@ -103,25 +104,30 @@ int main(int argc, char* argv[])
          std::stringstream ss(argv[2]);
          if(sscanf(argv[2], "%ld", &expeDuration) != 1 && ss.str() != "-")
          { printf("Error, %s is not an int", argv[2]); return EXIT_FAILURE; }
-
          if (argc > 3)
-         { // INPUT FILE
+         { // CPU % Factor
             std::stringstream ss(argv[3]);
-            if (ss.str() != "-") inputFile = argv[3];
-
+            if(sscanf(argv[2], "%d", &cpuFactor) != 1 && ss.str() != "-")
+            { printf("Error, %s is not an int", argv[3]); return EXIT_FAILURE; }
             if (argc > 4)
-            { // OUTPUT FILE
+            { // INPUT FILE
                std::stringstream ss(argv[4]);
-               if (ss.str() != "-") outputFile = argv[4];
+               if (ss.str() != "-") inputFile = argv[4];
 
                if (argc > 5)
-               { // SCHEDULING POLICY
+               { // OUTPUT FILE
                   std::stringstream ss(argv[5]);
-                  string _schedMode = ss.str();
-                  if (_schedMode == "FIFO")     tln->schedPolicy = SCHED_FIFO;
-                  else if  (_schedMode == "RM") tln->schedPolicy = SCHED_RM;
-                  else if  (_schedMode == "RR") tln->schedPolicy = SCHED_RR;
-                  else if  (_schedMode == "EDF") tln->schedPolicy = SCHED_RM;
+                  if (ss.str() != "-") outputFile = argv[5];
+
+                  if (argc > 6)
+                  { // SCHEDULING POLICY
+                     std::stringstream ss(argv[6]);
+                     string _schedMode = ss.str();
+                     if (_schedMode == "FIFO")     schedMode = SCHED_FIFO;
+                     else if  (_schedMode == "RM") schedMode = SCHED_RM;
+                     else if  (_schedMode == "RR") schedMode = SCHED_RR;
+                     else if  (_schedMode == "EDF") schedMode = SCHED_RM;
+                  }
                }
             }
          }
@@ -132,19 +138,20 @@ int main(int argc, char* argv[])
    cin.get();
 
    tln = new TaskLauncher(outputFile);
+   tln->schedPolicy = schedMode;
 
    rt_sem_create(&mysync,"Start Experiment",0,S_FIFO);
 
    #if VERBOSE_INFO
    cout << " Generating Task Set ..." << endl;
    #endif
-   tln->readChainsList(inputFile);
-   tln->readTasksList();
+   if(tln->readChainsList(inputFile)) {cout << "Faile to read task chains." << endl; return -1;}
+   if(tln->readTasksList(cpuFactor)) {cout << "Faile to read tasks list." << endl; return -2;};
 
    tln->printTasksInfos();
 
-   tln->createTasks();
-   tln->runTasks();
+   if(tln->createTasks()) {cout << "Faile to create all tasks" << endl; return -3;}
+   if(tln->runTasks()) {cout << "Faile to run all tasks" << endl; return -4;}
 
    if (enableAgent)
    {

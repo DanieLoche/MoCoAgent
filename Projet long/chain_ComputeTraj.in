@@ -2,7 +2,7 @@ name 		        meanET       path 							    wcet      affinity  arguments
 CT_bitcount_S   47          ./bench/bitcnts              237        2         75000 > ./bench/output/output_btcnt_small.txt
 CT_CRC32_S      49          ./bench/crc                  245        2         ./bench/data/large.pcm > ./bench/output/crc_output_large.txt
 CT_dijkstra_L   104         ./bench/dijkstra_large       523        2         ./bench/dijkstra/input.dat > ./bench/output/dijk_output_large.dat
-CT_blowfish_S   61          ./bench/blowfish_small.sh    304        2
-CT_basicmath_L  648           ./bench/basicmath_small      3240       2         > ./bench/output/output_basicmath_small.txt
+CT_blowfish_S   61          ./bench/blowfish_small.sh    304        2         > /dev/null
+CT_basicmath_L  648         ./bench/basicmath_small      3240       2         > ./bench/output/output_basicmath_small.txt
 CT_fft_S        69          ./bench/fft                  344        2         8 32768 > ./bench/output/fft_output_small.txt
 CT_fft_inv_S    69          ./bench/fft                  344        2         8 32768 -i > ./bench/output/ffti_output_small.inv.txt

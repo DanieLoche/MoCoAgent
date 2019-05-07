@@ -288,7 +288,7 @@ void MCAgent::displaySystemInfo(systemRTInfo* sInfos)
   { // Print task Params
       cout << "  |- Task    : "  << taskParam.name            << "\n"
            << "   ‾|- ID      : " << taskParam.id               << "\n"
-           << "     |- Deadline: " << taskParam.deadline /1.0e6  << "\n"
+           << "     |- Period  : " << taskParam.periodicity /1.0e6  << "\n"
            << "     |- WCET    : " << taskParam.wcet /1.0e6      << "\n"
            << "     |- affinity: " << taskParam.affinity         << "\n"
            << "     |- RealTime: " << taskParam.isHardRealTime   << "\n"
@@ -420,7 +420,7 @@ void taskChain::displayTasks()
 taskMonitoringStruct::taskMonitoringStruct(rtTaskInfosStruct* rtTaskInfos)
 {
    xenoTask = rtTaskInfos->task;
-   deadline = rtTaskInfos->deadline;
+   deadline = rtTaskInfos->periodicity;
    rwcet = rtTaskInfos->wcet;
    id = rtTaskInfos->id;
 

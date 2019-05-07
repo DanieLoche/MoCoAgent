@@ -16,11 +16,11 @@ class TaskLauncher
    public :
       int schedPolicy;
       TaskLauncher(string outputFileName);
-      void readChainsList(string);
-      int  readTasksList();
-      void createTasks();
-      void runTasks();
-      void runAgent();
+      int readChainsList(string);
+      int  readTasksList(int cpuPercent);
+      int createTasks();
+      int runTasks();
+      int runAgent();
       void stopTasks(bool);
       void saveData(string);
       void printTasksInfos (/* std::vector<rtTaskInfosStruct> _myTasksInfos*/);

@@ -59,21 +59,21 @@ struct rtTaskInfosStruct
    int affinity;
    int priority;
    RTIME wcet;
-   RTIME deadline;
+   RTIME periodicity;
 
    RT_TASK* task;
 };
 
-struct sortAscendingDeadline {
+struct sortAscendingPeriod {
    inline bool operator() (const rtTaskInfosStruct& struct1, const rtTaskInfosStruct& struct2)
    {
-      return (struct1.deadline < struct2.deadline);
+      return (struct1.periodicity < struct2.periodicity);
    }
 };
-struct sortDescendingDeadline {
+struct sortDescendingPeriod {
    inline bool operator() (const rtTaskInfosStruct& struct1, const rtTaskInfosStruct& struct2)
    {
-      return (struct1.deadline > struct2.deadline);
+      return (struct1.periodicity > struct2.periodicity);
    }
 };
 
