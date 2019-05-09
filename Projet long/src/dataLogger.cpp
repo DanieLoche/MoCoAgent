@@ -1,3 +1,4 @@
+#include "tools.h"
 #include "dataLogger.h"
 
 #include <iomanip>
@@ -100,7 +101,6 @@ void TaskDataLogger::saveData(string file)
   RTIME max_runtime = 0;
   RTIME min_runtime = 1.e9;
   double somme = 0;
-
   for (int i = 0; i < cptExecutions; i++)
   {
     RTIME _dur = execLogs[i].duration;
@@ -112,9 +112,10 @@ void TaskDataLogger::saveData(string file)
            << deadline       << " ; "
            << affinity       << " ; "
            << _dur           << "\n";
+
     somme += _dur;
     if (_dur < min_runtime) min_runtime = _dur;
-    else if (_dur > max_runtime) max_runtime = _dur;
+    if (_dur > max_runtime) max_runtime = _dur;
   }
   myFile.close();
 
@@ -130,7 +131,7 @@ void TaskDataLogger::saveData(string file)
          << "                    " << std::setw(6) <<  cptOutOfDeadline << " | " << cptExecutions << " times" << "\n"
          << "Primary Mode execution time - " << cti.stat.xtime/1.0e6 << " ms. Timeouts : " << cti.stat.timeout << "\n"
          <<         "  MIN  "   << " | " <<        "  AVG  "        << " | " <<      "  MAX"        << "\n"
-         << min_runtime / 1.0e6 << " | " << average_runtime / 1.0e6 << " | " << max_runtime / 1.0e6 << " runtimes (ms)" << "\n"
+         << min_runtime / 1.0e6 << " | " << average_runtime / 1.0e6 << " | " << max_runtime / 1.0e6 << " (ms)" << "\n"
          << "   Mode Switches - " << cti.stat.msw << "\n"
          << "Context Switches - " << cti.stat.csw << "\n"
          << "Cobalt Sys calls - " << cti.stat.xsc
@@ -144,7 +145,7 @@ void ChainDataLogger::saveData(string file)
 {
    RTIME average_runtime = 0;
    RTIME max_runtime = 0;
-   RTIME min_runtime = 1.e9;
+   RTIME min_runtime = 9.e9;
    RTIME sommeTime = 0;
 
    std::ofstream myFile;
@@ -167,9 +168,10 @@ void ChainDataLogger::saveData(string file)
              << std::setw(10) << deadline              << " ; "
              << std::setw(8)  << affinity              << " ; "
              << std::setw(10) << _dur                  << "\n";
+
       sommeTime += _dur;
       if (_dur < min_runtime) min_runtime = _dur;
-      else if (_dur > max_runtime) max_runtime = _dur;
+      if (_dur > max_runtime) max_runtime = _dur;
    }
 
   average_runtime = sommeTime / cptExecutions;

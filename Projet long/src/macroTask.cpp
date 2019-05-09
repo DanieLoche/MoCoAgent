@@ -1,3 +1,4 @@
+#include "tools.h"
 #include "macroTask.h"
 
 #define EXECTIME   2e8   // execution time in ns
@@ -19,8 +20,8 @@ MacroTask::MacroTask(taskRTInfo* _taskRTInfo)
    cout << "I am task : " << curtaskinfo.name << " of priority " << curtaskinfo.prio << endl;
    #endif
    */
-   string chain = std::string(properties->path_task) + " " + properties->arguments;
-   cmd = &chain[0u];
+   chain = std::string(properties->path_task) + " " + properties->arguments;
+   cout << "Command for this task is : " << chain << " ." << endl;
    //cmd = &properties->arguments[0u];
 
    msg.task    = properties->task;
@@ -49,8 +50,9 @@ void MacroTask::proceed()
       // let the task run RUNTIME ns in steps of SPINTIME ns
       //char* cmd;
 //    if (std::string path(properties->path_task) != "/null/")  {
-      //cmd = &properties->arguments[0u];
-      system(cmd);
+      //char* cmd = &properties->arguments[0u];
+      //cout << properties->name << " : " << chain << endl;
+      system(&chain[0u]);
 //    }
 //    else cout << properties->name <<"Oups, no valid path found !" << endl;
 }

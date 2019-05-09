@@ -1,3 +1,4 @@
+#include "tools.h"
 #include "taskLauncher.h"
 #include "sched.h"
 #include "edf.h"
@@ -54,6 +55,7 @@ int TaskLauncher::readChainsList(string input_file)
 
 int TaskLauncher::readTasksList(int cpuPercent)
 {
+   float cpuFactor = cpuPercent/100;
    for(int i=0; i < (int)taskSetInfos.e2eDD.size(); ++i )
    {
       std::ifstream myFile(taskSetInfos.e2eDD[i].Path);
@@ -85,9 +87,10 @@ int TaskLauncher::readTasksList(int cpuPercent)
                { cout << "\033[1;31mFailed to read line\033[0m !" << endl; return -1; } // error
             taskInfo->isHardRealTime = taskSetInfos.e2eDD[i].taskChainID;
             getline(iss , taskInfo->arguments);
+            taskInfo->arguments = reduce(taskInfo->arguments);
             if (schedPolicy != SCHED_RM) taskInfo->priority = 50;
             taskInfo->wcet *= 1.0e6;               // conversion ms to RTIME (ns)
-            taskInfo->periodicity = taskInfo->wcet * cpuPercent/100;
+            taskInfo->periodicity = taskInfo->wcet * cpuFactor;
             strncat(ext, name, 64);
             strcpy(taskInfo->name,ext);
             taskInfo->id = ++cptNumberTasks;

@@ -172,7 +172,7 @@ void MCAgent::setMode(int mode)
 {
    //cout << "[MONITORING & CONTROL AGENT] Change mode to " << ((mode>0)?"OVERLOADED":"NOMINAL") << ". " << endl;
    if (!mode)  runtimeMode = mode;
-   else
+   else if (bestEffortTasks.size() != 0)
    {
       if (mode >= MODE_OVERLOADED && runtimeMode <= MODE_NOMINAL)
       { // Pause Best Effort Tasks sur front montant changement de mode.
@@ -187,7 +187,9 @@ void MCAgent::setMode(int mode)
                printInquireInfo(bestEffortTask);
             }
          }
+         #if VERBOSE_DEBUG // ==1?"OVERLOADED":"NOMINAL"
          cout << "Stopped BE tasks." << endl;
+         #endif
       }
       else if (mode <= MODE_NOMINAL && runtimeMode >= MODE_OVERLOADED)
       { // runtimeMode NOMINAL
@@ -199,7 +201,6 @@ void MCAgent::setMode(int mode)
          #if VERBOSE_DEBUG // ==1?"OVERLOADED":"NOMINAL"
          cout << "Re-started BE tasks." << endl;
          #endif
-
       }
       runtimeMode = mode;
       #if VERBOSE_ASK // ==1?"OVERLOADED":"NOMINAL"

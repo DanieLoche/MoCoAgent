@@ -102,6 +102,13 @@ struct systemRTInfo
   string outputFileName;
 };
 
+std::string trim(const std::string& str,
+                 const std::string& whitespace = " \t");
+
+std::string reduce(const std::string& str,
+                   const std::string& fill = " ",
+                   const std::string& whitespace = " \t");
+
 void printInquireInfo(RT_TASK*);
 void printTaskInfo(rtTaskInfosStruct* task);
 void print_affinity(pid_t _pid);

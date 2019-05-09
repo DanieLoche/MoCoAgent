@@ -21,7 +21,7 @@ LDFLAGS = $(XENO_LDFLAGS) $(LIBS)
 
 ## FILES & FOLDERS ##
 HEADER_FILES = $(shell find $(HDR_DIR) -name "*.h")
-SRC_FILES = $(shell find $(SRC_DIR) -name "*.cpp")
+SRC_FILES = $(shell find ./src -name "*.cpp" -print -o -name "*.c" -print)
 SRC_DIRS = $(shell find . -name "*.cpp" | dirname {} | sort | uniq | sed 's/\/$(SRC_DIR)//g')
 # OBJ_FILES = $(patsubst %.cpp, %.o, $(SRC_FILES))
 OBJ_FILES = $(patsubst $(SRC_DIR)/%.cpp, $(OBJ_DIR)/%.o, $(SRC_FILES))
@@ -31,7 +31,7 @@ OUT_FILES = $(shell find ./bench/output/ -name "*.*")
 all : $(EXEC_NAME)
 
 clean :
-	$(RM) $(OBJ_FILES)
+	$(RM) -i $(OBJ_FILES)
 
 cleanout :
 	$(RM) $(OUT_FILES)

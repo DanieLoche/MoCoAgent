@@ -26,7 +26,7 @@ MCAgent* mca;
 bool enableAgent = TRUE;
 long expeDuration = 0;
 string inputFile = "input_chaine.txt", outputFile = "ExpeOutput.csv2";
-int schedMode = SCHED_FIFO, cpuFactor = 1;
+int schedMode = SCHED_FIFO, cpuFactor = 100;
 
 void RunmcAgentMain(void* arg)
 {
