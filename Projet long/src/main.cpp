@@ -40,7 +40,7 @@ void RunmcAgentMain(void* arg)
 void TaskMain(void* arg)
 {
   taskRTInfo* _taskRTInfo = (taskRTInfo*) arg;
-  MacroTask macroRT(_taskRTInfo);
+  MacroTask macroRT(_taskRTInfo, enableAgent);
   rt_sem_p(&mysync,TM_INFINITE);
   if (_taskRTInfo->rtTI->isHardRealTime == 0) {
     macroRT.executeRun_besteffort();
@@ -80,7 +80,7 @@ int main(int argc, char* argv[])
    // [MoCoAgent Activation] [Experiment duration] [cpuFactor%] [input file : task chains] [outputfile] [sched policy]
    //// "--" to set everything as default.
    if (argc > 1)
-   {
+   { // MoCoAgent activation
       std::stringstream ss(argv[1]);
       if (ss.str() == "-h" || ss.str() == "help" || ss.str() == "--help")
       { // HELP message
@@ -107,7 +107,7 @@ int main(int argc, char* argv[])
          if (argc > 3)
          { // CPU % Factor
             std::stringstream ss(argv[3]);
-            if(sscanf(argv[2], "%d", &cpuFactor) != 1 && ss.str() != "-")
+            if(sscanf(argv[3], "%d", &cpuFactor) != 100 && ss.str() != "-")
             { printf("Error, %s is not an int", argv[3]); return EXIT_FAILURE; }
             if (argc > 4)
             { // INPUT FILE
@@ -134,7 +134,14 @@ int main(int argc, char* argv[])
       }
    }
 
-   cout << "Hey, press a key to start (PID: " << getpid() << ")!" << endl;
+   cout << "Experiment made with parameters : \n"
+      << " MoCoAgent: " << enableAgent << "\n"
+      << "  Duration: " << expeDuration << "\n"
+      << "CPU Factor: " << cpuFactor << "\n"
+      << "Input  file: " << inputFile << "\n"
+      << "Output files: " << outputFile << " & " << "MoCoLogs_" << outputFile << endl;
+
+   cout << "Press a key to start (PID: " << getpid() << ")!" << endl;
    cin.get();
 
    tln = new TaskLauncher(outputFile);
@@ -203,7 +210,7 @@ void printTaskInfo(rtTaskInfosStruct* task)
   ss << "Name: "       << task->name
      << "| path: "     << task->path_task
      << "| is RT ? "   << task->isHardRealTime
-     << "| Deadline: " << task->deadline
+     << "| Deadline: " << task->wcet
      << "| affinity: " << task->affinity
      << "| ID :"       << task->id
      << endl;

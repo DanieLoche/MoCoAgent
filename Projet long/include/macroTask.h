@@ -34,7 +34,7 @@ class MacroTask
     int after();
 
   public :
-    MacroTask(taskRTInfo*);
+    MacroTask(taskRTInfo*, bool);
     void executeRun();
     void executeRun_besteffort();
 

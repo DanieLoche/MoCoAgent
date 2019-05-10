@@ -4,6 +4,8 @@
 #include "edf.h"
 #include "dataLogger.h"
 
+#include <iomanip>
+
 
 TaskLauncher::TaskLauncher(string outputFileName)
 {
@@ -89,7 +91,7 @@ int TaskLauncher::readTasksList(int cpuPercent)
             getline(iss , taskInfo->arguments);
             taskInfo->arguments = reduce(taskInfo->arguments);
             if (schedPolicy != SCHED_RM) taskInfo->priority = 50;
-            taskInfo->wcet *= 1.0e6;               // conversion ms to RTIME (ns)
+            taskInfo->wcet *= 1.0e6;              // conversion ms to RTIME (ns)
             taskInfo->periodicity = taskInfo->wcet * cpuFactor;
             strncat(ext, name, 64);
             strcpy(taskInfo->name,ext);
@@ -252,20 +254,36 @@ void TaskLauncher::stopTasks(bool val)
    }
 }
 
+
 void TaskLauncher::saveData(string file)
 {
    cout << "Stopping Tasks." << endl;
    stopTasks(1);
    sleep (1);
    cout << "Saving tasks data..." << endl;
+   cout << "Checking tasks names :" << endl;
+   int nameMaxSize = 0;
+   for (auto& taskLog : tasksLogsList)
+   {
+      int sizeName = strlen(taskLog->getName());
+      //cout << taskLog->getName() << " - size is : " << sizeName << endl;
+      if (sizeName > nameMaxSize) nameMaxSize = sizeName;
+   }
+   //cout << "Max name size is : " << nameMaxSize << endl;
 
    std::ofstream myFile;
    myFile.open (file);    // TO APPEND :  //,ios_base::app);
-   myFile << "timestamp ; name ; ID ; HRT ; deadline ; affinity ; duration \n";
+   myFile << std::setw(15) << "timestamp" << " ; "
+          << std::setw(nameMaxSize) << "name"     << " ; "
+          << std::setw(2)  << "ID"       << " ; "
+          << std::setw(3)  << "HRT"      << " ; "
+          << std::setw(10) << "deadline" << " ; "
+          << std::setw(4)  << "aff." << " ; "
+          << std::setw(10) << "duration" << "\n";
    myFile.close();
    for (auto& taskLog : tasksLogsList)
    {
-      taskLog->saveData(file);
+      taskLog->saveData(file, nameMaxSize);
    }
 
    if (enableAgent)

@@ -260,7 +260,7 @@ void MCAgent::saveData()
 
     for (auto _taskChain : allTaskChain)
     {
-        _taskChain->logger->saveData(outputFileName);
+        _taskChain->logger->saveData(outputFileName, NULL);
     }
 
 }
