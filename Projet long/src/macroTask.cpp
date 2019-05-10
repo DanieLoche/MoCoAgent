@@ -5,7 +5,7 @@
 #define SPINTIME   1e7   // spin time in ns
 
 
-MacroTask::MacroTask(taskRTInfo* _taskRTInfo)
+MacroTask::MacroTask(taskRTInfo* _taskRTInfo, bool MoCo)
 {
    properties = _taskRTInfo->rtTI;
    dataLogs = _taskRTInfo->taskLog;
@@ -29,17 +29,17 @@ MacroTask::MacroTask(taskRTInfo* _taskRTInfo)
    msg.time    = 0;
    msg.isExecuted = 0;
 
-   MoCoIsAlive = 1;
+   MoCoIsAlive = MoCo;
 
 }
 
 int MacroTask::before()
 {
    msg.time = dataLogs->logStart();
-   msg.isExecuted =0;
+   msg.isExecuted = 0;
    if(MoCoIsAlive && (rt_buffer_write(&bf , &msg , sizeof(monitoringMsg) , 100000) < 0))
    {
-     //MoCoIsAlive = 0;
+      //MoCoIsAlive = 0;
      rt_printf("[%s] : failed to write BEFORE monitoring message to buffer.\n",properties->name);
    }
    return 0;
@@ -49,7 +49,7 @@ void MacroTask::proceed()
 {
       // let the task run RUNTIME ns in steps of SPINTIME ns
       //char* cmd;
-//    if (std::string path(properties->path_task) != "/null/")  {
+      // if (std::string path(properties->path_task) != "/null/")  {
       //char* cmd = &properties->arguments[0u];
       //cout << properties->name << " : " << chain << endl;
       system(&chain[0u]);
@@ -62,12 +62,11 @@ int MacroTask::after()
   #if VERBOSE_OTHER
   rt_printf("End Task  : %s\n",properties->name);
   #endif
-
   msg.time = dataLogs->logExec();
   msg.isExecuted = 1;
   if(MoCoIsAlive && (rt_buffer_write(&bf , &msg , sizeof(monitoringMsg) , 100000) < 0))
   {
-     MoCoIsAlive = 0;
+     //MoCoIsAlive = 0;
      rt_printf("[%s] : failed to write AFTER monitoring message to buffer.\n",properties->name);
   }
   //ChaineInfo_Struct.Wcet_update() ;
@@ -78,13 +77,16 @@ int MacroTask::after()
 
 void MacroTask::executeRun()
   {
-    if( rt_buffer_bind (&bf , "/monitoringTopic", 100000) < 0)
-    {
-      rt_buffer_delete(&bf);
-      rt_printf("%s\n","Failed to link to Monitoring Buffer");
-      MoCoIsAlive = 0;
-      //exit(-1);
-    }
+     if (MoCoIsAlive)
+     {
+        if( rt_buffer_bind (&bf , "/monitoringTopic", 100000) < 0)
+        {
+          rt_buffer_delete(&bf);
+          rt_printf("%s\n","Failed to link to Monitoring Buffer");
+          MoCoIsAlive = 0;
+          //exit(-1);
+        }
+     }
   //cout << "Running..." << endl;
     while (1)
     {
@@ -94,14 +96,15 @@ void MacroTask::executeRun()
       after();  // Inform of execution time for the mcAgent
 
       #if defined SCHED_POLICY  &&  SCHED_POLICY == SCHED_RR
-        //cout << "POLICY IS RR" << endl;
-        rt_task_wait_period(NULL);
+       //cout << "POLICY IS RR" << endl;
+       rt_task_wait_period(NULL);
       #endif
       #if defined SCHED_POLICY  &&  SCHED_POLICY == SCHED_FIFO
-        //cout << "POLICY IS FIFO" << endl;
-        rt_task_yield();
+       //cout << "POLICY IS FIFO" << endl;
+       rt_task_yield();
       #endif
     }
+
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////

@@ -91,7 +91,7 @@ RTIME DataLogger::logExec( )
   return _logTime;
 }
 
-void TaskDataLogger::saveData(string file)
+void TaskDataLogger::saveData(string file, int nameSize)
 {
   std::ofstream myFile;
   myFile.open (file, std::ios::app);    // TO APPEND :  //,ios_base::app);
@@ -105,13 +105,13 @@ void TaskDataLogger::saveData(string file)
   {
     RTIME _dur = execLogs[i].duration;
 
-    myFile << execLogs[i].timestamp << " ; "
-           << name           << " ; "
-           << id             << " ; "
-           << isHardRealTime << " ; "
-           << deadline       << " ; "
-           << affinity       << " ; "
-           << _dur           << "\n";
+    myFile << std::setw(15) << execLogs[i].timestamp << " ; "
+           << std::setw(nameSize) << name           << " ; "
+           << std::setw(2) << id             << " ; "
+           << std::setw(3) << isHardRealTime << " ; "
+           << std::setw(10) << deadline       << " ; "
+           << std::setw(4) << affinity       << " ; "
+           << std::setw(10) << _dur           << "\n";
 
     somme += _dur;
     if (_dur < min_runtime) min_runtime = _dur;
@@ -141,7 +141,7 @@ void TaskDataLogger::saveData(string file)
 
 }
 
-void ChainDataLogger::saveData(string file)
+void ChainDataLogger::saveData(string file, int nameSize)
 {
    RTIME average_runtime = 0;
    RTIME max_runtime = 0;
@@ -151,22 +151,22 @@ void ChainDataLogger::saveData(string file)
    std::ofstream myFile;
    myFile.open (file, std::ios::app);    // TO APPEND :  //,ios_base::app);
 
-   myFile << std::setw(12) << "timestamp" << " ; "
-          << std::setw(10) << "Chain"     << " ; "
+   myFile << std::setw(15) << "timestamp" << " ; "
+          << std::setw(strlen(name)) << "Chain"     << " ; "
           << std::setw(2) << "ID"        << " ; "
           << std::setw(10) << "deadline"  << " ; "
-          << std::setw(8)  << "affinity"  << " ; "
-          << std::setw(20) << "duration"  << "\n";
+          << std::setw(4)  << "aff."  << " ; "
+          << std::setw(10) << "duration"  << "\n";
 
    for (int i = 0; i < cptExecutions; i++)
    {
       RTIME _dur = execLogs[i].duration;
 
-      myFile << std::setw(12) << execLogs[i].timestamp << " ; "
-             << std::setw(10) << name                  << " ; "
+      myFile << std::setw(15) << execLogs[i].timestamp << " ; "
+             << std::setw(strlen(name)) << name                  << " ; "
              << std::setw(2)  << id                    << " ; "
              << std::setw(10) << deadline              << " ; "
-             << std::setw(8)  << affinity              << " ; "
+             << std::setw(4)  << affinity              << " ; "
              << std::setw(10) << _dur                  << "\n";
 
       sommeTime += _dur;
@@ -191,4 +191,9 @@ void ChainDataLogger::saveData(string file)
 
   myFile.close();
 
+}
+
+char* DataLogger::getName()
+{
+   return name;
 }

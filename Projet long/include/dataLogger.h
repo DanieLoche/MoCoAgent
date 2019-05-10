@@ -29,7 +29,9 @@ class DataLogger
     RTIME logStart();
     void logExec(RTIME );
     RTIME logExec();
-    virtual void saveData(string) = 0;
+    virtual void saveData(string, int) = 0;
+
+    char* getName();
 };
 
 class TaskDataLogger : public DataLogger
@@ -39,7 +41,7 @@ class TaskDataLogger : public DataLogger
     int isHardRealTime;
 
     TaskDataLogger(rtTaskInfosStruct*);
-    void saveData(string);
+    void saveData(string, int);
 
 };
 
@@ -49,7 +51,7 @@ class ChainDataLogger : public DataLogger
     int cptAnticipatedMisses;
 
     ChainDataLogger(end2endDeadlineStruct*);
-    void saveData(string);
+    void saveData(string, int);
 
 };
 
