@@ -107,7 +107,7 @@ int main(int argc, char* argv[])
          if (argc > 3)
          { // CPU % Factor
             std::stringstream ss(argv[3]);
-            if(sscanf(argv[3], "%d", &cpuFactor) != 100 && ss.str() != "-")
+            if(sscanf(argv[3], "%d", &cpuFactor) != 1 && ss.str() != "-")
             { printf("Error, %s is not an int", argv[3]); return EXIT_FAILURE; }
             if (argc > 4)
             { // INPUT FILE
