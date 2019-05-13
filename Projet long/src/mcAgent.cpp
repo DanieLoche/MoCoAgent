@@ -249,18 +249,24 @@ void MCAgent::updateTaskInfo(monitoringMsg msg)
 
 void MCAgent::saveData()
 {
+   std::ofstream outputFileResume;
+   string file = "Resume_" + outputFileName;
+   outputFileResume.open (file, std::ios::app);    // TO APPEND :  //,ios_base::app);
    RT_TASK_INFO cti;
    rt_task_inquire(0, &cti);
-   cout << "\n Monitoring and Control Agent Stats : \n"
-        << "Primary Mode execution time - " << cti.stat.xtime/1.0e6 << " ms. Timeouts : " << cti.stat.timeout << "\n"
-        << "   Mode Switches - " << cti.stat.msw << "\n"
-        << "Context Switches - " << cti.stat.csw << "\n"
-        << "Cobalt Sys calls - " << cti.stat.xsc
-        << endl;
+   //"MoCoLogs_" +
+   outputFileResume << "\n Monitoring and Control Agent Stats : \n"
+                    << "Primary Mode execution time - " << cti.stat.xtime/1.0e6 << " ms."
+                    << " Timeouts : " << cti.stat.timeout << "\n"
+                    << "   Mode Switches - " << cti.stat.msw << "\n"
+                    << "Context Switches - " << cti.stat.csw << "\n"
+                    << "Cobalt Sys calls - " << cti.stat.xsc
+                    << endl;
+   outputFileResume.close();
 
     for (auto _taskChain : allTaskChain)
     {
-        _taskChain->logger->saveData(outputFileName, NULL);
+        _taskChain->logger->saveData(outputFileName, 0);
     }
 
 }

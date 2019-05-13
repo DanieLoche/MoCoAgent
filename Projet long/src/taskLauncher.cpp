@@ -18,7 +18,7 @@ TaskLauncher::TaskLauncher(string outputFileName)
    trigA = 0;
    triggerSave = trigA;
    taskSetInfos.triggerSave = &triggerSave;
-   taskSetInfos.outputFileName = "MoCoLogs_" + outputFileName;
+   taskSetInfos.outputFileName = outputFileName;
 }
 
 int TaskLauncher::readChainsList(string input_file)
@@ -57,7 +57,8 @@ int TaskLauncher::readChainsList(string input_file)
 
 int TaskLauncher::readTasksList(int cpuPercent)
 {
-   float cpuFactor = cpuPercent/100;
+   float cpuFactor = cpuPercent/100.0;
+   cout << "CPU FACTOR IS : " << cpuFactor << endl;
    for(int i=0; i < (int)taskSetInfos.e2eDD.size(); ++i )
    {
       std::ifstream myFile(taskSetInfos.e2eDD[i].Path);
@@ -159,7 +160,7 @@ int TaskLauncher::createTasks()
          #endif
          if ((ret = rt_task_set_priority(taskInfo.task, taskInfo.priority)))
             { cout << "Set_Priority Error : " << ret << " ." << endl; return -4; }
-/*
+         /* Gestion EDF Scheduling
          RT_TASK_INFO curtaskinfo;
          rt_task_inquire(taskInfo->task, &curtaskinfo);
 
@@ -272,7 +273,8 @@ void TaskLauncher::saveData(string file)
    //cout << "Max name size is : " << nameMaxSize << endl;
 
    std::ofstream myFile;
-   myFile.open (file);    // TO APPEND :  //,ios_base::app);
+   string dataFileName = "Expe_" + file;
+   myFile.open (dataFileName);    // TO APPEND :  //,ios_base::app);
    myFile << std::setw(15) << "timestamp" << " ; "
           << std::setw(nameMaxSize) << "name"     << " ; "
           << std::setw(2)  << "ID"       << " ; "
