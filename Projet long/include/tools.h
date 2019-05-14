@@ -6,7 +6,7 @@
 //define    SCHED_EDF       6 // Not Implemented
 #define     SCHED_RM        7 // Rate-Monotonic
 
-#define   SCHED_POLICY      SCHED_RR
+#define   SCHED_POLICY      SCHED_FIFO
 #define   RR_SLICE_TIME     20000e6  // clock ticks (=ns)
 
 #define   VERBOSE_INFO      1 // Cout d'informations, démarrage, etc...

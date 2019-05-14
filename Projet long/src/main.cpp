@@ -134,15 +134,22 @@ int main(int argc, char* argv[])
       }
    }
 
+   std::ofstream outputFileResume;
+   string outputFileName = "Resume_" + outputFile;
+   outputFileResume.open (outputFileName, std::ios::app);    // TO APPEND :  //,ios_base::app);
    cout << "Experiment made with parameters : \n"
       << " MoCoAgent: " << enableAgent << "\n"
       << "  Duration: " << expeDuration << "\n"
       << "CPU Factor: " << cpuFactor << "\n"
       << "Input  file: " << inputFile << "\n"
-      << "Output files: " << outputFile << " & " << "MoCoLogs_" << outputFile << endl;
+      << "Output files: " << "Chains_" << outputFile << " & "
+                          << "MoCoLogs_" << outputFile
+                          << "Resume_" << outputFile << endl;
+
+   outputFileResume.close();
 
    cout << "Press a key to start (PID: " << getpid() << ")!" << endl;
-   cin.get();
+   //cin.get();
 
    tln = new TaskLauncher(outputFile);
    tln->schedPolicy = schedMode;

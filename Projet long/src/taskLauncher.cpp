@@ -12,7 +12,7 @@ TaskLauncher::TaskLauncher(string outputFileName)
    enableAgent = 0;
    //triggerSaveAgent = 0;
    cptNumberTasks =0;
-   schedPolicy = SCHED_FIFO;
+   //schedPolicy = SCHED_FIFO;
 
    bool trigA = new bool();
    trigA = 0;
@@ -109,7 +109,7 @@ int TaskLauncher::readTasksList(int cpuPercent)
       { // Changer les niveaux de priorité si on schedule en RM.
          cout << "Updating task informations to use Rate-Monotinic Scheduling." << endl;
          std::sort(taskSetInfos.rtTIs.begin(), taskSetInfos.rtTIs.end(), sortAscendingPeriod());
-         int prio = 1;
+         int prio = 10;
          RTIME lastPeriod = taskSetInfos.rtTIs[0].periodicity;
          for (auto taskInfo = taskSetInfos.rtTIs.begin(); taskInfo != taskSetInfos.rtTIs.end(); ++taskInfo)
          {
@@ -219,7 +219,7 @@ int TaskLauncher::runAgent()
    #if VERBOSE_INFO
    cout << endl << "LAUNCHING MoCoAgent." << endl;
    #endif
-   if( rt_task_create(&mcAgent, "MoCoAgent", 0, 2, 0))
+   if( rt_task_create(&mcAgent, "MoCoAgent", 0, 99, 0))
    {
       cout << "Error creating Monitoring and Control Agent" << endl;
       return -1;
@@ -332,6 +332,7 @@ void TaskLauncher::printTasksInfos ( ) // std::vector<rtTaskInfosStruct> _myTask
       << "| Period: " << taskInfo.periodicity/1.0e6
       << "| Deadline: " << taskInfo.wcet/1.0e6
       << "| affinity: " << taskInfo.affinity
+      << "| priority: " << taskInfo.priority
       << "| ID :"<< taskInfo.id << endl;
 
    }
