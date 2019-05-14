@@ -1,0 +1,52 @@
+
+Running summary for task RT_VR_stringsearch_L. (22649, 1, RT_VR_stringsearch_L)
+Deadline : 153.6 ms.  Missed | Executions 
+                       243 | 245 times
+Primary Mode execution time - 1.42394 ms. Timeouts : 0
+  MIN   |   AVG   |   MAX
+5.22852 | 2438.62 | 14874.5 (ms)
+   Mode Switches - 249
+Context Switches - 252
+Cobalt Sys calls - 506
+
+Running summary for task RT_VR_bitcount_S. (22650, 2, RT_VR_bitcount_S)
+Deadline : 189.6 ms.  Missed | Executions 
+                       278 | 279 times
+Primary Mode execution time - 1.60035 ms. Timeouts : 0
+  MIN   |   AVG   |   MAX
+11.8161 | 2141.42 | 5999.16 (ms)
+   Mode Switches - 283
+Context Switches - 287
+Cobalt Sys calls - 576
+
+Running summary for task RT_VR_gsm_L. (22651, 3, RT_VR_gsm_L)
+Deadline : 1788 ms.  Missed | Executions 
+                        69 | 351 times
+Primary Mode execution time - 1.93565 ms. Timeouts : 0
+  MIN   |   AVG   |   MAX
+76.1852 | 1702.12 | 5477.27 (ms)
+   Mode Switches - 355
+Context Switches - 358
+Cobalt Sys calls - 719
+
+Running summary for task RT_VR_basicmath_L. (22652, 4, RT_VR_basicmath_L)
+Deadline : 2592 ms.  Missed | Executions 
+                        29 | 600 times
+Primary Mode execution time - 3.68997 ms. Timeouts : 0
+  MIN   |   AVG   |   MAX
+450.719 | 999.363 | 5478.99 (ms)
+   Mode Switches - 604
+Context Switches - 612
+Cobalt Sys calls - 1226
+
+ Monitoring and Control Agent Stats : 
+Primary Mode execution time - 291.872 ms. Timeouts : 0
+   Mode Switches - 15
+Context Switches - 156607
+Cobalt Sys calls - 150029
+
+Running summary for Chain VoiceRecognition. ( 4 )
+Deadline : 10000 ms. Anticipated Misses |  Missed  |  Chain loops 
+                                    26 |          1 | 245 times
+  MIN   |   AVG   |   MAX
+542.114 | 2438.62 | 14874.5 runtimes (ms)

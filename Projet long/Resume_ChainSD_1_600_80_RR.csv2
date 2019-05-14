@@ -1,0 +1,62 @@
+
+Running summary for task RT_SDP_bitcount_S. (2518, 50, RT_SDP_bitcount_S)
+Deadline : 189.6 ms.  Missed | Executions 
+                      1713 | 1716 times
+Primary Mode execution time - 7.6039 ms. Timeouts : 0
+  MIN   |   AVG   |   MAX
+166.404 | 349.639 | 1569.2 (ms)
+   Mode Switches - 1720
+Context Switches - 1728
+Cobalt Sys calls - 3451
+
+Running summary for task RT_SDP_fft_S. (2519, 50, RT_SDP_fft_S)
+Deadline : 275.2 ms.  Missed | Executions 
+                      1711 | 1717 times
+Primary Mode execution time - 8.97657 ms. Timeouts : 0
+  MIN   |   AVG   |   MAX
+135.121 | 349.436 | 1578.47 (ms)
+   Mode Switches - 1721
+Context Switches - 1746
+Cobalt Sys calls - 3479
+
+Running summary for task RT_SDP_CRC32_L. (2520, 50, RT_SDP_CRC32_L)
+Deadline : 3551.2 ms.  Missed | Executions 
+                         0 | 1718 times
+Primary Mode execution time - 8.863 ms. Timeouts : 0
+  MIN   |   AVG   |   MAX
+144.948 | 349.231 | 1421.9 (ms)
+   Mode Switches - 1722
+Context Switches - 1733
+Cobalt Sys calls - 3458
+
+Running summary for task RT_SDP_basicmath_S. (2521, 50, RT_SDP_basicmath_S)
+Deadline : 231.2 ms.  Missed | Executions 
+                      1714 | 1720 times
+Primary Mode execution time - 7.63891 ms. Timeouts : 0
+  MIN   |   AVG   |   MAX
+34.0897 | 348.828 | 1416.38 (ms)
+   Mode Switches - 1724
+Context Switches - 1778
+Cobalt Sys calls - 3525
+
+Running summary for task RT_SDP_qsort_L. (2522, 50, RT_SDP_qsort_L)
+Deadline : 555.2 ms.  Missed | Executions 
+                        30 | 1720 times
+Primary Mode execution time - 8.61065 ms. Timeouts : 0
+  MIN   |   AVG   |   MAX
+105.45 | 348.827 | 1423.91 (ms)
+   Mode Switches - 1724
+Context Switches - 1742
+Cobalt Sys calls - 3473
+
+ Monitoring and Control Agent Stats : 
+Primary Mode execution time - 459.001 ms. Timeouts : 0
+   Mode Switches - 17
+Context Switches - 176848
+Cobalt Sys calls - 149992
+
+Running summary for Chain SignalDataProcessing. ( 1 )
+Deadline : 10000 ms. Anticipated Misses |  Missed  |  Chain loops 
+                                     0 |          0 | 1714 times
+  MIN   |   AVG   |   MAX
+34.0897 | 350.049 | 1578.47 runtimes (ms)

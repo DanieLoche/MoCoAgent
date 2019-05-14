@@ -1,0 +1,62 @@
+
+Running summary for task RT_DE_bitcount_S. (20189, 1, RT_DE_bitcount_S)
+Deadline : 189.6 ms.  Missed | Executions 
+                       953 | 956 times
+Primary Mode execution time - 5.41356 ms. Timeouts : 0
+  MIN   |   AVG   |   MAX
+11.6624 | 619.45 | 22147.4 (ms)
+   Mode Switches - 960
+Context Switches - 966
+Cobalt Sys calls - 1933
+
+Running summary for task RT_DE_CRC32_S. (20190, 2, RT_DE_CRC32_S)
+Deadline : 196 ms.  Missed | Executions 
+                       947 | 965 times
+Primary Mode execution time - 5.32998 ms. Timeouts : 0
+  MIN   |   AVG   |   MAX
+10.764 | 613.645 | 22147.3 (ms)
+   Mode Switches - 969
+Context Switches - 972
+Cobalt Sys calls - 1947
+
+Running summary for task RT_DE_basicmath_S. (20191, 3, RT_DE_basicmath_S)
+Deadline : 231.2 ms.  Missed | Executions 
+                       756 | 1033 times
+Primary Mode execution time - 6.02173 ms. Timeouts : 0
+  MIN   |   AVG   |   MAX
+18.1375 | 573.242 | 22147.3 (ms)
+   Mode Switches - 1037
+Context Switches - 1047
+Cobalt Sys calls - 2099
+
+Running summary for task RT_DE_blowfish_S. (20192, 4, RT_DE_blowfish_S)
+Deadline : 243.2 ms.  Missed | Executions 
+                       491 | 1255 times
+Primary Mode execution time - 7.0579 ms. Timeouts : 0
+  MIN   |   AVG   |   MAX
+20.6325 | 475.463 | 12300.9 (ms)
+   Mode Switches - 1259
+Context Switches - 1263
+Cobalt Sys calls - 2529
+
+Running summary for task RT_DE_patricia_L. (20193, 5, RT_DE_patricia_L)
+Deadline : 3352 ms.  Missed | Executions 
+                         1 | 3163 times
+Primary Mode execution time - 19.2305 ms. Timeouts : 0
+  MIN   |   AVG   |   MAX
+133.785 | 189.65 | 4845.56 (ms)
+   Mode Switches - 3167
+Context Switches - 3180
+Cobalt Sys calls - 6363
+
+ Monitoring and Control Agent Stats : 
+Primary Mode execution time - 391.504 ms. Timeouts : 0
+   Mode Switches - 17
+Context Switches - 180115
+Cobalt Sys calls - 150012
+
+Running summary for Chain DatabaseEncryption. ( 3 )
+Deadline : 10000 ms. Anticipated Misses |  Missed  |  Chain loops 
+                                    21 |         21 | 956 times
+  MIN   |   AVG   |   MAX
+182.479 | 619.45 | 22147.4 runtimes (ms)

@@ -1,0 +1,62 @@
+
+Running summary for task RT_DE_bitcount_S. (22291, 50, RT_DE_bitcount_S)
+Deadline : 189.6 ms.  Missed | Executions 
+                        51 | 3131 times
+Primary Mode execution time - 33.983 ms. Timeouts : 0
+  MIN   |   AVG   |   MAX
+10.8927 | 24.2729 | 804.69 (ms)
+   Mode Switches - 3134
+Context Switches - 6216
+Cobalt Sys calls - 12494
+
+Running summary for task RT_DE_CRC32_S. (22292, 50, RT_DE_CRC32_S)
+Deadline : 196 ms.  Missed | Executions 
+                        48 | 3029 times
+Primary Mode execution time - 32.5559 ms. Timeouts : 0
+  MIN   |   AVG   |   MAX
+10.0645 | 23.486 | 804.605 (ms)
+   Mode Switches - 3032
+Context Switches - 6013
+Cobalt Sys calls - 12077
+
+Running summary for task RT_DE_patricia_L. (22293, 50, RT_DE_patricia_L)
+Deadline : 3352 ms.  Missed | Executions 
+                         0 | 181 times
+Primary Mode execution time - 2.10871 ms. Timeouts : 0
+  MIN   |   AVG   |   MAX
+135.129 | 149.417 | 443.682 (ms)
+   Mode Switches - 184
+Context Switches - 367
+Cobalt Sys calls - 736
+
+Running summary for task RT_DE_blowfish_S. (22294, 50, RT_DE_blowfish_S)
+Deadline : 243.2 ms.  Missed | Executions 
+                        47 | 2452 times
+Primary Mode execution time - 25.6613 ms. Timeouts : 0
+  MIN   |   AVG   |   MAX
+19.6222 | 37.2991 | 777.609 (ms)
+   Mode Switches - 2455
+Context Switches - 4862
+Cobalt Sys calls - 9776
+
+Running summary for task RT_DE_basicmath_S. (22295, 50, RT_DE_basicmath_S)
+Deadline : 231.2 ms.  Missed | Executions 
+                        50 | 2575 times
+Primary Mode execution time - 28.1295 ms. Timeouts : 0
+  MIN   |   AVG   |   MAX
+17.4347 | 32.6427 | 794.022 (ms)
+   Mode Switches - 2578
+Context Switches - 5103
+Cobalt Sys calls - 10267
+
+ Monitoring and Control Agent Stats : 
+Primary Mode execution time - 357.496 ms. Timeouts : 0
+   Mode Switches - 17
+Context Switches - 193766
+Cobalt Sys calls - 150028
+
+Running summary for Chain DatabaseEncryption. ( 3 )
+Deadline : 10000 ms. Anticipated Misses |  Missed  |  Chain loops 
+                                     0 |          0 | 181 times
+  MIN   |   AVG   |   MAX
+202.804 | 3271.88 | 3631.83 runtimes (ms)
