@@ -227,7 +227,7 @@ int TaskLauncher::runAgent()
    else
    {
       enableAgent = 1;
-      rt_task_affinity(&mcAgent, 3, 0);
+      rt_task_affinity(&mcAgent, 0, 0);
 
       //  systemRTInfo ch_taks ;
       rt_task_start(&mcAgent, RunmcAgentMain, &taskSetInfos);

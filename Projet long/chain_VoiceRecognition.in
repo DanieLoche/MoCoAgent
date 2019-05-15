@@ -1,4 +1,4 @@
-name 		          meanET     path 							    wcet      affinity  arguments
+name 		       meanET     path 					        wcet      affinity  arguments
 VR_bitcount_S      47          ./bench/bitcnts              237        1         75000 > ./bench/output/output_btcnt_small.txt
 VR_gsm_L           447         ./bench/gsm_large.sh         2235       1
 VR_basicmath_L     648         ./bench/basicmath_large      3240       1         > ./bench/output/output_basicmath_small.txt

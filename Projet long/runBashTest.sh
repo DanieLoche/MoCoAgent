@@ -15,7 +15,7 @@
 
 commentaire="//"
 file=$1
-if [ $# == 1 ] && test -f $1
+if(( $# >= 1 )) && test -f $1
 then
     for toExecute in {2..6} # exécuter toutes les chaines
     do
@@ -33,9 +33,9 @@ then
             numLigne=`expr $numLigne + 1`
         done < $1 > inputFile
         #echo "Name is "$name
-        ./MoCoAgent.out true 600 80 ./inputFile Chain2${name}_1_600_80_RM.csv2 FIFO
+        ./MoCoAgent.out true 600 80 ./inputFile Chain2${name}_1_600_80_${2}.csv2 $2
         rm ./bench/output/*
-        ./MoCoAgent.out false 600 80 ./inputFile Chain2${name}_0_600_80_RM.csv2 FIFO
+        ./MoCoAgent.out false 600 80 ./inputFile Chain2${name}_0_600_80_${2}.csv2 $2
         rm ./bench/output/*
         rm -f ./inputFile
     done
