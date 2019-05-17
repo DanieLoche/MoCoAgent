@@ -137,7 +137,7 @@ int main(int argc, char* argv[])
    std::ofstream outputFileResume;
    string outputFileName = "Resume_" + outputFile;
    outputFileResume.open (outputFileName, std::ios::app);    // TO APPEND :  //,ios_base::app);
-   cout << "Experiment made with parameters : \n"
+   outputFileResume << "Experiment made with parameters : \n"
       << " MoCoAgent: " << enableAgent  << "\n"
       << "  Duration: " << expeDuration << "\n"
       << "CPU Factor: " << cpuFactor    << "\n"
