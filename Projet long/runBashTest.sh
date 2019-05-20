@@ -15,7 +15,8 @@
 
 commentaire="//"
 file=$1
-if(( $# >= 1 )) && test -f $1
+schedPolicy=$2
+if(( $# >= 1 )) && test -f $file
 then
     for toExecute in {2..6} # exécuter toutes les chaines
     do
@@ -31,11 +32,14 @@ then
                 echo "${commentaire}$line"
             fi
             numLigne=`expr $numLigne + 1`
-        done < $1 > inputFile
+        done < $file > inputFile
         #echo "Name is "$name
-        ./MoCoAgent.out true 600 80 ./inputFile Chain2${name}_1_600_80_${2}.csv2 $2
+        sudo sar -o ./Experimentations/Expe_16-05/IODatas${name}_1_600_80_${schedPolicy} -P 0,1,2,3 1 600 > /dev/null 2>&1 & 
+        ./MoCoAgent.out true  600 80 ./inputFile Chain2${name}_1_600_80_${schedPolicy}.csv2 $schedPolicy
         rm ./bench/output/*
-        ./MoCoAgent.out false 600 80 ./inputFile Chain2${name}_0_600_80_${2}.csv2 $2
+
+        sudo sar -o ./Experimentations/Expe_16-05/IODatas${name}_0_600_80_${schedPolicy} -P 0,1,2,3 1 600 > /dev/null 2>&1 & 
+        ./MoCoAgent.out false 600 80 ./inputFile Chain2${name}_0_600_80_${schedPolicy}.csv2 $schedPolicy    
         rm ./bench/output/*
         rm -f ./inputFile
     done
