@@ -10,7 +10,6 @@ ChainDataLogger::ChainDataLogger(end2endDeadlineStruct* chainInfos)
 {
   strcpy(name, chainInfos->name);
   id = chainInfos->taskChainID;
-  affinity = 0;
   deadline = chainInfos->deadline;
 
   cptAnticipatedMisses = 0;
@@ -175,7 +174,6 @@ void ChainDataLogger::saveData(string file, int nameSize)
                      << std::setw(strlen(name)) << name        << " ; "
                      << std::setw(2)            << id          << " ; "
                      << std::setw(10)           << deadline    << " ; "
-                     << std::setw(4)            << affinity    << " ; "
                      << std::setw(10)           << _dur        << "\n";
 
       sommeTime += _dur;

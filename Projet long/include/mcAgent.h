@@ -29,11 +29,11 @@ class taskMonitoringStruct
 {
   private :
     RT_MUTEX mtx_taskStatus;
-    bool isExecuted;   // Run-time - computed
+    bool isExecuted; // Run-time - computed
 
   public :
     taskMonitoringStruct(rtTaskInfosStruct* rtTaskInfos);
-
+    int precedencyID;
     RT_TASK* xenoTask;
     int id;
     //RTIME endTime;     // Run-time - received
@@ -66,6 +66,7 @@ class taskChain
     //double slackTime;
     std::vector<taskMonitoringStruct> taskList;
 
+    bool checkPrecedency(int taskID);
     bool checkTaskE2E();
     bool checkIfEnded();
     void resetChain();

@@ -76,7 +76,7 @@ void MCAgent::initMoCoAgent(systemRTInfo* sInfos)
 
 void MCAgent::initCommunications()
 {
-   rt_buffer_create(&bf, "/monitoringTopic", 10*sizeof(monitoringMsg), B_FIFO);
+   rt_buffer_create(&bf, "/monitoringTopic", 20*sizeof(monitoringMsg), B_FIFO);
    // u_int flagMask = 0;
    rt_event_create(&mode_change_flag, "/modeChangeTopic", 0, EV_PRIO);
 }
@@ -216,35 +216,36 @@ void MCAgent::updateTaskInfo(monitoringMsg msg)
    // RT_TASK_INFO curtaskinfo;
    // rt_task_inquire((RT_TASK*) msg.task, &curtaskinfo);
    // cout << "Update from task : " << curtaskinfo.name<<" ("<< msg.ID << ") - " << msg.isExecuted << " T=" << msg.time/1e6 << endl;
-  for (auto& _taskChain : allTaskChain)
-  {
-      for (auto& task : _taskChain->taskList)
+   // printInquireInfo((RT_TASK*) msg.task);
+   for (auto& _taskChain : allTaskChain)
+   {
+      for (auto& _task : _taskChain->taskList)
       {
-        if( task.id == msg.ID)
-        {
-          if (msg.isExecuted)
-          {
-            //task.endTime = msg.time;
-            task.setState(TRUE);
-            _taskChain->currentEndTime = std::max(_taskChain->currentEndTime, msg.time);
-            if (_taskChain->checkIfEnded())
-            {
                //cout << "Logged chain end at : " << _taskChain->currentEndTime/1.0e6 << endl;
-               _taskChain->logger->logExec(_taskChain->currentEndTime);
-               if (_taskChain->isAtRisk) setMode(MODE_NOMINAL);
-               _taskChain->resetChain();
-            }
-          }
-          else if (_taskChain->startTime == 0)
-          {
-            _taskChain->startTime = msg.time;
-            _taskChain->logger->logStart(msg.time);
             //cout << "Logged chain start at : " << msg.time/1.0e6 << endl;
-          }
-          return;
-        }
-    }
-  }
+         if( _task.id == msg.ID )
+         {
+             if (_task.precedencyID == 0 && _taskChain->startTime == 0)
+             { // First task of the chain
+                _taskChain->startTime = msg.time;
+                _taskChain->logger->logStart(msg.time);
+                _task.setState(TRUE);
+             }
+             else if (msg.isExecuted && _taskChain->checkPrecedency(_task.precedencyID))
+             { // Next task of the chain
+               _taskChain->currentEndTime = std::max(_taskChain->currentEndTime, msg.time);
+               _task.setState(TRUE);
+               if (_taskChain->checkIfEnded())
+               {
+                  _taskChain->logger->logExec(_taskChain->currentEndTime);
+                  if (_taskChain->isAtRisk) setMode(MODE_NOMINAL);
+                  _taskChain->resetChain();
+               }
+             }
+             return;
+         }
+      }
+   }
 }
 
 void MCAgent::saveData()
@@ -346,31 +347,40 @@ bool taskChain::checkTaskE2E()
       miss = ( execTime + Wmax + t_RT + remTime > end2endDeadline );
       //cout << "Exec Time : " << execTime/1e6 << " | Rem Time : " << remTime/1e6 << " | Deadline : " << end2endDeadline/1e6 << endl;
    }
-  //if (miss) cptAnticipatedMisses++;
-  return (miss);
+   //if (miss) cptAnticipatedMisses++;
+   return (miss);
+}
+
+bool taskChain::checkPrecedency(int _id)
+{ // Attention ! Précédence entre tâche géré que avec une tâche antérieure..!
+   bool isOkay = FALSE;
+   for (auto& task : taskList)
+   { // Plus simple à coder..!
+      isOkay = isOkay || ((task.id == _id) && task.getState());
+   }
+   return isOkay;
 }
 
 bool taskChain::checkIfEnded()
 {
-  bool ended = TRUE;
-  for (auto& task : taskList)
-  { // only one FALSE is enough
+   bool ended = TRUE;
+   for (auto& task : taskList)
+   { // only one FALSE is enough
     ended = ended & task.getState();
-  }
-
-  return ended;
+   }
+   return ended;
 }
 
-inline void taskChain::resetChain()
+void taskChain::resetChain()
 {
-  for (auto& task : taskList)
-  {
-    task.setState(FALSE);
-    //task.endTime = 0;
-  }
-  if (isAtRisk) isAtRisk = FALSE;
-  startTime = 0;
-  currentEndTime = 0;
+   for (auto& task : taskList)
+   {
+      task.setState(FALSE);
+      //task.endTime = 0;
+   }
+   if (isAtRisk) isAtRisk = FALSE;
+   startTime = 0;
+   currentEndTime = 0;
 }
 
 RTIME taskChain::getExecutionTime()
@@ -430,6 +440,7 @@ taskMonitoringStruct::taskMonitoringStruct(rtTaskInfosStruct* rtTaskInfos)
    deadline = rtTaskInfos->periodicity;
    rwcet = rtTaskInfos->wcet;
    id = rtTaskInfos->id;
+   precedencyID = rtTaskInfos->precedency;
 
    setState(FALSE);
    //endTime = 0;

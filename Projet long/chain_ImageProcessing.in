@@ -1,9 +1,9 @@
-name 		         meanET   path                        wcet      affinity  arguments
-IP_susan_L_smooth    50      ./bench/susan_bin            250        1         ./bench/susan/input_large.pgm ./bench/output/susan_output_large.smoothing.pgm -s
-IP_susan_L_edges     50      ./bench/susan_bin            250        1         ./bench/susan/input_large.pgm ./bench/output/susan_output_large.edges.pgm -e
-IP_susan_L_corners   44      ./bench/susan_bin            240        1         ./bench/susan/input_large.pgm ./bench/output/susan_output_large.corners.pgm -c
-IP_jpeg_L       	 77      ./bench/jpeg_large.sh        384        1
-IP_adpcm_S           79      ./bench/adpcm_small.sh       397        1
-IP_bitcount_L        197 	 ./bench/bitcnts              984        1         1125000 > ./bench/output/output_btcnt_large.txt
-IP_basicmath_S  	 58      ./bench/basicmath_small      289        1         > ./bench/output/output_basicmath_small.txt
-IP_dijkstra_S        53      ./bench/dijkstra_small       267        1         ./bench/dijkstra/input.dat > ./bench/output/dijk_output_small.dat
+ID  name 		        meanET  wcet  isHRT aff  prec   path                     arguments
+1  IP_susan_L_smooth    50     250   1     1    1     ./bench/susan_bin         ./bench/susan/input_large.pgm ./bench/output/susan_output_large.smoothing.pgm -s
+2  IP_susan_L_edges     50     250   1     1    1     ./bench/susan_bin         ./bench/susan/input_large.pgm ./bench/output/susan_output_large.edges.pgm -e
+3  IP_susan_L_corners   44     240   1     1    1     ./bench/susan_bin         ./bench/susan/input_large.pgm ./bench/output/susan_output_large.corners.pgm -c
+4  IP_jpeg_L       	   77     384   1     1    1     ./bench/jpeg_large.sh
+5  IP_adpcm_S           79     397   1     1    1     ./bench/adpcm_small.sh
+6  IP_bitcount_L        197    984   1     1    1     ./bench/bitcnts           1125000 > ./bench/output/output_btcnt_large.txt
+7  IP_basicmath_S  	   58     289   1     1    1     ./bench/basicmath_small   > ./bench/output/output_basicmath_small.txt
+8  IP_dijkstra_S        53     267   1     1    1     ./bench/dijkstra_small    ./bench/dijkstra/input.dat > ./bench/output/dijk_output_small.dat

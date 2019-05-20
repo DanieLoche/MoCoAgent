@@ -15,7 +15,6 @@ class DataLogger
   protected :
     char name[32];
     int id;
-    int affinity;
     RTIME deadline;
 
   public :
@@ -36,12 +35,14 @@ class DataLogger
 
 class TaskDataLogger : public DataLogger
 {
-  public :
-    RT_TASK* task;
-    int isHardRealTime;
+   private:
+      int affinity;
+   public :
+      RT_TASK* task;
+      int isHardRealTime;
 
-    TaskDataLogger(rtTaskInfosStruct*);
-    void saveData(string, int);
+      TaskDataLogger(rtTaskInfosStruct*);
+      void saveData(string, int);
 
 };
 

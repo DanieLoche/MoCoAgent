@@ -10,9 +10,6 @@
 TaskLauncher::TaskLauncher(string outputFileName)
 {
    enableAgent = 0;
-   //triggerSaveAgent = 0;
-   cptNumberTasks =0;
-   //schedPolicy = SCHED_FIFO;
 
    bool trigA = new bool();
    trigA = 0;
@@ -82,22 +79,26 @@ int TaskLauncher::readTasksList(int cpuPercent)
          if (str.substr(0,2) != "//")
          {
             char name[28];
-            if (!(iss >> name
+            if (!(iss >> taskInfo->id >> name
                       >> taskInfo->periodicity     // placeholder.
-                      >> taskInfo->path_task
                       >> taskInfo->wcet
-                      >> taskInfo->affinity ) )
+                      >> taskInfo->isHardRealTime
+                      >> taskInfo->affinity
+                      >> taskInfo->precedency
+                      >> taskInfo->path_task ) )
                { cout << "\033[1;31mFailed to read line\033[0m !" << endl; return -1; } // error
-            taskInfo->isHardRealTime = taskSetInfos.e2eDD[i].taskChainID;
+            //taskInfo->isHardRealTime = taskSetInfos.e2eDD[i].taskChainID;
             getline(iss , taskInfo->arguments);
             taskInfo->arguments = reduce(taskInfo->arguments);
-            if (schedPolicy != SCHED_RM) taskInfo->priority = 50;
+            taskInfo->priority = 50;
+            // Traitement de la périodicité de la tâche
             taskInfo->wcet *= 1.0e6;              // conversion ms to RTIME (ns)
             taskInfo->periodicity = taskInfo->wcet * cpuFactor;
+            // Traitement du nom de la tâche
             strncat(ext, name, 64);
             strcpy(taskInfo->name,ext);
-            taskInfo->id = ++cptNumberTasks;
-            //printTaskInfo(&taskInfo);
+            //printTaskInfo(&taskInfo); // Résumé
+
             taskSetInfos.rtTIs.push_back(*taskInfo);
          }
          #if VERBOSE_ASK

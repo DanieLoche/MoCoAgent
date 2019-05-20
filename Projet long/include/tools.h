@@ -54,9 +54,10 @@ struct rtTaskInfosStruct
    char name[32];
    char path_task[128];
    string arguments;
-   int isHardRealTime;
+   int isHardRealTime;     // task chain ID or best effort if null
    int id;
    int affinity;
+   int precedency;
    int priority;
    RTIME wcet;
    RTIME periodicity;

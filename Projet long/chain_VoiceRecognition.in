@@ -1,5 +1,5 @@
-name 		       meanET     path 					        wcet      affinity  arguments
-VR_bitcount_S      47          ./bench/bitcnts              237        1         75000 > ./bench/output/output_btcnt_small.txt
-VR_gsm_L           447         ./bench/gsm_large.sh         2235       1
-VR_basicmath_L     648         ./bench/basicmath_large      3240       1         > ./bench/output/output_basicmath_small.txt
-VR_stringsearch_L  38          ./bench/search_large         192        1         >  ./bench/output/output_search_large
+ID  name 		        meanET  wcet    isHRT aff  prec path                    arguments
+1   VR_bitcount_S      47      237     1     1    0    ./bench/bitcnts         75000 > ./bench/output/output_btcnt_small.txt
+2   VR_gsm_L           447     2235    1     1    1    ./bench/gsm_large.sh
+3   VR_basicmath_L     648     3240    1     1    2    ./bench/basicmath_large > ./bench/output/output_basicmath_small.txt
+4   VR_stringsearch_L  38      192     1     1    3    ./bench/search_large    >  ./bench/output/output_search_large

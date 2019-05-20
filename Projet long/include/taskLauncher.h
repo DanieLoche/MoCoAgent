@@ -4,7 +4,6 @@
 class TaskLauncher
 {
    private :
-      int cptNumberTasks ;
       systemRTInfo taskSetInfos;
       std::vector<DataLogger*> tasksLogsList;
       RT_TASK mcAgent;
