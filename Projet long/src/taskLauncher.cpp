@@ -274,7 +274,7 @@ void TaskLauncher::saveData(string file)
    //cout << "Max name size is : " << nameMaxSize << endl;
 
    std::ofstream myFile;
-   string dataFileName = "Expe_" + file;
+   string dataFileName = file + "_Expe.csv";
    myFile.open (dataFileName);    // TO APPEND :  //,ios_base::app);
    myFile << std::setw(15) << "timestamp" << " ; "
           << std::setw(nameMaxSize) << "name"     << " ; "

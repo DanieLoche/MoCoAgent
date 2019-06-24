@@ -25,7 +25,7 @@ TaskLauncher* tln;
 MCAgent* mca;
 bool enableAgent = TRUE;
 long expeDuration = 0;
-string inputFile = "input_chaine.txt", outputFile = "ExpeOutput.csv2";
+string inputFile = "input_chaine.txt", outputFile = "ExpeOutput";
 int schedMode = SCHED_FIFO, cpuFactor = 100;
 
 void RunmcAgentMain(void* arg)
@@ -135,16 +135,16 @@ int main(int argc, char* argv[])
    }
 
    std::ofstream outputFileResume;
-   string outputFileName = "Resume_" + outputFile;
+   string outputFileName = outputFile + "_Resume.cvs";
    outputFileResume.open (outputFileName, std::ios::app);    // TO APPEND :  //,ios_base::app);
    outputFileResume << "Experiment made with parameters : \n"
       << " MoCoAgent: " << enableAgent  << "\n"
       << "  Duration: " << expeDuration << "\n"
       << "CPU Factor: " << cpuFactor    << "\n"
       << "Input  file: " << inputFile   << "\n"
-      << "Output files: " << outputFile << " & "
-      << "MoCoLogs_" << outputFile      << " & "
-      << "Resume_"   << outputFile      << endl;
+      << "Output files: " << outputFile << ".csv & "
+      << outputFile       << "_MoCoLogs.csv"  << " & "
+      << outputFile       << "_Resume.cvs"    << endl;
 
    outputFileResume.close();
 

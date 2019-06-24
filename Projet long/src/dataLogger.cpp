@@ -93,7 +93,7 @@ RTIME DataLogger::logExec( )
 void TaskDataLogger::saveData(string file, int nameSize)
 {
   std::ofstream outputFileTasksData;
-  string outputFileName = "Expe_" + file;
+  string outputFileName = file+ "_Expe.csv";
   outputFileTasksData.open (outputFileName, std::ios::app);    // TO APPEND :  //,ios_base::app);
 
   //myFile << "timestamp ; name ; ID ; HRT ; deadline ; duration ; affinity \n";
@@ -122,7 +122,7 @@ void TaskDataLogger::saveData(string file, int nameSize)
 
   #if VERBOSE_INFO
   std::ofstream outputFileResume;
-  outputFileName = "Resume_" + file;
+  outputFileName = file + "_Resume";
   outputFileResume.open (outputFileName, std::ios::app);    // TO APPEND :  //,ios_base::app);
 
   average_runtime = somme / cptExecutions;
@@ -156,7 +156,7 @@ void ChainDataLogger::saveData(string file, int nameSize)
    RTIME sommeTime = 0;
 
    std::ofstream outputFileChainData;
-   string outputFileName = "Chains_" + file;
+   string outputFileName = file + "_Chains.csv";
    outputFileChainData.open (outputFileName, std::ios::app);    // TO APPEND :  //,ios_base::app);
 
    outputFileChainData << std::setw(15)           << "timestamp" << " ; "
@@ -183,7 +183,7 @@ void ChainDataLogger::saveData(string file, int nameSize)
   outputFileChainData.close();
 
   std::ofstream outputFileResume;
-  outputFileName = "Resume_" + file;
+  outputFileName = file + "_Resume.csv";
   outputFileResume.open (outputFileName, std::ios::app);    // TO APPEND :  //,ios_base::app);
   average_runtime = sommeTime / cptExecutions;
   #if VERBOSE_INFO

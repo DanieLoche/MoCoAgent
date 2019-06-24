@@ -251,7 +251,7 @@ void MCAgent::updateTaskInfo(monitoringMsg msg)
 void MCAgent::saveData()
 {
    std::ofstream outputFileResume;
-   string file = "Resume_" + outputFileName;
+   string file = outputFileName + "_Resume.csv";
    outputFileResume.open (file, std::ios::app);    // TO APPEND :  //,ios_base::app);
    RT_TASK_INFO cti;
    rt_task_inquire(0, &cti);
