@@ -16,7 +16,7 @@
 commentaire="//"
 file=$1
 schedPolicy=$2
-duration=600
+duration=10
 load=80
 if(( $# >= 1 )) && test -f $file
 then
@@ -38,16 +38,16 @@ then
             numLigne=`expr $numLigne + 1`
         done < $file > inputFile
         #echo "Name is "$name
-        sudo sar -o ${dirName}/IODatas${name}_1_${duration}_80_${schedPolicy} -P 0-3 1 $duration > /dev/null 2>&1 & 
-        ./MoCoAgent.out true  $duration $load ./inputFile ${dirName}/Chain2${name}_1_${duration}_${load}_${schedPolicy} $schedPolicy
+        sudo sar -o ${dirName}/IODatas${name}_1_${duration}_${load}_${schedPolicy} -P 0-3 1 $duration > /dev/null 2>&1 & 
+        ./MoCoAgent.out true  $duration $load ./inputFile ${dirName}/${name}_1_${duration}_${load}_${schedPolicy} $schedPolicy
         rm ./bench/output/*
 
         sudo sar -o ${dirName}/IODatas${name}_0_${duration}_${load}_${schedPolicy} -P 0-3 1 $duration > /dev/null 2>&1 & 
-        ./MoCoAgent.out false $duration $load ./inputFile ${dirName}/Chain2${name}_0_${duration}_${load}_${schedPolicy} $schedPolicy    
+        ./MoCoAgent.out false $duration $load ./inputFile ${dirName}/${name}_0_${duration}_${load}_${schedPolicy} $schedPolicy    
         rm ./bench/output/*
         rm -f ./inputFile
     done
-    # Convertir les fichiers SAR en .svg... la totale..!
+    # Convertir les fichiers SAR en .csv... la totale..!
     for file in ${dirName}/IODatas*
     do
         sadf -dh -- -P 0-3 ${file} > tmp1        
