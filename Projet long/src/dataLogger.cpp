@@ -93,7 +93,7 @@ RTIME DataLogger::logExec( )
 void TaskDataLogger::saveData(string file, int nameSize)
 {
   std::ofstream outputFileTasksData;
-  string outputFileName = file+ "_Expe.csv";
+  string outputFileName = file + "_Expe.csv";
   outputFileTasksData.open (outputFileName, std::ios::app);    // TO APPEND :  //,ios_base::app);
 
   //myFile << "timestamp ; name ; ID ; HRT ; deadline ; duration ; affinity \n";
@@ -122,7 +122,7 @@ void TaskDataLogger::saveData(string file, int nameSize)
 
   #if VERBOSE_INFO
   std::ofstream outputFileResume;
-  outputFileName = file + "_Resume";
+  outputFileName = file + "_Resume.csv";
   outputFileResume.open (outputFileName, std::ios::app);    // TO APPEND :  //,ios_base::app);
 
   average_runtime = somme / cptExecutions;

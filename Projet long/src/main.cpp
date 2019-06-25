@@ -135,7 +135,7 @@ int main(int argc, char* argv[])
    }
 
    std::ofstream outputFileResume;
-   string outputFileName = outputFile + "_Resume.cvs";
+   string outputFileName = outputFile + "_Resume.csv";
    outputFileResume.open (outputFileName, std::ios::app);    // TO APPEND :  //,ios_base::app);
    outputFileResume << "Experiment made with parameters : \n"
       << " MoCoAgent: " << enableAgent  << "\n"
