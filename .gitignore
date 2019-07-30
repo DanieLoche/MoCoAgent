@@ -71,13 +71,13 @@ Thumbs.db
 *.dll
 *.exe
 *.out
-*.txt
-SchedulerSimulator
+.txt
 *.dat
 
 # directories
 trace-cmd/
 #bench/
+Projet\ long/Experimentations/
 
 # Output files
 *output*

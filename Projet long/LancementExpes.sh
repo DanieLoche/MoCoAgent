@@ -1,9 +1,9 @@
 ./runBashTest.sh input_chaine.txt FIFO ; 
-echo Result FIFO : $? ; 
+FIFO="Result FIFO : $?" ; 
 
 ./runBashTest.sh input_chaine.txt RR ; 
-echo Result RR : $? ; 
+RR="Result RR : $?" ; 
 
 ./runBashTest.sh input_chaine.txt RM ; 
-echo Result RM : $?
+RM="Result RM : $?"
 

@@ -20,7 +20,7 @@ if(( $# >= 3 )) && test -f $file
 then
     duration=$3
 else 
-    duration=500
+    duration=600
 fi
 if(( $# >= 4 )) && test -f $file
 then
@@ -53,10 +53,10 @@ then
         ./MoCoAgent.out true  $duration $load ./inputFile ${dirName}/${name}_1_${duration}_${load}_${schedPolicy} $schedPolicy
         rm ./bench/output/*
 
-        #sudo sar -o ${dirName}/IODatas${name}_0_${duration}_${load}_${schedPolicy} -P 0-3 1 $duration > /dev/null 2>&1 & 
-        #./MoCoAgent.out false $duration $load ./inputFile ${dirName}/${name}_0_${duration}_${load}_${schedPolicy} $schedPolicy    
-        #rm ./bench/output/*
-        #rm -f ./inputFile
+        sudo sar -o ${dirName}/IODatas${name}_0_${duration}_${load}_${schedPolicy} -P 0-3 1 $duration > /dev/null 2>&1 & 
+        ./MoCoAgent.out false $duration $load ./inputFile ${dirName}/${name}_0_${duration}_${load}_${schedPolicy} $schedPolicy    
+        rm ./bench/output/*
+        rm -f ./inputFile
     done
     # Convertir les fichiers SAR en .csv... la totale..!
     for file in ${dirName}/IODatas*
