@@ -135,16 +135,16 @@ int main(int argc, char* argv[])
    }
 
    std::ofstream outputFileResume;
-   string outputFileName = outputFile + "_Resume.csv";
+   string outputFileName = outputFile + "_Resume.txt";
    outputFileResume.open (outputFileName, std::ios::app);    // TO APPEND :  //,ios_base::app);
    outputFileResume << "Experiment made with parameters : \n"
       << " MoCoAgent: " << enableAgent  << "\n"
       << "  Duration: " << expeDuration << "\n"
       << "CPU Factor: " << cpuFactor    << "\n"
       << "Input  file: " << inputFile   << "\n"
-      << "Output files: " << outputFile << ".csv & "
-      << outputFile       << "_MoCoLogs.csv"  << " & "
-      << outputFile       << "_Resume.cvs"    << endl;
+      << "Output files: " << outputFile << "_Expe.csv & "
+      << outputFile       << "_Chains.csv"  << " & "
+      << outputFile       << "_Resume.txt"    << endl;
 
    outputFileResume.close();
 

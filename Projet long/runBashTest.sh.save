@@ -16,7 +16,7 @@
 commentaire="//"
 file=$1
 schedPolicy=$2
-duration=600
+duration=10
 load=80
 if(( $# >= 1 )) && test -f $file
 then
@@ -38,7 +38,7 @@ then
             numLigne=`expr $numLigne + 1`
         done < $file > inputFile
         #echo "Name is "$name
-        sudo sar -o ${dirName}/IODatas${name}_1_${duration}_80_${schedPolicy} -P 0-3 1 $duration > /dev/null 2>&1 & 
+        sudo sar -o ${dirName}/IODatas${name}_1_${duration}_${load}_${schedPolicy} -P 0-3 1 $duration > /dev/null 2>&1 & 
         ./MoCoAgent.out true  $duration $load ./inputFile ${dirName}/Chain2${name}_1_${duration}_${load}_${schedPolicy} $schedPolicy
         rm ./bench/output/*
 

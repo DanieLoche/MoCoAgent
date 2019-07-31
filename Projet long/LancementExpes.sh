@@ -7,3 +7,6 @@ RR="Result RR : $?" ;
 ./runBashTest.sh input_chaine.txt RM ; 
 RM="Result RM : $?"
 
+echo RM result : $RM
+echo RR result : $RR
+echo FIFO result : $FIFO

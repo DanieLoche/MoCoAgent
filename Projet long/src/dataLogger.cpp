@@ -122,7 +122,7 @@ void TaskDataLogger::saveData(string file, int nameSize)
 
   #if VERBOSE_INFO
   std::ofstream outputFileResume;
-  outputFileName = file + "_Resume.csv";
+  outputFileName = file + "_Resume.txt";
   outputFileResume.open (outputFileName, std::ios::app);    // TO APPEND :  //,ios_base::app);
 
   average_runtime = somme / cptExecutions;
@@ -183,7 +183,7 @@ void ChainDataLogger::saveData(string file, int nameSize)
   outputFileChainData.close();
 
   std::ofstream outputFileResume;
-  outputFileName = file + "_Resume.csv";
+  outputFileName = file + "_Resume.txt";
   outputFileResume.open (outputFileName, std::ios::app);    // TO APPEND :  //,ios_base::app);
   average_runtime = sommeTime / cptExecutions;
   #if VERBOSE_INFO
