@@ -152,8 +152,8 @@ void ChainDataLogger::saveData(string file, int nameSize)
 {
    RTIME average_runtime = 0;
    RTIME max_runtime = 0;
-   RTIME min_runtime = 9.e9;
-   RTIME sommeTime = 0;
+   RTIME min_runtime = 1.e9;
+   double sommeTime = 0;
 
    std::ofstream outputFileChainData;
    string outputFileName = file + "_Chains.csv";
@@ -163,8 +163,7 @@ void ChainDataLogger::saveData(string file, int nameSize)
                   << std::setw(strlen(name)) << "Chain"     << " ; "
                   << std::setw(2)            << "ID"        << " ; "
                   << std::setw(10)           << "deadline"  << " ; "
-                  << std::setw(4)            << "aff."      << " ; "
-                  << std::setw(10)           << "duration"  << "\n";
+                  << std::setw(10)           << "duration"  << endl;
 
    for (int i = 0; i < cptExecutions; i++)
    {
@@ -174,7 +173,7 @@ void ChainDataLogger::saveData(string file, int nameSize)
                      << std::setw(strlen(name)) << name        << " ; "
                      << std::setw(2)            << id          << " ; "
                      << std::setw(10)           << deadline    << " ; "
-                     << std::setw(10)           << _dur        << "\n";
+                     << std::setw(10)           << _dur        << endl;
 
       sommeTime += _dur;
       if (_dur < min_runtime) min_runtime = _dur;

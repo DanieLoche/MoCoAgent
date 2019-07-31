@@ -3,7 +3,7 @@
 
 //define    SCHED_FIFO      1 // First-In First-Out
 //define    SCHED_RR        2 // Round-Robin
-//define    SCHED_EDF       6 // Not Implemented
+#define    SCHED_EDF       6 // Not Implemented
 #define     SCHED_RM        7 // Rate-Monotonic
 
 #define   SCHED_POLICY      SCHED_FIFO
