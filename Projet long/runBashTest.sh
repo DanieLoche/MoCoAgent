@@ -14,24 +14,43 @@
 # Ensuite vient la phase de benchmarks :
 
 commentaire="//"
-file=$1
-schedPolicy=$2
-if(( $# >= 3 )) && test -f $file
-then
-    duration=$3
-else 
-    duration=100
-fi
-if(( $# >= 4 )) && test -f $file
-then
-    load=$4
-else 
-    load=80
-fi
 
-if(( $# >= 1 )) && test -f $file
+Infile="input_chaine.txt"
+duration=100
+load=80
+schedPolicy=FIFO
+
+while [ "$1" != "" ]; do
+    case $1 in
+        -i | -f | --input )     shift
+                                Infile=$1
+                                ;;
+        -d | --duration )    	shift
+				duration=$1
+                                ;;
+	-l | --load )		shift
+				load=$1
+				;;
+	-s | --sched )		shift
+				schedPolicy=$1
+				;;
+        -h | --help )           echo "usage: runBashTest.sh [[[-f file ] [-d duration] [-l load]] | [-h]]"
+                                exit
+                                ;;
+        * )                     echo "usage: runBashTest.sh [[[-f file ] [-d duration] [-l load]] | [-h]]"
+                                exit 1
+    esac
+    shift
+done
+
+echo $Infile
+echo $duration
+echo $load
+echo $schedPolicy
+
+if test -f $Infile
 then
-    dirName=./Experimentations/Expe_`date +%e-%m-%Hh`
+    dirName=./Experimentations/Expe_`date +%d-%m-%Hh`
     mkdir $dirName
     for toExecute in {2..6} # exécuter toutes les chaines
     do
@@ -47,7 +66,7 @@ then
                 echo "${commentaire}$line"
             fi
             numLigne=`expr $numLigne + 1`
-        done < $file > inputFile
+        done < $Infile > inputFile
         #echo "Name is "$name
         sudo sar -o ${dirName}/IODatas${name}_1_${duration}_${load}_${schedPolicy} -P 0-3 1 $duration > /dev/null 2>&1 & 
         ./MoCoAgent.out true  $duration $load ./inputFile ${dirName}/${name}_1_${duration}_${load}_${schedPolicy} $schedPolicy
@@ -58,12 +77,15 @@ then
         rm ./bench/output/*
         rm -f ./inputFile
     done
+
+exit 0
+
     # Convertir les fichiers SAR en .csv... la totale..!
 cd ${dirName}
 for file in IODatas*
 do
 	sudo chmod 666 ${file}
-    sadf -dh -- -P 0-3 ${file} > tmp1        
+    sadf -dh -- -P 0-3 ${file} > tmp1
     sadf -dh -- -P 0-3 -rB -m CPU,TEMP ${file} | cut -d\; -f1-3 --complement > tmp2
     headerBefore="# hostname;interval;timestamp; CPU0;CPU0%user;CPU0%nice;CPU0%system;CPU0%iowait;CPU0%steal;CPU0%idle; CPU1;CPU1%user;CPU1%nice;CPU1%system;CPU1%iowait;CPU1%steal;CPU1%idle; CPU2;CPU2%user;CPU2%nice;CPU2%system;CPU2%iowait;CPU2%steal;CPU2%idle; CPU3;CPU3%user;CPU3%nice;CPU3%system;CPU3%iowait;CPU3%steal;CPU3%idle; pgpgin-s;pgpgout-s;fault-s;majflt-s;pgfree-s;pgscank-s;pgscand-s;pgsteal-s; %vmeff;kbmemfree;kbavail;kbmemused;%memused;kbbuffers;kbcached;kbcommit;%commit;kbactive;kbinact;kbdirty; CPU0;CPU0MHz;CPU1;CPU1MHz;CPU2;CPU2MHz;CPU3;CPU3MHz; CPU0TEMP;CPU0DEVICE;CPU0degC;CPU0%temp; CPU1TEMP;CPU1DEVICE;CPU1degC;CPU1%temp; CPU2TEMP;CPU2DEVICE;CPU2degC;CPU2%temp; CPU3TEMP;CPU3DEVICE;CPU3degC;CPU3%temp; CPU4TEMP;CPU4DEVICE;CPU4degC;CPU4%temp; CPU5TEMP;CPU5DEVICE;CPU5degC;CPU5%temp"
     # On dégage toutes les colonnes inutiles
@@ -79,6 +101,7 @@ do
     rm tmp2
 done
     exit 0
+
 else
     exit 1
 fi

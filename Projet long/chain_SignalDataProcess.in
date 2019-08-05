@@ -1,4 +1,4 @@
-ID  name 		     meanET  wcet    isHRT aff  prec path                       arguments
+ID  name 		     meanET  wcet   isHRT aff  prec path                       arguments
 1   SDP_bitcount_S   47     237     1     1    0    ./bench/bitcnts           75000 > ./bench/output/output_btcnt_small.txt
 2   SDP_fft_S        69     344     1     1    1    ./bench/fft               8 32768 > ./bench/output/fft_output_small.txt
 3   SDP_CRC32_L      888    4439    1     1    2    ./bench/crc               ./bench/data/large.pcm > ./bench/output/crc_output_large.txt

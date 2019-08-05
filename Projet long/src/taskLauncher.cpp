@@ -293,7 +293,6 @@ void TaskLauncher::saveData(string file)
    {
      triggerSave = 1;
      rt_task_resume(&mcAgent);
-     cout << "\nSaving Agent data..." << endl;
      sleep (1);
    }
 

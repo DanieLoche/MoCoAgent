@@ -250,6 +250,7 @@ void MCAgent::updateTaskInfo(monitoringMsg msg)
 
 void MCAgent::saveData()
 {
+   cout << "SAVING MoCoAgent datas" << endl;
    std::ofstream outputFileResume;
    string file = outputFileName + "_Resume.txt";
    outputFileResume.open (file, std::ios::app);    // TO APPEND :  //,ios_base::app);

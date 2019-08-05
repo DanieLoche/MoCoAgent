@@ -96,12 +96,18 @@ void TaskDataLogger::saveData(string file, int nameSize)
   string outputFileName = file + "_Expe.csv";
   outputFileTasksData.open (outputFileName, std::ios::app);    // TO APPEND :  //,ios_base::app);
 
-  //myFile << "timestamp ; name ; ID ; HRT ; deadline ; duration ; affinity \n";
   RTIME average_runtime = 0;
   RTIME max_runtime = 0;
   RTIME min_runtime = 1.e9;
   double somme = 0;
-  for (int i = 0; i < cptExecutions; i++)
+
+
+
+
+
+
+  if (!(cptExecutions > 0)) cout << "Error : no logs to print !" << endl;
+  else for (int i = 0; i < cptExecutions; i++)
   {
     RTIME _dur = execLogs[i].duration;
 
@@ -118,7 +124,6 @@ void TaskDataLogger::saveData(string file, int nameSize)
     if (_dur > max_runtime) max_runtime = _dur;
   }
   outputFileTasksData.close();
-
 
   #if VERBOSE_INFO
   std::ofstream outputFileResume;
@@ -150,22 +155,22 @@ void TaskDataLogger::saveData(string file, int nameSize)
 
 void ChainDataLogger::saveData(string file, int nameSize)
 {
-   RTIME average_runtime = 0;
-   RTIME max_runtime = 0;
-   RTIME min_runtime = 1.e9;
-   double sommeTime = 0;
-
    std::ofstream outputFileChainData;
    string outputFileName = file + "_Chains.csv";
    outputFileChainData.open (outputFileName, std::ios::app);    // TO APPEND :  //,ios_base::app);
 
-   outputFileChainData << std::setw(15)           << "timestamp" << " ; "
+   double average_runtime = 0;
+   RTIME max_runtime = 0;
+   RTIME min_runtime = 1.e9;
+   double sommeTime = 0;
+   outputFileChainData << std::setw(15)      << "timestamp" << " ; "
                   << std::setw(strlen(name)) << "Chain"     << " ; "
                   << std::setw(2)            << "ID"        << " ; "
                   << std::setw(10)           << "deadline"  << " ; "
                   << std::setw(10)           << "duration"  << endl;
 
-   for (int i = 0; i < cptExecutions; i++)
+   if (!(cptExecutions > 0)) cout << "Error : no logs to print !" << endl;
+   else for (int i = 0; i < cptExecutions; i++)
    {
       RTIME _dur = execLogs[i].duration;
 
@@ -173,7 +178,9 @@ void ChainDataLogger::saveData(string file, int nameSize)
                      << std::setw(strlen(name)) << name        << " ; "
                      << std::setw(2)            << id          << " ; "
                      << std::setw(10)           << deadline    << " ; "
-                     << std::setw(10)           << _dur        << endl;
+                     << std::setw(10)           << _dur        << "\n";
+
+
 
       sommeTime += _dur;
       if (_dur < min_runtime) min_runtime = _dur;
@@ -184,6 +191,7 @@ void ChainDataLogger::saveData(string file, int nameSize)
   std::ofstream outputFileResume;
   outputFileName = file + "_Resume.txt";
   outputFileResume.open (outputFileName, std::ios::app);    // TO APPEND :  //,ios_base::app);
+
   average_runtime = sommeTime / cptExecutions;
   #if VERBOSE_INFO
   outputFileResume << "\nRunning summary for Chain " << name << ". ( " << id << " )" << "\n"

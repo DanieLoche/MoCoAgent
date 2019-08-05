@@ -67,7 +67,6 @@ void endOfExpeHandler(int s){
 
 int main(int argc, char* argv[])
 {
-   system("clear");
    nproc = get_nprocs();
 
    struct sigaction sigIntHandler;

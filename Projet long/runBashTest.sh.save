@@ -20,7 +20,7 @@ duration=10
 load=80
 if(( $# >= 1 )) && test -f $file
 then
-    dirName=./Experimentations/Expe_`date +%e-%m-%Hh`
+    dirName=./Experimentations/Expe_`date +%d-%m-%Hh`
     mkdir $dirName
     for toExecute in {2..6} # exécuter toutes les chaines
     do
