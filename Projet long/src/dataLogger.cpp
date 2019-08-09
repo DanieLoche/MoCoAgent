@@ -35,29 +35,30 @@ TaskDataLogger::TaskDataLogger(rtTaskInfosStruct* taskInfos)
 
 }
 
-void DataLogger::logStart(RTIME startTime)
+void DataLogger::logStart(timespec startTime)
 {
   execLogs[cptExecutions].timestamp = startTime;
 }
 
 
-RTIME DataLogger::logStart()
+timespec DataLogger::logStart()
 {
-  return (execLogs[cptExecutions].timestamp = rt_timer_read());
+   getTime( &execLogs[cptExecutions].timestamp );
+  return execLogs[cptExecutions].timestamp;
 }
 
-void DataLogger::logExec(RTIME endTime)
+void DataLogger::logExec(timespec endTime)
 {
-   if (execLogs[cptExecutions].timestamp)
+   if (execLogs[cptExecutions].timestamp.tv_sec > 0)
    {
-      execLogs[cptExecutions].duration = endTime - execLogs[cptExecutions].timestamp;
+      execLogs[cptExecutions].duration = diffTime(endTime, execLogs[cptExecutions].timestamp);
 
-      if(execLogs[cptExecutions].duration > deadline )
+      if(getTime_ms(execLogs[cptExecutions].duration) > deadline )
       {
+         cptOutOfDeadline++;
         #if VERBOSE_ASK
         rt_printf("[  \033[1;31mERROR\033[0m  ] Task : \033[1;31m%s\033[0m - \033[1;36m%.2f ms\033[0m\n",name,execLogs[cptExecutions].duration/1e6);
         #endif
-        cptOutOfDeadline++;
       }else{
         #if VERBOSE_ASK
           rt_printf("[ \033[1;32mPERFECT\033[0m ] Task : \033[1;32m%s\033[0m - \033[1;36m%.2f ms\033[0m\n",name,execLogs[cptExecutions].duration/1e6);
@@ -66,16 +67,17 @@ void DataLogger::logExec(RTIME endTime)
       cptExecutions++;
       //return execLogs[cptExecutions - 1].duration;
    }
-   else cout << "Warning : Exec not logged as timestamp was not set yet." << endl;
+   else cout << "Warning : Exec not logged because timestamp was not set yet." << endl;
 
 }
 
-RTIME DataLogger::logExec( )
+timespec DataLogger::logExec( )
 {
-  RTIME _logTime = rt_timer_read();
-  execLogs[cptExecutions].duration = _logTime - execLogs[cptExecutions].timestamp;
+  timespec _logTime;
+  getTime(&_logTime);
+  execLogs[cptExecutions].duration = diffTime(_logTime, execLogs[cptExecutions].timestamp);
 
-  if(execLogs[cptExecutions].duration > deadline )
+  if( getTime_ms(execLogs[cptExecutions].duration) > deadline )
   {
     #if VERBOSE_ASK
     rt_printf("[  \033[1;31mERROR\033[0m  ] Task : \033[1;31m%s\033[0m - \033[1;36m%.2f ms\033[0m\n",name,execLogs[cptExecutions].duration/1e6);
@@ -96,10 +98,10 @@ void TaskDataLogger::saveData(string file, int nameSize)
   string outputFileName = file + "_Expe.csv";
   outputFileTasksData.open (outputFileName, std::ios::app);    // TO APPEND :  //,ios_base::app);
 
-  RTIME average_runtime = 0;
-  RTIME max_runtime = 0;
-  RTIME min_runtime = 1.e9;
-  double somme = 0;
+  double average_runtime = 0;
+  uint64_t max_runtime = 0;
+  uint64_t min_runtime = 1.e9;
+  uint64_t somme = 0;
 
 
 
@@ -109,9 +111,9 @@ void TaskDataLogger::saveData(string file, int nameSize)
   if (!(cptExecutions > 0)) cout << "Error : no logs to print !" << endl;
   else for (int i = 0; i < cptExecutions; i++)
   {
-    RTIME _dur = execLogs[i].duration;
+    uint64_t _dur = getTime_us(execLogs[i].duration);
 
-    outputFileTasksData << std::setw(15) << execLogs[i].timestamp << " ; "
+    outputFileTasksData << std::setw(15) << getTime_us(execLogs[i].timestamp) << " ; "
                    << std::setw(nameSize) << name           << " ; "
                    << std::setw(2) << id                    << " ; "
                    << std::setw(3) << isHardRealTime        << " ; "
@@ -160,9 +162,9 @@ void ChainDataLogger::saveData(string file, int nameSize)
    outputFileChainData.open (outputFileName, std::ios::app);    // TO APPEND :  //,ios_base::app);
 
    double average_runtime = 0;
-   RTIME max_runtime = 0;
-   RTIME min_runtime = 1.e9;
-   double sommeTime = 0;
+   uint64_t max_runtime = 0;
+   uint64_t min_runtime = 1.e9;
+   uint64_t sommeTime = 0;
    outputFileChainData << std::setw(15)      << "timestamp" << " ; "
                   << std::setw(strlen(name)) << "Chain"     << " ; "
                   << std::setw(2)            << "ID"        << " ; "
@@ -172,9 +174,9 @@ void ChainDataLogger::saveData(string file, int nameSize)
    if (!(cptExecutions > 0)) cout << "Error : no logs to print !" << endl;
    else for (int i = 0; i < cptExecutions; i++)
    {
-      RTIME _dur = execLogs[i].duration;
+      uint64_t _dur = getTime_us(execLogs[i].duration);
 
-      outputFileChainData << std::setw(15) << execLogs[i].timestamp << " ; "
+      outputFileChainData << std::setw(15) << getTime_us(execLogs[i].timestamp) << " ; "
                      << std::setw(strlen(name)) << name        << " ; "
                      << std::setw(2)            << id          << " ; "
                      << std::setw(10)           << deadline    << " ; "

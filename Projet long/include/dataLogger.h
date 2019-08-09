@@ -6,8 +6,8 @@
 
 struct timeLog
 {
-  RTIME timestamp;
-  RTIME duration;
+  timespec timestamp;
+  timespec duration;
 };
 
 class DataLogger
@@ -15,7 +15,7 @@ class DataLogger
   protected :
     char name[32];
     int id;
-    RTIME deadline;
+    uint64_t deadline;
 
   public :
     DataLogger();
@@ -24,10 +24,10 @@ class DataLogger
     int cptOutOfDeadline;
     int cptExecutions;
 
-    void logStart(RTIME );
-    RTIME logStart();
-    void logExec(RTIME );
-    RTIME logExec();
+    void logStart(timespec );
+    timespec logStart();
+    void logExec(timespec );
+    timespec logExec();
     virtual void saveData(string, int) = 0;
 
     char* getName();
@@ -38,7 +38,7 @@ class TaskDataLogger : public DataLogger
    private:
       int affinity;
    public :
-      RT_TASK* task;
+      xnthread* task;
       int isHardRealTime;
 
       TaskDataLogger(rtTaskInfosStruct*);

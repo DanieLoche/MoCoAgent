@@ -26,7 +26,8 @@ MacroTask::MacroTask(taskRTInfo* _taskRTInfo, bool MoCo)
 
    msg.task    = properties->task;
    msg.ID      = properties->id;
-   msg.time    = 0;
+   msg.time.tv_sec = 0;
+   msg.time.tv_nsec = 0;
    msg.isExecuted = 0;
 
    MoCoIsAlive = MoCo;
@@ -37,7 +38,7 @@ int MacroTask::before()
 {
    msg.time = dataLogs->logStart();
    msg.isExecuted = 0;
-   if(MoCoIsAlive && (rt_buffer_write(&bf , &msg , sizeof(monitoringMsg) , 100000) < 0))
+   if(MoCoIsAlive && (rt_buffer_write(&bf , &msg , sizeof(monitoringMsg) , properties->priority) < 0))
    {
       //MoCoIsAlive = 0;
      rt_printf("[%s] : failed to write BEFORE monitoring message to buffer.\n",properties->name);

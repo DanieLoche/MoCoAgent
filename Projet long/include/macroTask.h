@@ -20,7 +20,7 @@ class MacroTask
     rtTaskInfosStruct* properties;
     TaskDataLogger* dataLogs;
 
-    RT_BUFFER bf;
+    mqd_t bf;
     RT_EVENT	event;
     bool MoCoIsAlive;
 
