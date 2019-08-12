@@ -3,12 +3,7 @@
 
 //define    SCHED_FIFO      1 // First-In First-Out
 //define    SCHED_RR        2 // Round-Robin
-//define    SCHED_WEAK      0 // Weak
-//define    SCHED_COBALT    3 // Cobalt
-//define    SCHED_SPORADIC  4 // Sporadic
-//define    SCHED_TP        5 // TP
-//define    SCHED_QUOTA     8 // Quota
-#define     SCHED_EDF       6 // Not Implemented
+#define    SCHED_EDF       6 // Not Implemented
 #define     SCHED_RM        7 // Rate-Monotonic
 
 #define   SCHED_POLICY      SCHED_FIFO
@@ -29,50 +24,18 @@
 #include <signal.h>
 #include <cstdlib>
 
-#include <cobalt/pthread.h>
-#include <cobalt/semaphore.h>
-#include <cobalt/time.h>
-#include <cobalt/mqueue.h>
-#include <cobalt/signal.h>
-//#include <cobalt/mutex.h>
+#include <alchemy/task.h>
+#include <alchemy/sem.h>
+#include <alchemy/timer.h>
+#include <alchemy/buffer.h>
+#include <alchemy/event.h>
+#include <alchemy/mutex.h>
 
 
 using std::string;
 using std::cout;
 using std::endl;
 using std::cin;
-
-void setTime( uint64_t time_us /* in micro ! */, timespec* timeOut) {
-   timeOut->tv_sec = time_us / 1000000;
-   timeOut->tv_nsec = (time_us - 1000000*timeOut->tv_sec) * 1000;
-}
-
-void cpyTime( timespec* timeIn, timespec* timeOut ) {
-   timeOut->tv_sec = timeIn->tv_sec;
-   timeOut->tv_nsec = timeIn->tv_nsec;
-}
-
-timespec diffTime( timespec timeA, timespec timeB )
-{
-   timespec timeDiff;
-   timeDiff.tv_sec = labs(timeA.tv_sec - timeB.tv_sec);
-   timeDiff.tv_nsec = labs(timeA.tv_nsec - timeB.tv_nsec);
-   return timeDiff;
-}
-
-uint64_t getTime_us(timespec tp){
-   return (uint64_t) (tp.tv_sec * 1000000 + tp.tv_nsec / 1000); // time in microseconds
-}
-
-uint64_t getTime_ms(timespec tp){
-      return (uint64_t) (tp.tv_sec * 1000 + tp.tv_nsec / 1000000); // time in milliseconds
-}
-
-inline int getTime(timespec* tp){
-   if (clock_gettime(CLOCK_MONOTONIC, tp) == 0)
-      return 0; // time in milliseconds
-   else return -1;
-}
 
 /*
 struct logData
@@ -96,10 +59,10 @@ struct rtTaskInfosStruct
    int affinity;
    int precedency;
    int priority;
-   uint64_t wcet; // in milliseconds
-   uint64_t periodicity; // in milliseconds
+   RTIME wcet;
+   RTIME periodicity;
 
-   struct xnthread* task;
+   RT_TASK* task;
 };
 
 struct sortAscendingPeriod {
@@ -120,14 +83,14 @@ struct end2endDeadlineStruct
   char name[32];
   int taskChainID;
   string Path;
-  uint64_t deadline; // in milliseconds
+  RTIME deadline;
 };
 
 struct monitoringMsg
 {
-  xnthread* task;
+  RT_TASK* task;
   int ID;
-  timespec time;   // Run-time - received
+  RTIME time;   // Run-time - received
   bool isExecuted;    // Run-time - computed
 };
 
@@ -147,7 +110,7 @@ std::string reduce(const std::string& str,
                    const std::string& fill = " ",
                    const std::string& whitespace = " \t");
 
-void printInquireInfo(xnthread*);
+void printInquireInfo(RT_TASK*);
 void printTaskInfo(rtTaskInfosStruct* task);
 void print_affinity(pid_t _pid);
 

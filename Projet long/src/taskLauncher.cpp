@@ -129,7 +129,7 @@ int TaskLauncher::readTasksList(int cpuPercent)
 int TaskLauncher::createTasks()
 {
    #if VERBOSE_INFO
-   cout << endl << "CREATING TASKS : Sched. policy is " << schedPolicy << endl;
+   cout << endl << "CREATING TASKS : " << endl;
    #endif
    //for (auto taskInfo = taskSetInfos.rtTIs.begin(); taskInfo != taskSetInfos.rtTIs.end(); ++taskInfo)
    for (auto& taskInfo : taskSetInfos.rtTIs)
@@ -139,7 +139,7 @@ int TaskLauncher::createTasks()
       cout << "Creating Task " << taskInfo.name << "." << endl;
       #endif
 
-      if(xnthread_init(taskInfo.task, taskInfo.name, 0, taskInfo.priority, 0) < 0)
+      if(rt_task_create(taskInfo.task, taskInfo.name, 0, taskInfo.priority, 0) < 0)
       {
          printf("Failed to create task %s\n",taskInfo.name);
          return -1;
@@ -161,27 +161,27 @@ int TaskLauncher::createTasks()
          #endif
          if ((ret = rt_task_set_priority(taskInfo.task, taskInfo.priority)))
             { cout << "Set_Priority Error : " << ret << " ." << endl; return -4; }
+         /* Gestion EDF Scheduling
+         RT_TASK_INFO curtaskinfo;
+         rt_task_inquire(taskInfo->task, &curtaskinfo);
 
-         // Gestion EDF Scheduling
-         // RT_TASK_INFO curtaskinfo;
-         // rt_task_inquire(taskInfo->task, &curtaskinfo);
-
-         // struct sched_attr para;
-         // para.sched_policy = SCHED_POLICY;
-         // para.sched_flags= 0;
-         // //para.sched_runtime = taskInfo.periodicity;;
-         // //para.sched_deadline = taskInfo.periodicity;
-         // para.sched_period = taskInfo->periodicity;
-         // para.sched_priority = taskInfo->priority;
-         // para.size=sizeof(sched_attr);
-         // rt_task_inquire(taskInfo->task, &curtaskinfo);
-         // if( sched_setattr(curtaskinfo.pid, &para, 0) != 0)
-         // {
-         //    fprintf(stderr,"error setting scheduler ... are you root? : %d \n", errno);
-         //    exit(errno);
-         // }
-
+         struct sched_attr para;
+         para.sched_policy = SCHED_POLICY;
+         para.sched_flags= 0;
+         //para.sched_runtime = taskInfo.periodicity;;
+         //para.sched_deadline = taskInfo.periodicity;
+         para.sched_period = taskInfo->periodicity;
+         para.sched_priority = taskInfo->priority;
+         para.size=sizeof(sched_attr);
+         rt_task_inquire(taskInfo->task, &curtaskinfo);
+         if( sched_setattr(curtaskinfo.pid, &para, 0) != 0)
+         {
+            fprintf(stderr,"error setting scheduler ... are you root? : %d \n", errno);
+            exit(errno);
+         }
+*/
       }
+
    }
    return 0;
 }
