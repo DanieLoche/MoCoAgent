@@ -115,6 +115,7 @@ void TaskDataLogger::saveData(string file, int nameSize)
                    << std::setw(nameSize) << name           << " ; "
                    << std::setw(2) << id                    << " ; "
                    << std::setw(3) << isHardRealTime        << " ; "
+                   << std::setw(4) << priority              << " ; "                   
                    << std::setw(10) << deadline             << " ; "
                    << std::setw(4) << affinity              << " ; "
                    << std::setw(10) << _dur                 << "\n";

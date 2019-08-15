@@ -37,9 +37,10 @@ class TaskDataLogger : public DataLogger
 {
    private:
       int affinity;
+      int priority;
+      int isHardRealTime;
    public :
       RT_TASK* task;
-      int isHardRealTime;
 
       TaskDataLogger(rtTaskInfosStruct*);
       void saveData(string, int);

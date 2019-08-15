@@ -18,6 +18,7 @@ TaskLauncher::TaskLauncher(string outputFileName)
    taskSetInfos.outputFileName = outputFileName;
 }
 
+
 int TaskLauncher::readChainsList(string input_file)
 {
    cout << "Initialising machine...\n";
@@ -34,7 +35,6 @@ int TaskLauncher::readChainsList(string input_file)
    {
       end2endDeadlineStruct chaineInfo;
       std::istringstream iss(str);
-      string token;
       #if VERBOSE_INFO
       cout << "Managing line : " << str << endl;
       #endif
@@ -116,7 +116,7 @@ int TaskLauncher::readTasksList(int cpuPercent)
          {
             if (taskInfo->periodicity != lastPeriod)
             {
-               prio++;
+               prio += 2;
                lastPeriod = taskInfo->periodicity;
             }
             taskInfo->priority = prio;
@@ -126,8 +126,26 @@ int TaskLauncher::readTasksList(int cpuPercent)
    return 0;
 }
 
+/*
+int TaskLauncher::createMutexes(int _nprocs)
+{
+   cout << "Creating mutexes." << endl;
+   int ret = 0;
+   string mutexName = "mutCore";
+   for (int i = 0; i < _nprocs; i++)
+   {
+      string name = mutexName + std::to_string(i);
+      ret += rt_mutex_create(&mutexes[i], &name[0]);
+      cout << "Created mutex " << name << endl;
+   }
+
+   return ret;
+}
+*/
+
 int TaskLauncher::createTasks()
 {
+   int ret = 0;
    #if VERBOSE_INFO
    cout << endl << "CREATING TASKS : " << endl;
    #endif
@@ -146,21 +164,34 @@ int TaskLauncher::createTasks()
       }
       else
       {
+         RT_TASK_INFO curtaskinfo;
+         rt_task_inquire(taskInfo.task, &curtaskinfo);
+         struct sched_param_ex para;
+         para.sched_priority = taskInfo.priority;
+         /* sched_param
+         para.sched_flags= 0;
+         para.sched_runtime = taskInfo.periodicity;;
+         para.sched_deadline = taskInfo.periodicity;
+         para.sched_period = taskInfo->periodicity;
+         para.size=sizeof(sched_attr);
+         old... */
+         if (schedPolicy == SCHED_RM) schedPolicy = SCHED_FIFO;
+         if( (ret = sched_setscheduler_ex(curtaskinfo.pid, schedPolicy, &para)) != 0)
+         {
+            cout << "error setting scheduling policy " << schedPolicy << ", Error #" << ret;
+            exit(ret);
+         }
          //Periodicity
-         int ret = 0;
          if ((ret = rt_task_set_periodic(taskInfo.task, TM_NOW, taskInfo.periodicity)))
-            { cout << "Set_Period Error : " << ret << " ." << endl; return -2; }
+         { cout << "Set_Period Error : " << ret << " ." << endl; exit(-2); }
          rt_task_affinity(taskInfo.task, taskInfo.affinity, 0);
          if (schedPolicy == SCHED_RR)
          { //#if defined SCHED_POLICY  &&  SCHED_POLICY == SCHED_RR
             if ((ret = rt_task_slice(taskInfo.task, RR_SLICE_TIME)))
-               { cout << "Slice Error : " << ret << " ." << endl; return -3; }
+            { cout << "Slice Error : " << ret << " ." << endl; exit(-3); }
          } //#endif
-         #if defined SCHED_POLICY  &&  SCHED_POLICY == SCHED_FIFO
-            // FIFO.
-         #endif
          if ((ret = rt_task_set_priority(taskInfo.task, taskInfo.priority)))
-            { cout << "Set_Priority Error : " << ret << " ." << endl; return -4; }
+            { cout << "Set_Priority Error : " << ret << " ." << endl; exit(-4); }
          /* Gestion EDF Scheduling
          RT_TASK_INFO curtaskinfo;
          rt_task_inquire(taskInfo->task, &curtaskinfo);
@@ -280,8 +311,9 @@ void TaskLauncher::saveData(string file)
           << std::setw(nameMaxSize) << "name"     << " ; "
           << std::setw(2)  << "ID"       << " ; "
           << std::setw(3)  << "HRT"      << " ; "
+          << std::setw(4) << "Prio"      << " ; "
           << std::setw(10) << "deadline" << " ; "
-          << std::setw(4)  << "aff." << " ; "
+          << std::setw(4)  << "aff."     << " ; "
           << std::setw(10) << "duration" << "\n";
    myFile.close();
    for (auto& taskLog : tasksLogsList)
