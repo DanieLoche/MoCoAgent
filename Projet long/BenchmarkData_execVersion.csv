@@ -1,0 +1,45 @@
+name	meanET	path	wcet	affinity	parameter				
+basicmath_S	58	./bench/basicmath_small	289	1	>	./bench/output/output_basicmath_small.txt			
+basicmath_L	648	./bench/basicmath_large	3240	1	>	./bench/output/output_basicmath_small.txt			
+bitcount_S	48	./bench/bitcnts	237	1	75000	>	./bench/output/output_btcnt_small.txt		
+bitcount_L	197	./bench/bitcnts	984	1	1125000	>	./bench/output/output_btcnt_large.txt		
+qsort_S	44	./bench/qsort_small	219	1	./bench/qsort/input_small.dat	>	./bench/output/output_qsort_small.txt		
+qsort_L	139	./bench/qsort_large	694	1	./bench/qsort/input_large.dat	>	./bench/output/output_qsort_large.txt		
+susan_S_smooth	44	./bench/susan_bin	220	1	./bench/susan/input_small.pgm	./bench/output/susan_output_small.smoothing.pgm	-s		
+susan_S_edges	44	./bench/susan_bin	220	1	./bench/susan/input_small.pgm	./bench/output/susan_output_small.edges.pgm	-e		
+susan_S_corners	44	./bench/susan_bin	220	1	./bench/susan/input_small.pgm	./bench/output/susan_output_small.corners.pgm	-c		
+susan_L_smooth	50	./bench/susan_bin	250	1	./bench/susan/input_large.pgm	./bench/output/susan_output_large.smoothing.pgm	-s		
+susan_L_edges	50	./bench/susan_bin	250	1	./bench/susan/input_large.pgm	./bench/output/susan_output_large.edges.pgm	-e		
+susan_L_corners	45	./bench/susan_bin	240	1	./bench/susan/input_large.pgm	./bench/output/susan_output_large.corners.pgm	-c		
+cjpeg_S	50	./bench/cjpeg	248	1	-dct int -progressive -opt -outfile ./bench/output/output_small_encode.jpeg ./bench/jpg/input_small.ppm				
+cjpeg_L	77	./bench/cjpeg	384	1	-dct int -progressive -opt -outfile ./bench/output/output_large_encode.jpeg ./bench/jpg/input_large.ppm				
+djpeg_S	50	./bench/djpeg	248	1	-dct int -ppm -outfile ./bench/output/output_small_decode.ppm ./bench/jpg/input_small.jpg				
+djpeg_L	77	./bench/djpeg	384	1	-dct int -ppm -outfile ./bench/output/output_large_decode.ppm ./bench/jpg/input_large.jpg				
+typeset_S	79	./bench/lout	392	1	-I ./bench/typeset/include -D ./bench/typeset/data -F ./bench/typeset/font -C ./bench/typeset/maps -H ./bench/typeset/hyph ./bench/typeset/small.lout > ./bench/output/output_typeset_small.ps				
+typeset_L	804	./bench/lout	4021	1	-I ./bench/typeset/include -D ./bench/typeset/data -F ./bench/typeset/font -C ./bench/typeset/maps -H ./bench/typeset/hyph ./bench/typeset/large.lout > ./bench/output/output_typeset_large.ps				
+dijkstra_S	53	./bench/dijkstra_small	267	1	./bench/dijkstra/input.dat	>	./bench/output/dijk_output_small.dat		
+dijkstra_L	104	./bench/dijkstra_large	523	1	./bench/dijkstra/input.dat	>	./bench/output/dijk_output_large.dat		
+patricia_S	70	./bench/patricia_bin	349	1	./bench/patricia/small.udp	>	./bench/output/pat_output_small.txt		
+patricia_L	838	./bench/patricia_bin	4190	1	./bench/patricia/large.udp	>	./bench/output/pat_output_large.txt		
+stringsearch_L	38	./bench/search_large	192	1	>	./bench/output/output_search_large			
+stringsearch_S	38	./bench/search_small	189	1	>	./bench/output/output_search_small			
+blowfishE_S	30	./bench/bf	150	1	e ./bench/blowfish/input_small.asc ./bench/output/output_small.enc 1234567890abcdeffedcba0987654321				
+blowfishD_S	30	./bench/bf	150	1	d ./bench/output/output_small.enc ./bench/output/output_small.asc 1234567890abcdeffedcba0987654321				
+blowfishE_L	450	./bench/bf	2200	1	e ./bench/blowfish/input_large.asc ./bench/output/output_large.enc 1234567890abcdeffedcba0987654321				
+blowfishD_L	450	./bench/bf	2200	1	d ./bench/output/output_large.enc ./bench/output/output_large.asc 1234567890abcdeffedcba0987654321				
+sha_S	42	./bench/sha_bin	209	1	./bench/sha/input_small.asc	>	./bench/output/sha_output_small.txt		
+sha_L	82	./bench/sha_bin	410	1	./bench/sha/input_large.asc	>	./bench/output/sha_output_large.txt		
+adpcmCaudio_S	79	./bench/adpcm_small.sh	397	1	< ./bench/adpcm/small.pcm > ./bench/output/output_small.adpcm				
+adpcmCaudio_L	964	./bench/adpcm_large.sh	4819	1	< ./bench/adpcm/large.pcm > ./bench/output/output_large.adpcm				
+adpcmDaudio_S	79	./bench/adpcm_small.sh	397	1	< ./bench/adpcm/small.adpcm > ./bench/output/output_small.pcm				
+adpcmDaudio_L	964	./bench/adpcm_large.sh	4819	1	< ./bench/adpcm/large.adpcm > ./bench/output/output_large.pcm				
+CRC32_S	49	./bench/crc	245	1	./bench/data/small.pcm	>	./bench/output/crc_output_small.txt		
+CRC32_L	888	./bench/crc	4439	1	./bench/data/large.pcm	>	./bench/output/crc_output_large.txt		
+fft_S	69	./bench/fft	344	1	8	32768	>	./bench/output/fft_output_small.txt	
+fft_L	849	./bench/fft	4248	1	8	32768	>	./bench/output/fft_output_large.txt	
+fft_inv_S	69	./bench/fft	344	1	8	32768	-i	>	./bench/output/ffti_output_small.inv.txt
+fft_inv_L	850	./bench/fft	4248	1	8	32768	-i	>	./bench/output/ffti_output_large.inv.txt
+gsmToast_S	48	./bench/toast	239	1	-fps -c ./bench/gsm/small.au > ./bench/output/output_small.encode.gsm				
+gsmToast_L	447	./bench/toast	2235	1	-fps -c ./bench/gsm/large.au > ./bench/output/output_large.encode.gsm				
+gsmUToast_S	48	./bench/untoast	239	1	-fps -c ./bench/gsm/small.au.run.gsm > ./bench/output/output_small.decode.run				
+gsmUToast_L	447	./bench/untoast	2235	1	-fps -c ./bench/gsm/large.au.run.gsm > ./bench/output/output_large.decode.run				
