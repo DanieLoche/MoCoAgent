@@ -56,7 +56,7 @@ void MacroTask::parseParameters()
       while (getline(iss, token, ' '))
       {
          token = reduce(token);
-         cout << "[ " << properties->name << " ] : " << "Managing token " << token << endl;
+         //cout << "[ " << properties->name << " ] : " << "Managing token " << token << endl;
          if (token == "<")
             nextStr = 1;
          else if (token == ">")
@@ -86,7 +86,7 @@ void MacroTask::parseParameters()
          string toPrint;
          if (arg==NULL)toPrint = "null";
          else toPrint = arg;
-         cout << "Arg #" << i << " = " << toPrint << " ; ";
+         //cout << "Arg #" << i << " = " << toPrint << " ; ";
          i++;
       }
       cout << endl;
@@ -142,7 +142,9 @@ int MacroTask::before()
 
 void MacroTask::proceed()
 {
+      #if VERBOSE_OTHER
       std::cerr << "[ " << properties->name << " ] : "<< "Executing Proceed." << endl;
+      #endif
       // if (std::string path(properties->path_task) != "/null/")  {
       //cout << properties->name << " : " << chain << endl;
       if (vfork() == 0)
@@ -153,7 +155,9 @@ void MacroTask::proceed()
       else
       {
          wait(NULL);
+         #if VERBOSE_OTHER
          std::cerr << "[ " << properties->name << " ] : "<< "End of Proceed." << endl;
+         #endif
       }
 
       //system(&chain[0u]);
