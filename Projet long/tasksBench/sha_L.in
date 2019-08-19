@@ -1,0 +1,2 @@
+ID  name 		     meanET  wcet    isHRT aff  prec path                       arguments
+1 sha_L 500 1000 1 1 0 ./bench/sha_bin ./bench/sha/input_large.asc > ./bench/output/o_sha_large.txt

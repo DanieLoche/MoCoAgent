@@ -29,10 +29,10 @@ blowfishE_L	450	./bench/bf	2200	1	e ./bench/blowfish/input_large.asc ./bench/out
 blowfishD_L	450	./bench/bf	2200	1	d ./bench/output/output_large.enc ./bench/output/output_large.asc 1234567890abcdeffedcba0987654321				
 sha_S	42	./bench/sha_bin	209	1	./bench/sha/input_small.asc	>	./bench/output/sha_output_small.txt		
 sha_L	82	./bench/sha_bin	410	1	./bench/sha/input_large.asc	>	./bench/output/sha_output_large.txt		
-adpcmCaudio_S	79	./bench/adpcm_small.sh	397	1	< ./bench/adpcm/small.pcm > ./bench/output/output_small.adpcm				
-adpcmCaudio_L	964	./bench/adpcm_large.sh	4819	1	< ./bench/adpcm/large.pcm > ./bench/output/output_large.adpcm				
-adpcmDaudio_S	79	./bench/adpcm_small.sh	397	1	< ./bench/adpcm/small.adpcm > ./bench/output/output_small.pcm				
-adpcmDaudio_L	964	./bench/adpcm_large.sh	4819	1	< ./bench/adpcm/large.adpcm > ./bench/output/output_large.pcm				
+adpcmCaudio_S	79	./bench/adpcm_rawcaudio	397	1	< ./bench/adpcm/small.pcm > ./bench/output/output_small.adpcm				
+adpcmCaudio_L	964	./bench/adpcm_rawcaudio	4819	1	< ./bench/adpcm/large.pcm > ./bench/output/output_large.adpcm				
+adpcmDaudio_S	79	./bench/adpcm_rawdaudio	397	1	< ./bench/adpcm/small.adpcm > ./bench/output/output_small.pcm				
+adpcmDaudio_L	964	./bench/adpcm_rawdaudio	4819	1	< ./bench/adpcm/large.adpcm > ./bench/output/output_large.pcm				
 CRC32_S	49	./bench/crc	245	1	./bench/data/small.pcm	>	./bench/output/crc_output_small.txt		
 CRC32_L	888	./bench/crc	4439	1	./bench/data/large.pcm	>	./bench/output/crc_output_large.txt		
 fft_S	69	./bench/fft	344	1	8	32768	>	./bench/output/fft_output_small.txt	

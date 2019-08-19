@@ -29,11 +29,12 @@ class MacroTask
     bool MoCoIsAlive;
     int priority;
     monitoringMsg msg ;
-    string chain;
-    char **argv;
-    char* stdIn;
-    char* stdOut;
+    //string chain;
+    char stdIn[35];
+    char stdOut[35];
+    std::vector<char*> argv;
 
+    void parseParameters( );
     inline int before_besteff();
     inline int before();
     inline void proceed();

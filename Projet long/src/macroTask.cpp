@@ -16,7 +16,7 @@ MacroTask::MacroTask(taskRTInfo* _taskRTInfo, bool MoCo)
    printTaskInfo(_taskRTInfo->rtTI);
 
    printInquireInfo(_taskRTInfo->rtTI->task);
-   /* Du vieux début...
+   /* Du vieux débug...
    RT_TASK_INFO curtaskinfo;
    rt_task_inquire(NULL, &curtaskinfo);
    print_affinity(curtaskinfo.pid);
@@ -24,33 +24,9 @@ MacroTask::MacroTask(taskRTInfo* _taskRTInfo, bool MoCo)
    cout << "I am task : " << curtaskinfo.name << " of priority " << curtaskinfo.prio << endl;
    #endif
    */
-   chain = std::string(properties->path_task) + " " + properties->arguments;
+   //chain = std::string(properties->path_task) + " " + properties->arguments;
    //cout << "Command for this task is : " << chain << " ." << endl;
-
-   *stdIn = '\0'; *stdOut = '\0'; argv[0] = &properties->name[0u];
-   std::istringstream iss(properties->arguments);
-   string token;
-   int i = 1, nextStr = 0;
-   while (getline(iss, token, ' '))
-   {
-      if (token == "<")
-         nextStr = 1;
-      else if (token == ">")
-         nextStr = 2;
-      else
-      {
-         if (nextStr == 1)  stdIn = &reduce(token)[0u];
-         else if (nextStr == 2)  stdOut = &reduce(token)[0u];
-         else
-         {
-            argv[i] = &reduce(token)[0u];
-            i++;
-         }
-         nextStr = 0;
-      }
-   }
-
-   //cmd = &properties->arguments[0u];
+   parseParameters( );
 
    msg.task    = properties->task;
    msg.ID      = properties->id;
@@ -67,10 +43,90 @@ MacroTask::MacroTask(taskRTInfo* _taskRTInfo, bool MoCo)
 */
 }
 
+void MacroTask::parseParameters()
+{
+      cout << "[ " << properties->name << " ] : "
+            << "Started parsing params." << endl;
+      stdIn[0] = '\0'; stdOut[0] = '\0';
+      argv.push_back(properties->name); //argv[0] = properties->name;
+
+      std::istringstream iss( properties->arguments);
+      string token;
+      int i = 1, nextStr = 0;
+      while (getline(iss, token, ' '))
+      {
+         token = reduce(token);
+         cout << "[ " << properties->name << " ] : " << "Managing token " << token << endl;
+         if (token == "<")
+            nextStr = 1;
+         else if (token == ">")
+            nextStr = 2;
+         else
+         {
+            if (nextStr == 1)  {token.copy(stdIn, token.size()); stdIn[token.size()] = '\0'; cout << "[ " << properties->name << " ] : " << "stdIn = " << stdIn << "." << endl; }
+            else if (nextStr == 2)  { token.copy(stdOut, token.size()); stdOut[token.size()] = '\0'; cout << "[ " << properties->name << " ] : " << "stdOut = " << stdOut << "." << endl; }
+            else
+            {
+               //argv[i] = &reduce(token)[0u];
+               //token.copy(argv[i], token.size());
+               char *arg = new char[token.size()];  // +1
+               copy(token.begin(), token.end(), arg);
+               // arg[token.size()]c= '\0';
+               argv.push_back(arg);
+               //i++;
+            }
+            nextStr = 0;
+         }
+      }
+      argv.push_back(0);
+      //token.copy(argv[i], token.size()); // arguments list must end with a null.
+      i = 0;
+      for (auto arg : argv)
+      {
+         string toPrint;
+         if (arg==NULL)toPrint = "null";
+         else toPrint = arg;
+         cout << "Arg #" << i << " = " << toPrint << " ; ";
+         i++;
+      }
+      cout << endl;
+
+      if (stdIn[0] != '\0')
+      {
+         #if VERBOSE_OTHER
+         cout << "Changed Input to : " << stdIn << endl;
+         #endif
+         int fdIn = open(stdIn, O_RDWR | O_CREAT, S_IRUSR | S_IWUSR);
+         dup2(fdIn, 0);
+         close(fdIn);
+      }
+      #if VERBOSE_OTHER
+      else cout << "Unchanged Input." << endl;
+      #endif
+
+      if (stdOut[0] != '\0')
+      {
+         #if VERBOSE_OTHER
+         cout << "Changed Output to : " << stdOut << endl;
+         #endif
+         int fdOut = open(stdOut, O_RDWR | O_CREAT, S_IRUSR | S_IWUSR);
+         dup2(fdOut, 1);
+         close(fdOut);
+      }
+      #if VERBOSE_OTHER
+      else
+      cout << "Unchanged Output." << endl;
+      #endif
+
+}
+
 int MacroTask::before()
 {
-//   rt_mutex_acquire(&mutex, TM_INFINITE);
-   rt_task_set_priority(NULL, priority+1);
+   //   rt_mutex_acquire(&mutex, TM_INFINITE);
+   #if VERBOSE_OTHER
+   std::cerr << "[ " << properties->name << " ] : " << "Executing Before." << endl;
+   #endif
+   //rt_task_set_priority(NULL, priority+1);
    msg.time = dataLogs->logStart();
    msg.isExecuted = 0;
    if(MoCoIsAlive && (rt_buffer_write(&bf , &msg , sizeof(monitoringMsg) , 100000) < 0))
@@ -86,32 +142,18 @@ int MacroTask::before()
 
 void MacroTask::proceed()
 {
-      // let the task run RUNTIME ns in steps of SPINTIME ns
-      //char* cmd;
+      std::cerr << "[ " << properties->name << " ] : "<< "Executing Proceed." << endl;
       // if (std::string path(properties->path_task) != "/null/")  {
-      //char* cmd = &properties->arguments[0u];
       //cout << properties->name << " : " << chain << endl;
-      //pid_t cpid;
       if (vfork() == 0)
       {
-         if (*stdIn != '\0')
-         {
-            int fdOut = open(stdOut, O_RDWR | O_CREAT, S_IRUSR | S_IWUSR);
-            dup2(fdOut, 1);
-            close(fdOut);
-         }
-         if (*stdOut != '\0')
-         {
-         int fdIn = open(stdIn, O_RDWR | O_CREAT, S_IRUSR | S_IWUSR);
-         dup2(fdIn, 0);
-         close(fdIn);
-         }
-
-         execv(properties->path_task, argv);
+         execv(properties->path_task, &argv[0]);
+         _exit(0);
       }
       else
       {
          wait(NULL);
+         std::cerr << "[ " << properties->name << " ] : "<< "End of Proceed." << endl;
       }
 
       //system(&chain[0u]);
@@ -122,7 +164,7 @@ void MacroTask::proceed()
 int MacroTask::after()
 {
   #if VERBOSE_OTHER
-  rt_printf("End Task  : %s\n",properties->name);
+  std::cerr << "[ " << properties->name << " ] : "<< "Executing After." << endl;
   #endif
   msg.time = dataLogs->logExec();
   msg.isExecuted = 1;
@@ -137,7 +179,7 @@ int MacroTask::after()
   //ChaineInfo_Struct.Wcet_update() ;
   //ChaineInfo_Struct.Exectime.Update() ;
 //  rt_mutex_release(&mutex);
-   rt_task_set_priority(NULL, priority);
+   //rt_task_set_priority(NULL, priority);
   return 0;
 }
 
@@ -148,7 +190,7 @@ void MacroTask::executeRun()
         if( rt_buffer_bind (&bf , "/monitoringTopic", 100000) < 0)
         {
           rt_buffer_delete(&bf);
-          rt_printf("%s\n","Failed to link to Monitoring Buffer");
+          std::cerr << "Failed to lin to Monitoring Buffer" << endl;
           MoCoIsAlive = 0;
           //exit(-1);
         }
@@ -185,7 +227,7 @@ int MacroTask::after_besteff()
 {
     dataLogs->logExec();
     #if VERBOSE_OTHER
-    rt_printf("End Task  : %s\n",properties->name);
+    std::cerr << "End Task : " << properties->name << endl;
     #endif
 //   rt_mutex_release(&mutex);
    rt_task_set_priority(NULL, priority);
