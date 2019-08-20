@@ -35,7 +35,7 @@ int TaskLauncher::readChainsList(string input_file)
    {
       end2endDeadlineStruct chaineInfo;
       std::istringstream iss(str);
-      #if VERBOSE_INFO
+      #if VERBOSE_ASK
       cout << "Managing line : " << str << endl;
       #endif
       if (str.substr(0,2) != "//")
@@ -47,7 +47,10 @@ int TaskLauncher::readChainsList(string input_file)
             { cout << "\033[1;31mFailed to read line\033[0m !" << endl; return -1; } // error
          chaineInfo.deadline *= 1.0e6;
          taskSetInfos.e2eDD.push_back(chaineInfo);
-      } else cout << "line ignored." << endl;
+      }
+      #if VERBOSE_ASK
+      else cout << "line ignored." << endl;
+      #endif
    }
    return 0;
 }
@@ -73,7 +76,7 @@ int TaskLauncher::readTasksList(int cpuPercent)
          std::istringstream iss(str);
          string token;
          char ext[32] = "RT_";
-         #if VERBOSE_INFO
+         #if VERBOSE_ASK
          cout << "Managing line : " << str << endl;
          #endif
          if (str.substr(0,2) != "//")

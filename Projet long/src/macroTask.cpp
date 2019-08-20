@@ -86,7 +86,7 @@ void MacroTask::parseParameters()
          string toPrint;
          if (arg==NULL)toPrint = "null";
          else toPrint = arg;
-         //cout << "Arg #" << i << " = " << toPrint << " ; ";
+         cout << "Arg #" << i << " = " << toPrint << " ; ";
          i++;
       }
       cout << endl;
