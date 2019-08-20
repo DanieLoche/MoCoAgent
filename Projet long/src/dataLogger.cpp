@@ -55,18 +55,18 @@ void DataLogger::logExec(RTIME endTime)
       if(execLogs[cptExecutions].duration > deadline )
       {
         #if VERBOSE_ASK
-        rt_printf("[  \033[1;31mERROR\033[0m  ] Task : \033[1;31m%s\033[0m - \033[1;36m%.2f ms\033[0m\n",name,execLogs[cptExecutions].duration/1e6);
+        fprintf(stderr, "[  \033[1;31mERROR\033[0m  ] Task : \033[1;31m%s\033[0m - \033[1;36m%.2f ms\033[0m\n",name,execLogs[cptExecutions].duration/1e6);
         #endif
         cptOutOfDeadline++;
       }else{
         #if VERBOSE_ASK
-          rt_printf("[ \033[1;32mPERFECT\033[0m ] Task : \033[1;32m%s\033[0m - \033[1;36m%.2f ms\033[0m\n",name,execLogs[cptExecutions].duration/1e6);
+          fprintf(stderr, "[ \033[1;32mPERFECT\033[0m ] Task : \033[1;32m%s\033[0m - \033[1;36m%.2f ms\033[0m\n",name,execLogs[cptExecutions].duration/1e6);
         #endif
       }
       cptExecutions++;
       //return execLogs[cptExecutions - 1].duration;
    }
-   else cout << "Warning : Exec not logged as timestamp was not set yet." << endl;
+   else cerr << "[" << name << "] " << "- WARNING : Exec not logged as timestamp was not set yet." << endl;
 
 }
 
@@ -78,15 +78,20 @@ RTIME DataLogger::logExec( )
   if(execLogs[cptExecutions].duration > deadline )
   {
     #if VERBOSE_ASK
-    rt_printf("[  \033[1;31mERROR\033[0m  ] Task : \033[1;31m%s\033[0m - \033[1;36m%.2f ms\033[0m\n",name,execLogs[cptExecutions].duration/1e6);
+    fprintf(stderr, "[  \033[1;31mERROR\033[0m  ] Task : \033[1;31m%s\033[0m - \033[1;36m%.2f ms\033[0m\n",name,execLogs[cptExecutions].duration/1e6);
     #endif
     cptOutOfDeadline++;
   }else{
     #if VERBOSE_ASK
-      rt_printf("[ \033[1;32mPERFECT\033[0m ] Task : \033[1;32m%s\033[0m - \033[1;36m%.2f ms\033[0m\n",name,execLogs[cptExecutions].duration/1e6);
+    fprintf(stderr, "[ \033[1;32mPERFECT\033[0m ] Task : \033[1;32m%s\033[0m - \033[1;36m%.2f ms\033[0m\n",name,execLogs[cptExecutions].duration/1e6);
     #endif
   }
   cptExecutions++;
+  if (cptExecutions > 4095)
+  {
+     cptExecutions = 0;
+     cerr << "[" << name << "] " << "WARNING - Measures more than allowed buffer size." << endl;
+  }
   return _logTime;
 }
 
@@ -106,7 +111,7 @@ void TaskDataLogger::saveData(string file, int nameSize)
 
 
 
-  if (!(cptExecutions > 0)) cout << "Error : no logs to print !" << endl;
+  if (!(cptExecutions > 0)) cerr << "[" << name << "] -" << "Error : no logs to print !" << endl;
   else for (int i = 0; i < cptExecutions; i++)
   {
     RTIME _dur = execLogs[i].duration;
@@ -115,7 +120,7 @@ void TaskDataLogger::saveData(string file, int nameSize)
                    << std::setw(nameSize) << name           << " ; "
                    << std::setw(2) << id                    << " ; "
                    << std::setw(3) << isHardRealTime        << " ; "
-                   << std::setw(4) << priority              << " ; "                   
+                   << std::setw(4) << priority              << " ; "
                    << std::setw(10) << deadline             << " ; "
                    << std::setw(4) << affinity              << " ; "
                    << std::setw(10) << _dur                 << "\n";
@@ -170,7 +175,7 @@ void ChainDataLogger::saveData(string file, int nameSize)
                   << std::setw(10)           << "deadline"  << " ; "
                   << std::setw(10)           << "duration"  << endl;
 
-   if (!(cptExecutions > 0)) cout << "Error : no logs to print !" << endl;
+   if (!(cptExecutions > 0)) cerr << "[" << name << "] -" << "Error : no logs to print !" << endl;
    else for (int i = 0; i < cptExecutions; i++)
    {
       RTIME _dur = execLogs[i].duration;

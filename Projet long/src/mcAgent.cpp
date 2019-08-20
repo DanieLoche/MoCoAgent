@@ -182,9 +182,9 @@ void MCAgent::setMode(int mode)
             if (rt_task_suspend(bestEffortTask))
             {
                #if VERBOSE_DEBUG // ==1?"OVERLOADED":"NOMINAL"
-               cout << "Failed to stop task ";
+               cerr << "Failed to stop task ";
                #endif
-               printInquireInfo(bestEffortTask);
+               //printInquireInfo(bestEffortTask);
             }
          }
          #if VERBOSE_DEBUG // ==1?"OVERLOADED":"NOMINAL"

@@ -197,8 +197,8 @@ void printInquireInfo(RT_TASK* task)
    int ret = 0;
    if ((ret = rt_task_inquire(task, &curtaskinfo)))
    {  cout << ret;
-      if (ret == -EINVAL) cout << "\n - Invalid Task Descriptor or invalid Prio." << endl;
-      if (ret == -EPERM) cout << "\n - Task is NULL, and service called from invalid context." << endl;
+      if (ret == -EINVAL) cerr << "\n - Invalid Task Descriptor or invalid Prio." << endl;
+      if (ret == -EPERM) cerr << "\n - Task is NULL, and service called from invalid context." << endl;
    } else {
    std::stringstream ss;
    ss << "[ " << curtaskinfo.name

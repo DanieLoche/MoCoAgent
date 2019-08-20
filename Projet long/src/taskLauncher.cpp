@@ -44,7 +44,7 @@ int TaskLauncher::readChainsList(string input_file)
                    >> chaineInfo.taskChainID
                    >> chaineInfo.Path
                    >> chaineInfo.deadline ))
-            { cout << "\033[1;31mFailed to read line\033[0m !" << endl; return -1; } // error
+            { cerr << "\033[1;31mFailed to read line\033[0m !" << endl; return -1; } // error
          chaineInfo.deadline *= 1.0e6;
          taskSetInfos.e2eDD.push_back(chaineInfo);
       }
@@ -64,7 +64,7 @@ int TaskLauncher::readTasksList(int cpuPercent)
       std::ifstream myFile(taskSetInfos.e2eDD[i].Path);
       if (!myFile.is_open())
       {
-         cout << "Failed to open file : " << taskSetInfos.e2eDD[i].Path << endl;
+         cerr << "Failed to open file : " << taskSetInfos.e2eDD[i].Path << endl;
          exit(EXIT_FAILURE);
       }
 
@@ -89,7 +89,7 @@ int TaskLauncher::readTasksList(int cpuPercent)
                       >> taskInfo->affinity
                       >> taskInfo->precedency
                       >> taskInfo->path_task ) )
-               { cout << "\033[1;31mFailed to read line\033[0m !" << endl; return -1; } // error
+               { cerr << "\033[1;31mFailed to read line\033[0m !" << endl; return -1; } // error
             //taskInfo->isHardRealTime = taskSetInfos.e2eDD[i].taskChainID;
             getline(iss , taskInfo->arguments);
             taskInfo->arguments = reduce(taskInfo->arguments);
@@ -162,7 +162,7 @@ int TaskLauncher::createTasks()
 
       if(rt_task_create(taskInfo.task, taskInfo.name, 0, taskInfo.priority, 0) < 0)
       {
-         printf("Failed to create task %s\n",taskInfo.name);
+         cerr << "[" << taskInfo.name << "] " << "Failed to create task." << endl;
          return -1;
       }
       else
@@ -181,20 +181,20 @@ int TaskLauncher::createTasks()
          if (schedPolicy == SCHED_RM) schedPolicy = SCHED_FIFO;
          if( (ret = sched_setscheduler_ex(curtaskinfo.pid, schedPolicy, &para)) != 0)
          {
-            cout << "error setting scheduling policy " << schedPolicy << ", Error #" << ret;
+            cerr << "[" << taskInfo.name << "] " << "error setting scheduling policy " << schedPolicy << ", Error #" << ret;
             exit(ret);
          }
          //Periodicity
          if ((ret = rt_task_set_periodic(taskInfo.task, TM_NOW, taskInfo.periodicity)))
-         { cout << "Set_Period Error : " << ret << " ." << endl; exit(-2); }
+         { cerr << "[" << taskInfo.name << "] " << "Set_Period Error : " << ret << " ." << endl; exit(-2); }
          rt_task_affinity(taskInfo.task, taskInfo.affinity, 0);
          if (schedPolicy == SCHED_RR)
          { //#if defined SCHED_POLICY  &&  SCHED_POLICY == SCHED_RR
             if ((ret = rt_task_slice(taskInfo.task, RR_SLICE_TIME)))
-            { cout << "Slice Error : " << ret << " ." << endl; exit(-3); }
+            { cerr << "[" << taskInfo.name << "] " << "Slice Error : " << ret << " ." << endl; exit(-3); }
          } //#endif
          if ((ret = rt_task_set_priority(taskInfo.task, taskInfo.priority)))
-            { cout << "Set_Priority Error : " << ret << " ." << endl; exit(-4); }
+            { cerr << "[" << taskInfo.name << "] " << "Set_Priority Error : " << ret << " ." << endl; exit(-4); }
          /* Gestion EDF Scheduling
          RT_TASK_INFO curtaskinfo;
          rt_task_inquire(taskInfo->task, &curtaskinfo);
@@ -232,10 +232,10 @@ int TaskLauncher::runTasks()
       taskRTInfo* _taskRTInfo = new taskRTInfo;
       _taskRTInfo->taskLog = dlog;
       _taskRTInfo->rtTI = &taskInfo;
-      printInquireInfo(taskInfo.task);
+      //printInquireInfo(taskInfo.task);
       if( rt_task_start(taskInfo.task, TaskMain, _taskRTInfo))
       {
-         printf("Failed to start task %s\n",taskInfo.name);
+         cerr << "[" << taskInfo.name << "] :" << "Failed to start task." << endl;
          return -1;
       }
       else
@@ -256,7 +256,7 @@ int TaskLauncher::runAgent()
    #endif
    if( rt_task_create(&mcAgent, "MoCoAgent", 0, 99, 0))
    {
-      cout << "Error creating Monitoring and Control Agent" << endl;
+      cerr << "Error creating Monitoring and Control Agent" << endl;
       return -1;
    }
    else
@@ -345,7 +345,7 @@ void TaskLauncher::rt_task_affinity (RT_TASK* task, int _aff, int mode)
 
    if (int ret = rt_task_set_affinity(task, &mask))
    {
-      cout << "Error while setting (" << mode << ") affinity for task "
+      cerr << "Error while setting (" << mode << ") affinity for task "
       << curtaskinfo.name << " to CPU " << _aff << ": " <<  ret << "."<< endl;
    }
    #if VERBOSE_ASK

@@ -124,7 +124,7 @@ int MacroTask::before()
 {
    //   rt_mutex_acquire(&mutex, TM_INFINITE);
    #if VERBOSE_OTHER
-   std::cerr << "[ " << properties->name << " ] : " << "Executing Before." << endl;
+   cout << "[ " << properties->name << " ] : " << "Executing Before." << endl;
    #endif
    //rt_task_set_priority(NULL, priority+1);
    msg.time = dataLogs->logStart();
@@ -134,7 +134,7 @@ int MacroTask::before()
       //MoCoIsAlive = 0;
       RT_BUFFER_INFO infos;
       rt_buffer_inquire(&bf, &infos);
-      std::cerr << properties->name << " : failed to write BEFORE monitoring message to buffer.\n"
+      cerr << properties->name << " : failed to write BEFORE monitoring message to buffer.\n"
           << infos.availmem << " / " << infos.totalmem << " available on buffer " << infos.name << " " << infos.owaiters << " waiting too." << endl;
    }
    return 0;
@@ -143,7 +143,7 @@ int MacroTask::before()
 void MacroTask::proceed()
 {
       #if VERBOSE_OTHER
-      std::cerr << "[ " << properties->name << " ] : "<< "Executing Proceed." << endl;
+      cout << "[ " << properties->name << " ] : "<< "Executing Proceed." << endl;
       #endif
       // if (std::string path(properties->path_task) != "/null/")  {
       //cout << properties->name << " : " << chain << endl;
@@ -156,7 +156,7 @@ void MacroTask::proceed()
       {
          wait(NULL);
          #if VERBOSE_OTHER
-         std::cerr << "[ " << properties->name << " ] : "<< "End of Proceed." << endl;
+         cout << "[ " << properties->name << " ] : "<< "End of Proceed." << endl;
          #endif
       }
 
@@ -168,7 +168,7 @@ void MacroTask::proceed()
 int MacroTask::after()
 {
   #if VERBOSE_OTHER
-  std::cerr << "[ " << properties->name << " ] : "<< "Executing After." << endl;
+  cout << "[ " << properties->name << " ] : "<< "Executing After." << endl;
   #endif
   msg.time = dataLogs->logExec();
   msg.isExecuted = 1;
@@ -177,7 +177,7 @@ int MacroTask::after()
      //MoCoIsAlive = 0;
      RT_BUFFER_INFO infos;
      rt_buffer_inquire(&bf, &infos);
-     std::cerr << properties->name << " : failed to write AFTER monitoring message to buffer.\n"
+     cerr << properties->name << " : failed to write AFTER monitoring message to buffer.\n"
          << infos.availmem << " / " << infos.totalmem << " available on buffer " << infos.name << " " << infos.owaiters << " waiting too." << endl;
   }
   //ChaineInfo_Struct.Wcet_update() ;
@@ -194,7 +194,7 @@ void MacroTask::executeRun()
         if( rt_buffer_bind (&bf , "/monitoringTopic", 100000) < 0)
         {
           rt_buffer_delete(&bf);
-          std::cerr << "Failed to lin to Monitoring Buffer" << endl;
+          cerr << "Failed to lin to Monitoring Buffer" << endl;
           MoCoIsAlive = 0;
           //exit(-1);
         }
@@ -231,7 +231,7 @@ int MacroTask::after_besteff()
 {
     dataLogs->logExec();
     #if VERBOSE_OTHER
-    std::cerr << "End Task : " << properties->name << endl;
+    cout << "End Task : " << properties->name << endl;
     #endif
 //   rt_mutex_release(&mutex);
    rt_task_set_priority(NULL, priority);
