@@ -2,7 +2,6 @@
 #include "taskLauncher.h"
 #include "sched.h"
 #include "edf.h"
-#include "dataLogger.h"
 
 #include <iomanip>
 

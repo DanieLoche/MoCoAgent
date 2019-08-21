@@ -1,2 +1,2 @@
 ID  name 		     meanET  wcet    isHRT aff  prec path                       arguments
-1 adpcmCaudio_S 500 1000 1 1 0 ./bench/adpcm_rawcaudio < ./bench/adpcm/small.pcm > ./bench/output/o_small.adpcm
+1 adpcmCaudio_S 250 200 1 1 0 ./bench/adpcm_rawcaudio < ./bench/adpcm/small.pcm > ./bench/output/o_small.adpcm

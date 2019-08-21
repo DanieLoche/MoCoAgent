@@ -65,6 +65,11 @@ void DataLogger::logExec(RTIME endTime)
       }
       cptExecutions++;
       //return execLogs[cptExecutions - 1].duration;
+      if (cptExecutions > 4095)
+      {
+         cptExecutions = 0;
+         cerr << "[" << name << "] " << "WARNING - Measured more than allowed buffer size." << endl;
+      }
    }
    else cerr << "[" << name << "] " << "- WARNING : Exec not logged as timestamp was not set yet." << endl;
 
@@ -72,27 +77,31 @@ void DataLogger::logExec(RTIME endTime)
 
 RTIME DataLogger::logExec( )
 {
-  RTIME _logTime = rt_timer_read();
-  execLogs[cptExecutions].duration = _logTime - execLogs[cptExecutions].timestamp;
+   RTIME _logTime = rt_timer_read();
+   if (execLogs[cptExecutions].timestamp)
+   {
+      execLogs[cptExecutions].duration = _logTime - execLogs[cptExecutions].timestamp;
 
-  if(execLogs[cptExecutions].duration > deadline )
-  {
-    #if VERBOSE_ASK
-    fprintf(stderr, "[  \033[1;31mERROR\033[0m  ] Task : \033[1;31m%s\033[0m - \033[1;36m%.2f ms\033[0m\n",name,execLogs[cptExecutions].duration/1e6);
-    #endif
-    cptOutOfDeadline++;
-  }else{
-    #if VERBOSE_ASK
-    fprintf(stderr, "[ \033[1;32mPERFECT\033[0m ] Task : \033[1;32m%s\033[0m - \033[1;36m%.2f ms\033[0m\n",name,execLogs[cptExecutions].duration/1e6);
-    #endif
-  }
-  cptExecutions++;
-  if (cptExecutions > 4095)
-  {
-     cptExecutions = 0;
-     cerr << "[" << name << "] " << "WARNING - Measures more than allowed buffer size." << endl;
-  }
-  return _logTime;
+      if(execLogs[cptExecutions].duration > deadline )
+      {
+       #if VERBOSE_ASK
+       fprintf(stderr, "[  \033[1;31mERROR\033[0m  ] Task : \033[1;31m%s\033[0m - \033[1;36m%.2f ms\033[0m\n",name,execLogs[cptExecutions].duration/1e6);
+       #endif
+       cptOutOfDeadline++;
+      }else{
+       #if VERBOSE_ASK
+       fprintf(stderr, "[ \033[1;32mPERFECT\033[0m ] Task : \033[1;32m%s\033[0m - \033[1;36m%.2f ms\033[0m\n",name,execLogs[cptExecutions].duration/1e6);
+       #endif
+      }
+      cptExecutions++;
+      if (cptExecutions > 4095)
+      {
+        cptExecutions = 0;
+        cerr << "[" << name << "] " << "WARNING - Measured more than allowed buffer size." << endl;
+      }
+   }
+   else cerr << "[" << name << "] " << "- WARNING : Exec not logged as timestamp was not set yet." << endl;
+   return _logTime;
 }
 
 void TaskDataLogger::saveData(string file, int nameSize)
