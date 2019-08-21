@@ -45,33 +45,47 @@ MacroTask::MacroTask(taskRTInfo* _taskRTInfo, bool MoCo)
 
 void MacroTask::parseParameters()
 {
-      cout << "[ " << properties->name << " ] : "
-            << "Started parsing params." << endl;
+      //cout << "[ " << properties->name << " ] : " << "Started parsing params." << endl;
       stdIn[0] = '\0'; stdOut[0] = '\0';
       argv.push_back(properties->name); //argv[0] = properties->name;
 
       std::istringstream iss( properties->arguments);
       string token;
-      int i = 1, nextStr = 0;
+      int nextStr = 0;
       while (getline(iss, token, ' '))
       {
          token = reduce(token);
-         //cout << "[ " << properties->name << " ] : " << "Managing token " << token << endl;
+         //cout << "[ " << properties->name << " ] : " << "Managing token [" << token << "]" << endl;
          if (token == "<")
             nextStr = 1;
          else if (token == ">")
             nextStr = 2;
          else
          {
-            if (nextStr == 1)  {token.copy(stdIn, token.size()); stdIn[token.size()] = '\0'; cout << "[ " << properties->name << " ] : " << "stdIn = " << stdIn << "." << endl; }
-            else if (nextStr == 2)  { token.copy(stdOut, token.size()); stdOut[token.size()] = '\0'; cout << "[ " << properties->name << " ] : " << "stdOut = " << stdOut << "." << endl; }
+            if (nextStr == 1)
+            {
+               token.copy(stdIn, token.size());
+               stdIn[token.size()] = '\0';
+               #if VERBOSE_OTHER
+               cout << "[ " << properties->name << " ] : " << "stdIn = " << stdIn << "." << endl;
+               #endif
+            }
+            else if (nextStr == 2)
+            {
+               token.copy(stdOut, token.size());
+               stdOut[token.size()] = '\0';
+               #if VERBOSE_OTHER
+               cout << "[ " << properties->name << " ] : " << "stdOut = " << stdOut << "." << endl;
+               #endif
+            }
             else
             {
-               //argv[i] = &reduce(token)[0u];
-               //token.copy(argv[i], token.size());
-               char *arg = new char[token.size()];  // +1
+               char *arg = new char[token.size() +1];  // +1
                copy(token.begin(), token.end(), arg);
-               // arg[token.size()]c= '\0';
+               arg[token.size()]= '\0';
+               #if VERBOSE_OTHER
+               cout << "token : [" << token << "] (" << token.size() << ") copied to [" << arg << "] (" << strlen(arg) << ")." << endl;
+               #endif
                argv.push_back(arg);
                //i++;
             }
@@ -80,6 +94,8 @@ void MacroTask::parseParameters()
       }
       argv.push_back(0);
       //token.copy(argv[i], token.size()); // arguments list must end with a null.
+      #if VERBOSE_OTHER
+      int i = 1;
       i = 0;
       for (auto arg : argv)
       {
@@ -90,6 +106,7 @@ void MacroTask::parseParameters()
          i++;
       }
       cout << endl;
+      #endif
 
       if (stdIn[0] != '\0')
       {
