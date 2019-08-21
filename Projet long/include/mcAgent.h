@@ -1,4 +1,5 @@
 #include "tools.h"
+#include "dataLogger.h"
 //#include <array>
 
 #define   TRUE    1
@@ -20,10 +21,6 @@ startTime     // 0 si on donne un end time
 endTime       // 0 si on donne un start time
 isExecuted    // 1 en conjonction du end time
 chaines concernées par la tâche ??
-
-On MaJ :
-si startTime (chaine) == 0, alors startTime = currentTime
-currentTime =
 */
 class taskMonitoringStruct
 {
@@ -45,8 +42,6 @@ class taskMonitoringStruct
     //bool operator <(const taskMonitoringStruct& tms) const {return (id < tms.id);}
 };
 
-
-#include "dataLogger.h"
 class taskChain
 {
   public :

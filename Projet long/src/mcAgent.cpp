@@ -400,8 +400,8 @@ RTIME taskChain::getRemWCET()
   RTIME RemWCET = 0;
   for (auto& task : taskList)
   {
-     bool state = task.getState();
-     //cout << state << "-";
+    bool state = task.getState();
+    //cout << state << "-";
     if (!state)
       RemWCET += task.rwcet;
   }

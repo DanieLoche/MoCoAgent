@@ -82,8 +82,8 @@ int TaskLauncher::readTasksList(int cpuPercent)
          {
             char name[28];
             if (!(iss >> taskInfo->id >> name
-                      >> taskInfo->periodicity     // placeholder.
-                      >> taskInfo->wcet
+                      >> taskInfo->periodicity     // placeholder. // meanET -> period
+                      >> taskInfo->wcet                            // WCET -> for task chain
                       >> taskInfo->isHardRealTime
                       >> taskInfo->affinity
                       >> taskInfo->precedency
@@ -95,7 +95,7 @@ int TaskLauncher::readTasksList(int cpuPercent)
             taskInfo->priority = 50;
             // Traitement de la périodicité de la tâche
             taskInfo->wcet *= 1.0e6;              // conversion ms to RTIME (ns)
-            taskInfo->periodicity = taskInfo->wcet * cpuFactor;
+            taskInfo->periodicity = taskInfo->wcet * cpuFactor; //taskInfo->periodicity = taskInfo->periodicity * 1.0e6 * cpuFactor;
             // Traitement du nom de la tâche
             strncat(ext, name, 64);
             strcpy(taskInfo->name,ext);
@@ -186,14 +186,15 @@ int TaskLauncher::createTasks()
          //Periodicity
          if ((ret = rt_task_set_periodic(taskInfo.task, TM_NOW, taskInfo.periodicity)))
          { cerr << "[" << taskInfo.name << "] " << "Set_Period Error : " << ret << " ." << endl; exit(-2); }
-         rt_task_affinity(taskInfo.task, taskInfo.affinity, 0);
+         if ((ret = rt_task_affinity(taskInfo.task, taskInfo.affinity, 0)))
+         { cerr << "[" << taskInfo.name << "] " << "Set_Affinity Error : " << ret << " ." << endl; exit(-3); }
          if (schedPolicy == SCHED_RR)
          { //#if defined SCHED_POLICY  &&  SCHED_POLICY == SCHED_RR
             if ((ret = rt_task_slice(taskInfo.task, RR_SLICE_TIME)))
-            { cerr << "[" << taskInfo.name << "] " << "Slice Error : " << ret << " ." << endl; exit(-3); }
+            { cerr << "[" << taskInfo.name << "] " << "Slice Error : " << ret << " ." << endl; exit(-4); }
          } //#endif
          if ((ret = rt_task_set_priority(taskInfo.task, taskInfo.priority)))
-            { cerr << "[" << taskInfo.name << "] " << "Set_Priority Error : " << ret << " ." << endl; exit(-4); }
+            { cerr << "[" << taskInfo.name << "] " << "Set_Priority Error : " << ret << " ." << endl; exit(-5); }
          /* Gestion EDF Scheduling
          RT_TASK_INFO curtaskinfo;
          rt_task_inquire(taskInfo->task, &curtaskinfo);
@@ -260,11 +261,18 @@ int TaskLauncher::runAgent()
    }
    else
    {
-      enableAgent = 1;
-      rt_task_affinity(&mcAgent, 0, 0);
+        enableAgent = 1;
+        if ((ret = rt_task_affinity(&mcAgent, 0, 0)))
+            { cerr << "[" << taskInfo.name << "] " << "Set_Affinity Error : " << ret << " ." << endl; exit(-2); }
+        if ((ret = rt_task_set_periodic(taskInfo.task, TM_NOW, taskInfo.periodicity)))
+            { cerr << "[" << taskInfo.name << "] " << "Set_Period Error : " << ret << " ." << endl; exit(-3); }
 
-      //  systemRTInfo ch_taks ;
-      rt_task_start(&mcAgent, RunmcAgentMain, &taskSetInfos);
+        //  systemRTInfo ch_taks ;
+        if (rt_task_start(&mcAgent, RunmcAgentMain, &taskSetInfos) )
+        {
+           cerr << "[" << taskInfo.name << "] :" << "Failed to start task." << endl;
+           return -1;
+        }
    }
    return 0;
 }
