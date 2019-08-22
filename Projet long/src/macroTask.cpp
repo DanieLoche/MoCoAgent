@@ -108,32 +108,32 @@ void MacroTask::parseParameters()
       cout << endl;
       #endif
 
-      if (stdIn[0] != '\0')
-      {
-         #if VERBOSE_OTHER
-         cout << "Changed Input to : " << stdIn << endl;
-         #endif
-         int fdIn = open(stdIn, O_RDWR | O_CREAT, S_IRUSR | S_IWUSR);
-         dup2(fdIn, 0);
-         close(fdIn);
-      }
-      #if VERBOSE_OTHER
-      else cout << "Unchanged Input." << endl;
-      #endif
-
-      if (stdOut[0] != '\0')
-      {
-         #if VERBOSE_OTHER
-         cout << "Changed Output to : " << stdOut << endl;
-         #endif
-         int fdOut = open(stdOut, O_RDWR | O_CREAT, S_IRUSR | S_IWUSR);
-         dup2(fdOut, 1);
-         close(fdOut);
-      }
-      #if VERBOSE_OTHER
-      else
-      cout << "Unchanged Output." << endl;
-      #endif
+      // if (stdIn[0] != '\0')
+      // {
+      //    #if VERBOSE_OTHER
+      //    cout << "Changed Input to : " << stdIn << endl;
+      //    #endif
+      //    int fdIn = open(stdIn, O_RDWR | O_CREAT, S_IRUSR | S_IWUSR);
+      //    dup2(fdIn, 0);
+      //    close(fdIn);
+      // }
+      // #if VERBOSE_OTHER
+      // else cout << "Unchanged Input." << endl;
+      // #endif
+      //
+      // if (stdOut[0] != '\0')
+      // {
+      //    #if VERBOSE_OTHER
+      //    cout << "Changed Output to : " << stdOut << endl;
+      //    #endif
+      //    int fdOut = open(stdOut, O_RDWR | O_CREAT, S_IRUSR | S_IWUSR);
+      //    dup2(fdOut, 1);
+      //    close(fdOut);
+      // }
+      // #if VERBOSE_OTHER
+      // else
+      // cout << "Unchanged Output." << endl;
+      // #endif
 
 }
 
@@ -166,6 +166,19 @@ void MacroTask::proceed()
       //cout << properties->name << " : " << chain << endl;
       if (vfork() == 0)
       {
+          if (stdIn[0] != '\0')
+          {
+             int fdIn = open(stdIn, O_RDWR | O_CREAT, S_IRUSR | S_IWUSR);
+             dup2(fdIn, 0);
+             close(fdIn);
+          }
+
+          if (stdOut[0] != '\0')
+          {
+             int fdOut = open(stdOut, O_RDWR | O_CREAT, S_IRUSR | S_IWUSR);
+             dup2(fdOut, 1);
+             close(fdOut);
+          }
          execv(properties->path_task, &argv[0]);
          _exit(0);
       }
