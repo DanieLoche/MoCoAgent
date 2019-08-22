@@ -11,8 +11,8 @@ susan_S_corners  250  100  1     1    0   ./bench/susan_bin          ./bench/sus
 susan_L_smooth   250  100  1     1    0   ./bench/susan_bin          ./bench/susan/input_large.pgm   ./bench/output/o_susan_large.smoothing.pgm   -s
 susan_L_edges    250  100  1     1    0   ./bench/susan_bin          ./bench/susan/input_large.pgm   ./bench/output/o_susan_large.edges.pgm   -e
 susan_L_corners  250  100  1     1    0   ./bench/susan_bin          ./bench/susan/input_large.pgm   ./bench/output/o_susan_large.corners.pgm   -c
-cjpeg_S          250  250  1     1    0   ./bench/cjpeg              -dct int -progressive -opt -outfile ./bench/output/o_small_encode.jpeg ./bench/jpg/input_small.ppm
-cjpeg_L          250  250  1     1    0   ./bench/cjpeg              -dct int -progressive -opt -outfile ./bench/output/o_large_encode.jpeg ./bench/jpg/input_large.ppm
+cjpeg_S          250  50   1     1    0   ./bench/cjpeg              -dct int -progressive -opt -outfile ./bench/output/o_small_encode.jpeg ./bench/jpg/input_small.ppm
+cjpeg_L          250  100  1     1    0   ./bench/cjpeg              -dct int -progressive -opt -outfile ./bench/output/o_large_encode.jpeg ./bench/jpg/input_large.ppm
 djpeg_S          250  100  1     1    0   ./bench/djpeg              -dct int -ppm -outfile ./bench/output/o_small_decode.ppm ./bench/jpg/input_small.jpg
 djpeg_L          250  100  1     1    0   ./bench/djpeg              -dct int -ppm -outfile ./bench/output/o_large_decode.ppm ./bench/jpg/input_large.jpg
 typeset_S        250  100  1     1    0   ./bench/lout               -I ./bench/typeset/include -D ./bench/typeset/data -F ./bench/typeset/font -C ./bench/typeset/maps -H ./bench/typeset/hyph ./bench/typeset/small.lout > ./bench/output/o_typeset_small.ps
