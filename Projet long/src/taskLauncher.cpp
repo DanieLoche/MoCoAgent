@@ -186,8 +186,7 @@ int TaskLauncher::createTasks()
          //Periodicity
          if ((ret = rt_task_set_periodic(taskInfo.task, TM_NOW, taskInfo.periodicity)))
          { cerr << "[" << taskInfo.name << "] " << "Set_Period Error : " << ret << " ." << endl; exit(-2); }
-         if ((ret = rt_task_affinity(taskInfo.task, taskInfo.affinity, 0)))
-         { cerr << "[" << taskInfo.name << "] " << "Set_Affinity Error : " << ret << " ." << endl; exit(-3); }
+         rt_task_affinity(taskInfo.task, taskInfo.affinity, 0);
          if (schedPolicy == SCHED_RR)
          { //#if defined SCHED_POLICY  &&  SCHED_POLICY == SCHED_RR
             if ((ret = rt_task_slice(taskInfo.task, RR_SLICE_TIME)))
@@ -251,26 +250,26 @@ int TaskLauncher::runTasks()
 
 int TaskLauncher::runAgent()
 {
+  int ret = 0;
    #if VERBOSE_INFO
    cout << endl << "LAUNCHING MoCoAgent." << endl;
    #endif
-   if( rt_task_create(&mcAgent, "MoCoAgent", 0, 99, 0))
+   if( (ret = rt_task_create(&mcAgent, "MoCoAgent", 0, 99, 0)) )
    {
-      cerr << "Error creating Monitoring and Control Agent" << endl;
+      cerr << "Error creating Monitoring and Control Agent (" << ret << ")." << endl;
       return -1;
    }
    else
    {
         enableAgent = 1;
-        if ((ret = rt_task_affinity(&mcAgent, 0, 0)))
-            { cerr << "[" << taskInfo.name << "] " << "Set_Affinity Error : " << ret << " ." << endl; exit(-2); }
-        if ((ret = rt_task_set_periodic(taskInfo.task, TM_NOW, taskInfo.periodicity)))
-            { cerr << "[" << taskInfo.name << "] " << "Set_Period Error : " << ret << " ." << endl; exit(-3); }
+        rt_task_affinity(&mcAgent, 0, 0);
+        if ( (ret = rt_task_set_periodic(&mcAgent, TM_NOW, 10*1e6)) )
+            { cerr << "[Task Launcher] " << "Set_Period Error : " << ret << " ." << endl; exit(-3); }
 
         //  systemRTInfo ch_taks ;
-        if (rt_task_start(&mcAgent, RunmcAgentMain, &taskSetInfos) )
+        if ( (ret = rt_task_start(&mcAgent, RunmcAgentMain, &taskSetInfos)) )
         {
-           cerr << "[" << taskInfo.name << "] :" << "Failed to start task." << endl;
+           cerr << "[ Task Launcher ] :" << "Failed to start Mo Co Agent. ("<< ret << ")."  << endl;
            return -1;
         }
    }
