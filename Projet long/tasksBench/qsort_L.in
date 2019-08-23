@@ -1,2 +1,2 @@
 ID  name 		     meanET  wcet    isHRT aff  prec path                       arguments
-1 qsort_L 5.04 100 1 1 0 ./bench/qsort_large ./bench/qsort/input_large.dat > ./bench/output/o_qsort_large.txt
+1 qsort_L 45 120 1 1 0 ./bench/qsort_large ./bench/qsort/input_large.dat > ./bench/output/o_qsort_large.txt

@@ -1,11 +1,11 @@
-ID  name 		meanET  wcet  isHRT    aff    prec      path                     arguments
-1  IP_susan_S_smooth	8	15	1	1	0	./bench/susan_bin	./bench/susan/input_small.pgm   ./bench/output/o_susan_small.smoothing.pgm   -s
-2  IP_susan_S_edges	0.5	15	1	1	1	./bench/susan_bin	./bench/susan/input_small.pgm   ./bench/output/o_susan_small.edges.pgm   -e
-3  IP_susan_S_corners	0.5	15	1	1	2	./bench/susan_bin	./bench/susan/input_small.pgm   ./bench/output/o_susan_small.corners.pgm   -c
-4  IP_bitcount_S	5	15	1	1	3	./bench/bitcnts	75000   >   ./bench/output/o_btcnt_small.txt
-5  IP_basicmath_S	15	30	1	1	4	./bench/basicmath_small	>   ./bench/output/o_basmth_small.txt
-6  IP_dijkstra_S	12	30	1	1	5	./bench/dijkstra_small	./bench/dijkstra/input.dat   >   ./bench/output/o_dijk_small.dat
-7  IP_djpeg_S	        2	15	1	1	6	./bench/djpeg	-dct int -ppm -outfile ./bench/output/o_small_decode.ppm ./bench/jpg/input_small.jpg
-8  IP_djpeg_L	        4	15	1	1	7	./bench/djpeg	-dct int -ppm -outfile ./bench/output/o_large_decode.ppm ./bench/jpg/input_large.jpg
-9  IP_qsort_S	        8.5	15	1	1	8	./bench/qsort_small	./bench/qsort/input_small.dat   >   ./bench/output/o_qsort_small.txt
-10 IP_sha_S	        4	15	1	1	9	./bench/sha_bin	./bench/sha/input_small.asc   >   ./bench/output/o_sha_small.txt
+ID  name       meanET  wcet  isHRT    aff    prec      path                     arguments
+1  IP_susan_S_smooth   8   15   1   1   0   ./bench/susan_bin   ./bench/susan/input_small.pgm   ./bench/output/o_susan_small.smoothing.pgm   -s
+2  IP_susan_S_edges   0.5   15   1   1   1   ./bench/susan_bin   ./bench/susan/input_small.pgm   ./bench/output/o_susan_small.edges.pgm   -e
+3  IP_susan_S_corners   0.5   15   1   1   2   ./bench/susan_bin   ./bench/susan/input_small.pgm   ./bench/output/o_susan_small.corners.pgm   -c
+4  IP_bitcount_S   5   15   1   1   3   ./bench/bitcnts   75000   >   ./bench/output/o_btcnt_small.txt
+5  IP_basicmath_S   15   30   1   1   4   ./bench/basicmath_small   >   ./bench/output/o_basmth_small.txt
+6  IP_dijkstra_S   12   30   1   1   5   ./bench/dijkstra_small   ./bench/dijkstra/input.dat   >   ./bench/output/o_dijk_small.dat
+7  IP_djpeg_S           2   15   1   1   6   ./bench/djpeg   -dct int -ppm -outfile ./bench/output/o_small_decode.ppm ./bench/jpg/input_small.jpg
+8  IP_djpeg_L           4   15   1   1   7   ./bench/djpeg   -dct int -ppm -outfile ./bench/output/o_large_decode.ppm ./bench/jpg/input_large.jpg
+9  IP_qsort_S           8.5   15   1   1   8   ./bench/qsort_small   ./bench/qsort/input_small.dat   >   ./bench/output/o_qsort_small.txt
+10 IP_sha_S           4   15   1   1   9   ./bench/sha_bin   ./bench/sha/input_small.asc   >   ./bench/output/o_sha_small.txt

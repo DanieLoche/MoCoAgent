@@ -1,2 +1,2 @@
 ID  name 		     meanET  wcet    isHRT aff  prec path                       arguments
-1 gsmUToast_S 0.43 250 1 1 0 ./bench/untoast -fps -c ./bench/gsm/small.au.run.gsm > ./bench/output/o_small.decode.run
+1 gsmUToast_S 0.43 15 1 1 0 ./bench/untoast -fps -c ./bench/gsm/small.au.run.gsm > ./bench/output/o_small.decode.run

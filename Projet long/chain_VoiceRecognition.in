@@ -1,9 +1,9 @@
-ID  name 		meanET  wcet   isHRT   aff    prec      path                    arguments
-1   VR_bitcount_S	5	15	1	1	0	./bench/bitcnts	75000   >   ./bench/output/o_btcnt_small.txt
-3   VR_stringsearch_L	5	15	1	1	1	./bench/search_large	>   ./bench/output/o_search_large.txt
-4   VR_gsmToast_S	3	15	1	1	2	./bench/toast	-fps -c ./bench/gsm/small.au > ./bench/output/o_small.encode.gsm
-5   VR_adpcmCaudio_S	14	30	1	1	3	./bench/adpcm_rawcaudio	< ./bench/adpcm/small.pcm > ./bench/output/o_small.adpcm
-6   VR_adpcmCaudio_L	198	480	1	1	6	./bench/adpcm_rawcaudio	< ./bench/adpcm/large.pcm > ./bench/output/o_large.adpcm
-7   VR_adpcmDaudio_S	6	15	1	1	4	./bench/adpcm_rawdaudio	< ./bench/adpcm/small.adpcm > ./bench/output/o_small.pcm
-8   VR_adpcmDaudio_L	95	240	1	1	5	./bench/adpcm_rawdaudio	< ./bench/adpcm/large.adpcm > ./bench/output/o_large.pcm
-2   VR_basicmath_L	250	480	1	1	7	./bench/basicmath_large	>   ./bench/output/o_basmth_large.txt
+ID  name       meanET  wcet   isHRT   aff    prec      path                    arguments
+1   VR_bitcount_S   5   15   1   1   0   ./bench/bitcnts   75000   >   ./bench/output/o_btcnt_small.txt
+3   VR_stringsearch_L   5   15   1   1   1   ./bench/search_large   >   ./bench/output/o_search_large.txt
+4   VR_gsmToast_S   3   15   1   1   2   ./bench/toast   -fps -c ./bench/gsm/small.au > ./bench/output/o_small.encode.gsm
+5   VR_adpcmCaudio_S   14   30   1   1   3   ./bench/adpcm_rawcaudio   < ./bench/adpcm/small.pcm > ./bench/output/o_small.adpcm
+6   VR_adpcmCaudio_L   198   480   1   1   6   ./bench/adpcm_rawcaudio   < ./bench/adpcm/large.pcm > ./bench/output/o_large.adpcm
+7   VR_adpcmDaudio_S   6   15   1   1   4   ./bench/adpcm_rawdaudio   < ./bench/adpcm/small.adpcm > ./bench/output/o_small.pcm
+8   VR_adpcmDaudio_L   95   240   1   1   5   ./bench/adpcm_rawdaudio   < ./bench/adpcm/large.adpcm > ./bench/output/o_large.pcm
+2   VR_basicmath_L   250   480   1   1   7   ./bench/basicmath_large   >   ./bench/output/o_basmth_large.txt
