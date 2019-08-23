@@ -1,2 +1,2 @@
 ID  name 		     meanET  wcet    isHRT aff  prec path                       arguments
-1 fft_inv_L 250 100 1 1 0 ./bench/fft 8 32768 -i > ./bench/output/o_ffti_large.inv.txt
+1 fft_inv_L 29.6 500 1 1 0 ./bench/fft 8 65536 -i > ./bench/output/o_ffti_large.inv.txt

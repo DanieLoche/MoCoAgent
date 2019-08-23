@@ -1,2 +1,2 @@
 ID  name 		     meanET  wcet    isHRT aff  prec path                       arguments
-1 typeset_L 250 200 1 1 0 ./bench/lout -I ./bench/typeset/include -D ./bench/typeset/data -F ./bench/typeset/font -C ./bench/typeset/maps -H ./bench/typeset/hyph ./bench/typeset/large.lout > ./bench/output/o_typeset_large.ps
+1 typeset_L 88.2 200 1 1 0 ./bench/lout -I ./bench/typeset/include -D ./bench/typeset/data -F ./bench/typeset/font -C ./bench/typeset/maps -H ./bench/typeset/hyph ./bench/typeset/large.lout > ./bench/output/o_typeset_large.ps

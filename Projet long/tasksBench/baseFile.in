@@ -1,4 +1,4 @@
-name           meanET wcet  isHRT aff  prec path                      parameters
+name             wcet period isHRT aff  prec path                      parameters
 basicmath_S      8.70   200  1     1    0   ./bench/basicmath_small    >   ./bench/output/o_basmth_small.txt
 basicmath_L      725    750  1     1    0   ./bench/basicmath_large    >   ./bench/output/o_basmth_large.txt
 bitcount_S       15     100  1     1    0   ./bench/bitcnts            75000   >   ./bench/output/o_btcnt_small.txt
