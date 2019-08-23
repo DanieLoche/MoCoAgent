@@ -158,14 +158,14 @@ int main(int argc, char* argv[])
    #if VERBOSE_INFO
    cout << " Generating Task Set ..." << endl;
    #endif
-   if(tln->readChainsList(inputFile)) {cout << "Failed to read task chains." << endl; return -1;}
-   if(tln->readTasksList(cpuFactor)) {cout << "Failed to read tasks list." << endl; return -2;}
+   if(tln->readChainsList(inputFile)) {cerr << "Failed to read task chains." << endl; return -1;}
+   if(tln->readTasksList(cpuFactor)) {cerr << "Failed to read tasks list." << endl; return -2;}
 //   if(tln->createMutexes(nproc)) {cout << "Failed to read tasks list." << endl; return -3;}
 
    tln->printTasksInfos();
 
-   if(tln->createTasks()) {cout << "Failed to create all tasks" << endl; return -4;}
-   if(tln->runTasks()) {cout << "Failed to run all tasks" << endl; return -5;}
+   if(tln->createTasks()) {cerr << "Failed to create all tasks" << endl; return -4;}
+   if(tln->runTasks()) {cerr << "Failed to run all tasks" << endl; return -5;}
 
    if (enableAgent)
    {

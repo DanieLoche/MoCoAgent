@@ -43,7 +43,7 @@ int TaskLauncher::readChainsList(string input_file)
                    >> chaineInfo.taskChainID
                    >> chaineInfo.Path
                    >> chaineInfo.deadline ))
-            { cerr << "\033[1;31mFailed to read line\033[0m !" << endl; return -1; } // error
+            { cerr << "Failed to read line : " << str << endl; return -1; } // error
          chaineInfo.deadline *= 1.0e6;
          taskSetInfos.e2eDD.push_back(chaineInfo);
       }
@@ -80,22 +80,23 @@ int TaskLauncher::readTasksList(int cpuPercent)
          #endif
          if (str.substr(0,2) != "//")
          {
+            float tmp_wcet = 0;
             char name[28];
             if (!(iss >> taskInfo->id >> name
-                      >> taskInfo->periodicity     // placeholder. // meanET -> period
-                      >> taskInfo->wcet                            // WCET -> for task chain
+                      >> tmp_wcet     // WCET -> for task chain // placeholder.
+                      >> taskInfo->periodicity               // meanET -> period
                       >> taskInfo->isHardRealTime
                       >> taskInfo->affinity
                       >> taskInfo->precedency
                       >> taskInfo->path_task ) )
-               { cerr << "\033[1;31mFailed to read line\033[0m !" << endl; return -1; } // error
+               { cerr << "Failed to read line : " << str << endl; return -1; } // error
             //taskInfo->isHardRealTime = taskSetInfos.e2eDD[i].taskChainID;
             getline(iss , taskInfo->arguments);
             taskInfo->arguments = reduce(taskInfo->arguments);
             taskInfo->priority = 50;
             // Traitement de la périodicité de la tâche
-            taskInfo->wcet *= 1.0e6;              // conversion ms to RTIME (ns)
-            taskInfo->periodicity = taskInfo->wcet * cpuFactor; //taskInfo->periodicity = taskInfo->periodicity * 1.0e6 * cpuFactor;
+            taskInfo->wcet = tmp_wcet * 1.0e6;              // conversion ms to RTIME (ns)
+            taskInfo->periodicity = taskInfo->periodicity * 1.0e6 * cpuFactor; //taskInfo->periodicity = taskInfo->periodicity * 1.0e6 * cpuFactor;
             // Traitement du nom de la tâche
             strncat(ext, name, 64);
             strcpy(taskInfo->name,ext);
@@ -303,7 +304,7 @@ void TaskLauncher::saveData(string file)
    stopTasks(1);
    sleep (1);
    cout << "Saving tasks data..." << endl;
-   cout << "Checking tasks names :" << endl;
+   //cout << "Checking tasks names :" << endl;
    int nameMaxSize = 0;
    for (auto& taskLog : tasksLogsList)
    {
