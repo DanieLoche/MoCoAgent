@@ -11,6 +11,7 @@ void messageReceiver(void* arg)
     rt_buffer_read(&mocoAgent->bf, &msg, sizeof(monitoringMsg), TM_INFINITE);
   //  cout<<"done buffer read"<<endl;
     mocoAgent->updateTaskInfo(msg);
+  // rt_task_wait_period(&mocoAgent->overruns);
   // rt_task_yield();
 
   }
@@ -34,33 +35,6 @@ MCAgent::MCAgent(systemRTInfo* sInfos)
 
 }
 
-void MCAgent::execute()
-{
-   while(TRUE)
-   {
-     if (runtimeMode)
-     {
-         for (auto& _taskChain : allTaskChain)
-         {
-            if ( _taskChain->checkTaskE2E() && !_taskChain->isAtRisk)
-            {
-             _taskChain->isAtRisk = TRUE;
-             _taskChain->logger->cptAnticipatedMisses++;
-             setMode(MODE_OVERLOADED);
-            }
-         }
-     }
-     if (*triggerSave)
-     {
-         saveData();
-         pause();
-     }
-
-    rt_task_yield();
-    }
-}
-
-
 void MCAgent::initMoCoAgent(systemRTInfo* sInfos)
 {
    outputFileName = sInfos->outputFileName;
@@ -69,9 +43,13 @@ void MCAgent::initMoCoAgent(systemRTInfo* sInfos)
    setAllTasks(sInfos->rtTIs);
    displayChains();
    sleep(1);
-   RT_TASK mcAgentReceiver;
-   rt_task_create(&mcAgentReceiver, "MoCoAgentReceiver", 0, 99, 0);
-   rt_task_start(&mcAgentReceiver, messageReceiver, this);
+
+   //rt_task_create(&mcAgentReceiver, "MoCoAgentReceiver", 0, 99, 0);
+   int ret;
+   if ( (ret = rt_task_set_periodic(NULL, TM_NOW, 5*1e6)) )
+       { cerr << "[MoCoAgent] " << "Set_Period Error : " << ret << " ." << endl; exit(-3); }
+   //rt_task_start(&mcAgentReceiver, messageReceiver, this);
+
 }
 
 void MCAgent::initCommunications()
@@ -79,6 +57,62 @@ void MCAgent::initCommunications()
    rt_buffer_create(&bf, "/monitoringTopic", 20*sizeof(monitoringMsg), B_FIFO);
    // u_int flagMask = 0;
    rt_event_create(&mode_change_flag, "/modeChangeTopic", 0, EV_PRIO);
+}
+
+void MCAgent::execute()
+{
+   while(TRUE)
+   {
+      if (runtimeMode)
+      {
+         // Update Msg part //
+         rt_buffer_read(&bf, &msg, sizeof(monitoringMsg), TM_INFINITE);
+         for (auto& _taskChain : allTaskChain)
+         {
+            for (auto& _task : _taskChain->taskList)
+            {
+               //cout << "Logged chain end at : " << _taskChain->currentEndTime/1.0e6 << endl;
+               //cout << "Logged chain start at : " << msg.time/1.0e6 << endl;
+               if( _task.id == msg.ID )
+               {
+                  if (_task.precedencyID == 0 && _taskChain->startTime == 0)
+                  { // First task of the chain
+                     _taskChain->startTime = msg.time;
+                     _taskChain->logger->logStart(msg.time);
+                     _task.setState(TRUE);
+                  }
+                  else if (msg.isExecuted && _taskChain->checkPrecedency(_task.precedencyID))
+                  { // Next task of the chain
+                     _taskChain->currentEndTime = msg.time;
+                     _task.setState(TRUE);
+                     if (_taskChain->checkIfEnded())
+                     {
+                        _taskChain->logger->logExec(_taskChain->currentEndTime);
+                        if (_taskChain->isAtRisk) setMode(MODE_NOMINAL);
+                        _taskChain->resetChain();
+                     }
+                  }
+                  break;
+               }
+            }
+
+            // Execute part //
+            if ( _taskChain->checkTaskE2E() && !_taskChain->isAtRisk)
+            {
+               _taskChain->isAtRisk = TRUE;
+               _taskChain->logger->cptAnticipatedMisses++;
+               setMode(MODE_OVERLOADED);
+            }
+         }
+      }
+      if (*triggerSave)
+      {
+      saveData();
+      pause();
+      }
+
+    rt_task_wait_period(&overruns);
+    }
 }
 
 /***********************

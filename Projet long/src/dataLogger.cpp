@@ -8,14 +8,14 @@ DataLogger::DataLogger(){}
 
 ChainDataLogger::ChainDataLogger(end2endDeadlineStruct* chainInfos)
 {
-  strcpy(name, chainInfos->name);
-  id = chainInfos->taskChainID;
-  deadline = chainInfos->deadline;
+   strcpy(name, chainInfos->name);
+   id = chainInfos->taskChainID;
+   deadline = chainInfos->deadline;
 
-  cptAnticipatedMisses = 0;
-  cptOutOfDeadline = 0;
-  cptExecutions = 0;
-  execLogs = {0};
+   cptAnticipatedMisses = 0;
+   cptOutOfDeadline = 0;
+   cptExecutions = 0;
+   execLogs = {0};
  //cout << "Init of Chains logger is okay." << endl;
 }
 
@@ -27,6 +27,7 @@ TaskDataLogger::TaskDataLogger(rtTaskInfosStruct* taskInfos)
   isHardRealTime = taskInfos->isHardRealTime;
   affinity = taskInfos->affinity;
   deadline = taskInfos->periodicity;
+  priority = taskInfos->priority;
 
   cptOutOfDeadline = 0;
   cptExecutions = 0;
@@ -152,8 +153,8 @@ void TaskDataLogger::saveData(string file, int nameSize)
     rt_task_inquire(task, &cti);
 
     outputFileResume << "\nRunning summary for task " << name << ". (" << cti.pid << ", " << cti.prio << ", " << cti.name << ")" << "\n"
-         << "Deadline : " << deadline / 1.0e6     << " ms.  Missed"     << " | " << "Executions " << "\n"
-         << "                    " << std::setw(6) <<  cptOutOfDeadline << " | " << cptExecutions << " times" << "\n"
+         << "Deadline : " << deadline / 1.0e6     << " ms.  Missed"     << " | "                 << "(2) | " << "Executions " << "\n"
+         << "                    " << std::setw(6) <<  cptOutOfDeadline << " | " << std::setw(3) << overruns << " | " << cptExecutions << " times" << "\n"
          << "Primary Mode execution time - " << cti.stat.xtime/1.0e6 << " ms. Timeouts : " << cti.stat.timeout << "\n"
          <<         "  MIN  "   << " | " <<        "  AVG  "        << " | " <<      "  MAX"        << "\n"
          << min_runtime / 1.0e6 << " | " << average_runtime / 1.0e6 << " | " << max_runtime / 1.0e6 << " (ms)" << "\n"
@@ -184,7 +185,7 @@ void ChainDataLogger::saveData(string file, int nameSize)
                   << std::setw(10)           << "deadline"  << " ; "
                   << std::setw(10)           << "duration"  << endl;
 
-   if (!(cptExecutions > 0)) cerr << "[" << name << "] -" << "Error : no logs to print !" << endl;
+   if (cptExecutions <= 0) cerr << "[" << name << "] -" << "Error : no logs to print !" << endl;
    else for (int i = 0; i < cptExecutions; i++)
    {
       RTIME _dur = execLogs[i].duration;
@@ -194,8 +195,6 @@ void ChainDataLogger::saveData(string file, int nameSize)
                      << std::setw(2)            << id          << " ; "
                      << std::setw(10)           << deadline    << " ; "
                      << std::setw(10)           << _dur        << "\n";
-
-
 
       sommeTime += _dur;
       if (_dur < min_runtime) min_runtime = _dur;

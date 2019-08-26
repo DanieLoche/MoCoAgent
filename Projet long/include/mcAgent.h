@@ -73,17 +73,20 @@ class taskChain
 
 class MCAgent
 {
-  public :
-    MCAgent(systemRTInfo* sInfos);
-    RT_BUFFER bf;
-    RT_EVENT mode_change_flag;
-    void updateTaskInfo(monitoringMsg msg);
-    void execute();
+   public :
+      MCAgent(systemRTInfo* sInfos);
+      RT_TASK mcAgentReceiver;
+      RT_BUFFER bf;
+      RT_EVENT mode_change_flag;
+      ulong overruns;
+      void updateTaskInfo(monitoringMsg msg);
+      void execute();
 
-  private :
+   private :
+      monitoringMsg msg;
       string outputFileName;
       bool* triggerSave;
-      int runtimeMode;    // NOMINAL or OVERLOADED
+      short runtimeMode;    // NOMINAL or OVERLOADED
       //std::vector<rtTaskInfosStruct>* TasksInformations;
       std::vector<taskChain*> allTaskChain;
       std::vector<RT_TASK*> bestEffortTasks;

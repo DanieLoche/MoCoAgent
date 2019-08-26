@@ -22,6 +22,7 @@ class DataLogger
 
     std::array<timeLog, 4096> execLogs;
     int cptOutOfDeadline;
+    unsigned long overruns;
     int cptExecutions;
 
     void logStart(RTIME );

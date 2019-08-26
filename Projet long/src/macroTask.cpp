@@ -146,12 +146,12 @@ int MacroTask::before()
    //rt_task_set_priority(NULL, priority+1);
    msg.time = dataLogs->logStart();
    msg.isExecuted = 0;
-   if(MoCoIsAlive && (rt_buffer_write(&bf , &msg , sizeof(monitoringMsg) , 100000) < 0))
+   if(MoCoIsAlive && (rt_buffer_write(&bf , &msg , sizeof(monitoringMsg) , 1e6) < 0))
    {
       //MoCoIsAlive = 0;
       RT_BUFFER_INFO infos;
       rt_buffer_inquire(&bf, &infos);
-      cerr << properties->name << " : failed to write BEFORE monitoring message to buffer.\n"
+      cerr << properties->name << " : failed to write BEFORE monitoring message to buffer." << "(Moco : " << MoCoIsAlive << ")" << endl
           << infos.availmem << " / " << infos.totalmem << " available on buffer " << infos.name << " " << infos.owaiters << " waiting too." << endl;
    }
    return 0;
@@ -197,24 +197,22 @@ void MacroTask::proceed()
 
 int MacroTask::after()
 {
-  #if VERBOSE_OTHER
-  cout << "[ " << properties->name << " ] : "<< "Executing After." << endl;
-  #endif
-  msg.time = dataLogs->logExec();
-  msg.isExecuted = 1;
-  if(MoCoIsAlive && (rt_buffer_write(&bf , &msg , sizeof(monitoringMsg) , 100000) < 0))
-  {
-     //MoCoIsAlive = 0;
-     RT_BUFFER_INFO infos;
-     rt_buffer_inquire(&bf, &infos);
-     cerr << properties->name << " : failed to write AFTER monitoring message to buffer.\n"
+   #if VERBOSE_OTHER
+   cout << "[ " << properties->name << " ] : "<< "Executing After." << endl;
+   #endif
+   msg.time = dataLogs->logExec();
+   msg.isExecuted = 1;
+   if(MoCoIsAlive && (rt_buffer_write(&bf , &msg , sizeof(monitoringMsg) , 1e6) < 0))
+   {
+      //MoCoIsAlive = 0;
+      RT_BUFFER_INFO infos;
+      rt_buffer_inquire(&bf, &infos);
+      cerr << properties->name << " : failed to write AFTER monitoring message to buffer." << "(Moco : " << MoCoIsAlive << ")" << endl
          << infos.availmem << " / " << infos.totalmem << " available on buffer " << infos.name << " " << infos.owaiters << " waiting too." << endl;
-  }
-  //ChaineInfo_Struct.Wcet_update() ;
-  //ChaineInfo_Struct.Exectime.Update() ;
-//  rt_mutex_release(&mutex);
    //rt_task_set_priority(NULL, priority);
-  return 0;
+   }
+   //  rt_mutex_release(&mutex);
+   return 0;
 }
 
 void MacroTask::executeRun()
@@ -224,7 +222,7 @@ void MacroTask::executeRun()
         if( rt_buffer_bind (&bf , "/monitoringTopic", 100000) < 0)
         {
           rt_buffer_delete(&bf);
-          cerr << "Failed to lin to Monitoring Buffer" << endl;
+          cerr << "Failed to link to Monitoring Buffer" << endl;
           MoCoIsAlive = 0;
           //exit(-1);
         }
@@ -237,7 +235,7 @@ void MacroTask::executeRun()
       proceed();  // execute task
       after();  // Inform of execution time for the mcAgent
 
-      rt_task_wait_period(NULL);
+      rt_task_wait_period(&dataLogs->overruns);
 
     }
 
@@ -288,7 +286,7 @@ void MacroTask::executeRun_besteffort()
       before_besteff(); // Check if execution allowed
       proceed();  // execute task
       after_besteff();  // Inform of execution time for the mcAgent
-      rt_task_wait_period(NULL);
+      rt_task_wait_period(&dataLogs->overruns);
 
     }
 }

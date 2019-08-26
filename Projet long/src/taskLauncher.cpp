@@ -264,9 +264,8 @@ int TaskLauncher::runAgent()
    {
         enableAgent = 1;
         rt_task_affinity(&mcAgent, 0, 0);
-        if ( (ret = rt_task_set_periodic(&mcAgent, TM_NOW, 10*1e6)) )
-            { cerr << "[Task Launcher] " << "Set_Period Error : " << ret << " ." << endl; exit(-3); }
-
+        //if ( (ret = rt_task_set_periodic(&mcAgent, TM_NOW, 5*1e6)) )
+      //      { cerr << "[MoCoAgent] " << "Set_Period Error : " << ret << " ." << endl; exit(-3); }
         //  systemRTInfo ch_taks ;
         if ( (ret = rt_task_start(&mcAgent, RunmcAgentMain, &taskSetInfos)) )
         {
