@@ -1,6 +1,6 @@
-ID  name 		     meanET  wcet   isHRT aff  prec path                       arguments
-1   SDP_bitcount_S   47     237     1     1    0    ./bench/bitcnts           75000 > ./bench/output/output_btcnt_small.txt
-2   SDP_fft_S        69     344     1     1    1    ./bench/fft               8 32768 > ./bench/output/fft_output_small.txt
-3   SDP_CRC32_L      888    4439    1     1    2    ./bench/crc               ./bench/data/large.pcm > ./bench/output/crc_output_large.txt
-4   SDP_basicmath_S  58     289     1     1    3    ./bench/basicmath_small   > ./bench/output/output_basicmath_small.txt
-5   SDP_qsort_L      139    694     1     1    4    ./bench/qsort_large       ./bench/qsort/input_large.dat >  ./bench/output/output_qsort_large.txt
+ID  name       meanET  wcet   isHRT   aff    prec      path                       arguments
+1   SDP_bitcount_L   70   240   1   1   0   ./bench/bitcnts   1125000   >   ./bench/output/o_btcnt_large.txt
+2   SDP_fft_L           61   120   1   1   1   ./bench/fft   8   32768   >   ./bench/output/o_fft_large.txt
+3   SDP_CRC32_L           112   240   1   1   2   ./bench/crc   ./bench/data/large.pcm   >   ./bench/output/o_crc_large.txt
+4   SDP_basicmath_L   250   480   1   1   3   ./bench/basicmath_large   >   ./bench/output/o_basmth_large.txt
+5   SDP_qsort_L           45   120   1   1   4   ./bench/qsort_large   ./bench/qsort/input_large.dat   >   ./bench/output/o_qsort_large.txt

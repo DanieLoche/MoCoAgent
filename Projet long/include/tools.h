@@ -3,10 +3,14 @@
 
 //define    SCHED_FIFO      1 // First-In First-Out
 //define    SCHED_RR        2 // Round-Robin
-#define    SCHED_EDF       6 // Not Implemented
+//define    SCHED_WEAK      0 // Weak
+//define    SCHED_COBALT    3 // Cobalt
+//define    SCHED_SPORADIC  4 // Sporadic
+//define    SCHED_TP        5 // TP
+//define    SCHED_QUOTA     8 // Quota
+#define     SCHED_EDF       6 // Not Implemented
 #define     SCHED_RM        7 // Rate-Monotonic
 
-#define   SCHED_POLICY      SCHED_FIFO
 #define   RR_SLICE_TIME     20000e6  // clock ticks (=ns)
 
 #define   VERBOSE_INFO      1 // Cout d'informations, démarrage, etc...
@@ -36,6 +40,7 @@ using std::string;
 using std::cout;
 using std::endl;
 using std::cin;
+using std::cerr;
 
 /*
 struct logData

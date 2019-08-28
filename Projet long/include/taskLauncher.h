@@ -7,6 +7,7 @@ class TaskLauncher
       systemRTInfo taskSetInfos;
       std::vector<DataLogger*> tasksLogsList;
       RT_TASK mcAgent;
+//      RT_MUTEX mutexes[8];
       bool enableAgent;
       bool triggerSave;
 
@@ -18,6 +19,7 @@ class TaskLauncher
       int readChainsList(string);
       int  readTasksList(int cpuPercent);
       int createTasks();
+//      int createMutexes(int nprocs);
       int runTasks();
       int runAgent();
       void stopTasks(bool);

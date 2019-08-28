@@ -158,13 +158,14 @@ int main(int argc, char* argv[])
    #if VERBOSE_INFO
    cout << " Generating Task Set ..." << endl;
    #endif
-   if(tln->readChainsList(inputFile)) {cout << "Faile to read task chains." << endl; return -1;}
-   if(tln->readTasksList(cpuFactor)) {cout << "Faile to read tasks list." << endl; return -2;};
+   if(tln->readChainsList(inputFile)) {cerr << "Failed to read task chains." << endl; return -1;}
+   if(tln->readTasksList(cpuFactor)) {cerr << "Failed to read tasks list." << endl; return -2;}
+//   if(tln->createMutexes(nproc)) {cout << "Failed to read tasks list." << endl; return -3;}
 
    tln->printTasksInfos();
 
-   if(tln->createTasks()) {cout << "Faile to create all tasks" << endl; return -3;}
-   if(tln->runTasks()) {cout << "Faile to run all tasks" << endl; return -4;}
+   if(tln->createTasks()) {cerr << "Failed to create all tasks" << endl; return -4;}
+   if(tln->runTasks()) {cerr << "Failed to run all tasks" << endl; return -5;}
 
    if (enableAgent)
    {
@@ -177,7 +178,6 @@ int main(int argc, char* argv[])
    cout << "Wake up all tasks." << endl;
    rt_sem_broadcast(&mysync);
 
-   printf("\nType Ctrl + C to end this program\n\n" );
    //    string ss;
    //    while (ss != "STOP") cin >> ss;
 
@@ -197,8 +197,8 @@ void printInquireInfo(RT_TASK* task)
    int ret = 0;
    if ((ret = rt_task_inquire(task, &curtaskinfo)))
    {  cout << ret;
-      if (ret == -EINVAL) cout << "\n - Invalid Task Descriptor or invalid Prio." << endl;
-      if (ret == -EPERM) cout << "\n - Task is NULL, and service called from invalid context." << endl;
+      if (ret == -EINVAL) cerr << "\n - Invalid Task Descriptor or invalid Prio." << endl;
+      if (ret == -EPERM) cerr << "\n - Task is NULL, and service called from invalid context." << endl;
    } else {
    std::stringstream ss;
    ss << "[ " << curtaskinfo.name

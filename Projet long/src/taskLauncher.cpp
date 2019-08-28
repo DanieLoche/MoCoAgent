@@ -2,7 +2,6 @@
 #include "taskLauncher.h"
 #include "sched.h"
 #include "edf.h"
-#include "dataLogger.h"
 
 #include <iomanip>
 
@@ -17,6 +16,7 @@ TaskLauncher::TaskLauncher(string outputFileName)
    taskSetInfos.triggerSave = &triggerSave;
    taskSetInfos.outputFileName = outputFileName;
 }
+
 
 int TaskLauncher::readChainsList(string input_file)
 {
@@ -34,8 +34,7 @@ int TaskLauncher::readChainsList(string input_file)
    {
       end2endDeadlineStruct chaineInfo;
       std::istringstream iss(str);
-      string token;
-      #if VERBOSE_INFO
+      #if VERBOSE_ASK
       cout << "Managing line : " << str << endl;
       #endif
       if (str.substr(0,2) != "//")
@@ -44,10 +43,13 @@ int TaskLauncher::readChainsList(string input_file)
                    >> chaineInfo.taskChainID
                    >> chaineInfo.Path
                    >> chaineInfo.deadline ))
-            { cout << "\033[1;31mFailed to read line\033[0m !" << endl; return -1; } // error
+            { cerr << "Failed to read line : " << str << endl; return -1; } // error
          chaineInfo.deadline *= 1.0e6;
          taskSetInfos.e2eDD.push_back(chaineInfo);
-      } else cout << "line ignored." << endl;
+      }
+      #if VERBOSE_ASK
+      else cout << "line ignored." << endl;
+      #endif
    }
    return 0;
 }
@@ -61,7 +63,7 @@ int TaskLauncher::readTasksList(int cpuPercent)
       std::ifstream myFile(taskSetInfos.e2eDD[i].Path);
       if (!myFile.is_open())
       {
-         cout << "Failed to open file : " << taskSetInfos.e2eDD[i].Path << endl;
+         cerr << "Failed to open file : " << taskSetInfos.e2eDD[i].Path << endl;
          exit(EXIT_FAILURE);
       }
 
@@ -73,27 +75,28 @@ int TaskLauncher::readTasksList(int cpuPercent)
          std::istringstream iss(str);
          string token;
          char ext[32] = "RT_";
-         #if VERBOSE_INFO
+         #if VERBOSE_ASK
          cout << "Managing line : " << str << endl;
          #endif
          if (str.substr(0,2) != "//")
          {
+            float tmp_wcet = 0;
             char name[28];
             if (!(iss >> taskInfo->id >> name
-                      >> taskInfo->periodicity     // placeholder.
-                      >> taskInfo->wcet
+                      >> tmp_wcet     // WCET -> for task chain // placeholder.
+                      >> taskInfo->periodicity               // meanET -> period
                       >> taskInfo->isHardRealTime
                       >> taskInfo->affinity
                       >> taskInfo->precedency
                       >> taskInfo->path_task ) )
-               { cout << "\033[1;31mFailed to read line\033[0m !" << endl; return -1; } // error
+               { cerr << "Failed to read line : " << str << endl; return -1; } // error
             //taskInfo->isHardRealTime = taskSetInfos.e2eDD[i].taskChainID;
             getline(iss , taskInfo->arguments);
             taskInfo->arguments = reduce(taskInfo->arguments);
             taskInfo->priority = 50;
             // Traitement de la périodicité de la tâche
-            taskInfo->wcet *= 1.0e6;              // conversion ms to RTIME (ns)
-            taskInfo->periodicity = taskInfo->wcet * cpuFactor;
+            taskInfo->wcet = tmp_wcet * 1.0e6;              // conversion ms to RTIME (ns)
+            taskInfo->periodicity = taskInfo->periodicity * 1.0e6 * cpuFactor; //taskInfo->periodicity = taskInfo->periodicity * 1.0e6 * cpuFactor;
             // Traitement du nom de la tâche
             strncat(ext, name, 64);
             strcpy(taskInfo->name,ext);
@@ -116,7 +119,7 @@ int TaskLauncher::readTasksList(int cpuPercent)
          {
             if (taskInfo->periodicity != lastPeriod)
             {
-               prio++;
+               prio += 2;
                lastPeriod = taskInfo->periodicity;
             }
             taskInfo->priority = prio;
@@ -126,8 +129,26 @@ int TaskLauncher::readTasksList(int cpuPercent)
    return 0;
 }
 
+/*
+int TaskLauncher::createMutexes(int _nprocs)
+{
+   cout << "Creating mutexes." << endl;
+   int ret = 0;
+   string mutexName = "mutCore";
+   for (int i = 0; i < _nprocs; i++)
+   {
+      string name = mutexName + std::to_string(i);
+      ret += rt_mutex_create(&mutexes[i], &name[0]);
+      cout << "Created mutex " << name << endl;
+   }
+
+   return ret;
+}
+*/
+
 int TaskLauncher::createTasks()
 {
+   int ret = 0;
    #if VERBOSE_INFO
    cout << endl << "CREATING TASKS : " << endl;
    #endif
@@ -141,26 +162,39 @@ int TaskLauncher::createTasks()
 
       if(rt_task_create(taskInfo.task, taskInfo.name, 0, taskInfo.priority, 0) < 0)
       {
-         printf("Failed to create task %s\n",taskInfo.name);
+         cerr << "[" << taskInfo.name << "] " << "Failed to create task." << endl;
          return -1;
       }
       else
       {
+         RT_TASK_INFO curtaskinfo;
+         rt_task_inquire(taskInfo.task, &curtaskinfo);
+         struct sched_param_ex para;
+         para.sched_priority = taskInfo.priority;
+         /* sched_param
+         para.sched_flags= 0;
+         para.sched_runtime = taskInfo.periodicity;;
+         para.sched_deadline = taskInfo.periodicity;
+         para.sched_period = taskInfo->periodicity;
+         para.size=sizeof(sched_attr);
+         old... */
+         if (schedPolicy == SCHED_RM) schedPolicy = SCHED_FIFO;
+         if( (ret = sched_setscheduler_ex(curtaskinfo.pid, schedPolicy, &para)) != 0)
+         {
+            cerr << "[" << taskInfo.name << "] " << "error setting scheduling policy " << schedPolicy << ", Error #" << ret;
+            exit(ret);
+         }
          //Periodicity
-         int ret = 0;
          if ((ret = rt_task_set_periodic(taskInfo.task, TM_NOW, taskInfo.periodicity)))
-            { cout << "Set_Period Error : " << ret << " ." << endl; return -2; }
+         { cerr << "[" << taskInfo.name << "] " << "Set_Period Error : " << ret << " ." << endl; exit(-2); }
          rt_task_affinity(taskInfo.task, taskInfo.affinity, 0);
          if (schedPolicy == SCHED_RR)
          { //#if defined SCHED_POLICY  &&  SCHED_POLICY == SCHED_RR
             if ((ret = rt_task_slice(taskInfo.task, RR_SLICE_TIME)))
-               { cout << "Slice Error : " << ret << " ." << endl; return -3; }
+            { cerr << "[" << taskInfo.name << "] " << "Slice Error : " << ret << " ." << endl; exit(-4); }
          } //#endif
-         #if defined SCHED_POLICY  &&  SCHED_POLICY == SCHED_FIFO
-            // FIFO.
-         #endif
          if ((ret = rt_task_set_priority(taskInfo.task, taskInfo.priority)))
-            { cout << "Set_Priority Error : " << ret << " ." << endl; return -4; }
+            { cerr << "[" << taskInfo.name << "] " << "Set_Priority Error : " << ret << " ." << endl; exit(-5); }
          /* Gestion EDF Scheduling
          RT_TASK_INFO curtaskinfo;
          rt_task_inquire(taskInfo->task, &curtaskinfo);
@@ -198,10 +232,10 @@ int TaskLauncher::runTasks()
       taskRTInfo* _taskRTInfo = new taskRTInfo;
       _taskRTInfo->taskLog = dlog;
       _taskRTInfo->rtTI = &taskInfo;
-      printInquireInfo(taskInfo.task);
+      //printInquireInfo(taskInfo.task);
       if( rt_task_start(taskInfo.task, TaskMain, _taskRTInfo))
       {
-         printf("Failed to start task %s\n",taskInfo.name);
+         cerr << "[" << taskInfo.name << "] :" << "Failed to start task." << endl;
          return -1;
       }
       else
@@ -217,21 +251,27 @@ int TaskLauncher::runTasks()
 
 int TaskLauncher::runAgent()
 {
+  int ret = 0;
    #if VERBOSE_INFO
    cout << endl << "LAUNCHING MoCoAgent." << endl;
    #endif
-   if( rt_task_create(&mcAgent, "MoCoAgent", 0, 99, 0))
+   if( (ret = rt_task_create(&mcAgent, "MoCoAgent", 0, 99, 0)) )
    {
-      cout << "Error creating Monitoring and Control Agent" << endl;
+      cerr << "Error creating Monitoring and Control Agent (" << ret << ")." << endl;
       return -1;
    }
    else
    {
-      enableAgent = 1;
-      rt_task_affinity(&mcAgent, 0, 0);
-
-      //  systemRTInfo ch_taks ;
-      rt_task_start(&mcAgent, RunmcAgentMain, &taskSetInfos);
+        enableAgent = 1;
+        rt_task_affinity(&mcAgent, 0, 0);
+        //if ( (ret = rt_task_set_periodic(&mcAgent, TM_NOW, 5*1e6)) )
+      //      { cerr << "[MoCoAgent] " << "Set_Period Error : " << ret << " ." << endl; exit(-3); }
+        //  systemRTInfo ch_taks ;
+        if ( (ret = rt_task_start(&mcAgent, RunmcAgentMain, &taskSetInfos)) )
+        {
+           cerr << "[ Task Launcher ] :" << "Failed to start Mo Co Agent. ("<< ret << ")."  << endl;
+           return -1;
+        }
    }
    return 0;
 }
@@ -263,7 +303,7 @@ void TaskLauncher::saveData(string file)
    stopTasks(1);
    sleep (1);
    cout << "Saving tasks data..." << endl;
-   cout << "Checking tasks names :" << endl;
+   //cout << "Checking tasks names :" << endl;
    int nameMaxSize = 0;
    for (auto& taskLog : tasksLogsList)
    {
@@ -280,8 +320,9 @@ void TaskLauncher::saveData(string file)
           << std::setw(nameMaxSize) << "name"     << " ; "
           << std::setw(2)  << "ID"       << " ; "
           << std::setw(3)  << "HRT"      << " ; "
+          << std::setw(4) << "Prio"      << " ; "
           << std::setw(10) << "deadline" << " ; "
-          << std::setw(4)  << "aff." << " ; "
+          << std::setw(4)  << "aff."     << " ; "
           << std::setw(10) << "duration" << "\n";
    myFile.close();
    for (auto& taskLog : tasksLogsList)
@@ -310,7 +351,7 @@ void TaskLauncher::rt_task_affinity (RT_TASK* task, int _aff, int mode)
 
    if (int ret = rt_task_set_affinity(task, &mask))
    {
-      cout << "Error while setting (" << mode << ") affinity for task "
+      cerr << "Error while setting (" << mode << ") affinity for task "
       << curtaskinfo.name << " to CPU " << _aff << ": " <<  ret << "."<< endl;
    }
    #if VERBOSE_ASK

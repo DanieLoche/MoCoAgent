@@ -70,12 +70,16 @@ then
         #echo "Name is "$name
         sudo sar -o ${dirName}/IODatas${name}_1_${duration}_${load}_${schedPolicy} -P 0-3 1 $duration > /dev/null 2>&1 & 
         ./MoCoAgent.out true  $duration $load ./inputFile ${dirName}/${name}_1_${duration}_${load}_${schedPolicy} $schedPolicy
+        expe1Out=$?
         rm ./bench/output/*
 
         sudo sar -o ${dirName}/IODatas${name}_0_${duration}_${load}_${schedPolicy} -P 0-3 1 $duration > /dev/null 2>&1 & 
         ./MoCoAgent.out false $duration $load ./inputFile ${dirName}/${name}_0_${duration}_${load}_${schedPolicy} $schedPolicy    
+        expe0Out=$?
         rm ./bench/output/*
         rm -f ./inputFile
+        echo "expe1out : $expe1Out"
+        echo "expe0out : $expe0Out"
     done
 
 exit 0

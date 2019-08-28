@@ -7,14 +7,17 @@ class MacroTask
   protected :
     /* struct rtTaskInfosStruct
     {
-        char name[64];
-        char path_task[128];
-        int  isHardRealTime;
-        RTIME  periodicity;
-        RTIME  deadline;
-        int affinity;
-        int ID;
-        RT_TASK* task;
+         char   name[32];
+         char   path_task[128];
+         string arguments;
+         int    isHardRealTime;     // task chain ID or best effort if null
+         int    id;
+         int    affinity;
+         int    precedency;
+         int    priority;
+         RTIME  wcet;
+         RTIME  periodicity;
+         RT_TASK* task;
     } ;
     */
     rtTaskInfosStruct* properties;
@@ -22,16 +25,21 @@ class MacroTask
 
     RT_BUFFER bf;
     RT_EVENT	event;
+//    RT_MUTEX mutex;
     bool MoCoIsAlive;
-
+    int priority;
     monitoringMsg msg ;
-    string chain;
+    //string chain;
+    char stdIn[35];
+    char stdOut[35];
+    std::vector<char*> argv;
 
-    int before_besteff();
-    void proceed();
-    int after_besteff();
-    int before();
-    int after();
+    void parseParameters( );
+    inline int before_besteff();
+    inline int before();
+    inline void proceed();
+    inline int after();
+    inline int after_besteff();
 
   public :
     MacroTask(taskRTInfo*, bool);

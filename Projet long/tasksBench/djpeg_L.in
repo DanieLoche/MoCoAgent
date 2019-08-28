@@ -1,0 +1,2 @@
+ID  name 		     meanET  wcet    isHRT aff  prec path                       arguments
+1 djpeg_L 4 15 1 1 0 ./bench/djpeg -dct int -ppm -outfile ./bench/output/o_large_decode.ppm ./bench/jpg/input_large.jpg

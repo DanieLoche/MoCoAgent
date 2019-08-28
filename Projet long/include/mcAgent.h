@@ -1,4 +1,5 @@
 #include "tools.h"
+#include "dataLogger.h"
 //#include <array>
 
 #define   TRUE    1
@@ -20,10 +21,6 @@ startTime     // 0 si on donne un end time
 endTime       // 0 si on donne un start time
 isExecuted    // 1 en conjonction du end time
 chaines concernées par la tâche ??
-
-On MaJ :
-si startTime (chaine) == 0, alors startTime = currentTime
-currentTime =
 */
 class taskMonitoringStruct
 {
@@ -45,8 +42,6 @@ class taskMonitoringStruct
     //bool operator <(const taskMonitoringStruct& tms) const {return (id < tms.id);}
 };
 
-
-#include "dataLogger.h"
 class taskChain
 {
   public :
@@ -78,17 +73,20 @@ class taskChain
 
 class MCAgent
 {
-  public :
-    MCAgent(systemRTInfo* sInfos);
-    RT_BUFFER bf;
-    RT_EVENT mode_change_flag;
-    void updateTaskInfo(monitoringMsg msg);
-    void execute();
+   public :
+      MCAgent(systemRTInfo* sInfos);
+      RT_TASK mcAgentReceiver;
+      RT_BUFFER bf;
+      RT_EVENT mode_change_flag;
+      ulong overruns;
+      void updateTaskInfo(monitoringMsg msg);
+      void execute();
 
-  private :
+   private :
+      monitoringMsg msg;
       string outputFileName;
       bool* triggerSave;
-      int runtimeMode;    // NOMINAL or OVERLOADED
+      short runtimeMode;    // NOMINAL or OVERLOADED
       //std::vector<rtTaskInfosStruct>* TasksInformations;
       std::vector<taskChain*> allTaskChain;
       std::vector<RT_TASK*> bestEffortTasks;

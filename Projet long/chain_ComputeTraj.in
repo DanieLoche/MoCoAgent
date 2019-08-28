@@ -1,8 +1,8 @@
-ID  name 		     meanET  wcet    isHRT aff  prec path                       arguments
-1   CT_bitcount_S   47      237     1     1    0    ./bench/bitcnts            75000 > ./bench/output/output_btcnt_small.txt
-2   CT_CRC32_S      49      245     1     1    1    ./bench/crc                ./bench/data/small.pcm > ./bench/output/crc_output_small.txt
-3   CT_dijkstra_L   104     523     1     1    2    ./bench/dijkstra_large     ./bench/dijkstra/input.dat > ./bench/output/dijk_output_large.dat
-4   CT_blowfish_S   61      304     1     1    6    ./bench/blowfish_small.sh  > /dev/null
-5   CT_basicmath_L  648     3240    1     1    3    ./bench/basicmath_large    > ./bench/output/output_basicmath_large.txt
-6   CT_fft_S        69      344     1     1    4    ./bench/fft                8 32768 > ./bench/output/fft_output_small.txt
-7   CT_fft_inv_S    69      344     1     1    5    ./bench/fft                8 32768 -i > ./bench/output/ffti_output_small.inv.txt
+ID  name            meanET  wcet    isHRT aff  prec path                       arguments
+1   CT_bitcount_S   5   15   1   1   0   ./bench/bitcnts   75000   >   ./bench/output/o_btcnt_small.txt
+2   CT_CRC32_S           6.5   15   1   1   2   ./bench/crc   ./bench/data/small.pcm   >   ./bench/output/o_crc_small.txt
+3   CT_dijkstra_L   35   60   1   1   1   ./bench/dijkstra_large   ./bench/dijkstra/input.dat   >   ./bench/output/o_dijk_large.dat
+4   CT_blowfishD_S   6.33   15   1   1   3   ./bench/bf   d ./bench/blowfish/o_small.enc ./bench/output/o_small.asc 1234567890abcdeffedcba0987654321
+5   CT_basicmath_S   15   30   1   1   4   ./bench/basicmath_small   >   ./bench/output/o_basmth_small.txt
+6   CT_fft_S           8   15   1   1   5   ./bench/fft   8   4096   >   ./bench/output/o_fft_small.txt
+7   CT_fft_inv_S   8   15   1   1   6   ./bench/fft   8   8192   -i   >   ./bench/output/o_ffti_small.inv.txt

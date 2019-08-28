@@ -1,6 +1,5 @@
-ID  name 		    meanET       path                        wcet    isHRT aff  prec   arguments
-bitcount_small1   /home/danlo/BrixCode/Benchmarker/bench/automotive/bitcount/bitcount_small.sh    	1	    200     200       2        50
-fft_small1        /home/danlo/BrixCode/Benchmarker/bench/telecomm/FFT/fft_small.sh           	   1	    200     200       2        50
-CRC32_large1      /home/danlo/BrixCode/Benchmarker/bench/telecomm/CRC32/CRC32_large.sh         	   1	    1500    1500      3        50
-basicmath_small2  /home/danlo/BrixCode/Benchmarker/bench/automotive/basicmath/basicmath_small.sh   1	    200     200       3        50
-qsort_large1      /home/danlo/BrixCode/Benchmarker/bench/automotive/qsort/qsort_large.sh       	   1	    400     400       2        50
+name             chaineID   Path                        deadline
+blowfishE_S      9       ./tasksBench/blowfishE_S.in       5000      BNCH
+bitcount_S       1       ./tasksBench/bitcount_S.in        5000      BNCH
+basicmath_S      1       ./tasksBench/basicmath_S.in       5000      BNCH
+adpcmCaudio_S    11      ./tasksBench/adpcmCaudio_S.in     5000      BNCH

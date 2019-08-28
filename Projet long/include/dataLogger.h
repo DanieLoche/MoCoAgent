@@ -22,6 +22,7 @@ class DataLogger
 
     std::array<timeLog, 4096> execLogs;
     int cptOutOfDeadline;
+    unsigned long overruns;
     int cptExecutions;
 
     void logStart(RTIME );
@@ -37,9 +38,10 @@ class TaskDataLogger : public DataLogger
 {
    private:
       int affinity;
+      int priority;
+      int isHardRealTime;
    public :
       RT_TASK* task;
-      int isHardRealTime;
 
       TaskDataLogger(rtTaskInfosStruct*);
       void saveData(string, int);

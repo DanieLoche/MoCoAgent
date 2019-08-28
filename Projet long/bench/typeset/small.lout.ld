@@ -14,7 +14,7 @@
 {@@V @BeginTheoremCounter {}} } }
 }
 {@@V @TheoremCounterMarker
-  \a{"10.2599./home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/consumer/typeset/small.lout.1"}
+  \a{"10.2599../bench/typeset/small.lout.1"}
   \b{{} @Join 0}}}
 
 {@@E {
@@ -24,7 +24,7 @@
 {@@V @BeginDefinitionCounter {}} } }
 }
 {@@V @DefinitionCounterMarker
-  \a{"10.2658./home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/consumer/typeset/small.lout.1"}
+  \a{"10.2658../bench/typeset/small.lout.1"}
   \b{{} @Join 0}}}
 
 {@@E {
@@ -34,7 +34,7 @@
 {@@V @BeginClaimCounter {}} } }
 }
 {@@V @ClaimCounterMarker
-  \a{"10.2713./home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/consumer/typeset/small.lout.1"}
+  \a{"10.2713../bench/typeset/small.lout.1"}
   \b{{} @Join 0}}}
 
 {@@E {
@@ -44,7 +44,7 @@
 {@@V @BeginPropositionCounter {}} } }
 }
 {@@V @PropositionCounterMarker
-  \a{"10.2768./home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/consumer/typeset/small.lout.1"}
+  \a{"10.2768../bench/typeset/small.lout.1"}
   \b{{} @Join 0}}}
 
 {@@E {
@@ -54,7 +54,7 @@
 {@@V @BeginLemmaCounter {}} } }
 }
 {@@V @LemmaCounterMarker
-  \a{"10.2823./home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/consumer/typeset/small.lout.1"}
+  \a{"10.2823../bench/typeset/small.lout.1"}
   \b{{} @Join 0}}}
 
 {@@E {
@@ -64,7 +64,7 @@
 {@@V @BeginCorollaryCounter {}} } }
 }
 {@@V @CorollaryCounterMarker
-  \a{"10.2878./home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/consumer/typeset/small.lout.1"}
+  \a{"10.2878../bench/typeset/small.lout.1"}
   \b{{} @Join 0}}}
 
 {@@E {
@@ -74,7 +74,7 @@
 {@@V @BeginExampleCounter {}} } }
 }
 {@@V @ExampleCounterMarker
-  \a{"10.2933./home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/consumer/typeset/small.lout.1"}
+  \a{"10.2933../bench/typeset/small.lout.1"}
   \b{{} @Join 0}}}
 
 {@@E {
@@ -85,42 +85,42 @@
  }
 {@@E {
 { @@A { @@E {
-@@D "1623 80"
+@@D "1273 80"
 }
 {?? @@V @Do ??} } }
 }
 {@@V y}} }
 }
 {@@V @NumDispCounterMarker
-  \a{"7.1249./home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/consumer/typeset/small.lout.1"}
+  \a{"7.1249../bench/typeset/small.lout.1"}
   \b{{} @Join 0}}}
 
 {@@E {
 @@D "21 2"
 }
 {@@V @FigurePrefixMarker
-  \a{"10.3494./home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/consumer/typeset/small.lout.1"}
+  \a{"10.3494../bench/typeset/small.lout.1"}
   \b{}}}
 
 {@@E {
 @@D "21 2"
 }
 {@@V @FigureCounterMarker
-  \a{"10.3502./home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/consumer/typeset/small.lout.1"}
+  \a{"10.3502../bench/typeset/small.lout.1"}
   \b{0}}}
 
 {@@E {
 @@D "21 2"
 }
 {@@V @TablePrefixMarker
-  \a{"10.3739./home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/consumer/typeset/small.lout.1"}
+  \a{"10.3739../bench/typeset/small.lout.1"}
   \b{}}}
 
 {@@E {
 @@D "21 2"
 }
 {@@V @TableCounterMarker
-  \a{"10.3747./home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/consumer/typeset/small.lout.1"}
+  \a{"10.3747../bench/typeset/small.lout.1"}
   \b{0}}}
 
 {@@E {
@@ -144,7 +144,7 @@
 1} } }
 }
 {@PageMarker
-  \a{"7.1067./home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/consumer/typeset/small.lout.1"}
+  \a{"7.1067../bench/typeset/small.lout.1"}
   \c{1}
   \b{Arabic @@V @Num 1}}}
 
@@ -152,18 +152,18 @@
 @@D "21 2"
 }
 {@@V @FootNoteCounterMarker
-  \a{"10.1381./home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/consumer/typeset/small.lout.1"}
+  \a{"10.1381../bench/typeset/small.lout.1"}
   \b{0}}}
 
 {@@E {
 @@D "21 2"
 }
 {Start @Runner
-  \g{"10.796./home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/consumer/typeset/small.lout.2"}}}
+  \g{"10.796../bench/typeset/small.lout.2"}}}
 
 {@@E {
 { @@A { @@E {
-@@D "2509 126"
+@@D "1909 126"
 }
 {@@V @SimpleEvenPageList
   \a{1}
@@ -171,7 +171,7 @@
 2} } }
 }
 {@PageMarker
-  \a{"7.1067./home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/consumer/typeset/small.lout.2"}
+  \a{"7.1067../bench/typeset/small.lout.2"}
   \c{2}
   \b{Arabic @@V @Num 2}}}
 
@@ -179,18 +179,18 @@
 @@D "21 2"
 }
 {@@V @FootNoteCounterMarker
-  \a{"10.1381./home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/consumer/typeset/small.lout.2"}
+  \a{"10.1381../bench/typeset/small.lout.2"}
   \b{0}}}
 
 {@@E {
 @@D "21 2"
 }
 {NonStart @Runner
-  \g{"10.796./home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/consumer/typeset/small.lout.3"}}}
+  \g{"10.796../bench/typeset/small.lout.3"}}}
 
 {@@E {
 @@D "21 2"
 }
 {NonStart @Runner
-  \g{"10.796./home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/consumer/typeset/small.lout.1"}}}
+  \g{"10.796../bench/typeset/small.lout.1"}}}
 
