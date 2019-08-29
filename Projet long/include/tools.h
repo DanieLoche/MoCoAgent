@@ -28,13 +28,15 @@
 #include <signal.h>
 #include <cstdlib>
 
-#include <alchemy/task.h>
-#include <alchemy/sem.h>
-#include <alchemy/timer.h>
-#include <alchemy/buffer.h>
-#include <alchemy/event.h>
-#include <alchemy/mutex.h>
+// #include <task.h>
+// #include <sem.h>
+// #include <timer.h>
+// #include <buffer.h>
+// #include <event.h>
+// #include <mutex.h>
 
+typedef unsigned long long int RTIME;
+typedef pthread_t RT_TASK;
 
 using std::string;
 using std::cout;

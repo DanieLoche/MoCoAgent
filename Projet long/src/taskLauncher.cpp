@@ -124,6 +124,7 @@ int TaskLauncher::readTasksList(int cpuPercent)
             }
             taskInfo->priority = prio;
          }
+         schedPolicy = SCHED_FIFO;
       }
    }
    return 0;
@@ -160,9 +161,36 @@ int TaskLauncher::createTasks()
       cout << "Creating Task " << taskInfo.name << "." << endl;
       #endif
 
-      if(rt_task_create(taskInfo.task, taskInfo.name, 0, taskInfo.priority, 0) < 0)
+      TaskDataLogger* dlog = new TaskDataLogger(&taskInfo);
+      taskRTInfo* _taskRTInfo = new taskRTInfo;
+      _taskRTInfo->taskLog = dlog;
+      _taskRTInfo->rtTI = &taskInfo;
+      //printInquireInfo(taskInfo.task);
+      int local_errno;
+      pthread_attr_t attr;
+      if ( (local_errno = pthread_attr_init(&attr)) != 0)
       {
-         cerr << "[" << taskInfo.name << "] " << "Failed to create task." << endl;
+         cerr << "[" << taskInfo.name << "] " << "Failed to setup tasks parameters." << endl;
+      }
+      else
+      {
+         struct sched_param sp;
+         local_errno = pthread_attr_getschedparam(&attr, &sp);
+         if (local_errno != 0) { cerr << "[" << taskInfo.name << "] " << "Failed to get tasks parameters. (err " << local_errno << ")" << endl; }
+         local_errno = pthread_attr_setinheritsched(&attr, PTHREAD_INHERIT_SCHED);
+         if (local_errno != 0) { cerr << "[" << taskInfo.name << "] " << "Failed to set scheduling inheritance. (err " << local_errno << ")" << endl; }
+         local_errno = pthread_attr_setschedpolicy(&attr, schedPolicy);
+         if (local_errno != 0) { cerr << "[" << taskInfo.name << "] " << "Failed to set scheduling policy. (err " << local_errno << ")" << endl; }
+         sp.sched_priority = taskInfo.priority;
+         local_errno = pthread_attr_setschedparam(&attr, &sp);
+         if (local_errno != 0) { cerr << "[" << taskInfo.name << "] " << "Failed to set tasks parameters. (err " << local_errno << ")" << endl; }
+      }
+
+
+
+      if(pthread_create(taskInfo.task, &attr, TaskMain, _taskRTInfo) < 0)
+      {
+         cerr << "[" << taskInfo.name << "] " << "Failed to create task. (err " << local_errno << ")" << endl;
          return -1;
       }
       else
@@ -178,7 +206,6 @@ int TaskLauncher::createTasks()
          para.sched_period = taskInfo->periodicity;
          para.size=sizeof(sched_attr);
          old... */
-         if (schedPolicy == SCHED_RM) schedPolicy = SCHED_FIFO;
          if( (ret = sched_setscheduler_ex(curtaskinfo.pid, schedPolicy, &para)) != 0)
          {
             cerr << "[" << taskInfo.name << "] " << "error setting scheduling policy " << schedPolicy << ", Error #" << ret;
