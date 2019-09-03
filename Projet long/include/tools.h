@@ -120,8 +120,6 @@ void printTaskInfo(rtTaskInfosStruct* task);
 void print_affinity(pid_t _pid);
 
 
-
-
 /* To create a task :
  * Arguments : &task,
  *             name,

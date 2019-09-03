@@ -13,10 +13,11 @@ INSTALL_DIR = .
 OBJ_DIR = bin
 SRC_DIR = src
 HDR_DIR = include
+LIB_DIR = include/libs
 # INCLUDES =  # to include other makefiles
 LIBS = #-lboost_system -lboost_chrono -lpthread -lboost_thread
 
-CXXFLAGS = $(XENO_CFLAGS) -Wall -std=c++11 -I $(HDR_DIR)
+CXXFLAGS = $(XENO_CFLAGS) -Wall -std=c++11 -I $(HDR_DIR) -I $(LIB_DIR)
 LDFLAGS = $(XENO_LDFLAGS) $(LIBS)
 
 ## FILES & FOLDERS ##
@@ -40,7 +41,6 @@ cleanout :
 	$(RM) $(OUT_FILES)
 
 $(EXEC_NAME) : $(OBJ_FILES)
-	mkdir -p $(OBJ_DIR)
 	$(CXX) $(CXXFLAGS) -o $(EXEC_NAME) $(OBJ_FILES) $(LDFLAGS)
 	find . -name \*.gch -type f -exec rm -f {} +
 
