@@ -27,6 +27,10 @@ blowfishE_S      7      15      1    1    0    ./bench/bf                   e ./
 blowfishD_S      6.33   15      1    1    0    ./bench/bf                   d ./bench/blowfish/o_small.enc       ./bench/output/o_small.asc 1234567890abcdeffedcba0987654321
 blowfishE_L      69     120     1    1    0    ./bench/bf                   e ./bench/blowfish/input_large.asc ./bench/output/o_large.enc 1234567890abcdeffedcba0987654321
 blowfishD_L      66     120     1    1    0    ./bench/bf                   d ./bench/blowfish/o_large.enc       ./bench/output/o_large.asc 1234567890abcdeffedcba0987654321
+rijndaelE_S                     1    1    0    rijndael             input_small.asc output_small.enc e 1234567890abcdeffedcba09876543211234567890abcdeffedcba0987654321
+rijndaelE_S                     1    1    0    rijndael             output_small.enc output_small.dec d 1234567890abcdeffedcba09876543211234567890abcdeffedcba0987654321
+rijndaelE_L                     1    1    0    rijndael             input_large.asc output_large.enc e 1234567890abcdeffedcba09876543211234567890abcdeffedcba0987654321
+rijndaelE_L                     1    1    0    rijndael             output_large.enc output_large.dec d 1234567890abcdeffedcba09876543211234567890abcdeffedcba0987654321
 sha_S            4      15      1    1    0    ./bench/sha_bin              ./bench/sha/input_small.asc   > ./bench/output/o_sha_small.txt
 sha_L            25     60      1    1    0    ./bench/sha_bin              ./bench/sha/input_large.asc   > ./bench/output/o_sha_large.txt
 adpcmCaudio_S    14     30      1    1    0    ./bench/adpcm_rawcaudio      < ./bench/adpcm/small.pcm     > ./bench/output/o_small.adpcm
