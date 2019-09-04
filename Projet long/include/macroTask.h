@@ -30,8 +30,10 @@ class MacroTask
     int priority;
     monitoringMsg msg ;
     //string chain;
+    int (*proceed_function)(int argc, char *argv[]);
     char stdIn[35];
     char stdOut[35];
+    //int argc;
     std::vector<char*> argv;
 
 
