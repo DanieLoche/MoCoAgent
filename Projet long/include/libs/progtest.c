@@ -1,11 +1,14 @@
 #include <stdio.h>
 
+extern "C" {
+int basicmath_small(int argc, char *argv[]);
+}
 
-void main(int argc, char *argv[])
+int main(int argc, char *argv[])
 {
 	printf("Debut test\n");
 	int ret = 0;
-//	ret += basicmath_small( argc, argv);
+	ret += basicmath_small( argc, argv);
 //	ret += basicmath_large( argc, argv);
 //	ret += bitcount_func( argc, argv);
 //	ret += qsort_small( argc, argv) ;
@@ -29,5 +32,6 @@ void main(int argc, char *argv[])
 //	ret += gsm_func ( argc, argv);
 
 	printf("Fin test : %d.\n", ret);
+	return ret;
 
 }

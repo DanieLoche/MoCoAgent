@@ -1,9 +1,9 @@
 #include "tools.h"
 #include "macroTask.h"
 //#include <utmpx.h>    // Pour fonction getcpu()
-#include <spawn.h>
-#include <sys/wait.h>
-#include <fcntl.h>
+//#include <spawn.h>
+//#include <sys/wait.h>
+#include <fcntl.h>      // gestion systèmes de fichiers ( dup() )
 
 #define EXECTIME   2e8   // execution time in ns
 #define SPINTIME   1e7   // spin time in ns

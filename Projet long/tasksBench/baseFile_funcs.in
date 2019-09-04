@@ -1,16 +1,16 @@
 name            wcet    period isHRT aff  prec path                         parameters
-basicmath_S      15     30      1    1    0    basicmath_small      >   ./bench/output/o_basmth_small.txt
-basicmath_L      250    480     1    1    0    basicmath_large      >   ./bench/output/o_basmth_large.txt
-bitcount_S       5      15      1    1    0    bitcnts              75000   >   ./bench/output/o_btcnt_small.txt
-bitcount_L       70     240     1    1    0    bitcnts              1125000   >   ./bench/output/o_btcnt_large.txt
-qsort_S          8.5    15      1    1    0    qsort_small          ./bench/qsort/input_small.dat   >   ./bench/output/o_qsort_small.txt
-qsort_L          45     120     1    1    0    qsort_large          ./bench/qsort/input_large.dat   >   ./bench/output/o_qsort_large.txt
-susan_S_smooth   8      15      1    1    0    susan_bin            ./bench/susan/input_small.pgm   ./bench/output/o_susan_small.smoothing.pgm -s
-susan_S_edges    0.5    15      1    1    0    susan_bin            ./bench/susan/input_small.pgm   ./bench/output/o_susan_small.edges.pgm     -e
-susan_S_corners  0.5    15      1    1    0    susan_bin            ./bench/susan/input_small.pgm   ./bench/output/o_susan_small.corners.pgm   -c
-susan_L_smooth   32     60      1    1    0    susan_bin            ./bench/susan/input_large.pgm   ./bench/output/o_susan_large.smoothing.pgm -s
-susan_L_edges    7.5    15      1    1    0    susan_bin            ./bench/susan/input_large.pgm   ./bench/output/o_susan_large.edges.pgm     -e
-susan_L_corners  4      15      1    1    0    susan_bin            ./bench/susan/input_large.pgm   ./bench/output/o_susan_large.corners.pgm   -c
+basicmath_S      15     30      1    1    0    basicmath_small      > ./bench/output/o_basmth_small.txt
+basicmath_L      250    480     1    1    0    basicmath_large      > ./bench/output/o_basmth_large.txt
+bitcount_S       5      15      1    1    0    bitcnts              75000   > ./bench/output/o_btcnt_small.txt
+bitcount_L       70     240     1    1    0    bitcnts              1125000 > ./bench/output/o_btcnt_large.txt
+qsort_S          8.5    15      1    1    0    qsort_small          ./bench/qsort/input_small.dat > ./bench/output/o_qsort_small.txt
+qsort_L          45     120     1    1    0    qsort_large          ./bench/qsort/input_large.dat > ./bench/output/o_qsort_large.txt
+susan_S_smooth   8      15      1    1    0    susan_bin            ./bench/susan/input_small.pgm ./bench/output/o_susan_small.smoothing.pgm -s
+susan_S_edges    0.5    15      1    1    0    susan_bin            ./bench/susan/input_small.pgm ./bench/output/o_susan_small.edges.pgm     -e
+susan_S_corners  0.5    15      1    1    0    susan_bin            ./bench/susan/input_small.pgm ./bench/output/o_susan_small.corners.pgm   -c
+susan_L_smooth   32     60      1    1    0    susan_bin            ./bench/susan/input_large.pgm ./bench/output/o_susan_large.smoothing.pgm -s
+susan_L_edges    7.5    15      1    1    0    susan_bin            ./bench/susan/input_large.pgm ./bench/output/o_susan_large.edges.pgm     -e
+susan_L_corners  4      15      1    1    0    susan_bin            ./bench/susan/input_large.pgm ./bench/output/o_susan_large.corners.pgm   -c
 cjpeg_S          7      15      1    1    0    cjpeg                -dct int -progressive -opt -outfile ./bench/output/o_small_encode.jpeg ./bench/jpg/input_small.ppm
 cjpeg_L          18     30      1    1    0    cjpeg                -dct int -progressive -opt -outfile ./bench/output/o_large_encode.jpeg ./bench/jpg/input_large.ppm
 djpeg_S          2      15      1    1    0    djpeg                -dct int -ppm -outfile ./bench/output/o_small_decode.ppm ./bench/jpg/input_small.jpg
@@ -24,9 +24,9 @@ patricia_L       82     240     1    1    0    patricia_bin         ./bench/patr
 stringsearch_L   5      15      1    1    0    search_large         >   ./bench/output/o_search_large.txt
 stringsearch_S   4      15      1    1    0    search_small         >   ./bench/output/o_search_small.txt
 blowfishE_S      7      15      1    1    0    bf                   e ./bench/blowfish/input_small.asc ./bench/output/o_small.enc 1234567890abcdeffedcba0987654321
-blowfishD_S      6.33   15      1    1    0    bf                   d ./bench/blowfish/o_small.enc       ./bench/output/o_small.asc 1234567890abcdeffedcba0987654321
+blowfishD_S      6.33   15      1    1    0    bf                   d ./bench/blowfish/o_small.enc     ./bench/output/o_small.asc 1234567890abcdeffedcba0987654321
 blowfishE_L      69     120     1    1    0    bf                   e ./bench/blowfish/input_large.asc ./bench/output/o_large.enc 1234567890abcdeffedcba0987654321
-blowfishD_L      66     120     1    1    0    bf                   d ./bench/blowfish/o_large.enc       ./bench/output/o_large.asc 1234567890abcdeffedcba0987654321
+blowfishD_L      66     120     1    1    0    bf                   d ./bench/blowfish/o_large.enc     ./bench/output/o_large.asc 1234567890abcdeffedcba0987654321
 rijndaelE_S      50     480     1    1    0    rijndael             input_small.asc output_small.enc e 1234567890abcdeffedcba09876543211234567890abcdeffedcba0987654321
 rijndaelE_S      50     480     1    1    0    rijndael             output_small.enc output_small.dec d 1234567890abcdeffedcba09876543211234567890abcdeffedcba0987654321
 rijndaelE_L      50     480     1    1    0    rijndael             input_large.asc output_large.enc e 1234567890abcdeffedcba09876543211234567890abcdeffedcba0987654321

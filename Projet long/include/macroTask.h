@@ -51,31 +51,30 @@ class MacroTask
 
 };
 
-extern int basicmath_small   (int argc, char *argv[]);
-extern int basicmath_large   (int argc, char *argv[]);
-extern int bitcount_func     (int argc, char *argv[]);
-extern int qsort_small       (int argc, char *argv[]);
-extern int qsort_large       (int argc, char *argv[]);
-extern int susan             (int argc, char *argv[]);
-extern int djpeg_func        (int argc, char *argv[]);
-extern int cjpeg_func        (int argc, char *argv[]);
-extern int typeset_func      (int argc, char *argv[]);
-extern int dijkstra_small    (int argc, char *argv[]);
-extern int dijkstra_large    (int argc, char *argv[]);
-extern int patricia          (int argc, char *argv[]);
-extern int stringsearch_small(int argc, char *argv[]);
-extern int stringsearch_large(int argc, char *argv[]);
-extern int blowfish          (int argc, char *argv[]);
-extern int rijndael          (int argc, char *argv[]);
-extern int sha               (int argc, char *argv[]);
-extern int rawdaudio         (int argc, char *argv[]);
-extern int rawcaudio         (int argc, char *argv[]);
-extern int crc               (int argc, char *argv[]);
-extern int fft               (int argc, char *argv[]);
-extern int gsm_func          (int argc, char *argv[]);
-
-extern void print_affinity(pid_t _pid);
-extern void printTaskInfo(rtTaskInfosStruct* task);
+extern "C" {
+int basicmath_small   (int argc, char *argv[]);
+int basicmath_large   (int argc, char *argv[]);
+int bitcount_func     (int argc, char *argv[]);
+int qsort_small       (int argc, char *argv[]);
+int qsort_large       (int argc, char *argv[]);
+int susan             (int argc, char *argv[]);
+int djpeg_func        (int argc, char *argv[]);
+int cjpeg_func        (int argc, char *argv[]);
+int typeset_func      (int argc, char *argv[]);
+int dijkstra_small    (int argc, char *argv[]);
+int dijkstra_large    (int argc, char *argv[]);
+int patricia          (int argc, char *argv[]);
+int stringsearch_small(int argc, char *argv[]);
+int stringsearch_large(int argc, char *argv[]);
+int blowfish          (int argc, char *argv[]);
+int rijndael          (int argc, char *argv[]);
+int sha               (int argc, char *argv[]);
+int rawdaudio         (int argc, char *argv[]);
+int rawcaudio         (int argc, char *argv[]);
+int crc               (int argc, char *argv[]);
+int fft               (int argc, char *argv[]);
+int gsm_func          (int argc, char *argv[]);
+}
 
 extern void print_affinity(pid_t _pid);
 extern void printTaskInfo(rtTaskInfosStruct* task);
