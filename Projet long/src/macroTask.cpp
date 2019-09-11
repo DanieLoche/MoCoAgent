@@ -27,29 +27,6 @@ MacroTask::MacroTask(taskRTInfo* _taskRTInfo, bool MoCo)
    //chain = std::string(properties->path_task) + " " + properties->arguments;
    //cout << "Command for this task is : " << chain << " ." << endl;
    parseParameters( );
-        if (strcmp(properties->path_task, "basicmath_small")) proceed_function = basicmath_small;
-   else if (strcmp(properties->path_task, "basicmath_large")) proceed_function = basicmath_large;
-   else if (strcmp(properties->path_task, "bitcnts"))         proceed_function = bitcount_func;
-   else if (strcmp(properties->path_task, "qsort_small"))     proceed_function = qsort_small;
-   else if (strcmp(properties->path_task, "qsort_large"))     proceed_function = qsort_large;
-   else if (strcmp(properties->path_task, "susan_bin"))       proceed_function = susan;
-   else if (strcmp(properties->path_task, "cjpeg"))           proceed_function = cjpeg_func;
-   else if (strcmp(properties->path_task, "djpeg"))           proceed_function = djpeg_func;
-   else if (strcmp(properties->path_task, "lout"))            proceed_function = typeset_func;
-   else if (strcmp(properties->path_task, "dijkstra_small"))  proceed_function = dijkstra_small;
-   else if (strcmp(properties->path_task, "dijkstra_large"))  proceed_function = dijkstra_large;
-   else if (strcmp(properties->path_task, "patricia_bin"))    proceed_function = patricia;
-   else if (strcmp(properties->path_task, "search_large"))    proceed_function = stringsearch_small;
-   else if (strcmp(properties->path_task, "search_small"))    proceed_function = stringsearch_large;
-   else if (strcmp(properties->path_task, "bf"))              proceed_function = blowfish;
-   else if (strcmp(properties->path_task, "rijndael"))        proceed_function = rijndael;
-   else if (strcmp(properties->path_task, "sha_bin"))         proceed_function = sha;
-   else if (strcmp(properties->path_task, "adpcm_rawcaudio")) proceed_function = rawcaudio;
-   else if (strcmp(properties->path_task, "adpcm_rawdaudio")) proceed_function = rawdaudio;
-   else if (strcmp(properties->path_task, "crc"))             proceed_function = crc;
-   else if (strcmp(properties->path_task, "fft"))             proceed_function = fft;
-   else if (strcmp(properties->path_task, "toast"))           proceed_function = gsm_func;
-   else if (strcmp(properties->path_task, "untoast"))         proceed_function = gsm_func;
 
    msg.task    = properties->task;
    msg.ID      = properties->id;
@@ -70,7 +47,30 @@ void MacroTask::parseParameters()
 {
       //cout << "[ " << properties->name << " ] : " << "Started parsing params." << endl;
       stdIn[0] = '\0'; stdOut[0] = '\0';
-      argv.push_back(properties->name); //argv[0] = properties->name;
+      if      (strcmp(properties->path_task, "basicmath_small")) proceed_function = basicmath_small;
+      else if (strcmp(properties->path_task, "basicmath_large")) proceed_function = basicmath_large;
+      else if (strcmp(properties->path_task, "bitcnts"))         proceed_function = bitcount_func;
+      else if (strcmp(properties->path_task, "qsort_small"))     proceed_function = qsort_small;
+      else if (strcmp(properties->path_task, "qsort_large"))     proceed_function = qsort_large;
+      else if (strcmp(properties->path_task, "susan_bin"))       proceed_function = susan;
+      else if (strcmp(properties->path_task, "cjpeg"))           proceed_function = cjpeg_func;
+      else if (strcmp(properties->path_task, "djpeg"))           proceed_function = djpeg_func;
+      else if (strcmp(properties->path_task, "lout"))            proceed_function = typeset_func;
+      else if (strcmp(properties->path_task, "dijkstra_small"))  proceed_function = dijkstra_small;
+      else if (strcmp(properties->path_task, "dijkstra_large"))  proceed_function = dijkstra_large;
+      else if (strcmp(properties->path_task, "patricia_bin"))    proceed_function = patricia;
+      else if (strcmp(properties->path_task, "search_large"))    proceed_function = stringsearch_small;
+      else if (strcmp(properties->path_task, "search_small"))    proceed_function = stringsearch_large;
+      else if (strcmp(properties->path_task, "bf"))              proceed_function = blowfish;
+      else if (strcmp(properties->path_task, "rijndael"))        proceed_function = rijndael;
+      else if (strcmp(properties->path_task, "sha_bin"))         proceed_function = sha;
+      else if (strcmp(properties->path_task, "adpcm_rawcaudio")) proceed_function = rawcaudio;
+      else if (strcmp(properties->path_task, "adpcm_rawdaudio")) proceed_function = rawdaudio;
+      else if (strcmp(properties->path_task, "crc"))             proceed_function = crc;
+      else if (strcmp(properties->path_task, "fft"))             proceed_function = fft;
+      else if (strcmp(properties->path_task, "toast"))           proceed_function = gsm_func;
+      else if (strcmp(properties->path_task, "untoast"))         proceed_function = gsm_func;
+      argv.push_back(properties->path_task); //argv[0] = properties->name;
 
       std::istringstream iss( properties->arguments);
       string token;
@@ -274,7 +274,7 @@ void MacroTask::executeRun()
 int MacroTask::before_besteff()
 {
 //  rt_mutex_acquire(&mutex, TM_INFINITE);
-   rt_task_set_priority(NULL, priority+1);
+   //rt_task_set_priority(NULL, priority+1);
   dataLogs->logStart();
   unsigned int flag;
   rt_event_wait(&event, sizeof(flag), &flag ,	EV_PRIO,TM_NONBLOCK) 	;
@@ -289,7 +289,7 @@ int MacroTask::after_besteff()
     cout << "End Task : " << properties->name << endl;
     #endif
 //   rt_mutex_release(&mutex);
-   rt_task_set_priority(NULL, priority);
+   // rt_task_set_priority(NULL, priority);
   return 0;
 }
 
@@ -298,16 +298,6 @@ void MacroTask::executeRun_besteffort()
 {
   //cout << "Running..." << endl;
 
-/*   mutex.lock();
-     properties->max_runtime =0;
-     properties->min_runtime =1e9;
-     properties->out_deadline=0;
-     properties->num_of_times=0;
-     Somme =0;
-     properties->average_runtime =0;
-     runtime= 0;
-    mutex.unlock();
-*/
     while (1)
     {
       before_besteff(); // Check if execution allowed
