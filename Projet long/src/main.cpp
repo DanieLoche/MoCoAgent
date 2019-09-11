@@ -42,6 +42,7 @@ void TaskMain(void* arg)
   taskRTInfo* _taskRTInfo = (taskRTInfo*) arg;
   MacroTask macroRT(_taskRTInfo, enableAgent);
   rt_sem_p(&mysync,TM_INFINITE);
+  cout << "Started. Function is : " << _taskRTInfo->rtTI->path_task << endl;
   if (_taskRTInfo->rtTI->isHardRealTime == 0) {
     macroRT.executeRun_besteffort();
   }
@@ -147,7 +148,7 @@ int main(int argc, char* argv[])
 
    outputFileResume.close();
 
-   cout << "Press a key to start (PID: " << getpid() << ")!" << endl;
+   //cout << "Press a key to start (PID: " << getpid() << ")!" << endl;
    //cin.get();
 
    tln = new TaskLauncher(outputFile);

@@ -187,7 +187,23 @@ void MacroTask::proceed()
       cout << "[ " << properties->name << " ] : "<< "Executing Proceed." << endl;
       #endif
 
-      proceed_function(argv.size() - 1, &argv[0]);  // -1 : no need for last element "NULL".
+      int ret = 0;
+      ret = proceed_function(argv.size() - 1, &argv[0]);  // -1 : no need for last element "NULL".
+      if (ret != 0)
+      {
+        cout << "["<< properties->name << " ("<< getpid() << ")] - Error during proceed ! [" << ret << "]. Function was : ";
+        int i = 1;
+        i = 0;
+        for (auto arg : argv)
+        {
+           string toPrint;
+           if (arg==NULL)toPrint = "null";
+           else toPrint = arg;
+           cout << "Arg #" << i << " = " << toPrint << " ; ";
+           i++;
+        }
+        cout << " with (" << argv.size() << ") elements." << endl;
+      }
       // if (std::string path(properties->path_task) != "/null/")  {
       //cout << properties->name << " : " << chain << endl;
 /*

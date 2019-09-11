@@ -1,2 +1,2 @@
 ID  name 		     meanET  wcet    isHRT aff  prec path                       arguments
-1 stringsearch_S 4 15 1 1 0 ./bench/search_small > ./bench/output/o_search_small.txt
+1 stringsearch_S 4 15 1 1 0 search_small > ./bench/output/o_search_small.txt

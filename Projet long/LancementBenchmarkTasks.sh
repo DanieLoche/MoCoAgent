@@ -1,7 +1,7 @@
-input=input_chaine.txt
+input=input_benchmarkTasks.in
 duration=100
 Duration=0
-load=80
+load=100
 
 while [ "$1" != "" ]; do
     case $1 in
