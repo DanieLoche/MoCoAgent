@@ -33,6 +33,8 @@ class MacroTask
     int (*proceed_function)(int argc, char *argv[]);
     char stdIn[35];
     char stdOut[35];
+    std::ifstream inStrm;
+    std::ofstream outStrm;
     //int argc;
     std::vector<char*> argv;
 
@@ -78,7 +80,7 @@ int gsm_func          (int argc, char *argv[]);
 
 extern void print_affinity(pid_t _pid);
 extern void printTaskInfo(rtTaskInfosStruct* task);
-
+extern std::streambuf *cinbuf, *coutbuf;
 /*
 class MacroTaskBestEffort : public MacroTask
 {

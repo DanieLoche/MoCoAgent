@@ -28,10 +28,10 @@ while [ "$1" != "" ]; do
         -d | --duration )    	shift
 				duration=$1
                                 ;;
-	-l | --load )		shift
+	    -l | --load )		shift
 				load=$1
 				;;
-	-s | --sched )		shift
+	    -s | --sched )		shift
 				schedPolicy=$1
 				;;
         -h | --help )           echo "usage: runBashTest.sh [[[-f file ] [-d duration] [-l load]] | [-h]]"

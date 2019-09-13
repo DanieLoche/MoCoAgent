@@ -28,6 +28,9 @@ long expeDuration = 0;
 string inputFile = "input_chaine.txt", outputFile = "ExpeOutput";
 int schedMode = SCHED_FIFO, cpuFactor = 100;
 
+std::streambuf *cinbuf;
+std::streambuf *coutbuf;
+
 void RunmcAgentMain(void* arg)
 {
   systemRTInfo* sInfos = (systemRTInfo*) arg;
@@ -42,7 +45,6 @@ void TaskMain(void* arg)
   taskRTInfo* _taskRTInfo = (taskRTInfo*) arg;
   MacroTask macroRT(_taskRTInfo, enableAgent);
   rt_sem_p(&mysync,TM_INFINITE);
-  cout << "Started. Function is : " << _taskRTInfo->rtTI->path_task << endl;
   if (_taskRTInfo->rtTI->isHardRealTime == 0) {
     macroRT.executeRun_besteffort();
   }
@@ -177,6 +179,8 @@ int main(int argc, char* argv[])
    //sleeping the time that all tasks will be started
    sleep(4);
    cout << "Wake up all tasks." << endl;
+   cinbuf = std::cin.rdbuf(); //save stdIn
+   coutbuf = std::cout.rdbuf(); //save stdOut
    rt_sem_broadcast(&mysync);
 
    //    string ss;
@@ -185,6 +189,8 @@ int main(int argc, char* argv[])
    //while (1) {    }
    if (expeDuration) sleep(expeDuration);
    else pause();
+   std::cin.rdbuf(cinbuf);   //reset to standard input again
+   std::cout.rdbuf(coutbuf); //reset to standard output again
    cout << "End of Experimentation." << endl;
    endOfExpeHandler(0);
 
