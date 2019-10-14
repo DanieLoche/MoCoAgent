@@ -1,2 +1,2 @@
 ID  name 		     meanET  wcet    isHRT aff  prec path                       arguments
-1 susan_S_corners 0.5 15 1 1 0 ./bench/susan_bin ./bench/susan/input_small.pgm ./bench/output/o_susan_small.corners.pgm -c
+1 susan_S_corners 0.5 15 1 1 0 susan_bin ./bench/susan/input_small.pgm ./bench/output/o_susan_small.corners.pgm -c

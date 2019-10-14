@@ -25,8 +25,19 @@ MacroTask::MacroTask(taskRTInfo* _taskRTInfo, bool MoCo)
    #endif
    */
    //chain = std::string(properties->path_task) + " " + properties->arguments;
-   //cout << "Command for this task is : " << chain << " ." << endl;
    parseParameters( );
+   cout << "Command for this task is : " << properties->path_task << " . ";
+   int i = 1;
+   i = 0;
+   for (auto arg : argv)
+   {
+      string toPrint;
+      if (arg==NULL)toPrint = "null";
+      else toPrint = arg;
+      cout << "Arg #" << i << " = " << toPrint << " ; ";
+      i++;
+   }
+   cout << endl;
 
    msg.task    = properties->task;
    msg.ID      = properties->id;
@@ -72,14 +83,21 @@ void MacroTask::parseParameters()
       else if (strcmp(properties->path_task, "untoast"))         proceed_function = gsm_func;
       argv.push_back(properties->path_task); //argv[0] = properties->name;
 
+      int chr;
+      for (chr = 0; properties->arguments[chr] != '\0'; chr++)
+      {
+        if (properties->arguments[chr] == '\n' || properties->arguments[chr] == '\r')
+          properties->arguments[chr] = '\0';
+      }
       std::istringstream iss( properties->arguments);
+      cout << "Managing arguments : [" << properties->arguments << "]" << endl;
       string token;
       int nextStr = 0;
       //argc = 1;
       while (getline(iss, token, ' '))
       {
          token = reduce(token);
-         //cout << "[ " << properties->name << " ] : " << "Managing token [" << token << "]" << endl;
+         cout << "[ " << properties->name << " ] : " << "Managing token [" << token << "]." << endl;
          if (token == "<")
             nextStr = 1;
          else if (token == ">")
@@ -90,6 +108,7 @@ void MacroTask::parseParameters()
             {
                token.copy(stdIn, token.size());
                stdIn[token.size()] = '\0';
+               inStrm.open(stdIn);
                #if VERBOSE_OTHER
                cout << "[ " << properties->name << " ] : " << "stdIn = " << stdIn << "." << endl;
                #endif
@@ -98,6 +117,7 @@ void MacroTask::parseParameters()
             {
                token.copy(stdOut, token.size());
                stdOut[token.size()] = '\0';
+               outStrm.open(stdOut);
                #if VERBOSE_OTHER
                cout << "[ " << properties->name << " ] : " << "stdOut = " << stdOut << "." << endl;
                #endif
@@ -110,6 +130,7 @@ void MacroTask::parseParameters()
                #if VERBOSE_OTHER
                cout << "token : [" << token << "] (" << token.size() << ") copied to [" << arg << "] (" << strlen(arg) << ")." << endl;
                #endif
+
                argv.push_back(arg);
                //argc++;
             }
@@ -131,34 +152,34 @@ void MacroTask::parseParameters()
       }
       cout << endl;
       #endif
+/*
+      if (stdIn[0] != '\0')
+      {
+         #if VERBOSE_OTHER
+         cout << "Changed Input to : " << stdIn << endl;
+         #endif
+         int fdIn = open(stdIn, O_RDWR | O_CREAT, S_IRUSR | S_IWUSR);
+         dup2(fdIn, 0);
+         close(fdIn);
+      }
+      #if VERBOSE_OTHER
+      else cout << "Unchanged Input." << endl;
+      #endif
 
-      // if (stdIn[0] != '\0')
-      // {
-      //    #if VERBOSE_OTHER
-      //    cout << "Changed Input to : " << stdIn << endl;
-      //    #endif
-      //    int fdIn = open(stdIn, O_RDWR | O_CREAT, S_IRUSR | S_IWUSR);
-      //    dup2(fdIn, 0);
-      //    close(fdIn);
-      // }
-      // #if VERBOSE_OTHER
-      // else cout << "Unchanged Input." << endl;
-      // #endif
-      //
-      // if (stdOut[0] != '\0')
-      // {
-      //    #if VERBOSE_OTHER
-      //    cout << "Changed Output to : " << stdOut << endl;
-      //    #endif
-      //    int fdOut = open(stdOut, O_RDWR | O_CREAT, S_IRUSR | S_IWUSR);
-      //    dup2(fdOut, 1);
-      //    close(fdOut);
-      // }
-      // #if VERBOSE_OTHER
-      // else
-      // cout << "Unchanged Output." << endl;
-      // #endif
-
+      if (stdOut[0] != '\0')
+      {
+         #if VERBOSE_OTHER
+         cout << "Changed Output to : " << stdOut << endl;
+         #endif
+         int fdOut = open(stdOut, O_RDWR | O_CREAT, S_IRUSR | S_IWUSR);
+         dup2(fdOut, 1);
+         close(fdOut);
+      }
+      #if VERBOSE_OTHER
+      else
+      cout << "Unchanged Output." << endl;
+      #endif
+*/
 }
 
 int MacroTask::before()
@@ -187,36 +208,82 @@ void MacroTask::proceed()
       cout << "[ " << properties->name << " ] : "<< "Executing Proceed." << endl;
       #endif
 
-      proceed_function(argv.size() - 1, &argv[0]);  // -1 : no need for last element "NULL".
-      // if (std::string path(properties->path_task) != "/null/")  {
-      //cout << properties->name << " : " << chain << endl;
-/*
-      if (vfork() == 0)
-      {
-          if (stdIn[0] != '\0')
-          {
-             int fdIn = open(stdIn, O_RDWR | O_CREAT, S_IRUSR | S_IWUSR);
-             dup2(fdIn, 0);
-             close(fdIn);
-          }
+      /*
+            if (vfork() == 0)
+            {
+                if (stdIn[0] != '\0')
+                {
+                   int fdIn = open(stdIn, O_RDWR | O_CREAT, S_IRUSR | S_IWUSR);
+                   dup2(fdIn, 0);
+                   close(fdIn);
+                }
 
-          if (stdOut[0] != '\0')
-          {
-             int fdOut = open(stdOut, O_RDWR | O_CREAT, S_IRUSR | S_IWUSR);
-             dup2(fdOut, 1);
-             close(fdOut);
-          }
-         execv(properties->path_task, &argv[0]);
-         _exit(0);
-      }
-      else
+                if (stdOut[0] != '\0')
+                {
+                   int fdOut = open(stdOut, O_RDWR | O_CREAT, S_IRUSR | S_IWUSR);
+                   dup2(fdOut, 1);
+                   close(fdOut);
+                }
+               execv(properties->path_task, &argv[0]);
+               _exit(0);
+            }
+            else
+            {
+               wait(NULL);
+               #if VERBOSE_OTHER
+               cout << "[ " << properties->name << " ] : "<< "End of Proceed." << endl;
+               #endif
+            }
+      */
+/*
+      if (stdIn[0] != '\0')
       {
-         wait(NULL);
-         #if VERBOSE_OTHER
-         cout << "[ " << properties->name << " ] : "<< "End of Proceed." << endl;
-         #endif
+          std::cin.rdbuf(inStrm.rdbuf()); //redirect std::cin to stdIn!
+      }
+
+      if (stdOut[0] != '\0')
+      {
+          std::cout.rdbuf(outStrm.rdbuf()); //redirect std::cout to stdOut!
       }
 */
+      if (stdIn[0] != '\0')
+      {
+         int fdIn = open(stdIn, O_RDWR | O_CREAT, S_IRUSR | S_IWUSR);
+         dup2(fdIn, 0);
+         close(fdIn);
+      }
+
+      if (stdOut[0] != '\0')
+      {
+         int fdOut = open(stdOut, O_RDWR | O_CREAT, S_IRUSR | S_IWUSR);
+         dup2(fdOut, 1);
+         close(fdOut);
+      }
+
+      int ret = 0;
+      ret = proceed_function(argv.size(), &argv[0]);  // -1 : no need for last element "NULL".
+      if (ret != 0)
+      {
+        cerr << "["<< properties->name << " ("<< getpid() << ")] - Error during proceed ! [" << ret << "]. Function was : ";
+        int i = 1;
+        i = 0;
+        for (auto arg : argv)
+        {
+           string toPrint;
+           if (arg==NULL)toPrint = "null";
+           else toPrint = arg;
+           cerr << "Arg #" << i << " = " << toPrint << " ; ";
+           i++;
+        }
+        cerr << " with (" << argv.size() << ") elements." << endl;
+      }
+      std::cout.flush();
+      //if (stdIn[0] != '\0') std::cin.rdbuf(cinbuf);   //reset to standard input again
+      //if (stdOut[0] != '\0') std::cout.rdbuf(coutbuf); //reset to standard output again
+
+      // if (std::string path(properties->path_task) != "/null/")  {
+      //cout << properties->name << " : " << chain << endl;
+
       //system(&chain[0u]);
 //    }
 //    else cout << properties->name <<"Oups, no valid path found !" << endl;

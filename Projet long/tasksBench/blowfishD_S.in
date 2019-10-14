@@ -1,2 +1,2 @@
 ID  name 		     meanET  wcet    isHRT aff  prec path                       arguments
-1 blowfishD_S 6.33 15 1 1 0 ./bench/bf d ./bench/blowfish/o_small.enc ./bench/output/o_small.asc 1234567890abcdeffedcba0987654321
+1 blowfishD_S 6.33 15 1 1 0 bf d ./bench/blowfish/o_small.enc ./bench/output/o_small.asc 1234567890abcdeffedcba0987654321

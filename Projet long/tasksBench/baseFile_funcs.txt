@@ -1,0 +1,50 @@
+name            wcet    period isHRT aff  prec path                         parameters
+basicmath_S      15     30      1    1    0    basicmath_small      > ./bench/output/o_basmth_small.txt 
+basicmath_L      250    480     1    1    0    basicmath_large      > ./bench/output/o_basmth_large.txt 
+bitcount_S       5      15      1    1    0    bitcnts              75000   > ./bench/output/o_btcnt_small.txt 
+bitcount_L       70     240     1    1    0    bitcnts              1125000 > ./bench/output/o_btcnt_large.txt 
+qsort_S          8.5    15      1    1    0    qsort_small          ./bench/qsort/input_small.dat > ./bench/output/o_qsort_small.txt 
+qsort_L          45     120     1    1    0    qsort_large          ./bench/qsort/input_large.dat > ./bench/output/o_qsort_large.txt 
+susan_S_smooth   8      15      1    1    0    susan_bin            ./bench/susan/input_small.pgm ./bench/output/o_susan_small.smoothing.pgm -s 
+susan_S_edges    0.5    15      1    1    0    susan_bin            ./bench/susan/input_small.pgm ./bench/output/o_susan_small.edges.pgm     -e 
+susan_S_corners  0.5    15      1    1    0    susan_bin            ./bench/susan/input_small.pgm ./bench/output/o_susan_small.corners.pgm   -c 
+susan_L_smooth   32     60      1    1    0    susan_bin            ./bench/susan/input_large.pgm ./bench/output/o_susan_large.smoothing.pgm -s 
+susan_L_edges    7.5    15      1    1    0    susan_bin            ./bench/susan/input_large.pgm ./bench/output/o_susan_large.edges.pgm     -e 
+susan_L_corners  4      15      1    1    0    susan_bin            ./bench/susan/input_large.pgm ./bench/output/o_susan_large.corners.pgm   -c 
+cjpeg_S          7      15      1    1    0    cjpeg                -dct int -progressive -opt -outfile ./bench/output/o_small_encode.jpeg ./bench/jpg/input_small.ppm 
+cjpeg_L          18     30      1    1    0    cjpeg                -dct int -progressive -opt -outfile ./bench/output/o_large_encode.jpeg ./bench/jpg/input_large.ppm 
+djpeg_S          2      15      1    1    0    djpeg                -dct int -ppm -outfile ./bench/output/o_small_decode.ppm ./bench/jpg/input_small.jpg 
+djpeg_L          4      15      1    1    0    djpeg                -dct int -ppm -outfile ./bench/output/o_large_decode.ppm ./bench/jpg/input_large.jpg 
+typeset_S        36     60      1    1    0    lout                 -I ./bench/typeset/include -D ./bench/typeset/data -F ./bench/typeset/font -C ./bench/typeset/maps -H ./bench/typeset/hyph ./bench/typeset/small.lout > ./bench/output/o_typeset_small.ps 
+typeset_L        79     120     1    1    0    lout                 -I ./bench/typeset/include -D ./bench/typeset/data -F ./bench/typeset/font -C ./bench/typeset/maps -H ./bench/typeset/hyph ./bench/typeset/large.lout > ./bench/output/o_typeset_large.ps 
+dijkstra_S       12     30      1    1    0    dijkstra_small       ./bench/dijkstra/input.dat   >   ./bench/output/o_dijk_small.dat 
+dijkstra_L       35     60      1    1    0    dijkstra_large       ./bench/dijkstra/input.dat   >   ./bench/output/o_dijk_large.dat 
+patricia_S       16     30      1    1    0    patricia_bin         ./bench/patricia/small.udp   >   ./bench/output/o_pat_small.txt 
+patricia_L       82     240     1    1    0    patricia_bin         ./bench/patricia/large.udp   >   ./bench/output/o_pat_large.txt 
+stringsearch_L   5      15      1    1    0    search_large         >   ./bench/output/o_search_large.txt 
+stringsearch_S   4      15      1    1    0    search_small         >   ./bench/output/o_search_small.txt 
+blowfishE_S      7      15      1    1    0    bf                   e ./bench/blowfish/input_small.asc ./bench/output/o_small.enc 1234567890abcdeffedcba0987654321 
+blowfishD_S      6.33   15      1    1    0    bf                   d ./bench/blowfish/o_small.enc     ./bench/output/o_small.asc 1234567890abcdeffedcba0987654321 
+blowfishE_L      69     120     1    1    0    bf                   e ./bench/blowfish/input_large.asc ./bench/output/o_large.enc 1234567890abcdeffedcba0987654321 
+blowfishD_L      66     120     1    1    0    bf                   d ./bench/blowfish/o_large.enc     ./bench/output/o_large.asc 1234567890abcdeffedcba0987654321 
+rijndaelE_S      50     480     1    1    0    rijndael             input_small.asc output_small.enc e 1234567890abcdeffedcba09876543211234567890abcdeffedcba0987654321 
+rijndaelE_S      50     480     1    1    0    rijndael             output_small.enc output_small.dec d 1234567890abcdeffedcba09876543211234567890abcdeffedcba0987654321 
+rijndaelE_L      50     480     1    1    0    rijndael             input_large.asc output_large.enc e 1234567890abcdeffedcba09876543211234567890abcdeffedcba0987654321 
+rijndaelE_L      50     480     1    1    0    rijndael             output_large.enc output_large.dec d 1234567890abcdeffedcba09876543211234567890abcdeffedcba0987654321 
+sha_S            4      15      1    1    0    sha_bin              ./bench/sha/input_small.asc   > ./bench/output/o_sha_small.txt 
+sha_L            25     60      1    1    0    sha_bin              ./bench/sha/input_large.asc   > ./bench/output/o_sha_large.txt 
+adpcmCaudio_S    14     30      1    1    0    adpcm_rawcaudio      < ./bench/adpcm/small.pcm     > ./bench/output/o_small.adpcm 
+adpcmCaudio_L    198    480     1    1    0    adpcm_rawcaudio      < ./bench/adpcm/large.pcm     > ./bench/output/o_large.adpcm 
+adpcmDaudio_S    6      15      1    1    0    adpcm_rawdaudio      < ./bench/adpcm/small.adpcm   > ./bench/output/o_small.pcm 
+adpcmDaudio_L    95     240     1    1    0    adpcm_rawdaudio      < ./bench/adpcm/large.adpcm   > ./bench/output/o_large.pcm 
+CRC32_S          6.5    15      1    1    0    crc                  ./bench/data/small.pcm        > ./bench/output/o_crc_small.txt 
+CRC32_L          112    240     1    1    0    crc                  ./bench/data/large.pcm        > ./bench/output/o_crc_large.txt 
+fft_S            8      15      1    1    0    fft                  8   4096        >   ./bench/output/o_fft_small.txt 
+fft_L            61     120     1    1    0    fft                  8   32768       >   ./bench/output/o_fft_large.txt 
+fft_inv_S        8      15      1    1    0    fft                  8   8192   -i   >   ./bench/output/o_ffti_small.inv.txt 
+fft_inv_L        55     120     1    1    0    fft                  8   65536  -i   >   ./bench/output/o_ffti_large.inv.txt 
+gsmToast_S       3      15      1    1    0    toast                -fps -c ./bench/gsm/small.au         > ./bench/output/o_small.encode.gsm 
+gsmToast_L       134    240     1    1    0    toast                -fps -c ./bench/gsm/large.au         > ./bench/output/o_large.encode.gsm 
+gsmUToast_S      0.43   15      1    1    0    untoast              -dfps -c ./bench/gsm/small.au.run.gsm > ./bench/output/o_small.decode.run 
+gsmUToast_L      0.25   15      1    1    0    untoast              -dfps -c ./bench/gsm/large.au.run.gsm > ./bench/output/o_large.decode.run 
+ 

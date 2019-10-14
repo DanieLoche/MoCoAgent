@@ -1,2 +1,2 @@
 ID  name 		     meanET  wcet    isHRT aff  prec path                       arguments
-1 bitcount_S 5 15 1 1 0 ./bench/bitcnts 75000 > ./bench/output/o_btcnt_small.txt
+1 bitcount_S 5 15 1 1 0 bitcnts 75000 > ./bench/output/o_btcnt_small.txt
