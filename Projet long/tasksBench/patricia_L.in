@@ -1,2 +1,2 @@
 ID  name 		     meanET  wcet    isHRT aff  prec path                       arguments
-1 patricia_L 82 240 1 1 0 patricia_bin ./bench/patricia/large.udp > ./bench/output/o_pat_large.txt
+1 patricia_L 82 240 1 1 0 patricia_bin ./bench/patricia/large.udp > ./bench/output/o_pat_large.txt 

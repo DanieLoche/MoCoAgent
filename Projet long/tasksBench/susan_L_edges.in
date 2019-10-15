@@ -1,2 +1,2 @@
 ID  name 		     meanET  wcet    isHRT aff  prec path                       arguments
-1 susan_L_edges 7.5 15 1 1 0 susan_bin ./bench/susan/input_large.pgm ./bench/output/o_susan_large.edges.pgm -e
+1 susan_L_edges 7.5 15 1 1 0 susan_bin ./bench/susan/input_large.pgm ./bench/output/o_susan_large.edges.pgm -e 

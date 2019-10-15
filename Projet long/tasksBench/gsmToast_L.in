@@ -1,2 +1,2 @@
 ID  name 		     meanET  wcet    isHRT aff  prec path                       arguments
-1 gsmToast_L 134 240 1 1 0 toast -fps -c ./bench/gsm/large.au > ./bench/output/o_large.encode.gsm
+1 gsmToast_L 134 240 1 1 0 toast -fps -c ./bench/gsm/large.au > ./bench/output/o_large.encode.gsm 

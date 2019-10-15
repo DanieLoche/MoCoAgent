@@ -222,7 +222,7 @@ void MCAgent::setMode(int mode)
             }
          }
          #if VERBOSE_DEBUG // ==1?"OVERLOADED":"NOMINAL"
-         cout << "Stopped BE tasks." << endl;
+         cerr << "Stopped BE tasks." << endl;
          #endif
       }
       else if (mode <= MODE_NOMINAL && runtimeMode >= MODE_OVERLOADED)
@@ -233,12 +233,12 @@ void MCAgent::setMode(int mode)
             rt_task_resume(bestEffortTask);
          }
          #if VERBOSE_DEBUG // ==1?"OVERLOADED":"NOMINAL"
-         cout << "Re-started BE tasks." << endl;
+         cerr << "Re-started BE tasks." << endl;
          #endif
       }
       runtimeMode = mode;
       #if VERBOSE_ASK // ==1?"OVERLOADED":"NOMINAL"
-      cout << "MoCoAgent Triggered to mode " << ((mode>0)?"OVERLOADED":"NOMINAL") << "!" << endl;
+      cerr << "MoCoAgent Triggered to mode " << ((mode>0)?"OVERLOADED":"NOMINAL") << "!" << endl;
       #endif
    }
 }

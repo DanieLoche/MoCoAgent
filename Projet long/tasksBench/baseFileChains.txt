@@ -31,6 +31,10 @@ patricia_S       7       ./tasksBench/patricia_S.in        5000      PA_S
 patricia_L       7       ./tasksBench/patricia_L.in        5000      PA_L
 qsort_S          2       ./tasksBench/qsort_S.in           5000      QS_S
 qsort_L          2       ./tasksBench/qsort_L.in           5000      QS_L
+rijndaelE_S      15      ./tasksBench/rijndaelE_S.in       5000      Rje_S
+rijndaelE_L      15      ./tasksBench/rijndaelE_L.in       5000      Rje_L
+rijndaelD_S      15      ./tasksBench/rijndaelD_S.in       5000      Rjd_S
+rijndaelD_L      15      ./tasksBench/rijndaelD_L.in       5000      Rjd_L
 sha_S            10      ./tasksBench/sha_S.in             5000      SH_S
 sha_L            10      ./tasksBench/sha_L.in             5000      SH_L
 stringsearch_L   8       ./tasksBench/stringsearch_L.in    5000      STR_L
