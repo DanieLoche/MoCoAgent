@@ -6,6 +6,7 @@
 #define   FALSE   0
 #define   MODE_OVERLOADED     1
 #define   MODE_NOMINAL        -1
+#define   MODE_DESABLE        0
 
 const RTIME t_RT = 000*1.0e6;  // time to trigger the Control Agent
 const RTIME Wmax = 400*1.0e6;    // next slice max time
@@ -74,30 +75,31 @@ class taskChain
 class MCAgent
 {
    public :
-      MCAgent(systemRTInfo* sInfos);
-      RT_TASK mcAgentReceiver;
-      RT_BUFFER bf;
-      RT_EVENT mode_change_flag;
-      ulong overruns;
-      void updateTaskInfo(monitoringMsg msg);
-      void execute();
+        MCAgent(systemRTInfo* sInfos, bool enable);
+        RT_TASK mcAgentReceiver;
+        RT_BUFFER bf;
+        RT_EVENT mode_change_flag;
+        ulong overruns;
+        void updateTaskInfo(monitoringMsg msg);
+        void execute();
 
    private :
-      monitoringMsg msg;
-      string outputFileName;
-      bool* triggerSave;
-      short runtimeMode;    // NOMINAL or OVERLOADED
-      //std::vector<rtTaskInfosStruct>* TasksInformations;
-      std::vector<taskChain*> allTaskChain;
-      std::vector<RT_TASK*> bestEffortTasks;
+        bool enable;
+        monitoringMsg msg;
+        string outputFileName;
+        bool* triggerSave;
+        short runtimeMode;    // NOMINAL or OVERLOADED
+        //std::vector<rtTaskInfosStruct>* TasksInformations;
+        std::vector<taskChain*> allTaskChain;
+        std::vector<RT_TASK*> bestEffortTasks;
 
-      void initMoCoAgent(systemRTInfo* sInfos);
-      void initCommunications();
-      void setMode(int mode);
-      void setAllDeadlines(std::vector<end2endDeadlineStruct> _tcDeadlineStructs);
-      void setAllTasks(std::vector<rtTaskInfosStruct> _TasksInfos);
-      //int checkTaskChains();
-      void displaySystemInfo(systemRTInfo* sInfos);
-      void displayChains();
-      void saveData( );
+        void initMoCoAgent(systemRTInfo* sInfos);
+        void initCommunications();
+        void setMode(int mode);
+        void setAllDeadlines(std::vector<end2endDeadlineStruct> _tcDeadlineStructs);
+        void setAllTasks(std::vector<rtTaskInfosStruct> _TasksInfos);
+        //int checkTaskChains();
+        void displaySystemInfo(systemRTInfo* sInfos);
+        void displayChains();
+        void saveData( );
 };
