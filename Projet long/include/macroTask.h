@@ -30,13 +30,14 @@ class MacroTask
     int priority;
     monitoringMsg msg ;
     //string chain;
-    int (*proceed_function)(int argc, char *argv[]);
+    int (*proceed_function)(int Argc, char *argv[]);
     char stdIn[35];
     char stdOut[35];
-    std::ifstream inStrm;
-    std::ofstream outStrm;
+    //std::ifstream inStrm;
+    //std::ofstream outStrm;
+    int new_fd;
     //int argc;
-    std::vector<char*> argv;
+    std::vector<char*> _argv;
 
 
     void parseParameters( );
@@ -48,6 +49,7 @@ class MacroTask
 
   public :
     MacroTask(taskRTInfo*, bool);
+    ~MacroTask();
     void executeRun();
     void executeRun_besteffort();
 

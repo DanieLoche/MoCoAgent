@@ -58,12 +58,12 @@ void endOfExpeHandler(int s){
    if (!HandleOnce)
    {
       HandleOnce = true;
+      tln->saveData(outputFile);
       #if VERBOSE_INFO
       cout << "\n------------------------------" << endl;
       #endif
-      tln->saveData(outputFile);
    }
-      sleep(2);
+   sleep(2);
    exit(0);
 }
 
@@ -157,8 +157,8 @@ int main(int argc, char* argv[])
    tln->schedPolicy = schedMode;
 
    rt_sem_create(&mysync,"Start Experiment",0,S_FIFO);
-
    #if VERBOSE_INFO
+   cout << "\n------------------------------" << endl;
    cout << " Generating Task Set ..." << endl;
    #endif
    if(tln->readChainsList(inputFile)) {cerr << "Failed to read task chains." << endl; return -1;}
@@ -176,11 +176,15 @@ int main(int argc, char* argv[])
       tln->runAgent();
    }
 
+
    //sleeping the time that all tasks will be started
-   sleep(4);
+   sleep(2);
    cout << "Wake up all tasks." << endl;
-   cinbuf = std::cin.rdbuf(); //save stdIn
-   coutbuf = std::cout.rdbuf(); //save stdOut
+   int bak_fd = dup(1);
+
+
+   //cinbuf = std::cin.rdbuf(); //save stdIn
+   //coutbuf = std::cout.rdbuf(); //save stdOut
    rt_sem_broadcast(&mysync);
 
    //    string ss;
@@ -189,8 +193,13 @@ int main(int argc, char* argv[])
    //while (1) {    }
    if (expeDuration) sleep(expeDuration);
    else pause();
-   std::cin.rdbuf(cinbuf);   //reset to standard input again
-   std::cout.rdbuf(coutbuf); //reset to standard output again
+
+   sleep(2);
+   fflush(stdout);
+   dup2(bak_fd, 1);
+   close(bak_fd);
+   //std::cin.rdbuf(cinbuf);   //reset to standard input again
+   //std::cout.rdbuf(coutbuf); //reset to standard output again
    cout << "End of Experimentation." << endl;
    endOfExpeHandler(0);
 

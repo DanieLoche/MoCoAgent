@@ -27,9 +27,8 @@ MacroTask::MacroTask(taskRTInfo* _taskRTInfo, bool MoCo)
    //chain = std::string(properties->path_task) + " " + properties->arguments;
    parseParameters( );
    cout << "Command for this task is : " << properties->path_task << " . ";
-   int i = 1;
-   i = 0;
-   for (auto arg : argv)
+   int i = 0;
+   for (auto arg : _argv)
    {
       string toPrint;
       if (arg==NULL)toPrint = "null";
@@ -58,42 +57,47 @@ void MacroTask::parseParameters()
 {
       //cout << "[ " << properties->name << " ] : " << "Started parsing params." << endl;
       stdIn[0] = '\0'; stdOut[0] = '\0';
-      if      (strcmp(properties->path_task, "basicmath_small")) proceed_function = basicmath_small;
-      else if (strcmp(properties->path_task, "basicmath_large")) proceed_function = basicmath_large;
-      else if (strcmp(properties->path_task, "bitcnts"))         proceed_function = bitcount_func;
-      else if (strcmp(properties->path_task, "qsort_small"))     proceed_function = qsort_small;
-      else if (strcmp(properties->path_task, "qsort_large"))     proceed_function = qsort_large;
-      else if (strcmp(properties->path_task, "susan_bin"))       proceed_function = susan;
-      else if (strcmp(properties->path_task, "cjpeg"))           proceed_function = cjpeg_func;
-      else if (strcmp(properties->path_task, "djpeg"))           proceed_function = djpeg_func;
-      else if (strcmp(properties->path_task, "lout"))            proceed_function = typeset_func;
-      else if (strcmp(properties->path_task, "dijkstra_small"))  proceed_function = dijkstra_small;
-      else if (strcmp(properties->path_task, "dijkstra_large"))  proceed_function = dijkstra_large;
-      else if (strcmp(properties->path_task, "patricia_bin"))    proceed_function = patricia;
-      else if (strcmp(properties->path_task, "search_large"))    proceed_function = stringsearch_small;
-      else if (strcmp(properties->path_task, "search_small"))    proceed_function = stringsearch_large;
-      else if (strcmp(properties->path_task, "bf"))              proceed_function = blowfish;
-      else if (strcmp(properties->path_task, "rijndael"))        proceed_function = rijndael;
-      else if (strcmp(properties->path_task, "sha_bin"))         proceed_function = sha;
-      else if (strcmp(properties->path_task, "adpcm_rawcaudio")) proceed_function = rawcaudio;
-      else if (strcmp(properties->path_task, "adpcm_rawdaudio")) proceed_function = rawdaudio;
-      else if (strcmp(properties->path_task, "crc"))             proceed_function = crc;
-      else if (strcmp(properties->path_task, "fft"))             proceed_function = fft;
-      else if (strcmp(properties->path_task, "toast"))           proceed_function = gsm_func;
-      else if (strcmp(properties->path_task, "untoast"))         proceed_function = gsm_func;
-      argv.push_back(properties->path_task); //argv[0] = properties->name;
+      if      (!strcmp(properties->path_task, "basicmath_small")) proceed_function = basicmath_small;
+      else if (!strcmp(properties->path_task, "basicmath_large")) proceed_function = basicmath_large;
+      else if (!strcmp(properties->path_task, "bitcnts"))         proceed_function = bitcount_func;
+      else if (!strcmp(properties->path_task, "qsort_small"))     proceed_function = qsort_small;
+      else if (!strcmp(properties->path_task, "qsort_large"))     proceed_function = qsort_large;
+      else if (!strcmp(properties->path_task, "susan_bin"))       proceed_function = susan;
+      else if (!strcmp(properties->path_task, "cjpeg"))           proceed_function = cjpeg_func;
+      else if (!strcmp(properties->path_task, "djpeg"))           proceed_function = djpeg_func;
+      else if (!strcmp(properties->path_task, "lout"))            proceed_function = typeset_func;
+      else if (!strcmp(properties->path_task, "dijkstra_small"))  proceed_function = dijkstra_small;
+      else if (!strcmp(properties->path_task, "dijkstra_large"))  proceed_function = dijkstra_large;
+      else if (!strcmp(properties->path_task, "patricia_bin"))    proceed_function = patricia;
+      else if (!strcmp(properties->path_task, "search_large"))    proceed_function = stringsearch_small;
+      else if (!strcmp(properties->path_task, "search_small"))    proceed_function = stringsearch_large;
+      else if (!strcmp(properties->path_task, "bf"))              proceed_function = blowfish;
+      else if (!strcmp(properties->path_task, "rijndael"))        proceed_function = rijndael;
+      else if (!strcmp(properties->path_task, "sha_bin"))         proceed_function = sha;
+      else if (!strcmp(properties->path_task, "adpcm_rawcaudio")) proceed_function = rawcaudio;
+      else if (!strcmp(properties->path_task, "adpcm_rawdaudio")) proceed_function = rawdaudio;
+      else if (!strcmp(properties->path_task, "crc"))             proceed_function = crc;
+      else if (!strcmp(properties->path_task, "fft"))             proceed_function = fft;
+      else if (!strcmp(properties->path_task, "toast"))           proceed_function = gsm_func;
+      else if (!strcmp(properties->path_task, "untoast"))         proceed_function = gsm_func;
 
+      _argv.push_back(properties->path_task); //argv[0] = properties->name;
+
+
+      new_fd = dup(1);
+      properties->arguments = reduce(properties->arguments);
       int chr;
       for (chr = 0; properties->arguments[chr] != '\0'; chr++)
       {
         if (properties->arguments[chr] == '\n' || properties->arguments[chr] == '\r')
-          properties->arguments[chr] = '\0';
+          { properties->arguments[chr] = ' '; cout << "/!\\ Strange ASCII char found !!" << endl; }
       }
+
       std::istringstream iss( properties->arguments);
       cout << "Managing arguments : [" << properties->arguments << "]" << endl;
       string token;
       int nextStr = 0;
-      //argc = 1;
+      //_argc = 1;
       while (getline(iss, token, ' '))
       {
          token = reduce(token);
@@ -102,25 +106,26 @@ void MacroTask::parseParameters()
             nextStr = 1;
          else if (token == ">")
             nextStr = 2;
-         else
+         else if (token != "")
          {
             if (nextStr == 1)
             {
-               token.copy(stdIn, token.size());
-               stdIn[token.size()] = '\0';
-               inStrm.open(stdIn);
                #if VERBOSE_OTHER
                cout << "[ " << properties->name << " ] : " << "stdIn = " << stdIn << "." << endl;
                #endif
+               token.copy(stdIn, token.size());
+               stdIn[token.size()] = '\0';
+               //inStrm.open(stdIn);
             }
             else if (nextStr == 2)
             {
-               token.copy(stdOut, token.size());
-               stdOut[token.size()] = '\0';
-               outStrm.open(stdOut);
                #if VERBOSE_OTHER
                cout << "[ " << properties->name << " ] : " << "stdOut = " << stdOut << "." << endl;
                #endif
+               token.copy(stdOut, token.size());
+               stdOut[token.size()] = '\0';
+               new_fd = open(stdOut, O_RDWR | O_CREAT, S_IRUSR | S_IWUSR);
+               //outStrm.open(stdOut);
             }
             else
             {
@@ -131,18 +136,17 @@ void MacroTask::parseParameters()
                cout << "token : [" << token << "] (" << token.size() << ") copied to [" << arg << "] (" << strlen(arg) << ")." << endl;
                #endif
 
-               argv.push_back(arg);
+               _argv.push_back(arg);
                //argc++;
             }
             nextStr = 0;
          }
       }
-      argv.push_back(0);
+      _argv.push_back(0);
       //token.copy(argv[i], token.size()); // arguments list must end with a null.
       #if VERBOSE_OTHER
-      int i = 1;
-      i = 0;
-      for (auto arg : argv)
+      int i = 0;
+      for (auto arg : _argv)
       {
          string toPrint;
          if (arg==NULL)toPrint = "null";
@@ -165,7 +169,8 @@ void MacroTask::parseParameters()
       #if VERBOSE_OTHER
       else cout << "Unchanged Input." << endl;
       #endif
-
+*/
+/*
       if (stdOut[0] != '\0')
       {
          #if VERBOSE_OTHER
@@ -208,33 +213,6 @@ void MacroTask::proceed()
       cout << "[ " << properties->name << " ] : "<< "Executing Proceed." << endl;
       #endif
 
-      /*
-            if (vfork() == 0)
-            {
-                if (stdIn[0] != '\0')
-                {
-                   int fdIn = open(stdIn, O_RDWR | O_CREAT, S_IRUSR | S_IWUSR);
-                   dup2(fdIn, 0);
-                   close(fdIn);
-                }
-
-                if (stdOut[0] != '\0')
-                {
-                   int fdOut = open(stdOut, O_RDWR | O_CREAT, S_IRUSR | S_IWUSR);
-                   dup2(fdOut, 1);
-                   close(fdOut);
-                }
-               execv(properties->path_task, &argv[0]);
-               _exit(0);
-            }
-            else
-            {
-               wait(NULL);
-               #if VERBOSE_OTHER
-               cout << "[ " << properties->name << " ] : "<< "End of Proceed." << endl;
-               #endif
-            }
-      */
 /*
       if (stdIn[0] != '\0')
       {
@@ -253,21 +231,20 @@ void MacroTask::proceed()
          close(fdIn);
       }
 
-      if (stdOut[0] != '\0')
-      {
-         int fdOut = open(stdOut, O_RDWR | O_CREAT, S_IRUSR | S_IWUSR);
-         dup2(fdOut, 1);
-         close(fdOut);
-      }
+      //if (stdOut[0] != '\0')
+      //{
+      fflush(stdout);
+      dup2(new_fd, 1);
+      //}
 
-      int ret = 0;
-      ret = proceed_function(argv.size(), &argv[0]);  // -1 : no need for last element "NULL".
+
+      int ret = proceed_function(_argv.size()-1, &_argv[0]);  // -1 : no need for last element "NULL".
       if (ret != 0)
       {
         cerr << "["<< properties->name << " ("<< getpid() << ")] - Error during proceed ! [" << ret << "]. Function was : ";
         int i = 1;
         i = 0;
-        for (auto arg : argv)
+        for (auto arg : _argv)
         {
            string toPrint;
            if (arg==NULL)toPrint = "null";
@@ -275,9 +252,10 @@ void MacroTask::proceed()
            cerr << "Arg #" << i << " = " << toPrint << " ; ";
            i++;
         }
-        cerr << " with (" << argv.size() << ") elements." << endl;
+        cerr << " with (" << _argv.size()-1 << ") elements." << endl;
       }
-      std::cout.flush();
+
+
       //if (stdIn[0] != '\0') std::cin.rdbuf(cinbuf);   //reset to standard input again
       //if (stdOut[0] != '\0') std::cout.rdbuf(coutbuf); //reset to standard output again
 
@@ -373,4 +351,9 @@ void MacroTask::executeRun_besteffort()
       rt_task_wait_period(&dataLogs->overruns);
 
     }
+}
+
+MacroTask::~MacroTask()
+{
+   close(new_fd);
 }

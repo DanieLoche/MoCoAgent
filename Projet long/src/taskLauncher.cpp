@@ -334,7 +334,12 @@ void TaskLauncher::saveData(string file)
    {
      triggerSave = 1;
      rt_task_resume(&mcAgent);
-     sleep (1);
+     sleep (2);
+   }
+
+   for (auto& task : taskSetInfos.rtTIs)
+   {
+      rt_task_delete(task.task);
    }
 
 }
