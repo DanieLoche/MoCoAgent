@@ -6,4 +6,3 @@ ID  name          WCET wcet isHRT aff  prec task                       arguments
 5 CT_dijkstra_L    35   60  1   1   4   dijkstra_large ./bench/dijkstra/input.dat > ./bench/output/o_dijk_large.dat 
 6 CT_sha_L         25   60  1   1   5   sha_bin     ./bench/sha/input_large.asc > ./bench/output/o_sha_large.txt
 7 CT_fft_S         8    15  1   1   6   fft         8 4096 > ./bench/output/o_fft_small.txt 
-
