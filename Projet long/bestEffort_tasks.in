@@ -1,24 +1,19 @@
-ID  name                 meanET  wcet   isHRT   aff  prec   path                    arguments
-11  BE_qsort_L           45      120    0       1    0      ./bench/qsort_large      ./bench/qsort/input_large.dat   >   ./bench/output/obe_qsort_large.txt
-29  BE_djpeg_S           2       15     0       1    0      ./bench/djpeg           -dct int -ppm -outfile ./bench/output/o_small_decode.ppm ./bench/jpg/input_small.jpg
-31  BE_djpeg_L           4       15     0       1    0      ./bench/djpeg           -dct int -ppm -outfile ./bench/output/o_large_decode.ppm ./bench/jpg/input_large.jpg
-13  BE_susan_S_edges     0.5     15     0       2    0      ./bench/susan_bin        ./bench/susan/input_small.pgm   ./bench/output/obe_susan_small.edges.pgm   -e
-14  BE_susan_S_corners   0.5     15     0       3    0      ./bench/susan_bin        ./bench/susan/input_small.pgm   ./bench/output/obe_susan_small.corners.pgm   -c
-12  BE_susan_S_smooth    8       15     0       2    0      ./bench/susan_bin        ./bench/susan/input_small.pgm   ./bench/output/obe_susan_small.smoothing.pgm   -s
-16  BE_susan_L_edges     7.5     15     0       3    0      ./bench/susan_bin        ./bench/susan/input_large.pgm   ./bench/output/obe_susan_large.edges.pgm   -e
-17  BE_susan_L_corners   4       15     0       2    0      ./bench/susan_bin        ./bench/susan/input_large.pgm   ./bench/output/obe_susan_large.corners.pgm   -c
-21  BE_adpcmDaudio_S     6       15     0       3    0      ./bench/adpcm_rawdaudio  < ./bench/adpcm/small.adpcm > ./bench/output/obe_small.pcm
-19  BE_adpcmCaudio_L     198     480    0       3    0      ./bench/adpcm_rawcaudio  < ./bench/adpcm/large.pcm > ./bench/output/obe_large.adpcm
-26  BE_patricia_L        82      240    0       2    0      ./bench/patricia_bin    ./bench/patricia/large.udp   >   ./bench/output/o_pat_large.txt
-22  BE_adpcmDaudio_L     95      240    0       2    0      ./bench/adpcm_rawdaudio  < ./bench/adpcm/large.adpcm > ./bench/output/obe_large.pcm
-24  BE_gsmToast_L        134     240    0       3    0      ./bench/toast           -fps -c ./bench/gsm/large.au > ./bench/output/obe_large.encode.gsm
-33  BE_bitcount_L        70      240    0       2    0      ./bench/bitcnts         1125000   >   ./bench/output/o_btcnt_large.txt
-35  BE_qsort_L           45      120    0       2    0      ./bench/qsort_large    ./bench/qsort/input_large.dat   >   ./bench/output/o_qsort_large.txt
-15  BE_susan_L_smooth    32      60     0       3    0      ./bench/susan_bin        ./bench/susan/input_large.pgm   ./bench/output/obe_susan_large.smoothing.pgm   -s
-28  BE_cjpeg_L           18      30     0       2    0      ./bench/cjpeg           -dct int -progressive -opt -outfile ./bench/output/o_large_encode.jpeg ./bench/jpg/input_large.ppm
-18  BE_adpcmCaudio_S     14      30     0       2    0      ./bench/adpcm_rawcaudio  < ./bench/adpcm/small.pcm > ./bench/output/obe_small.adpcm
-25  BE_patricia_S        16      30     0       3    0      ./bench/patricia_bin    ./bench/patricia/small.udp   >   ./bench/output/o_pat_small.txt
-23  BE_gsmToast_S        3       15     0       3    0      ./bench/toast           -fps -c ./bench/gsm/small.au > ./bench/output/obe_small.encode.gsm
-27  BE_cjpeg_S           7       15     0       2    0      ./bench/cjpeg           -dct int -progressive -opt -outfile ./bench/output/o_small_encode.jpeg ./bench/jpg/input_small.ppm
-32  BE_bitcount_S        5       15     0       2    0      ./bench/bitcnts         75000   >   ./bench/output/o_btcnt_small.txt
-34  BE_qsort_S           8.5     15     0       3    0      ./bench/qsort_small    ./bench/qsort/input_small.dat   >   ./bench/output/o_qsort_small.txt
+ID  name                WCET   T    isHRT  aff  prec  task                 arguments
+29  BE_cjpeg_S          7      30     1    1    0    cjpeg                -dct int -progressive -opt -outfile ./bench/output/o_small_encode.jpeg ./bench/jpg/input_small.ppm
+31  BE_cjpeg_L          18     60     3    1    0    cjpeg                -dct int -progressive -opt -outfile ./bench/output/o_large_encode.jpeg ./bench/jpg/input_large.ppm
+13  BE_susan_S_smooth   6      30     2    1    0    susan_bin            ./bench/susan/input_small.pgm ./bench/output/o_susan_small.smoothing.pgm -s
+14  BE_susan_S_edges    9      30     2    1    0    susan_bin            ./bench/susan/input_small.pgm ./bench/output/o_susan_small.edges.pgm     -e
+12  BE_susan_S_corners  3      30     3    1    0    susan_bin            ./bench/susan/input_small.pgm ./bench/output/o_susan_small.corners.pgm   -c
+16  BE_susan_L_edges    12     60     3    1    0    susan_bin            ./bench/susan/input_large.pgm ./bench/output/o_susan_large.edges.pgm     -e
+17  BE_susan_L_corners  15     60     2    1    0    susan_bin            ./bench/susan/input_large.pgm ./bench/output/o_susan_large.corners.pgm   -c
+21  BE_adpcmCaudio_S    16     60     3    1    0    adpcm_rawcaudio      < ./bench/adpcm/small.pcm     > ./bench/output/o_small.adpcm
+19  BE_adpcmDaudio_S    6      15     0    1    0    adpcm_rawdaudio      < ./bench/adpcm/small.adpcm   > ./bench/output/o_small.pcm
+24  BE_gsmToast1_S      3      60     2    1    0    toast                -fps -c ./bench/gsm/small.au         > ./bench/output/o_small.encode.gsm
+40  BE_gsmToast2_S      3      60     2    1    0    toast                -fps -c ./bench/gsm/small.au         > ./bench/output/o_small.encode.gsm
+41  BE_gsmToast3_S      3      60     3    1    0    toast                -fps -c ./bench/gsm/small.au         > ./bench/output/o_small.encode.gsm
+42  BE_gsmToast4_S      3      60     3    1    0    toast                -fps -c ./bench/gsm/small.au         > ./bench/output/o_small.encode.gsm
+33  BE_bitcount_L       70     240    2    1    0    bitcnts              1125000 > ./bench/output/o_btcnt_large.txt
+25  BE_rijndaelD_L      35     120    3    1    0    rijndael             ./bench/rijndael/output_large.enc ./bench/output/output_large.dec d 1234567890abcdeffedcba09876543211234567890abcdeffedcba0987654321
+23  BE_basicmath1_L     15     60     3    1    0    basicmath_large      > ./bench/output/o_basmth_large.txt
+27  BE_basicmath2_L     15     60     2    1    0    basicmath_large      > ./bench/output/o_basmth_large.txt
+32  BE_dijkstra_S       9      30     1    1    0    dijkstra_small       ./bench/dijkstra/input.dat   >   ./bench/output/o_dijk_small.dat

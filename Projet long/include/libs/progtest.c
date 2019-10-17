@@ -33,8 +33,7 @@ extern "C" {
 	int gsm_func          (int argc, char *argv[]);
 }
 
-std::string trim(const std::string& str,
-                 const std::string& whitespace = " ")
+std::string trim(const std::string& str, const std::string& whitespace = " ")
 {
     const auto strBegin = str.find_first_not_of(whitespace);
     if (strBegin == std::string::npos)
@@ -151,11 +150,11 @@ int main(int argc, char *argv[])
 // ret += basicmath_small( argc, argv);
 // ret += basicmath_large( argc, argv);
 //	ret += bitcount_func( argc, argv);
-//	ret += qsort_small( argc, argv) ;
+	ret += qsort_small(  _argv.size()-1, &_argv[0]) ;
 //	ret += qsort_large( argc, argv) ;
 //	ret += susan( argc, argv);
 //	ret += djpeg_func( argc, argv);
-	ret += cjpeg_func( _argv.size()-1, &_argv[0]);
+//	ret += cjpeg_func( _argv.size()-1, &_argv[0]);
 //	ret += dijkstra_small( argc, argv) ;
 //	ret += dijkstra_large( argc, argv) ;
 //	ret += patricia( argc, argv);

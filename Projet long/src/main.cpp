@@ -198,6 +198,7 @@ int main(int argc, char* argv[])
    fflush(stdout);
    dup2(bak_fd, 1);
    close(bak_fd);
+   fflush(stdout);
    //std::cin.rdbuf(cinbuf);   //reset to standard input again
    //std::cout.rdbuf(coutbuf); //reset to standard output again
    cout << "End of Experimentation." << endl;

@@ -1,6 +1,0 @@
-name		        path		  isRT  periodicity  deadline  affinity  priority
-basicmath_large.sh	/home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/automotive/basicmath/basicmath_large.sh	1     70           70        8
-basicmath_small.sh	/home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/automotive/basicmath/basicmath_small.sh	1     70           70        8
-bitcount_large.sh  /home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/automotive/bitcount/bitcount_large.sh 1     70           70        8
-bitcount_small.sh  /home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/automotive/bitcount/bitcount_small.sh 1     70           70        8
-qsort_large.sh  /home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/automotive/qsort/qsort_large.sh 1     70           70        8

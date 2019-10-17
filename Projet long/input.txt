@@ -1,3 +1,0 @@
-name        path                                                                           isHRT  WCET    deadline affinity  prio arguments
-adpcm_large /home/danlo/BrixCode/Benchmarker/bench/telecomm/adpcm/adpcm_large.sh  0     1500    1500     1         50
-CRC32_small /home/danlo/BrixCode/Benchmarker/bench/telecomm/CRC32/CRC32_small.sh  0     200     200      1         50

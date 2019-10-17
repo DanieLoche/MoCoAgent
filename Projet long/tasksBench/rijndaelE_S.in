@@ -1,2 +1,2 @@
 ID  name 		     meanET  wcet    isHRT aff  prec path                       arguments
-1 rijndaelE_S 50 480 1 1 0 rijndael input_small.asc output_small.enc e 1234567890abcdeffedcba09876543211234567890abcdeffedcba0987654321 
+1 rijndaelE_S 5 30 1 1 0 rijndael ./bench/rijndael/input_small.asc ./bench/output/output_small.enc e 1234567890abcdeffedcba09876543211234567890abcdeffedcba0987654321 
