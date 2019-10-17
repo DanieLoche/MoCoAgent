@@ -23,7 +23,7 @@ RT_SEM mysync;
 
 TaskLauncher* tln;
 MCAgent* mca;
-bool enableAgent = TRUE;
+int enableAgent = 1; // 0 = Disable | 1 = Enable | 2 = Enable for monitoring only
 long expeDuration = 0;
 string inputFile = "input_chaine.txt", outputFile = "ExpeOutput";
 int schedMode = SCHED_FIFO, cpuFactor = 100;
@@ -35,7 +35,9 @@ void RunmcAgentMain(void* arg)
 {
   systemRTInfo* sInfos = (systemRTInfo*) arg;
   //printTaskInfo(&sInfos->rtTIs[0]);
-  mca = new MCAgent(sInfos);
+  bool monitor = TRUE;
+  if (enableAgent == 2) monitor = FALSE;
+  mca = new MCAgent(sInfos, monitor);
   rt_sem_p(&mysync,TM_INFINITE);
   mca->execute();
 }
@@ -45,6 +47,7 @@ void TaskMain(void* arg)
   taskRTInfo* _taskRTInfo = (taskRTInfo*) arg;
   MacroTask macroRT(_taskRTInfo, enableAgent);
   rt_sem_p(&mysync,TM_INFINITE);
+  sleep(1);
   if (_taskRTInfo->rtTI->isHardRealTime == 0) {
     macroRT.executeRun_besteffort();
   }
@@ -70,71 +73,62 @@ void endOfExpeHandler(int s){
 
 int main(int argc, char* argv[])
 {
-   nproc = get_nprocs();
+    nproc = get_nprocs();
 
-   struct sigaction sigIntHandler;
-   sigIntHandler.sa_handler = endOfExpeHandler;
-   sigIntHandler.sa_flags = 0;
-   sigemptyset(&sigIntHandler.sa_mask);
-   sigaction(SIGINT, &sigIntHandler, NULL);
+    struct sigaction sigIntHandler;
+    sigIntHandler.sa_handler = endOfExpeHandler;
+    sigIntHandler.sa_flags = 0;
+    sigemptyset(&sigIntHandler.sa_mask);
+    sigaction(SIGINT, &sigIntHandler, NULL);
 
-   // Définition fichier d'information des tâches
-   // [MoCoAgent Activation] [Experiment duration] [cpuFactor%] [input file : task chains] [outputfile] [sched policy]
-   //// "--" to set everything as default.
-   if (argc > 1)
-   { // MoCoAgent activation
-      std::stringstream ss(argv[1]);
-      if (ss.str() == "-h" || ss.str() == "help" || ss.str() == "--help")
-      { // HELP message
-         cout  << "Format should be : " << endl
-               << argv[0] << " [MoCoAgent Activation] " << " | " << " [duration] " << " | " << "[wcet %]" << " | "
-               << std::setw(inputFile.length()) << "[input file]" << " | "
-               << std::setw(outputFile.length()) << "[output file]" << '\n';
-         cout  << std::boolalpha << "Default using \"-\" : "
-               << std::setw(11) << enableAgent << std::setw(11) << " | " << "No end time." << " | " << " 100 %  "
-               << std::setw(inputFile.length()) << inputFile << " | "
-               << std::setw(outputFile.length()) << outputFile << endl;
-         return 0;
-      }
-      else if(ss.str() != "-" && !(ss >> std::boolalpha >> enableAgent))
-      { // ENABLE MoCoAgent - parse true/false as bool
-         printf("Error, %s is not an bool", argv[1]); return EXIT_FAILURE;
-      }
-
-      if (argc > 2)
-      { // EXPE DURATION (s)
-         std::stringstream ss(argv[2]);
-         if(sscanf(argv[2], "%ld", &expeDuration) != 1 && ss.str() != "-")
-         { printf("Error, %s is not an int", argv[2]); return EXIT_FAILURE; }
-         if (argc > 3)
-         { // CPU % Factor
-            std::stringstream ss(argv[3]);
-            if(sscanf(argv[3], "%d", &cpuFactor) != 1 && ss.str() != "-")
+    // Définition fichier d'information des tâches
+    // [MoCoAgent Activation] [Experiment duration] [cpuFactor%] [input file : task chains] [outputfile] [sched policy]
+    //// "--" to set everything as default.
+    if (argc > 1)
+    { std::stringstream ss(argv[1]); // HELO or Agent Enable
+        if (ss.str() == "-h" || ss.str() == "help" || ss.str() == "--help")
+        { // HELP message
+            cout  << "Format should be : " << endl
+                << argv[0] << " [MoCoAgent Activation] " << " | " << " [duration] " << " | " << "[wcet %]" << " | "
+                << std::setw(inputFile.length()) << "[input file]" << " | "
+                << std::setw(outputFile.length()) << "[output file]" << '\n';
+            cout  << std::boolalpha << "Default using \"-\" : "
+                << std::setw(11) << enableAgent << std::setw(11) << " | " << "No end time." << " | " << " 100 %  "
+                << std::setw(inputFile.length()) << inputFile << " | "
+                << std::setw(outputFile.length()) << outputFile << endl;
+            return 0;
+        }
+        else if(ss.str() != "-" && sscanf(argv[1], "%d", &enableAgent) != 1)
+        { // ENABLE MoCoAgent - parse true/false as bool
+            printf("Error, %s is not an bool", argv[1]); return EXIT_FAILURE;
+        }
+    if (argc > 2)
+    { std::stringstream ss(argv[2]); // EXPE DURATION (s)
+        if(ss.str() != "-" && sscanf(argv[2], "%ld", &expeDuration) != 1)
+            { printf("Error, %s is not an int", argv[2]); return EXIT_FAILURE; }
+    if (argc > 3)
+    { std::stringstream ss(argv[3]);  // CPU % Factor
+        if(ss.str() != "-" && sscanf(argv[3], "%d", &cpuFactor) != 1)
             { printf("Error, %s is not an int", argv[3]); return EXIT_FAILURE; }
-            if (argc > 4)
-            { // INPUT FILE
-               std::stringstream ss(argv[4]);
-               if (ss.str() != "-") inputFile = argv[4];
-
-               if (argc > 5)
-               { // OUTPUT FILE
-                  std::stringstream ss(argv[5]);
-                  if (ss.str() != "-") outputFile = argv[5];
-
-                  if (argc > 6)
-                  { // SCHEDULING POLICY
-                     std::stringstream ss(argv[6]);
-                     string _schedMode = ss.str();
-                     if (_schedMode == "FIFO")     schedMode = SCHED_FIFO;
-                     else if  (_schedMode == "RM") schedMode = SCHED_RM;
-                     else if  (_schedMode == "RR") schedMode = SCHED_RR;
-                     else if  (_schedMode == "EDF") schedMode = SCHED_RM;
-                  }
-               }
-            }
-         }
-      }
-   }
+    if (argc > 4)
+    { std::stringstream ss(argv[4]);    // INPUT FILE
+        if (ss.str() != "-") inputFile = argv[4];
+    if (argc > 5)
+    { std::stringstream ss(argv[5]);     // OUTPUT FILE
+        if (ss.str() != "-") outputFile = argv[5];
+    if (argc > 6)
+    { std::stringstream ss(argv[6]);    // SCHEDULING POLICY
+        string _schedMode = ss.str();
+        if (_schedMode == "FIFO")     schedMode = SCHED_FIFO;
+        else if  (_schedMode == "RM") schedMode = SCHED_RM;
+        else if  (_schedMode == "RR") schedMode = SCHED_RR;
+        else if  (_schedMode == "EDF") schedMode = SCHED_RM;
+    } // if arg 6
+    } // if arg 5
+    } // if arg 4
+    } // if arg 3
+    } // if arg 2
+    } // if arg 1
 
    std::ofstream outputFileResume;
    string outputFileName = outputFile + "_Resume.txt";
