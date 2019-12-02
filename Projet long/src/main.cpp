@@ -85,7 +85,7 @@ int main(int argc, char* argv[])
     // [MoCoAgent Activation] [Experiment duration] [cpuFactor%] [input file : task chains] [outputfile] [sched policy]
     //// "--" to set everything as default.
     if (argc > 1)
-    { std::stringstream ss(argv[1]); // HELO or Agent Enable
+    { std::stringstream ss(argv[1]); // HELP or Agent Enable
         if (ss.str() == "-h" || ss.str() == "help" || ss.str() == "--help")
         { // HELP message
             cout  << "Format should be : " << endl
@@ -100,7 +100,7 @@ int main(int argc, char* argv[])
         }
         else if(ss.str() != "-" && sscanf(argv[1], "%d", &enableAgent) != 1)
         { // ENABLE MoCoAgent - parse true/false as bool
-            printf("Error, %s is not an bool", argv[1]); return EXIT_FAILURE;
+            printf("Error, %s is not an int ?!", argv[1]); return EXIT_FAILURE;
         }
     if (argc > 2)
     { std::stringstream ss(argv[2]); // EXPE DURATION (s)
@@ -129,6 +129,15 @@ int main(int argc, char* argv[])
     } // if arg 3
     } // if arg 2
     } // if arg 1
+
+    cout << "Experiment made with parameters : \n"
+      << " MoCoAgent: " << enableAgent  << "\n"
+      << "  Duration: " << expeDuration << "\n"
+      << "CPU Factor: " << cpuFactor    << "\n"
+      << "Input  file: " << inputFile   << "\n"
+      << "Output files: " << outputFile << "_Expe.csv & "
+      << outputFile       << "_Chains.csv"  << " & "
+      << outputFile       << "_Resume.txt"    << endl;
 
    std::ofstream outputFileResume;
    string outputFileName = outputFile + "_Resume.txt";
@@ -174,7 +183,12 @@ int main(int argc, char* argv[])
    //sleeping the time that all tasks will be started
    sleep(2);
    cout << "Wake up all tasks." << endl;
-   int bak_fd = dup(1);
+   /*
+      int bak_fd = dup(1);
+      fflush(stdout);
+      int new_fd = open("/dev/null", O_RDWR | O_CREAT, S_IRUSR | S_IWUSR);
+      dup2(new_fd, 1); //fflush(stdout);
+   */
 
 
    //cinbuf = std::cin.rdbuf(); //save stdIn
@@ -184,15 +198,16 @@ int main(int argc, char* argv[])
    //    string ss;
    //    while (ss != "STOP") cin >> ss;
 
-   //while (1) {    }
    if (expeDuration) sleep(expeDuration);
    else pause();
 
    sleep(2);
-   fflush(stdout);
-   dup2(bak_fd, 1);
-   close(bak_fd);
-   fflush(stdout);
+   //fflush(stdout);
+   /*
+      dup2(bak_fd, 1);
+      close(bak_fd);
+      fflush(stdout);
+   */
    //std::cin.rdbuf(cinbuf);   //reset to standard input again
    //std::cout.rdbuf(coutbuf); //reset to standard output again
    cout << "End of Experimentation." << endl;

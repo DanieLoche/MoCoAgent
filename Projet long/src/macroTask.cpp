@@ -26,6 +26,7 @@ MacroTask::MacroTask(taskRTInfo* _taskRTInfo, bool MoCo)
    */
    //chain = std::string(properties->path_task) + " " + properties->arguments;
    parseParameters( );
+   #if VERBOSE_DEBUG
    cout << "Command for this task is : " << properties->path_task << " . ";
    int i = 0;
    for (auto arg : _argv)
@@ -37,7 +38,8 @@ MacroTask::MacroTask(taskRTInfo* _taskRTInfo, bool MoCo)
       i++;
    }
    cout << endl;
-
+   #endif
+   
    msg.task    = properties->task;
    msg.ID      = properties->id;
    msg.time    = 0;
@@ -84,7 +86,7 @@ void MacroTask::parseParameters()
       _argv.push_back(properties->path_task); //argv[0] = properties->name;
 
 
-      new_fd = dup(1);
+      //new_fd = dup(1);
       properties->arguments = reduce(properties->arguments);
       int chr;
       for (chr = 0; properties->arguments[chr] != '\0'; chr++)
@@ -94,14 +96,14 @@ void MacroTask::parseParameters()
       }
 
       std::istringstream iss( properties->arguments);
-      cout << "Managing arguments : [" << properties->arguments << "]" << endl;
+      //cout << "Managing arguments : [" << properties->arguments << "]" << endl;
       string token;
       int nextStr = 0;
       //_argc = 1;
       while (getline(iss, token, ' '))
       {
          token = reduce(token);
-         cout << "[ " << properties->name << " ] : " << "Managing token [" << token << "]." << endl;
+         //cout << "[ " << properties->name << " ] : " << "Managing token [" << token << "]." << endl;
          if (token == "<")
             nextStr = 1;
          else if (token == ">")
@@ -124,7 +126,7 @@ void MacroTask::parseParameters()
                #endif
                token.copy(stdOut, token.size());
                stdOut[token.size()] = '\0';
-               new_fd = open(stdOut, O_RDWR | O_CREAT, S_IRUSR | S_IWUSR);
+               //new_fd = open(stdOut, O_RDWR | O_CREAT, S_IRUSR | S_IWUSR);
                //outStrm.open(stdOut);
             }
             else
@@ -156,7 +158,7 @@ void MacroTask::parseParameters()
       }
       cout << endl;
       #endif
-/*
+
       if (stdIn[0] != '\0')
       {
          #if VERBOSE_OTHER
@@ -169,8 +171,8 @@ void MacroTask::parseParameters()
       #if VERBOSE_OTHER
       else cout << "Unchanged Input." << endl;
       #endif
-*/
-/*
+
+
       if (stdOut[0] != '\0')
       {
          #if VERBOSE_OTHER
@@ -184,7 +186,7 @@ void MacroTask::parseParameters()
       else
       cout << "Unchanged Output." << endl;
       #endif
-*/
+
 }
 
 int MacroTask::before()
@@ -231,11 +233,13 @@ void MacroTask::proceed()
          close(fdIn);
       }
 
-      //if (stdOut[0] != '\0')
-      //{
-      fflush(stdout);
-      dup2(new_fd, 1);
-      //}
+      /* utilisation d'un new_fd
+         if (stdOut[0] != '\0')
+         {
+         fflush(stdout);
+         dup2(new_fd, 1);
+         }
+      */
 
 
       int ret = proceed_function(_argv.size()-1, &_argv[0]);  // -1 : no need for last element "NULL".

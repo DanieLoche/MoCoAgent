@@ -69,22 +69,23 @@ then
             fi
         done < $Infile
 
-	sudo sar -o ${dirName}/IODatas${name}_1_${duration}_${load}_${schedPolicy} -P 0-3 1 $duration > /dev/null 2>&1 & 
-	#./MoCoAgent.out 1  $duration $load ./$Infile ${dirName}/${name}_1_${duration}_${load}_${schedPolicy} $schedPolicy 2> errorLog1.txt
-	#expe1Out=$?
-	rm ./bench/output/*
-
 	sudo sar -o ${dirName}/IODatas${name}_0_${duration}_${load}_${schedPolicy} -P 0-3 1 $duration > /dev/null 2>&1 & 
 	./MoCoAgent.out 0 $duration $load ./$Infile ${dirName}/${name}_0_${duration}_${load}_${schedPolicy} $schedPolicy 2> errorLog0.txt    
 	expe0Out=$?
+    rm ./bench/output/*
+
+	#sudo sar -o ${dirName}/IODatas${name}_1_${duration}_${load}_${schedPolicy} -P 0-3 1 $duration > /dev/null 2>&1 & 
+	#./MoCoAgent.out 1  $duration $load ./$Infile ${dirName}/${name}_1_${duration}_${load}_${schedPolicy} $schedPolicy 2> errorLog1.txt
+	#expe1Out=$?
+	#rm ./bench/output/*
 
 	sudo sar -o ${dirName}/IODatas${name}_2_${duration}_${load}_${schedPolicy} -P 0-3 1 $duration > /dev/null 2>&1 & 
 	./MoCoAgent.out 2 $duration $load ./$Infile ${dirName}/${name}_2_${duration}_${load}_${schedPolicy} $schedPolicy 2> errorLog2.txt
 	expe2Out=$?
-
 	rm ./bench/output/*
-	#echo "expe1out : $expe1Out"
-	echo "expe0out : $expe0Out"
+
+	echo "expe0out : $expe0Out"	
+    #echo "expe1out : $expe1Out"
 	echo "expe2out : $expe2Out"
 
 exit 0
