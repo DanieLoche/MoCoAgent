@@ -4,20 +4,20 @@
 class TaskLauncher
 {
    private :
-      systemRTInfo taskSetInfos;
-      std::vector<DataLogger*> tasksLogsList;
-      RT_TASK mcAgent;
-//      RT_MUTEX mutexes[8];
+      string outputFileName;
+      std::vector<end2endDeadlineStruct> e2eDD;
+      std::vector<rtTaskInfosStruct> rtTIs;
+      std::vector<RT_TASK*> tasks;
+      rtTaskInfosStruct currentTaskDescriptor;
       bool enableAgent;
-      bool triggerSave;
-
-      void rt_task_affinity (RT_TASK* task, int _aff, int mode);
+      int schedPolicy;
 
    public :
-      int schedPolicy;
-      TaskLauncher(string outputFileName);
+
+      bool triggerSave;
+      TaskLauncher(string outputFileName, int schedPolicy);
       int readChainsList(string);
-      int  readTasksList(int cpuPercent);
+      int readTasksList (int cpuPercent);
       int createTasks();
 //      int createMutexes(int nprocs);
       int runTasks();

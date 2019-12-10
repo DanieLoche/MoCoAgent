@@ -41,7 +41,6 @@ class TaskDataLogger : public DataLogger
       int priority;
       int isHardRealTime;
    public :
-      RT_TASK* task;
 
       TaskDataLogger(rtTaskInfosStruct*);
       void saveData(string, int);

@@ -1,8 +1,44 @@
+#ifndef TASKS_H
+#define TASKS_H
+
 #include "tools.h"
 #include "dataLogger.h"
+#include "taskLauncher.h"
 #include <algorithm>
 
-class MacroTask
+#define   TRUE    1
+#define   FALSE   0
+#define   MODE_OVERLOADED     1
+#define   MODE_NOMINAL        -1
+#define   MODE_DISABLE        0
+
+const RTIME t_RT = 000*1.0e6;  // time to trigger the Control Agent
+const RTIME Wmax = 400*1.0e6;    // next slice max time
+
+class TaskProcess
+{
+   protected:
+      TaskLauncher* tl;
+      RT_EVENT	event;
+      monitoringMsg msg ;
+      char stdIn[35];
+      char stdOut[35];
+      bool MoCoIsAlive;
+
+      void setIO();
+      void setRTtask();
+      void setAffinity (int _aff, int mode);
+      virtual void configure(rtTaskInfosStruct);
+
+   public:
+      RT_TASK _task;
+      RT_BUFFER bf;
+
+      //TaskProcess(taskRTInfo* , bool );
+      virtual void executeRun();
+};
+
+class MacroTask : public TaskProcess
 {
   protected :
     /* struct rtTaskInfosStruct
@@ -20,40 +56,102 @@ class MacroTask
          RT_TASK* task;
     } ;
     */
-    rtTaskInfosStruct* properties;
-    TaskDataLogger* dataLogs;
-
-    RT_BUFFER bf;
-    RT_EVENT	event;
-//    RT_MUTEX mutex;
-    bool MoCoIsAlive;
-    int priority;
-    monitoringMsg msg ;
-    //string chain;
-    int (*proceed_function)(int Argc, char *argv[]);
-    char stdIn[35];
-    char stdOut[35];
-    //std::ifstream inStrm;
-    //std::ofstream outStrm;
-    int new_fd;
-    //int argc;
+    rtTaskInfosStruct prop;
     std::vector<char*> _argv;
+    TaskDataLogger* dataLogs;
+    int (*proceed_function)(int Argc, char *argv[]);
 
-
+    void configure(rtTaskInfosStruct);
     void parseParameters( );
-    inline int before_besteff();
     inline int before();
     inline void proceed();
     inline int after();
+    inline int before_besteff();
     inline int after_besteff();
 
   public :
-    MacroTask(taskRTInfo*, bool);
+    MacroTask(rtTaskInfosStruct, bool);
     ~MacroTask();
     void executeRun();
     void executeRun_besteffort();
 
 };
+
+class taskMonitoringStruct
+{
+  private :
+    RT_MUTEX mtx_taskStatus;
+    bool isExecuted; // Run-time - computed
+
+  public :
+    taskMonitoringStruct(rtTaskInfosStruct* rtTaskInfos);
+    int precedencyID;
+    RT_TASK* xenoTask;
+    int id;
+    //RTIME endTime;     // Run-time - received
+    RTIME deadline;    // Static
+    RTIME rwcet;       // Static
+
+    void setState(bool state);
+    bool getState();
+    //bool operator <(const taskMonitoringStruct& tms) const {return (id < tms.id);}
+};
+
+class taskChain
+{
+  public :
+    taskChain(end2endDeadlineStruct _tcDeadline);
+    ChainDataLogger* logger;
+    int cptAnticipatedMisses;
+    //int cptOutOfDeadline;
+    //int cptExecutions;
+    //std::array<RTIME, 2048> chainExecutionTime;
+    char name[32];
+    int chainID;                // static
+    RTIME end2endDeadline; // static
+    RTIME startTime;       // Runtime - deduced
+    RTIME currentEndTime;  // Runtime - deduced
+    RTIME remWCET;         // Runtime - computed
+    bool isAtRisk;         // Runtime - deduced
+    //double slackTime;
+    std::vector<taskMonitoringStruct> taskList;
+
+    bool checkPrecedency(int taskID);
+    bool checkTaskE2E();
+    bool checkIfEnded();
+    void resetChain();
+    RTIME getExecutionTime();
+    RTIME getRemWCET();
+
+    void displayTasks();
+};
+
+class MCAgent : public TaskProcess
+{
+   public :
+        MCAgent(systemRTInfo* sInfos, bool enable);
+        void updateTaskInfo(monitoringMsg msg);
+        void executeRun();
+
+   private :
+        bool enable;
+        short runtimeMode;    // NOMINAL or OVERLOADED
+        ulong overruns;
+        std::vector<taskChain*> allTaskChain;
+        std::vector<RT_TASK*> bestEffortTasks;
+
+        void configure(rtTaskInfosStruct);
+        void initMoCoAgent(systemRTInfo* sInfos);
+        void initCommunications();
+        void setMode(int mode);
+        void setAllDeadlines(std::vector<end2endDeadlineStruct> _tcDeadlineStructs);
+        void setAllTasks(std::vector<rtTaskInfosStruct> _TasksInfos);
+        //int checkTaskChains();
+        void displaySystemInfo(systemRTInfo* sInfos);
+        void displayChains();
+        void saveData( );
+};
+
 
 extern "C" {
 int basicmath_small   (int argc, char *argv[]);
@@ -96,3 +194,5 @@ class MacroTaskBestEffort : public MacroTask
 */
 
 //extern void printTaskInfo(rtTaskInfosStruct* task);
+
+#endif

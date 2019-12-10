@@ -35,12 +35,23 @@
 #include <alchemy/event.h>
 #include <alchemy/mutex.h>
 
-
 using std::string;
 using std::cout;
 using std::endl;
 using std::cin;
 using std::cerr;
+
+#define ERROR_MNG(fct)                                                 \
+do {                                                                   \
+   int err = fct;                                                      \
+   if ( err != 0)                                                      \
+   {                                                                   \
+      rt_fprintf(stderr, "%s-%s error %d\n", __FUNCTION__, #fct, err); \
+      exit(EXIT_FAILURE);                                              \
+   }                                                                   \
+} while(0)
+
+#define TO_STRING(str) convertToString(str)
 
 /*
 struct logData
@@ -56,18 +67,18 @@ struct logData
 */
 struct rtTaskInfosStruct
 {
+   RT_TASK* _t;
    char name[32];
-   char path_task[128];
+   char function[128];
    string arguments;
    int isHardRealTime;     // task chain ID or best effort if null
    int id;
    int affinity;
-   int precedency;
-   int priority;
    RTIME wcet;
    RTIME periodicity;
-
-   RT_TASK* task;
+   int precedency;
+   int priority;
+   int schedPolicy;
 };
 
 struct sortAscendingPeriod {
@@ -91,6 +102,14 @@ struct end2endDeadlineStruct
   RTIME deadline;
 };
 
+struct systemRTInfo
+{
+  std::vector<end2endDeadlineStruct> e2eDD;
+  std::vector<rtTaskInfosStruct> rtTIs;
+  //bool* triggerSave;
+  //string outputFileName;
+};
+
 struct monitoringMsg
 {
   RT_TASK* task;
@@ -100,20 +119,14 @@ struct monitoringMsg
 };
 
 
-struct systemRTInfo
-{
-  std::vector<end2endDeadlineStruct> e2eDD;
-  std::vector<rtTaskInfosStruct> rtTIs;
-  bool* triggerSave;
-  string outputFileName;
-};
-
 std::string trim(const std::string& str,
                  const std::string& whitespace = " \t");
 
 std::string reduce(const std::string& str,
                    const std::string& fill = " ",
                    const std::string& whitespace = " \t");
+
+string convertToString(const char* a){ string s = a; return s; }
 
 void printInquireInfo(RT_TASK*);
 void printTaskInfo(rtTaskInfosStruct* task);
