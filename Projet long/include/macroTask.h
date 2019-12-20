@@ -5,10 +5,10 @@
 #include "dataLogger.h"
 #include "taskLauncher.h"
 #include <algorithm>
+#define   MODE_OVERLOADED     1
 
 #define   TRUE    1
 #define   FALSE   0
-#define   MODE_OVERLOADED     1
 #define   MODE_NOMINAL        -1
 #define   MODE_DISABLE        0
 
@@ -28,7 +28,6 @@ class TaskProcess
       void setIO();
       void setRTtask();
       void setAffinity (int _aff, int mode);
-      virtual void configure(rtTaskInfosStruct);
 
    public:
       RT_TASK _task;
@@ -61,7 +60,7 @@ class MacroTask : public TaskProcess
     TaskDataLogger* dataLogs;
     int (*proceed_function)(int Argc, char *argv[]);
 
-    void configure(rtTaskInfosStruct);
+    void setRTtask();
     void parseParameters( );
     inline int before();
     inline void proceed();
@@ -128,20 +127,14 @@ class taskChain
 
 class MCAgent : public TaskProcess
 {
-   public :
-        MCAgent(systemRTInfo* sInfos, bool enable);
-        void updateTaskInfo(monitoringMsg msg);
-        void executeRun();
-
-   private :
+   protected :
         bool enable;
         short runtimeMode;    // NOMINAL or OVERLOADED
         ulong overruns;
         std::vector<taskChain*> allTaskChain;
         std::vector<RT_TASK*> bestEffortTasks;
 
-        void configure(rtTaskInfosStruct);
-        void initMoCoAgent(systemRTInfo* sInfos);
+        void setRTtask(systemRTInfo* sInfos);
         void initCommunications();
         void setMode(int mode);
         void setAllDeadlines(std::vector<end2endDeadlineStruct> _tcDeadlineStructs);
@@ -150,6 +143,11 @@ class MCAgent : public TaskProcess
         void displaySystemInfo(systemRTInfo* sInfos);
         void displayChains();
         void saveData( );
+
+   public :
+       MCAgent(systemRTInfo* sInfos, bool enable);
+       void updateTaskInfo(monitoringMsg msg);
+       void executeRun();
 };
 
 

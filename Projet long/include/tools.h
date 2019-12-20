@@ -50,7 +50,6 @@ do {                                                                   \
       exit(EXIT_FAILURE);                                              \
    }                                                                   \
 } while(0)
-
 #define TO_STRING(str) convertToString(str)
 
 /*
@@ -67,18 +66,18 @@ struct logData
 */
 struct rtTaskInfosStruct
 {
-   RT_TASK* _t;
-   char name[32];
+   RT_TASK* _t;  //
+   char name[32]; //
    char function[128];
    string arguments;
    int isHardRealTime;     // task chain ID or best effort if null
    int id;
-   int affinity;
-   RTIME wcet;
-   RTIME periodicity;
    int precedency;
-   int priority;
-   int schedPolicy;
+   int affinity; //
+   RTIME wcet;   //
+   RTIME periodicity; //
+   int priority;      //
+   int schedPolicy;   //
 };
 
 struct sortAscendingPeriod {

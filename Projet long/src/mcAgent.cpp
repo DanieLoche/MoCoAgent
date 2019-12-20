@@ -1,4 +1,4 @@
-#include "mcAgent.h"
+#include "macroTask.h"
 
 
 void messageReceiver(void* arg)
@@ -22,33 +22,33 @@ MCAgent::MCAgent(systemRTInfo* sInfos, bool enable)
     //printInquireInfo();
     //print_affinity(0);
     //TasksInformations = rtTI;
+    displaySystemInfo(sInfos);
     enable = enable;
     runtimeMode = MODE_NOMINAL;
-    displaySystemInfo(sInfos);
 
     initCommunications();
-    initMoCoAgent(sInfos);
+    setRTtask(sInfos);
 
+    stdOut = sInfos->outputFileName;
+    setAllDeadlines(sInfos->e2eDD);
+    setAllTasks(sInfos->rtTIs);
+    displayChains();
+    sleep(1);
+
+    //rt_task_create(&mcAgentReceiver, "MoCoAgentReceiver", 0, 99, 0);
+    int ret = rt_task_set_periodic(NULL, TM_NOW, 5*1e6);
+    if ( ret )
+        { cerr << "[MoCoAgent] " << "Set_Period Error : " << ret << " ." << endl; exit(-3); }
+    //rt_task_start(&mcAgentReceiver, messageReceiver, this);
     #if VERBOSE_INFO
     cout << "MoCoAgent Ready." << endl;
     #endif
-
 }
 
-void MCAgent::initMoCoAgent(systemRTInfo* sInfos)
-{
-   outputFileName = sInfos->outputFileName;
-   triggerSave = sInfos->triggerSave;
-   setAllDeadlines(sInfos->e2eDD);
-   setAllTasks(sInfos->rtTIs);
-   displayChains();
-   sleep(1);
 
-   //rt_task_create(&mcAgentReceiver, "MoCoAgentReceiver", 0, 99, 0);
-   int ret = rt_task_set_periodic(NULL, TM_NOW, 5*1e6);
-   if ( ret )
-       { cerr << "[MoCoAgent] " << "Set_Period Error : " << ret << " ." << endl; exit(-3); }
-   //rt_task_start(&mcAgentReceiver, messageReceiver, this);
+void MCAgent::setRTtask(systemRTInfo* sInfos)
+{
+
 
 }
 
@@ -56,10 +56,10 @@ void MCAgent::initCommunications()
 {
    rt_buffer_create(&bf, "/monitoringTopic", 20*sizeof(monitoringMsg), B_FIFO);
    // u_int flagMask = 0;
-   rt_event_create(&mode_change_flag, "/modeChangeTopic", 0, EV_PRIO);
+   rt_event_create(&event, "/modeChangeTopic", 0, EV_PRIO);
 }
 
-void MCAgent::execute()
+void MCAgent::executeRun()
 {
     while(TRUE)
     {
@@ -104,7 +104,7 @@ void MCAgent::execute()
                 }
             }
         }
-        if (*triggerSave)
+        if (tl->triggerSave)
         {
         saveData();
         pause();
@@ -150,11 +150,11 @@ void MCAgent::setAllTasks(std::vector<rtTaskInfosStruct> _TasksInfos)
   for (auto& _taskInfo : _TasksInfos)
   {
     cout << " Adding task " << _taskInfo.name << " (" << _taskInfo.isHardRealTime << ")." << endl;
-    printInquireInfo(_taskInfo.task);
+    printInquireInfo(&_task);
     if ( !_taskInfo.isHardRealTime )
     {
       cout << "Adding to BE list." << endl;
-      bestEffortTasks.push_back(_taskInfo.task);
+      bestEffortTasks.push_back(&_task);
       break;
     }
     else for (auto& _taskChain : allTaskChain)
@@ -209,7 +209,7 @@ void MCAgent::setMode(int mode)
     {
         if (mode >= MODE_OVERLOADED && runtimeMode <= MODE_NOMINAL)
         { // Pause Best Effort Tasks sur front montant changement de mode.
-            rt_event_signal(&mode_change_flag, 1);
+            rt_event_signal(&event, 1);
             for (auto& bestEffortTask : bestEffortTasks)
             {   // Publier message pour dire à stopper
                 if (rt_task_suspend(bestEffortTask))
@@ -226,7 +226,7 @@ void MCAgent::setMode(int mode)
         }
         else if (mode <= MODE_NOMINAL && runtimeMode >= MODE_OVERLOADED)
         { // runtimeMode NOMINAL
-            rt_event_signal(&mode_change_flag, 0);
+            rt_event_signal(&event, 0);
             for (auto& bestEffortTask : bestEffortTasks)
             {  // relancer Best Effort Tasks;
                 rt_task_resume(bestEffortTask);
@@ -285,7 +285,7 @@ void MCAgent::saveData()
 {
    cout << "SAVING MoCoAgent datas" << endl;
    std::ofstream outputFileResume;
-   string file = outputFileName + "_Resume.txt";
+   string file = TO_STRING(stdOut) + TO_STRING("_Resume.txt");
    outputFileResume.open (file, std::ios::app);    // TO APPEND :  //,ios_base::app);
    RT_TASK_INFO cti;
    rt_task_inquire(0, &cti);
@@ -301,7 +301,7 @@ void MCAgent::saveData()
 
     for (auto _taskChain : allTaskChain)
     {
-        _taskChain->logger->saveData(outputFileName, 0);
+        _taskChain->logger->saveData(stdOut, 0);
     }
 
 }
@@ -314,7 +314,7 @@ void MCAgent::saveData()
 ***********************/
 void MCAgent::displaySystemInfo(systemRTInfo* sInfos)
 {
-   cout << "\n I RECEIVED TRIGGER BOOLEAN " << *(sInfos->triggerSave) << endl;
+   cout << "\n I RECEIVED TRIGGER BOOLEAN " << tl->triggerSave << endl;
    sleep(1);
   #if VERBOSE_INFO
   cout << "INPUT Informations : " << endl;
@@ -334,7 +334,7 @@ void MCAgent::displaySystemInfo(systemRTInfo* sInfos)
            << "     |- WCET    : " << taskParam.wcet /1.0e6      << "\n"
            << "     |- affinity: " << taskParam.affinity         << "\n"
            << "     |- RealTime: " << taskParam.isHardRealTime   << "\n"
-           << "     |- path    : " << taskParam.path_task      //  << "\n"
+           << "     |- path    : " << taskParam.function      //  << "\n"
            << endl;
   }
   #endif
@@ -470,7 +470,7 @@ void taskChain::displayTasks()
 ***********************/
 taskMonitoringStruct::taskMonitoringStruct(rtTaskInfosStruct* rtTaskInfos)
 {
-   xenoTask = rtTaskInfos->task;
+   xenoTask = rtTaskInfos->_t;
    deadline = rtTaskInfos->periodicity;
    rwcet = rtTaskInfos->wcet;
    id = rtTaskInfos->id;

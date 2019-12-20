@@ -9,13 +9,14 @@
 #define SPINTIME   1e7   // spin time in ns
 
 
-MacroTask::MacroTask(taskRTInfo* _taskRTInfo, bool MoCo)
+MacroTask::MacroTask(rtTaskInfosStruct _taskRTInfo, bool MoCo)
 {
-   properties = _taskRTInfo->rtTI;
-   dataLogs = _taskRTInfo->taskLog;
-   printTaskInfo(_taskRTInfo->rtTI);
+   prop = _taskRTInfo;
+   dataLogs = new TaskDataLogger(&prop);
 
-   printInquireInfo(_taskRTInfo->rtTI->task);
+   printTaskInfo(&_taskRTInfo);
+
+   printInquireInfo(&_task);
    /* Du vieux débug...
    RT_TASK_INFO curtaskinfo;
    rt_task_inquire(NULL, &curtaskinfo);
@@ -24,10 +25,10 @@ MacroTask::MacroTask(taskRTInfo* _taskRTInfo, bool MoCo)
    cout << "I am task : " << curtaskinfo.name << " of priority " << curtaskinfo.prio << endl;
    #endif
    */
-   //chain = std::string(properties->path_task) + " " + properties->arguments;
+   //chain = std::string(prop.function) + " " + prop.arguments;
    parseParameters( );
    #if VERBOSE_DEBUG
-   cout << "Command for this task is : " << properties->path_task << " . ";
+   cout << "Command for this task is : " << prop.function << " . ";
    int i = 0;
    for (auto arg : _argv)
    {
@@ -39,71 +40,133 @@ MacroTask::MacroTask(taskRTInfo* _taskRTInfo, bool MoCo)
    }
    cout << endl;
    #endif
-   
-   msg.task    = properties->task;
-   msg.ID      = properties->id;
+
+   msg.task    = &_task;
+   msg.ID      = prop.id;
    msg.time    = 0;
    msg.isExecuted = 0;
 
    MoCoIsAlive = MoCo;
-   priority = properties->priority;
 /* Ajout subscribe au mutex pour chopper l'ordonnancement sur le coeur
    int cpu = sched_getcpu();
    char* name = &("mutCore" + std::to_string(cpu))[0];
    rt_mutex_bind(&mutex, name, 0);
-   cout << "Task " << properties->name << " binded to mutex " << name << endl;
+   cout << "Task " << prop.name << " binded to mutex " << name << endl;
 */
+}
+
+void MacroTask::setRTtask( )
+{
+   int ret = 0;
+   ERROR_MNG( rt_task_shadow(&_task, prop.name, prop.priority, T_WARNSW) );
+
+   RT_TASK_INFO curtaskinfo;
+   rt_task_inquire(&_task, &curtaskinfo);
+   struct sched_param_ex para;
+   para.sched_priority = prop.priority;
+   /* sched_param
+   para.sched_flags= 0;
+   para.sched_runtime = taskInfo.periodicity;;
+   para.sched_deadline = taskInfo.periodicity;
+   para.sched_period = taskInfo->periodicity;
+   para.size=sizeof(sched_attr);
+   old... */
+
+   if (prop.schedPolicy == SCHED_RM) prop.schedPolicy = SCHED_FIFO;
+
+   if( (ret = sched_setscheduler_ex(curtaskinfo.pid, prop.schedPolicy, &para)) != 0)
+   {
+      cerr << "[" << prop.name << "] " << "error setting scheduling policy " << prop.schedPolicy << ", Error #" << ret;
+      exit(ret);
+   }
+
+   if (prop.schedPolicy == SCHED_RR)
+   { //#if defined SCHED_POLICY  &&  SCHED_POLICY == SCHED_RR
+      if ((ret = rt_task_slice(&_task, RR_SLICE_TIME)))
+      { cerr << "[" << prop.name << "] " << "Slice Error : " << ret << " ." << endl; exit(-4); }
+   } //#endif
+
+   //Periodicity
+   if ((ret = rt_task_set_periodic(&_task, TM_NOW, prop.periodicity)))
+   {  cerr << "[" << prop.name << "] " << "Set_Period Error : " << ret << " ." << endl; exit(-2); }
+
+   setAffinity(prop.affinity, 0);
+
+   if ((ret = rt_task_set_priority(&_task, prop.priority)))
+      { cerr << "[" << prop.name << "] " << "Set_Priority Error : " << ret << " ." << endl; exit(-5); }
+   /* Gestion EDF Scheduling
+   RT_TASK_INFO curtaskinfo;
+   rt_task_inquire(taskInfo->task, &curtaskinfo);
+
+   struct sched_attr para;
+   para.sched_policy = SCHED_POLICY;
+   para.sched_flags= 0;
+   //para.sched_runtime = taskInfo.periodicity;;
+   //para.sched_deadline = taskInfo.periodicity;
+   para.sched_period = taskInfo->periodicity;
+   para.sched_priority = taskInfo->priority;
+   para.size=sizeof(sched_attr);
+   rt_task_inquire(taskInfo->task, &curtaskinfo);
+   if( sched_setattr(curtaskinfo.pid, &para, 0) != 0)
+   {
+      fprintf(stderr,"error setting scheduler ... are you root? : %d \n", errno);
+      exit(errno);
+   }
+*/
+
+   ERROR_MNG( rt_task_suspend(NULL) );
+
 }
 
 void MacroTask::parseParameters()
 {
-      //cout << "[ " << properties->name << " ] : " << "Started parsing params." << endl;
+      //cout << "[ " << prop.name << " ] : " << "Started parsing params." << endl;
       stdIn[0] = '\0'; stdOut[0] = '\0';
-      if      (!strcmp(properties->path_task, "basicmath_small")) proceed_function = basicmath_small;
-      else if (!strcmp(properties->path_task, "basicmath_large")) proceed_function = basicmath_large;
-      else if (!strcmp(properties->path_task, "bitcnts"))         proceed_function = bitcount_func;
-      else if (!strcmp(properties->path_task, "qsort_small"))     proceed_function = qsort_small;
-      else if (!strcmp(properties->path_task, "qsort_large"))     proceed_function = qsort_large;
-      else if (!strcmp(properties->path_task, "susan_bin"))       proceed_function = susan;
-      else if (!strcmp(properties->path_task, "cjpeg"))           proceed_function = cjpeg_func;
-      else if (!strcmp(properties->path_task, "djpeg"))           proceed_function = djpeg_func;
-      else if (!strcmp(properties->path_task, "lout"))            proceed_function = typeset_func;
-      else if (!strcmp(properties->path_task, "dijkstra_small"))  proceed_function = dijkstra_small;
-      else if (!strcmp(properties->path_task, "dijkstra_large"))  proceed_function = dijkstra_large;
-      else if (!strcmp(properties->path_task, "patricia_bin"))    proceed_function = patricia;
-      else if (!strcmp(properties->path_task, "search_large"))    proceed_function = stringsearch_small;
-      else if (!strcmp(properties->path_task, "search_small"))    proceed_function = stringsearch_large;
-      else if (!strcmp(properties->path_task, "bf"))              proceed_function = blowfish;
-      else if (!strcmp(properties->path_task, "rijndael"))        proceed_function = rijndael;
-      else if (!strcmp(properties->path_task, "sha_bin"))         proceed_function = sha;
-      else if (!strcmp(properties->path_task, "adpcm_rawcaudio")) proceed_function = rawcaudio;
-      else if (!strcmp(properties->path_task, "adpcm_rawdaudio")) proceed_function = rawdaudio;
-      else if (!strcmp(properties->path_task, "crc"))             proceed_function = crc;
-      else if (!strcmp(properties->path_task, "fft"))             proceed_function = fft;
-      else if (!strcmp(properties->path_task, "toast"))           proceed_function = gsm_func;
-      else if (!strcmp(properties->path_task, "untoast"))         proceed_function = gsm_func;
+      if      (!strcmp(prop.function, "basicmath_small")) proceed_function = basicmath_small;
+      else if (!strcmp(prop.function, "basicmath_large")) proceed_function = basicmath_large;
+      else if (!strcmp(prop.function, "bitcnts"))         proceed_function = bitcount_func;
+      else if (!strcmp(prop.function, "qsort_small"))     proceed_function = qsort_small;
+      else if (!strcmp(prop.function, "qsort_large"))     proceed_function = qsort_large;
+      else if (!strcmp(prop.function, "susan_bin"))       proceed_function = susan;
+      else if (!strcmp(prop.function, "cjpeg"))           proceed_function = cjpeg_func;
+      else if (!strcmp(prop.function, "djpeg"))           proceed_function = djpeg_func;
+      else if (!strcmp(prop.function, "lout"))            proceed_function = typeset_func;
+      else if (!strcmp(prop.function, "dijkstra_small"))  proceed_function = dijkstra_small;
+      else if (!strcmp(prop.function, "dijkstra_large"))  proceed_function = dijkstra_large;
+      else if (!strcmp(prop.function, "patricia_bin"))    proceed_function = patricia;
+      else if (!strcmp(prop.function, "search_large"))    proceed_function = stringsearch_small;
+      else if (!strcmp(prop.function, "search_small"))    proceed_function = stringsearch_large;
+      else if (!strcmp(prop.function, "bf"))              proceed_function = blowfish;
+      else if (!strcmp(prop.function, "rijndael"))        proceed_function = rijndael;
+      else if (!strcmp(prop.function, "sha_bin"))         proceed_function = sha;
+      else if (!strcmp(prop.function, "adpcm_rawcaudio")) proceed_function = rawcaudio;
+      else if (!strcmp(prop.function, "adpcm_rawdaudio")) proceed_function = rawdaudio;
+      else if (!strcmp(prop.function, "crc"))             proceed_function = crc;
+      else if (!strcmp(prop.function, "fft"))             proceed_function = fft;
+      else if (!strcmp(prop.function, "toast"))           proceed_function = gsm_func;
+      else if (!strcmp(prop.function, "untoast"))         proceed_function = gsm_func;
 
-      _argv.push_back(properties->path_task); //argv[0] = properties->name;
+      _argv.push_back(prop.function); //argv[0] = prop.name;
 
 
       //new_fd = dup(1);
-      properties->arguments = reduce(properties->arguments);
+      prop.arguments = reduce(prop.arguments);
       int chr;
-      for (chr = 0; properties->arguments[chr] != '\0'; chr++)
+      for (chr = 0; prop.arguments[chr] != '\0'; chr++)
       {
-        if (properties->arguments[chr] == '\n' || properties->arguments[chr] == '\r')
-          { properties->arguments[chr] = ' '; cout << "/!\\ Strange ASCII char found !!" << endl; }
+        if (prop.arguments[chr] == '\n' || prop.arguments[chr] == '\r')
+          { prop.arguments[chr] = ' '; cout << "/!\\ Strange ASCII char found !!" << endl; }
       }
 
-      std::istringstream iss( properties->arguments);
-      //cout << "Managing arguments : [" << properties->arguments << "]" << endl;
+      std::istringstream iss( prop.arguments);
+      //cout << "Managing arguments : [" << prop.arguments << "]" << endl;
       string token;
       int nextStr = 0;
       //_argc = 1;
       while (getline(iss, token, ' '))
       {
          token = reduce(token);
-         //cout << "[ " << properties->name << " ] : " << "Managing token [" << token << "]." << endl;
+         //cout << "[ " << prop.name << " ] : " << "Managing token [" << token << "]." << endl;
          if (token == "<")
             nextStr = 1;
          else if (token == ">")
@@ -113,7 +176,7 @@ void MacroTask::parseParameters()
             if (nextStr == 1)
             {
                #if VERBOSE_OTHER
-               cout << "[ " << properties->name << " ] : " << "stdIn = " << stdIn << "." << endl;
+               cout << "[ " << prop.name << " ] : " << "stdIn = " << stdIn << "." << endl;
                #endif
                token.copy(stdIn, token.size());
                stdIn[token.size()] = '\0';
@@ -122,7 +185,7 @@ void MacroTask::parseParameters()
             else if (nextStr == 2)
             {
                #if VERBOSE_OTHER
-               cout << "[ " << properties->name << " ] : " << "stdOut = " << stdOut << "." << endl;
+               cout << "[ " << prop.name << " ] : " << "stdOut = " << stdOut << "." << endl;
                #endif
                token.copy(stdOut, token.size());
                stdOut[token.size()] = '\0';
@@ -193,7 +256,7 @@ int MacroTask::before()
 {
    //   rt_mutex_acquire(&mutex, TM_INFINITE);
    #if VERBOSE_OTHER
-   cout << "[ " << properties->name << " ] : " << "Executing Before." << endl;
+   cout << "[ " << prop.name << " ] : " << "Executing Before." << endl;
    #endif
    //rt_task_set_priority(NULL, priority+1);
    msg.time = dataLogs->logStart();
@@ -203,7 +266,7 @@ int MacroTask::before()
       //MoCoIsAlive = 0;
       RT_BUFFER_INFO infos;
       rt_buffer_inquire(&bf, &infos);
-      cerr << properties->name << " : failed to write BEFORE monitoring message to buffer." << "(Moco : " << MoCoIsAlive << ")" << endl
+      cerr << prop.name << " : failed to write BEFORE monitoring message to buffer." << "(Moco : " << MoCoIsAlive << ")" << endl
           << infos.availmem << " / " << infos.totalmem << " available on buffer " << infos.name << " " << infos.owaiters << " waiting too." << endl;
    }
    return 0;
@@ -212,7 +275,7 @@ int MacroTask::before()
 void MacroTask::proceed()
 {
       #if VERBOSE_OTHER
-      cout << "[ " << properties->name << " ] : "<< "Executing Proceed." << endl;
+      cout << "[ " << prop.name << " ] : "<< "Executing Proceed." << endl;
       #endif
 
 /*
@@ -245,7 +308,7 @@ void MacroTask::proceed()
       int ret = proceed_function(_argv.size()-1, &_argv[0]);  // -1 : no need for last element "NULL".
       if (ret != 0)
       {
-        cerr << "["<< properties->name << " ("<< getpid() << ")] - Error during proceed ! [" << ret << "]. Function was : ";
+        cerr << "["<< prop.name << " ("<< getpid() << ")] - Error during proceed ! [" << ret << "]. Function was : ";
         int i = 1;
         i = 0;
         for (auto arg : _argv)
@@ -263,18 +326,18 @@ void MacroTask::proceed()
       //if (stdIn[0] != '\0') std::cin.rdbuf(cinbuf);   //reset to standard input again
       //if (stdOut[0] != '\0') std::cout.rdbuf(coutbuf); //reset to standard output again
 
-      // if (std::string path(properties->path_task) != "/null/")  {
-      //cout << properties->name << " : " << chain << endl;
+      // if (std::string path(prop.function) != "/null/")  {
+      //cout << prop.name << " : " << chain << endl;
 
       //system(&chain[0u]);
 //    }
-//    else cout << properties->name <<"Oups, no valid path found !" << endl;
+//    else cout << prop.name <<"Oups, no valid path found !" << endl;
 }
 
 int MacroTask::after()
 {
    #if VERBOSE_OTHER
-   cout << "[ " << properties->name << " ] : "<< "Executing After." << endl;
+   cout << "[ " << prop.name << " ] : "<< "Executing After." << endl;
    #endif
    msg.time = dataLogs->logExec();
    msg.isExecuted = 1;
@@ -283,7 +346,7 @@ int MacroTask::after()
       //MoCoIsAlive = 0;
       RT_BUFFER_INFO infos;
       rt_buffer_inquire(&bf, &infos);
-      cerr << properties->name << " : failed to write AFTER monitoring message to buffer." << "(Moco : " << MoCoIsAlive << ")" << endl
+      cerr << prop.name << " : failed to write AFTER monitoring message to buffer." << "(Moco : " << MoCoIsAlive << ")" << endl
          << infos.availmem << " / " << infos.totalmem << " available on buffer " << infos.name << " " << infos.owaiters << " waiting too." << endl;
    //rt_task_set_priority(NULL, priority);
    }
@@ -306,7 +369,7 @@ void MacroTask::executeRun()
   //cout << "Running..." << endl;
     while (1)
     {
-      //cout << "Task" << properties->name << " working." << endl;
+      //cout << "Task" << prop.name << " working." << endl;
       before(); // Check if execution allowed
       proceed();  // execute task
       after();  // Inform of execution time for the mcAgent
@@ -327,7 +390,7 @@ int MacroTask::before_besteff()
   dataLogs->logStart();
   unsigned int flag;
   rt_event_wait(&event, sizeof(flag), &flag ,	EV_PRIO,TM_NONBLOCK) 	;
-  //cout << "Task BE " << properties->name << " not executed." << endl;
+  //cout << "Task BE " << prop.name << " not executed." << endl;
   return 0;
 }
 
@@ -335,7 +398,7 @@ int MacroTask::after_besteff()
 {
     dataLogs->logExec();
     #if VERBOSE_OTHER
-    cout << "End Task : " << properties->name << endl;
+    cout << "End Task : " << prop.name << endl;
     #endif
 //   rt_mutex_release(&mutex);
    // rt_task_set_priority(NULL, priority);
@@ -357,7 +420,24 @@ void MacroTask::executeRun_besteffort()
     }
 }
 
-MacroTask::~MacroTask()
-{
-   close(new_fd);
+void TaskProcess::setAffinity (int _aff, int mode)
+{ // mode 0 : replace | mode 1 : add | mode -1 : remove
+   cpu_set_t mask;
+   if (mode == 0) { CPU_ZERO(&mask); CPU_SET(_aff, &mask); }
+   else if (mode > 1) CPU_SET(_aff, &mask);
+   else if (mode < -1) CPU_CLR(_aff, &mask);
+
+   RT_TASK_INFO curtaskinfo;
+   rt_task_inquire(&_task, &curtaskinfo);
+
+   if (int ret = rt_task_set_affinity(&_task, &mask))
+   {
+      cerr << "Error while setting (" << mode << ") affinity for task "
+      << curtaskinfo.name << " to CPU " << _aff << ": " <<  ret << "."<< endl;
+   }
+   #if VERBOSE_ASK
+   if (mode == 0) cout << "Switched affinity for task " << curtaskinfo.name << " = CPU " << _aff << endl;
+   else if (mode == 1) cout << "Added affinity for task " << curtaskinfo.name << " +CPU " << _aff << endl;
+   else if (mode == -1) cout << "Removed affinity for task " << curtaskinfo.name << " -CPU " << _aff << endl;
+   #endif
 }

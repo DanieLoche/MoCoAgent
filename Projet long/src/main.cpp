@@ -6,11 +6,9 @@
 #include "tools.h"
 #include "sched.h"
 
-#include "mcAgent.h"
+#include "macroTask.h"
 #include "macroTask.h"
 #include "taskLauncher.h"
-//#include "buildSet.h"
-//#include <mutex>
 #include <sys/sysinfo.h>
 #include <iomanip>
 
@@ -39,7 +37,7 @@ void RunmcAgentMain(void* arg)
   if (enableAgent == 2) monitor = FALSE;
   mca = new MCAgent(sInfos, monitor);
   rt_sem_p(&mysync,TM_INFINITE);
-  mca->execute();
+  mca->executeRun();
 }
 
 void TaskMain(void* arg)
@@ -57,7 +55,7 @@ void TaskMain(void* arg)
 }
 
 bool HandleOnce = false;
-void endOfExpeHandler(int s){
+void endOfExpeHandler(void){
    if (!HandleOnce)
    {
       HandleOnce = true;
@@ -67,7 +65,7 @@ void endOfExpeHandler(int s){
       #endif
    }
    sleep(2);
-   exit(0);
+
 }
 
 
@@ -75,11 +73,11 @@ int main(int argc, char* argv[])
 {
     nproc = get_nprocs();
 
-    struct sigaction sigIntHandler;
-    sigIntHandler.sa_handler = endOfExpeHandler;
-    sigIntHandler.sa_flags = 0;
-    sigemptyset(&sigIntHandler.sa_mask);
-    sigaction(SIGINT, &sigIntHandler, NULL);
+    int i = atexit(endOfExpeHandler);
+    if (i != 0) {
+        fprintf(stderr, "cannot set exit function\n");
+        exit(EXIT_FAILURE);
+    }
 
     // Définition fichier d'information des tâches
     // [MoCoAgent Activation] [Experiment duration] [cpuFactor%] [input file : task chains] [outputfile] [sched policy]
@@ -156,8 +154,7 @@ int main(int argc, char* argv[])
    //cout << "Press a key to start (PID: " << getpid() << ")!" << endl;
    //cin.get();
 
-   tln = new TaskLauncher(outputFile);
-   tln->schedPolicy = schedMode;
+   tln = new TaskLauncher(outputFile, schedMode);
 
    rt_sem_create(&mysync,"Start Experiment",0,S_FIFO);
    #if VERBOSE_INFO
@@ -211,9 +208,8 @@ int main(int argc, char* argv[])
    //std::cin.rdbuf(cinbuf);   //reset to standard input again
    //std::cout.rdbuf(coutbuf); //reset to standard output again
    cout << "End of Experimentation." << endl;
-   endOfExpeHandler(0);
 
-   return 0;
+   exit(EXIT_SUCCESS);
 }
 
 void printInquireInfo(RT_TASK* task)

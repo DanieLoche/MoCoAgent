@@ -1,3 +1,6 @@
+#ifndef TASKLAUNCHER_H
+#define TASKLAUNCHER_H
+
 #include "tools.h"
 #include "dataLogger.h"
 
@@ -32,3 +35,5 @@ extern void RunmcAgentMain(void *arg);
 extern void TaskMain(void* arg);
 extern void print_affinity(pid_t _pid);
 extern void printTaskInfo(rtTaskInfosStruct* task);
+
+#endif
