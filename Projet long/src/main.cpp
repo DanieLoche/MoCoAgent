@@ -6,20 +6,15 @@
 #include "tools.h"
 #include "sched.h"
 
-#include "mcAgent.h"
-#include "macroTask.h"
 #include "taskLauncher.h"
-//#include "buildSet.h"
-//#include <mutex>
 #include <sys/sysinfo.h>
 #include <iomanip>
-
 
 #define EXECTIME   2e8   // execution time in ns
 #define SPINTIME   1e7   // spin time in ns
 
+
 long nproc;
-RT_SEM mysync;
 
 TaskLauncher* tln;
 MCAgent* mca;
@@ -31,33 +26,8 @@ int schedMode = SCHED_FIFO, cpuFactor = 100;
 std::streambuf *cinbuf;
 std::streambuf *coutbuf;
 
-void RunmcAgentMain(void* arg)
-{
-  systemRTInfo* sInfos = (systemRTInfo*) arg;
-  //printTaskInfo(&sInfos->rtTIs[0]);
-  bool monitor = TRUE;
-  if (enableAgent == 2) monitor = FALSE;
-  mca = new MCAgent(sInfos, monitor);
-  rt_sem_p(&mysync,TM_INFINITE);
-  mca->execute();
-}
-
-void TaskMain(void* arg)
-{
-  taskRTInfo* _taskRTInfo = (taskRTInfo*) arg;
-  MacroTask macroRT(_taskRTInfo, enableAgent);
-  rt_sem_p(&mysync,TM_INFINITE);
-  sleep(1);
-  if (_taskRTInfo->rtTI->isHardRealTime == 0) {
-    macroRT.executeRun_besteffort();
-  }
-  else {
-    macroRT.executeRun();
-  }
-}
-
 bool HandleOnce = false;
-void endOfExpeHandler(int s){
+void endOfExpeHandler(void){
    if (!HandleOnce)
    {
       HandleOnce = true;
@@ -67,7 +37,7 @@ void endOfExpeHandler(int s){
       #endif
    }
    sleep(2);
-   exit(0);
+
 }
 
 
@@ -75,11 +45,11 @@ int main(int argc, char* argv[])
 {
     nproc = get_nprocs();
 
-    struct sigaction sigIntHandler;
-    sigIntHandler.sa_handler = endOfExpeHandler;
-    sigIntHandler.sa_flags = 0;
-    sigemptyset(&sigIntHandler.sa_mask);
-    sigaction(SIGINT, &sigIntHandler, NULL);
+    int i = atexit(endOfExpeHandler);
+    if (i != 0) {
+        fprintf(stderr, "cannot set exit function\n");
+        exit(EXIT_FAILURE);
+    }
 
     // Définition fichier d'information des tâches
     // [MoCoAgent Activation] [Experiment duration] [cpuFactor%] [input file : task chains] [outputfile] [sched policy]
@@ -156,10 +126,8 @@ int main(int argc, char* argv[])
    //cout << "Press a key to start (PID: " << getpid() << ")!" << endl;
    //cin.get();
 
-   tln = new TaskLauncher(outputFile);
-   tln->schedPolicy = schedMode;
+   tln = new TaskLauncher(outputFile, schedMode);
 
-   rt_sem_create(&mysync,"Start Experiment",0,S_FIFO);
    #if VERBOSE_INFO
    cout << "\n------------------------------" << endl;
    cout << " Generating Task Set ..." << endl;
@@ -171,8 +139,6 @@ int main(int argc, char* argv[])
    tln->printTasksInfos();
 
    if(tln->createTasks()) {cerr << "Failed to create all tasks" << endl; return -4;}
-   if(tln->runTasks()) {cerr << "Failed to run all tasks" << endl; return -5;}
-
    if (enableAgent)
    {
       sleep(1);
@@ -193,7 +159,6 @@ int main(int argc, char* argv[])
 
    //cinbuf = std::cin.rdbuf(); //save stdIn
    //coutbuf = std::cout.rdbuf(); //save stdOut
-   rt_sem_broadcast(&mysync);
 
    //    string ss;
    //    while (ss != "STOP") cin >> ss;
@@ -211,9 +176,8 @@ int main(int argc, char* argv[])
    //std::cin.rdbuf(cinbuf);   //reset to standard input again
    //std::cout.rdbuf(coutbuf); //reset to standard output again
    cout << "End of Experimentation." << endl;
-   endOfExpeHandler(0);
 
-   return 0;
+   exit(EXIT_SUCCESS);
 }
 
 void printInquireInfo(RT_TASK* task)

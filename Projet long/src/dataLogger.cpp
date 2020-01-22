@@ -8,8 +8,6 @@ DataLogger::DataLogger(){}
 
 ChainDataLogger::ChainDataLogger(end2endDeadlineStruct* chainInfos)
 {
-   strcpy(name, chainInfos->name);
-   id = chainInfos->taskChainID;
    deadline = chainInfos->deadline;
 
    cptAnticipatedMisses = 0;
@@ -19,15 +17,10 @@ ChainDataLogger::ChainDataLogger(end2endDeadlineStruct* chainInfos)
  //cout << "Init of Chains logger is okay." << endl;
 }
 
-TaskDataLogger::TaskDataLogger(rtTaskInfosStruct* taskInfos)
+TaskDataLogger::TaskDataLogger(rtTaskInfosStruct* _taskInfos)
 {
-  task = taskInfos->task;
-  strcpy(name, taskInfos->name);
-  id = taskInfos->id;
-  isHardRealTime = taskInfos->isHardRealTime;
-  affinity = taskInfos->affinity;
-  deadline = taskInfos->periodicity;
-  priority = taskInfos->priority;
+   taskInfos = _taskInfos;
+  deadline = taskInfos->rtP.periodicity;
 
   cptOutOfDeadline = 0;
   cptExecutions = 0;
@@ -69,10 +62,10 @@ void DataLogger::logExec(RTIME endTime)
       if (cptExecutions > 4095)
       {
          cptExecutions = 0;
-         cerr << "[" << name << "] " << "WARNING - Measured more than allowed buffer size." << endl;
+         cerr << "[" << getName() << "] " << "WARNING - Measured more than allowed buffer size." << endl;
       }
    }
-   else cerr << "[" << name << "] " << "- WARNING : Exec not logged as timestamp was not set yet." << endl;
+   else cerr << "[" << getName() << "] " << "- WARNING : Exec not logged as timestamp was not set yet." << endl;
 
 }
 
@@ -98,10 +91,10 @@ RTIME DataLogger::logExec( )
       if (cptExecutions > 4095)
       {
         cptExecutions = 0;
-        cerr << "[" << name << "] " << "WARNING - Measured more than allowed buffer size." << endl;
+        cerr << "[" << getName() << "] " << "WARNING - Measured more than allowed buffer size." << endl;
       }
    }
-   else cerr << "[" << name << "] " << "- WARNING : Exec not logged as timestamp was not set yet." << endl;
+   else cerr << "[" << getName() << "] " << "- WARNING : Exec not logged as timestamp was not set yet." << endl;
    return _logTime;
 }
 
@@ -116,24 +109,19 @@ void TaskDataLogger::saveData(string file, int nameSize)
   RTIME min_runtime = 1.e9;
   double somme = 0;
 
-
-
-
-
-
-  if (!(cptExecutions > 0)) cerr << "[" << name << "] -" << "Error : no logs to print !" << endl;
+  if (!(cptExecutions > 0)) cerr << "[" << getName() << "] -" << "Error : no logs to print !" << endl;
   else for (int i = 0; i < cptExecutions; i++)
   {
     RTIME _dur = execLogs[i].duration;
 
     outputFileTasksData << std::setw(15) << execLogs[i].timestamp << " ; "
-                   << std::setw(nameSize) << name           << " ; "
-                   << std::setw(2) << id                    << " ; "
-                   << std::setw(3) << isHardRealTime        << " ; "
-                   << std::setw(4) << priority              << " ; "
-                   << std::setw(10) << deadline             << " ; "
-                   << std::setw(4) << affinity              << " ; "
-                   << std::setw(10) << _dur                 << "\n";
+                   << std::setw(nameSize) << getName()         << " ; "
+                   << std::setw(2) << taskInfos->fP.id         << " ; "
+                   << std::setw(3) << taskInfos->fP.isHRT      << " ; "
+                   << std::setw(4) << taskInfos->rtP.priority  << " ; "
+                   << std::setw(10) << deadline                << " ; "
+                   << std::setw(4) << taskInfos->rtP.affinity  << " ; "
+                   << std::setw(10) << _dur                    << "\n";
 
     somme += _dur;
     if (_dur < min_runtime) min_runtime = _dur;
@@ -147,12 +135,12 @@ void TaskDataLogger::saveData(string file, int nameSize)
   outputFileResume.open (outputFileName, std::ios::app);    // TO APPEND :  //,ios_base::app);
 
   average_runtime = somme / cptExecutions;
-  if (task != NULL)
+  if (taskInfos->rtP._t != NULL)
   {
     RT_TASK_INFO cti;
-    rt_task_inquire(task, &cti);
+    rt_task_inquire(taskInfos->rtP._t, &cti);
 
-    outputFileResume << "\nRunning summary for task " << name << ". (" << cti.pid << ", " << cti.prio << ", " << cti.name << ")" << "\n"
+    outputFileResume << "\nRunning summary for task " << getName() << ". (" << cti.pid << ", " << cti.prio << ", " << cti.name << ")" << "\n"
          << "Deadline : " << deadline / 1.0e6     << " ms.  Missed"     << " | "                 << "(2) | " << "Executions " << "\n"
          << "                    " << std::setw(6) <<  cptOutOfDeadline << " | " << std::setw(3) << overruns << " | " << cptExecutions << " times" << "\n"
          << "Primary Mode execution time - " << cti.stat.xtime/1.0e6 << " ms. Timeouts : " << cti.stat.timeout << "\n"
@@ -162,7 +150,7 @@ void TaskDataLogger::saveData(string file, int nameSize)
          << "Context Switches - " << cti.stat.csw << "\n"
          << "Cobalt Sys calls - " << cti.stat.xsc
          << endl;
-    }
+    } else cout << "No task identifier found for : " << getName() << endl;
 
     outputFileResume.close();
     #endif
@@ -180,21 +168,21 @@ void ChainDataLogger::saveData(string file, int nameSize)
    RTIME min_runtime = 1.e9;
    double sommeTime = 0;
    outputFileChainData << std::setw(15)      << "timestamp" << " ; "
-                  << std::setw(strlen(name)) << "Chain"     << " ; "
+                  << std::setw(strlen(getName())) << "Chain"     << " ; "
                   << std::setw(2)            << "ID"        << " ; "
                   << std::setw(10)           << "deadline"  << " ; "
                   << std::setw(10)           << "duration"  << endl;
 
-   if (cptExecutions <= 0) cerr << "[" << name << "] -" << "Error : no logs to print !" << endl;
+   if (cptExecutions <= 0) cerr << "[" << getName() << "] -" << "Error : no logs to print !" << endl;
    else for (int i = 0; i < cptExecutions; i++)
    {
       RTIME _dur = execLogs[i].duration;
 
       outputFileChainData << std::setw(15) << execLogs[i].timestamp << " ; "
-                     << std::setw(strlen(name)) << name        << " ; "
-                     << std::setw(2)            << id          << " ; "
-                     << std::setw(10)           << deadline    << " ; "
-                     << std::setw(10)           << _dur        << "\n";
+                     << std::setw(strlen(getName())) << getName()        << " ; "
+                     << std::setw(2)         << chainInfos->taskChainID  << " ; "
+                     << std::setw(10)        << deadline    << " ; "
+                     << std::setw(10)        << _dur        << "\n";
 
       sommeTime += _dur;
       if (_dur < min_runtime) min_runtime = _dur;
@@ -208,7 +196,7 @@ void ChainDataLogger::saveData(string file, int nameSize)
 
   average_runtime = sommeTime / cptExecutions;
   #if VERBOSE_INFO
-  outputFileResume << "\nRunning summary for Chain " << name << ". ( " << id << " )" << "\n"
+  outputFileResume << "\nRunning summary for Chain " << getName() << ". ( " << chainInfos->taskChainID << " )" << "\n"
                    << "Deadline : " << deadline / 1.0e6     << " ms." << " Anticipated Misses" << " | "
                    <<   " Missed "     << " | " << " Chain loops " << "\n"
 
@@ -225,7 +213,13 @@ void ChainDataLogger::saveData(string file, int nameSize)
 
 }
 
-char* DataLogger::getName()
+char* ChainDataLogger::getName()
 {
-   return name;
+   return chainInfos->name;
+}
+
+
+char* TaskDataLogger::getName()
+{
+   return taskInfos->fP.name;
 }

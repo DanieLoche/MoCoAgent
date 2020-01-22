@@ -1,4 +1,4 @@
-#include "mcAgent.h"
+#include "macroTask.h"
 
 
 void messageReceiver(void* arg)
@@ -17,49 +17,36 @@ void messageReceiver(void* arg)
   }
 }
 
-MCAgent::MCAgent(systemRTInfo* sInfos, bool enable)
+MCAgent::MCAgent(rtTaskInfosStruct _taskInfo, bool enable,
+                  std::vector<end2endDeadlineStruct> e2eDD,
+                  std::vector<rtTaskInfosStruct> tasksSet) : TaskProcess (_taskInfo, enable)
 {
     //printInquireInfo();
     //print_affinity(0);
     //TasksInformations = rtTI;
+    displaySystemInfo(e2eDD, tasksSet);
     enable = enable;
     runtimeMode = MODE_NOMINAL;
-    displaySystemInfo(sInfos);
-
     initCommunications();
-    initMoCoAgent(sInfos);
+
+    setAllDeadlines(e2eDD);
+    setAllTasks(tasksSet);
+    displayChains();
+    sleep(1);
 
     #if VERBOSE_INFO
     cout << "MoCoAgent Ready." << endl;
     #endif
-
-}
-
-void MCAgent::initMoCoAgent(systemRTInfo* sInfos)
-{
-   outputFileName = sInfos->outputFileName;
-   triggerSave = sInfos->triggerSave;
-   setAllDeadlines(sInfos->e2eDD);
-   setAllTasks(sInfos->rtTIs);
-   displayChains();
-   sleep(1);
-
-   //rt_task_create(&mcAgentReceiver, "MoCoAgentReceiver", 0, 99, 0);
-   int ret = rt_task_set_periodic(NULL, TM_NOW, 5*1e6);
-   if ( ret )
-       { cerr << "[MoCoAgent] " << "Set_Period Error : " << ret << " ." << endl; exit(-3); }
-   //rt_task_start(&mcAgentReceiver, messageReceiver, this);
-
 }
 
 void MCAgent::initCommunications()
 {
    rt_buffer_create(&bf, "/monitoringTopic", 20*sizeof(monitoringMsg), B_FIFO);
    // u_int flagMask = 0;
-   rt_event_create(&mode_change_flag, "/modeChangeTopic", 0, EV_PRIO);
+   rt_event_create(&event, "/modeChangeTopic", 0, EV_PRIO);
 }
 
-void MCAgent::execute()
+void MCAgent::executeRun()
 {
     while(TRUE)
     {
@@ -104,7 +91,7 @@ void MCAgent::execute()
                 }
             }
         }
-        if (*triggerSave)
+        if (tl->triggerSave)
         {
         saveData();
         pause();
@@ -149,17 +136,19 @@ void MCAgent::setAllTasks(std::vector<rtTaskInfosStruct> _TasksInfos)
   #endif
   for (auto& _taskInfo : _TasksInfos)
   {
-    cout << " Adding task " << _taskInfo.name << " (" << _taskInfo.isHardRealTime << ")." << endl;
-    printInquireInfo(_taskInfo.task);
-    if ( !_taskInfo.isHardRealTime )
+    cout << " Adding task " << _taskInfo.fP.name << " (" << _taskInfo.fP.isHRT << ")." << endl;
+    RT_TASK* _t;
+    ERROR_MNG(rt_task_bind(_t, _taskInfo.fP.name, TM_INFINITE));
+    printInquireInfo(_t);
+    if ( !_taskInfo.fP.isHRT )
     {
       cout << "Adding to BE list." << endl;
-      bestEffortTasks.push_back(_taskInfo.task);
+      bestEffortTasks.push_back(_t);
       break;
     }
     else for (auto& _taskChain : allTaskChain)
     {
-      if ( _taskInfo.isHardRealTime == _taskChain->chainID )
+      if ( _taskInfo.fP.isHRT == _taskChain->chainID )
       {
          cout << "Adding to HRT chain " << _taskChain->chainID << "." << endl;
         taskMonitoringStruct* tms = new taskMonitoringStruct(&_taskInfo);
@@ -209,7 +198,7 @@ void MCAgent::setMode(int mode)
     {
         if (mode >= MODE_OVERLOADED && runtimeMode <= MODE_NOMINAL)
         { // Pause Best Effort Tasks sur front montant changement de mode.
-            rt_event_signal(&mode_change_flag, 1);
+            rt_event_signal(&event, 1);
             for (auto& bestEffortTask : bestEffortTasks)
             {   // Publier message pour dire à stopper
                 if (rt_task_suspend(bestEffortTask))
@@ -226,7 +215,7 @@ void MCAgent::setMode(int mode)
         }
         else if (mode <= MODE_NOMINAL && runtimeMode >= MODE_OVERLOADED)
         { // runtimeMode NOMINAL
-            rt_event_signal(&mode_change_flag, 0);
+            rt_event_signal(&event, 0);
             for (auto& bestEffortTask : bestEffortTasks)
             {  // relancer Best Effort Tasks;
                 rt_task_resume(bestEffortTask);
@@ -254,8 +243,8 @@ void MCAgent::updateTaskInfo(monitoringMsg msg)
    {
       for (auto& _task : _taskChain->taskList)
       {
-               //cout << "Logged chain end at : " << _taskChain->currentEndTime/1.0e6 << endl;
-            //cout << "Logged chain start at : " << msg.time/1.0e6 << endl;
+         //cout << "Logged chain end at : " << _taskChain->currentEndTime/1.0e6 << endl;
+         //cout << "Logged chain start at : " << msg.time/1.0e6 << endl;
          if( _task.id == msg.ID )
          {
              if (_task.precedencyID == 0 && _taskChain->startTime == 0)
@@ -285,7 +274,7 @@ void MCAgent::saveData()
 {
    cout << "SAVING MoCoAgent datas" << endl;
    std::ofstream outputFileResume;
-   string file = outputFileName + "_Resume.txt";
+   string file = TO_STRING(stdOut) + TO_STRING("_Resume.txt");
    outputFileResume.open (file, std::ios::app);    // TO APPEND :  //,ios_base::app);
    RT_TASK_INFO cti;
    rt_task_inquire(0, &cti);
@@ -301,7 +290,7 @@ void MCAgent::saveData()
 
     for (auto _taskChain : allTaskChain)
     {
-        _taskChain->logger->saveData(outputFileName, 0);
+        _taskChain->logger->saveData(stdOut, 0);
     }
 
 }
@@ -312,29 +301,30 @@ void MCAgent::saveData()
 * @params : [ systemRTInfo sInfos ]
 * @returns : cout
 ***********************/
-void MCAgent::displaySystemInfo(systemRTInfo* sInfos)
+void MCAgent::displaySystemInfo(std::vector<end2endDeadlineStruct> _e2eDD,
+                                 std::vector<rtTaskInfosStruct> _tasksSet)
 {
-   cout << "\n I RECEIVED TRIGGER BOOLEAN " << *(sInfos->triggerSave) << endl;
+   cout << "\n I RECEIVED TRIGGER BOOLEAN " << tl->triggerSave << endl;
    sleep(1);
   #if VERBOSE_INFO
   cout << "INPUT Informations : " << endl;
-  for (auto &taskdd : sInfos->e2eDD)
+  for (auto &taskdd : _e2eDD)
   { // Print chain params
-      cout << "|- Chain: " << taskdd.name       << "\n"
+      cout << "|- Chain: "      << taskdd.name       << "\n"
            << " ‾|- ID      : " << taskdd.taskChainID       << "\n"
-           << "   |- Deadline: " << taskdd.deadline /1.0e6   << "\n"
-           << "   |- Path    : " << taskdd.Path             // << "\n"
+           << "  |- Deadline: " << taskdd.deadline /1.0e6   << "\n"
+           << "  |- Path    : " << taskdd.Path             // << "\n"
            << endl;
   }
-  for (auto &taskParam : sInfos->rtTIs)
+  for (auto &taskParam : _tasksSet)
   { // Print task Params
-      cout << "  |- Task    : "  << taskParam.name            << "\n"
-           << "   ‾|- ID      : " << taskParam.id               << "\n"
-           << "     |- Period  : " << taskParam.periodicity /1.0e6  << "\n"
-           << "     |- WCET    : " << taskParam.wcet /1.0e6      << "\n"
-           << "     |- affinity: " << taskParam.affinity         << "\n"
-           << "     |- RealTime: " << taskParam.isHardRealTime   << "\n"
-           << "     |- path    : " << taskParam.path_task      //  << "\n"
+      cout << "  |- Task    : "  << taskParam.fP.name            << "\n"
+           << "   ‾|- ID      : " << taskParam.fP.id               << "\n"
+           << "     |- Period  : " << taskParam.rtP.periodicity /1.0e6  << "\n"
+           << "     |- WCET    : " << taskParam.fP.wcet /1.0e6      << "\n"
+           << "     |- affinity: " << taskParam.rtP.affinity         << "\n"
+           << "     |- RealTime: " << taskParam.fP.isHRT   << "\n"
+           << "     |- path    : " << taskParam.fP.func      //  << "\n"
            << endl;
   }
   #endif
@@ -468,21 +458,21 @@ void taskChain::displayTasks()
 * @params : vec<rtTaskInfosStruct> rtTasks
 * @returns : [ vector<taskMonitoringStruct> taskList ]
 ***********************/
-taskMonitoringStruct::taskMonitoringStruct(rtTaskInfosStruct* rtTaskInfos)
+taskMonitoringStruct::taskMonitoringStruct(rtTaskInfosStruct* _taskInfos)
 {
-   xenoTask = rtTaskInfos->task;
-   deadline = rtTaskInfos->periodicity;
-   rwcet = rtTaskInfos->wcet;
-   id = rtTaskInfos->id;
-   precedencyID = rtTaskInfos->precedency;
+   ERROR_MNG(rt_task_bind(xenoTask,_taskInfos->fP.name, TM_INFINITE));
+   deadline = _taskInfos->rtP.periodicity;
+   rwcet = _taskInfos->fP.wcet;
+   id = _taskInfos->fP.id;
+   precedencyID = _taskInfos->fP.prec;
 
    setState(FALSE);
    //endTime = 0;
 
    rt_mutex_create(&mtx_taskStatus,
-                  strncat(rtTaskInfos->name,
+                  strncat(_taskInfos->fP.name,
                            "taskStatusMTX",
-                           sizeof(rtTaskInfos->name)+sizeof("taskStatusMTX")));
+                           sizeof(_taskInfos->fP.name)+sizeof("taskStatusMTX")));
 
 }
 

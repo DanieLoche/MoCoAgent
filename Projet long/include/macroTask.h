@@ -5,77 +5,15 @@
 #include "dataLogger.h"
 #include "taskLauncher.h"
 #include <algorithm>
+#define   MODE_OVERLOADED     1
 
 #define   TRUE    1
 #define   FALSE   0
-#define   MODE_OVERLOADED     1
 #define   MODE_NOMINAL        -1
 #define   MODE_DISABLE        0
 
 const RTIME t_RT = 000*1.0e6;  // time to trigger the Control Agent
 const RTIME Wmax = 400*1.0e6;    // next slice max time
-
-class TaskProcess
-{
-   protected:
-      TaskLauncher* tl;
-      RT_EVENT	event;
-      monitoringMsg msg ;
-      char stdIn[35];
-      char stdOut[35];
-      bool MoCoIsAlive;
-
-      void setIO();
-      void setRTtask();
-      void setAffinity (int _aff, int mode);
-      virtual void configure(rtTaskInfosStruct);
-
-   public:
-      RT_TASK _task;
-      RT_BUFFER bf;
-
-      //TaskProcess(taskRTInfo* , bool );
-      virtual void executeRun();
-};
-
-class MacroTask : public TaskProcess
-{
-  protected :
-    /* struct rtTaskInfosStruct
-    {
-         char   name[32];
-         char   path_task[128];
-         string arguments;
-         int    isHardRealTime;     // task chain ID or best effort if null
-         int    id;
-         int    affinity;
-         int    precedency;
-         int    priority;
-         RTIME  wcet;
-         RTIME  periodicity;
-         RT_TASK* task;
-    } ;
-    */
-    rtTaskInfosStruct prop;
-    std::vector<char*> _argv;
-    TaskDataLogger* dataLogs;
-    int (*proceed_function)(int Argc, char *argv[]);
-
-    void configure(rtTaskInfosStruct);
-    void parseParameters( );
-    inline int before();
-    inline void proceed();
-    inline int after();
-    inline int before_besteff();
-    inline int after_besteff();
-
-  public :
-    MacroTask(rtTaskInfosStruct, bool);
-    ~MacroTask();
-    void executeRun();
-    void executeRun_besteffort();
-
-};
 
 class taskMonitoringStruct
 {
@@ -126,30 +64,94 @@ class taskChain
     void displayTasks();
 };
 
+class TaskProcess
+{
+   protected:
+      RT_EVENT	event;
+      monitoringMsg msg ;
+      std::vector<char*> _argv;
+      char stdIn[35];
+      char stdOut[35];
+      bool MoCoIsAlive;
+
+      void setIO(char _stdIn[35], char _stdOut[35]);
+      void setAffinity (int _aff, int mode);
+      void setRTtask(rtPStruct, char*);
+      void parseParameters(string _arguments);
+
+   public:
+      RT_TASK* _task;
+      RT_BUFFER bf;
+
+      TaskProcess(rtTaskInfosStruct _taskInfo, bool MoCo);
+      virtual void executeRun();
+};
+
+class MacroTask : public TaskProcess
+{
+  protected :
+    /* struct rtTaskInfosStruct
+    {
+         char   name[32];
+         char   path_task[128];
+         string arguments;
+         int    isHardRealTime;     // task chain ID or best effort if null
+         int    id;
+         int    affinity;
+         int    precedency;
+         int    priority;
+         RTIME  wcet;
+         RTIME  periodicity;
+         RT_TASK* task;
+    } ;
+    */
+    rtTaskInfosStruct prop;
+    TaskDataLogger* dataLogs;
+    int (*proceed_function)(int Argc, char *argv[]);
+
+    //void setRTtask(rtPStruct _rtInfos, char*);
+    void findFunction(char* _func);
+
+    inline int before();
+    inline void proceed();
+    inline int after();
+    inline int before_besteff();
+    inline int after_besteff();
+
+  public :
+    MacroTask(rtTaskInfosStruct, bool);
+    ~MacroTask();
+    void executeRun();
+    void executeRun_besteffort();
+
+};
+
 class MCAgent : public TaskProcess
 {
-   public :
-        MCAgent(systemRTInfo* sInfos, bool enable);
-        void updateTaskInfo(monitoringMsg msg);
-        void executeRun();
-
-   private :
+   protected :
         bool enable;
         short runtimeMode;    // NOMINAL or OVERLOADED
         ulong overruns;
         std::vector<taskChain*> allTaskChain;
         std::vector<RT_TASK*> bestEffortTasks;
 
-        void configure(rtTaskInfosStruct);
-        void initMoCoAgent(systemRTInfo* sInfos);
+        //void setRTtask(rtPStruct, char*);
         void initCommunications();
         void setMode(int mode);
         void setAllDeadlines(std::vector<end2endDeadlineStruct> _tcDeadlineStructs);
         void setAllTasks(std::vector<rtTaskInfosStruct> _TasksInfos);
         //int checkTaskChains();
-        void displaySystemInfo(systemRTInfo* sInfos);
+        void displaySystemInfo(std::vector<end2endDeadlineStruct> e2eDD,
+                              std::vector<rtTaskInfosStruct> tasksSet);
         void displayChains();
         void saveData( );
+
+   public :
+       MCAgent(rtTaskInfosStruct _taskInfo, bool enable,
+                         std::vector<end2endDeadlineStruct> e2eDD,
+                         std::vector<rtTaskInfosStruct> tasksSet);
+       void updateTaskInfo(monitoringMsg msg);
+       void executeRun();
 };
 
 
@@ -180,18 +182,8 @@ int gsm_func          (int argc, char *argv[]);
 
 extern void print_affinity(pid_t _pid);
 extern void printTaskInfo(rtTaskInfosStruct* task);
-extern std::streambuf *cinbuf, *coutbuf;
-/*
-class MacroTaskBestEffort : public MacroTask
-{
-  protected :
-    void executeRun(RT_SEM* mysync);
+//extern std::streambuf *cinbuf, *coutbuf;
 
-  public :
-    int before();
-    int after();
-};
-*/
 
 //extern void printTaskInfo(rtTaskInfosStruct* task);
 

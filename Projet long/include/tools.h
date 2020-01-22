@@ -11,7 +11,7 @@
 #define     SCHED_EDF       6 // Not Implemented
 #define     SCHED_RM        7 // Rate-Monotonic
 
-#define   RR_SLICE_TIME     20000e6  // clock ticks (=ns)
+#define   RR_SLICE_TIME     20e9  // clock ticks (=ns)
 
 #define   VERBOSE_INFO      1 // Cout d'informations, démarrage, etc...
 #define   VERBOSE_DEBUG     1 // Cout de débug...
@@ -50,9 +50,35 @@ do {                                                                   \
       exit(EXIT_FAILURE);                                              \
    }                                                                   \
 } while(0)
-
 #define TO_STRING(str) convertToString(str)
 
+struct rtPStruct // Real-time Parameters
+{
+   //RT_TASK* _t;  //
+
+   int affinity; //
+   RTIME periodicity; //
+   int priority;      //
+   int schedPolicy;   //
+
+};
+
+struct funcPStruct   // Functional parameters
+{
+   int id;
+   char name[32]; //
+   char func[128];
+   string args;
+   int isHRT;     // task chain ID or best effort if null
+   int prec;
+   RTIME wcet;   //
+};
+
+struct rtTaskInfosStruct
+{
+   rtPStruct rtP;
+   funcPStruct fP;
+};
 /*
 struct logData
 {
@@ -65,32 +91,32 @@ struct logData
   int cptExecutions;
 };
 */
-struct rtTaskInfosStruct
+/*struct rtTaskInfosStruct
 {
-   RT_TASK* _t;
-   char name[32];
+   RT_TASK* _t;  //
+   char name[32]; //
    char function[128];
    string arguments;
    int isHardRealTime;     // task chain ID or best effort if null
    int id;
-   int affinity;
-   RTIME wcet;
-   RTIME periodicity;
    int precedency;
-   int priority;
-   int schedPolicy;
-};
+   RTIME wcet;   //
+   RTIME periodicity; //
+   int affinity; //
+   int priority;      //
+   int schedPolicy;   //
+};*/
 
 struct sortAscendingPeriod {
    inline bool operator() (const rtTaskInfosStruct& struct1, const rtTaskInfosStruct& struct2)
    {
-      return (struct1.periodicity < struct2.periodicity);
+      return (struct1.rtP.periodicity < struct2.rtP.periodicity);
    }
 };
 struct sortDescendingPeriod {
    inline bool operator() (const rtTaskInfosStruct& struct1, const rtTaskInfosStruct& struct2)
    {
-      return (struct1.periodicity > struct2.periodicity);
+      return (struct1.rtP.periodicity > struct2.rtP.periodicity);
    }
 };
 
@@ -102,13 +128,13 @@ struct end2endDeadlineStruct
   RTIME deadline;
 };
 
-struct systemRTInfo
-{
-  std::vector<end2endDeadlineStruct> e2eDD;
-  std::vector<rtTaskInfosStruct> rtTIs;
-  //bool* triggerSave;
-  //string outputFileName;
-};
+// struct systemRTInfo
+// {
+//   std::vector<end2endDeadlineStruct> e2eDD;
+//   std::vector<rtTaskInfosStruct> rtTIs;
+//   //bool* triggerSave;
+//   //string outputFileName;
+// };
 
 struct monitoringMsg
 {

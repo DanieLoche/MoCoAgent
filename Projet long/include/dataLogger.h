@@ -13,8 +13,6 @@ struct timeLog
 class DataLogger
 {
   protected :
-    char name[32];
-    int id;
     RTIME deadline;
 
   public :
@@ -31,15 +29,14 @@ class DataLogger
     RTIME logExec();
     virtual void saveData(string, int) = 0;
 
-    char* getName();
+    virtual char* getName() =0;
 };
 
 class TaskDataLogger : public DataLogger
 {
-   private:
-      int affinity;
-      int priority;
-      int isHardRealTime;
+   protected:
+      rtTaskInfosStruct* taskInfos;
+      char* getName();
    public :
 
       TaskDataLogger(rtTaskInfosStruct*);
@@ -49,11 +46,14 @@ class TaskDataLogger : public DataLogger
 
 class ChainDataLogger : public DataLogger
 {
-  public :
-    int cptAnticipatedMisses;
+   protected:
+      end2endDeadlineStruct* chainInfos;
+      char* getName();
+   public :
+      int cptAnticipatedMisses;
 
-    ChainDataLogger(end2endDeadlineStruct*);
-    void saveData(string, int);
+      ChainDataLogger(end2endDeadlineStruct*);
+      void saveData(string, int);
 
 };
 
