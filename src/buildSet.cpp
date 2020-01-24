@@ -40,7 +40,6 @@ buildSet::buildSet() {
 
 void buildSet::readChainsList(string input_file,std::vector<end2endDeadlineStruct> *list_info_chaine)
 {
-  system("clear");
   cout << "Initialising machine...\n";
 
   std::ifstream myFile(input_file);
@@ -58,12 +57,13 @@ void buildSet::readChainsList(string input_file,std::vector<end2endDeadlineStruc
       end2endDeadlineStruct chaineInfo;
       std::istringstream iss(str);
       string token;
+      #if VERBOSE_INFO
       cout << "Managing line : " << str << endl;
+      #endif
       if (str.substr(0,2) != "//")
       {
             if (!(iss >> chaineInfo.name
                       >> chaineInfo.taskChainID
-                      >> chaineInfo.Num_tasks
                       >> chaineInfo.Path
                       >> chaineInfo.deadline ))
             { cout << "\033[1;31mFailed to read line\033[0m !" << endl; break; } // error

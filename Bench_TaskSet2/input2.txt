@@ -1,6 +1,0 @@
-name 		    path 									isHRT 	periodicity 	deadline 	affinity
-bitcount_small.sh   /home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/automotive/bitcount/bitcount_small.sh    	1	200           	200       	2
-CRC32_large.sh      /home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/telecomm/CRC32/CRC32_large.sh         	1	1500           	1500       	2
-dijkstra_large.sh   /home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/network/dijkstra/dijkstra_large.sh       	1	200           	200       	2
-blowfish_small.sh   /home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/security/blowfish/blowfish_small.sh      	1	200           	200       	2
-basicmath_small.sh  /home/danlo/BrixCode/MoCoAgent/Benchmarker/bench/automotive/basicmath/basicmath_small.sh   	1	200           	200       	2

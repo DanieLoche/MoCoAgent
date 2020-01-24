@@ -1,11 +1,22 @@
 #ifndef TOOLS_H
 #define TOOLS_H
 
+//define    SCHED_FIFO      1 // First-In First-Out
+//define    SCHED_RR        2 // Round-Robin
+//define    SCHED_WEAK      0 // Weak
+//define    SCHED_COBALT    3 // Cobalt
+//define    SCHED_SPORADIC  4 // Sporadic
+//define    SCHED_TP        5 // TP
+//define    SCHED_QUOTA     8 // Quota
+#define     SCHED_EDF       6 // Not Implemented
+#define     SCHED_RM        7 // Rate-Monotonic
 
-#define VERBOSE_INFO  1 // Cout d'informations, démarrage, etc...
-#define VERBOSE_DEBUG 1 // Cout de débug...
-#define VERBOSE_OTHER 1 // Cout autre...
-#define VERBOSE_ASK   1 // cout explicitement demandés dans le code
+#define   RR_SLICE_TIME     20e9  // clock ticks (=ns)
+
+#define   VERBOSE_INFO      1 // Cout d'informations, démarrage, etc...
+#define   VERBOSE_DEBUG     1 // Cout de débug...
+#define   VERBOSE_OTHER     0 // Cout autre...
+#define   VERBOSE_ASK       0 // cout explicitement demandés dans le code
 
 #include <fstream>
 #include <sstream>
@@ -20,71 +31,133 @@
 #include <alchemy/task.h>
 #include <alchemy/sem.h>
 #include <alchemy/timer.h>
-#include <rtdm/ipc.h>
 #include <alchemy/buffer.h>
 #include <alchemy/event.h>
-
+#include <alchemy/mutex.h>
 
 using std::string;
 using std::cout;
 using std::endl;
 using std::cin;
+using std::cerr;
 
+#define ERROR_MNG(fct)                                                 \
+do {                                                                   \
+   int err = fct;                                                      \
+   if ( err != 0)                                                      \
+   {                                                                   \
+      rt_fprintf(stderr, "%s-%s error %d\n", __FUNCTION__, #fct, err); \
+      exit(EXIT_FAILURE);                                              \
+   }                                                                   \
+} while(0)
+#define TO_STRING(str) convertToString(str)
 
+struct rtPStruct // Real-time Parameters
+{
+   //RT_TASK* _t;  //
+
+   int affinity; //
+   RTIME periodicity; //
+   int priority;      //
+   int schedPolicy;   //
+
+};
+
+struct funcPStruct   // Functional parameters
+{
+   int id;
+   char name[32]; //
+   char func[128];
+   string args;
+   int isHRT;     // task chain ID or best effort if null
+   int prec;
+   RTIME wcet;   //
+};
 
 struct rtTaskInfosStruct
 {
-    RT_TASK* task;
-    char   name[64];
-    int ID ;
-     string path_task;
-    string task_args;
+   rtPStruct rtP;
+   funcPStruct fP;
+};
+/*
+struct logData
+{
+  struct timeLog
+  {
+    RTIME timestamp;
+    RTIME duration;
+  } timeLogs[8000];
+  int cptOutOfDeadline;
+  int cptExecutions;
+};
+*/
+/*struct rtTaskInfosStruct
+{
+   RT_TASK* _t;  //
+   char name[32]; //
+   char function[128];
+   string arguments;
+   int isHardRealTime;     // task chain ID or best effort if null
+   int id;
+   int precedency;
+   RTIME wcet;   //
+   RTIME periodicity; //
+   int affinity; //
+   int priority;      //
+   int schedPolicy;   //
+};*/
 
-    int  isHardRealTime;
-    int  periodicity;
-    RTIME  deadline;
-    int  affinity;
-
-    RTIME average_runtime;
-    RTIME max_runtime;
-    RTIME min_runtime;
-    int  out_deadline;
-    int  num_of_times;
-
-} ;
+struct sortAscendingPeriod {
+   inline bool operator() (const rtTaskInfosStruct& struct1, const rtTaskInfosStruct& struct2)
+   {
+      return (struct1.rtP.periodicity < struct2.rtP.periodicity);
+   }
+};
+struct sortDescendingPeriod {
+   inline bool operator() (const rtTaskInfosStruct& struct1, const rtTaskInfosStruct& struct2)
+   {
+      return (struct1.rtP.periodicity > struct2.rtP.periodicity);
+   }
+};
 
 struct end2endDeadlineStruct
 {
-  string name ;
+  char name[32];
   int taskChainID;
-  int Num_tasks;
   string Path;
-  double deadline;
-
+  RTIME deadline;
 };
+
+// struct systemRTInfo
+// {
+//   std::vector<end2endDeadlineStruct> e2eDD;
+//   std::vector<rtTaskInfosStruct> rtTIs;
+//   //bool* triggerSave;
+//   //string outputFileName;
+// };
 
 struct monitoringMsg
 {
   RT_TASK* task;
   int ID;
-  double startTime;   // Run-time - received
-  double endTime;     // Run-time - received
+  RTIME time;   // Run-time - received
   bool isExecuted;    // Run-time - computed
 };
 
 
+std::string trim(const std::string& str,
+                 const std::string& whitespace = " \t");
 
-struct systemRTInfo
-{
-  // Toto test.
-  std::vector<end2endDeadlineStruct> e2eDD;
-  std::vector<rtTaskInfosStruct> rtTIs;
-};
+std::string reduce(const std::string& str,
+                   const std::string& fill = " ",
+                   const std::string& whitespace = " \t");
 
+string convertToString(const char* a){ string s = a; return s; }
 
-void printInquireInfo();
+void printInquireInfo(RT_TASK*);
 void printTaskInfo(rtTaskInfosStruct* task);
 void print_affinity(pid_t _pid);
+
 
 /* To create a task :
  * Arguments : &task,

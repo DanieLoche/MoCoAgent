@@ -1,0 +1,40 @@
+
+Running summary for task RT_VR_bitcount_S. (20215, 50, RT_VR_bitcount_S)
+Deadline : 189.6 ms.  Missed | Executions 
+                       659 | 679 times
+Primary Mode execution time - 10.2582 ms. Timeouts : 0
+  MIN   |   AVG   |   MAX
+16.5689 | 879.249 | 5597.2 (ms)
+   Mode Switches - 683
+Context Switches - 3830
+Cobalt Sys calls - 2738
+
+Running summary for task RT_VR_gsm_L. (20216, 50, RT_VR_gsm_L)
+Deadline : 1788 ms.  Missed | Executions 
+                        23 | 565 times
+Primary Mode execution time - 6.72785 ms. Timeouts : 0
+  MIN   |   AVG   |   MAX
+303.451 | 1057.24 | 8422.3 (ms)
+   Mode Switches - 569
+Context Switches - 2127
+Cobalt Sys calls - 2278
+
+Running summary for task RT_VR_basicmath_L. (20217, 50, RT_VR_basicmath_L)
+Deadline : 2592 ms.  Missed | Executions 
+                        17 | 623 times
+Primary Mode execution time - 13.461 ms. Timeouts : 0
+  MIN   |   AVG   |   MAX
+427.1 | 958.599 | 5597.33 (ms)
+   Mode Switches - 627
+Context Switches - 4570
+Cobalt Sys calls - 2507
+
+Running summary for task RT_VR_stringsearch_L. (20218, 50, RT_VR_stringsearch_L)
+Deadline : 153.6 ms.  Missed | Executions 
+                       663 | 681 times
+Primary Mode execution time - 10.0947 ms. Timeouts : 0
+  MIN   |   AVG   |   MAX
+5.67429 | 876.647 | 5597.19 (ms)
+   Mode Switches - 685
+Context Switches - 3715
+Cobalt Sys calls - 2747

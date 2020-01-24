@@ -1,0 +1,30 @@
+Experiment made with parameters : 
+ MoCoAgent: 0
+  Duration: 180
+CPU Factor: 100
+Input  file: ./inputFile
+Output files: ./Experimentations/Expe_16-08-18h/BNCH_0_180_100_FIFO_Expe.csv & ./Experimentations/Expe_16-08-18h/BNCH_0_180_100_FIFO_Chains.csv & ./Experimentations/Expe_16-08-18h/BNCH_0_180_100_FIFO_Resume.txt
+Experiment made with parameters : 
+ MoCoAgent: 0
+  Duration: 180
+CPU Factor: 100
+Input  file: ./inputFile
+Output files: ./Experimentations/Expe_16-08-18h/BNCH_0_180_100_FIFO_Expe.csv & ./Experimentations/Expe_16-08-18h/BNCH_0_180_100_FIFO_Chains.csv & ./Experimentations/Expe_16-08-18h/BNCH_0_180_100_FIFO_Resume.txt
+Experiment made with parameters : 
+ MoCoAgent: 0
+  Duration: 180
+CPU Factor: 100
+Input  file: ./inputFile
+Output files: ./Experimentations/Expe_16-08-18h/BNCH_0_180_100_FIFO_Expe.csv & ./Experimentations/Expe_16-08-18h/BNCH_0_180_100_FIFO_Chains.csv & ./Experimentations/Expe_16-08-18h/BNCH_0_180_100_FIFO_Resume.txt
+Experiment made with parameters : 
+ MoCoAgent: 0
+  Duration: 180
+CPU Factor: 100
+Input  file: ./inputFile
+Output files: ./Experimentations/Expe_16-08-18h/BNCH_0_180_100_FIFO_Expe.csv & ./Experimentations/Expe_16-08-18h/BNCH_0_180_100_FIFO_Chains.csv & ./Experimentations/Expe_16-08-18h/BNCH_0_180_100_FIFO_Resume.txt
+Experiment made with parameters : 
+ MoCoAgent: 0
+  Duration: 180
+CPU Factor: 100
+Input  file: ./inputFile
+Output files: ./Experimentations/Expe_16-08-18h/BNCH_0_180_100_FIFO_Expe.csv & ./Experimentations/Expe_16-08-18h/BNCH_0_180_100_FIFO_Chains.csv & ./Experimentations/Expe_16-08-18h/BNCH_0_180_100_FIFO_Resume.txt

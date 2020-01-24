@@ -1,0 +1,46 @@
+Experiment made with parameters : 
+ MoCoAgent: 0
+  Duration: 60
+CPU Factor: 80
+Input  file: ./inputFile
+Output files: ./Experimentations/Expe_05-08-14h/VR_0_60_80_FIFO_Expe.csv & ./Experimentations/Expe_05-08-14h/VR_0_60_80_FIFO_Chains.csv & ./Experimentations/Expe_05-08-14h/VR_0_60_80_FIFO_Resume.txt
+
+Running summary for task RT_VR_bitcount_S. (19173, 50, RT_VR_bitcount_S)
+Deadline : 189.6 ms.  Missed | Executions 
+                        85 | 104 times
+Primary Mode execution time - 0.630977 ms. Timeouts : 0
+  MIN   |   AVG   |   MAX
+17.1371 | 533.091 | 2987.99 (ms)
+   Mode Switches - 108
+Context Switches - 592
+Cobalt Sys calls - 118
+
+Running summary for task RT_VR_basicmath_L. (19174, 50, RT_VR_basicmath_L)
+Deadline : 2592 ms.  Missed | Executions 
+                         1 | 81 times
+Primary Mode execution time - 0.563019 ms. Timeouts : 0
+  MIN   |   AVG   |   MAX
+263.641 | 685.6 | 3223.65 (ms)
+   Mode Switches - 85
+Context Switches - 502
+Cobalt Sys calls - 95
+
+Running summary for task RT_VR_stringsearch_L. (19175, 50, RT_VR_stringsearch_L)
+Deadline : 153.6 ms.  Missed | Executions 
+                        85 | 106 times
+Primary Mode execution time - 0.572749 ms. Timeouts : 0
+  MIN   |   AVG   |   MAX
+29.1452 | 522.957 | 3223.64 (ms)
+   Mode Switches - 110
+Context Switches - 546
+Cobalt Sys calls - 120
+
+Running summary for task RT_VR_gsm_L. (19176, 50, RT_VR_gsm_L)
+Deadline : 1788 ms.  Missed | Executions 
+                         1 | 84 times
+Primary Mode execution time - 0.434658 ms. Timeouts : 0
+  MIN   |   AVG   |   MAX
+184.948 | 660.971 | 3039.33 (ms)
+   Mode Switches - 88
+Context Switches - 370
+Cobalt Sys calls - 98
