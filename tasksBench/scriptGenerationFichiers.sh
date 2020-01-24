@@ -1,9 +1,10 @@
 #! /bin/bash
 
-names=("basicmath_S" "basicmath_L" "bitcount_S" "bitcount_L" "qsort_S" "qsort_L" "susan_S_smooth" "susan_S_edges" "susan_S_corners" "susan_L_smooth" "susan_L_edges" "susan_L_corners" "cjpeg_S" "cjpeg_L" "djpeg_S" "djpeg_L" "typeset_S" "typeset_L" "dijkstra_S" "dijkstra_L" "patricia_S" "patricia_L" "stringsearch_L" "stringsearch_S" "blowfishE_S" "blowfishD_S" "blowfishE_L" "blowfishD_L" "sha_S" "sha_L" "adpcmCaudio_S" "adpcmCaudio_L" "adpcmDaudio_S" "adpcmDaudio_L" "CRC32_S" "CRC32_L" "fft_S" "fft_L" "fft_inv_S" "fft_inv_L" "gsmToast_S" "gsmToast_L" "gsmUToast_S" "gsmUToast_L" "rijndaelE_S" "rijndaelE_L" "rijndaelD_S" "rijndaelD_L")   
+names=("basicmath_S" "basicmath_L" "bitcount_S" "bitcount_L" "qsort_S" "qsort_L" "susan_S_smooth" "susan_S_edges" "susan_S_corners" "susan_L_smooth" "susan_L_edges" "susan_L_corners" "cjpeg_S" "cjpeg_L" "djpeg_S" "djpeg_L" "typeset_S" "typeset_L" "dijkstra_S" "dijkstra_L" "patricia_S" "patricia_L" "stringsearch_L" "stringsearch_S" "blowfishE_S" "blowfishD_S" "blowfishE_L" "blowfishD_L" "sha_S" "sha_L" "adpcmCaudio_S" "adpcmCaudio_L" "adpcmDaudio_S" "adpcmDaudio_L" "CRC32_S" "CRC32_L" "fft_S" "fft_L" "fft_inv_S" "fft_inv_L" "gsmToast_S" "gsmToast_L" "gsmUToast_S" "gsmUToast_L" "rijndaelE_S" "rijndaelE_L" "rijndaelD_S" "rijndaelD_L")
 
-DO=func
-inputFile=./baseFile_funcs.txt
+
+inputFile=./baseFile_funcs.csv
+DO=func # default behaviour
 
 while [ "$1" != "" ]; do
     case $1 in
@@ -12,7 +13,7 @@ while [ "$1" != "" ]; do
                         DO=func
                         ;;
         -m | --mode)     shift
-		        inputFile=./baseFile.txt
+		        inputFile=./baseFile.csv
                         DO=exec
                         ;;
         -h | --help )   echo "usage: scriptGenerationFichiers.sh [[-o outputmode = (0,1)] "
@@ -43,10 +44,10 @@ then
 	    done < ${n}.tmp > ./${n}.in
 	    rm ./${n}.tmp
 	done
-else
+else  # DO="exec"
 	for n in ${names[*]}
 	do
-	    cp ./baseFile.txt ./${n}.tmp
+	    cp ./baseFile.csv ./${n}.tmp
 	    numLigne=0
 	    while read -r firstWord restLine # Premier nom de la ligne
 	    do
