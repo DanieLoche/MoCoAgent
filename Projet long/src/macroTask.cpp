@@ -190,6 +190,17 @@ void TaskProcess::parseParameters(string _arguments)
 
 void TaskProcess::setIO(char _stdIn[35], char _stdOut[35])
 {
+    /*
+          if (stdIn[0] != '\0')
+          {
+              std::cin.rdbuf(inStrm.rdbuf()); //redirect std::cin to stdIn!
+          }
+
+          if (stdOut[0] != '\0')
+          {
+              std::cout.rdbuf(outStrm.rdbuf()); //redirect std::cout to stdOut!
+          }
+    */
    if (_stdIn[0] != '\0')
    {
       #if VERBOSE_OTHER
@@ -225,29 +236,11 @@ MacroTask::MacroTask(rtTaskInfosStruct _taskInfo, bool MoCo) : TaskProcess(_task
    dataLogs = new TaskDataLogger(&prop);
    findFunction(_taskInfo.fP.func);
 
-   /* Du vieux débug...
-   RT_TASK_INFO curtaskinfo;
-   rt_task_inquire(NULL, &curtaskinfo);
-   print_affinity(curtaskinfo.pid);
-   #if VERBOSE_OTHER
-   cout << "I am task : " << curtaskinfo.name << " of priority " << curtaskinfo.prio << endl;
-   #endif
-   */
-   //chain = std::string(prop.function) + " " + prop.arguments;
-   //parseParameters(_taskInfo.fP.args );   // setIO included
-
    msg.task    = _task;
    msg.ID      = prop.fP.id;
    msg.time    = 0;
    msg.isExecuted = 0;
 
-
-/* Ajout subscribe au mutex pour chopper l'ordonnancement sur le coeur
-   int cpu = sched_getcpu();
-   char* name = &("mutCore" + std::to_string(cpu))[0];
-   rt_mutex_bind(&mutex, name, 0);
-   cout << "Task " << prop.name << " binded to mutex " << name << endl;
-*/
 }
 
 void MacroTask::findFunction (char* _func)
@@ -306,39 +299,11 @@ void MacroTask::proceed()
       cout << "[ " << prop.name << " ] : "<< "Executing Proceed." << endl;
       #endif
 
-/*
-      if (stdIn[0] != '\0')
-      {
-          std::cin.rdbuf(inStrm.rdbuf()); //redirect std::cin to stdIn!
-      }
-
-      if (stdOut[0] != '\0')
-      {
-          std::cout.rdbuf(outStrm.rdbuf()); //redirect std::cout to stdOut!
-      }
-*/
-      if (stdIn[0] != '\0')
-      {
-         int fdIn = open(stdIn, O_RDWR | O_CREAT, S_IRUSR | S_IWUSR);
-         dup2(fdIn, 0);
-         close(fdIn);
-      }
-
-      /* utilisation d'un new_fd
-         if (stdOut[0] != '\0')
-         {
-         fflush(stdout);
-         dup2(new_fd, 1);
-         }
-      */
-
-
       int ret = proceed_function(_argv.size()-1, &_argv[0]);  // -1 : no need for last element "NULL".
       if (ret != 0)
       {
         cerr << "["<< prop.fP.name << " ("<< getpid() << ")] - Error during proceed ! [" << ret << "]. Function was : ";
-        int i = 1;
-        i = 0;
+        int i = 0;
         for (auto arg : _argv)
         {
            string toPrint;
@@ -349,17 +314,6 @@ void MacroTask::proceed()
         }
         cerr << " with (" << _argv.size()-1 << ") elements." << endl;
       }
-
-
-      //if (stdIn[0] != '\0') std::cin.rdbuf(cinbuf);   //reset to standard input again
-      //if (stdOut[0] != '\0') std::cout.rdbuf(coutbuf); //reset to standard output again
-
-      // if (std::string path(prop.function) != "/null/")  {
-      //cout << prop.name << " : " << chain << endl;
-
-      //system(&chain[0u]);
-//    }
-//    else cout << prop.name <<"Oups, no valid path found !" << endl;
 }
 
 int MacroTask::after()

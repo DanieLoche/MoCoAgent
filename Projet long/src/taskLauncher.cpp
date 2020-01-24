@@ -153,8 +153,7 @@ int TaskLauncher::createMutexes(int _nprocs)
 */
 
 int TaskLauncher::createTasks()
-{ 
-
+{
    #if VERBOSE_INFO
    cout << endl << "CREATING TASKS : " << endl;
    #endif
@@ -162,40 +161,40 @@ int TaskLauncher::createTasks()
    rt_sem_create(&syncSem, SEM_NAME, 0, S_PRIO);
    for (auto& taskInfo : tasksSet)
    {
-      #if VERBOSE_INFO
-      cout << "Creating Task " << taskInfo.fP.name << "." << endl;
-      #endif
-      pid_t pid = fork();
-      if (pid == 0) // proc fils
-      {
-         currentTaskDescriptor = taskInfo;
-         TaskDataLogger* dlog = new TaskDataLogger(&currentTaskDescriptor);
-         taskRTInfo* _taskRTInfo = new taskRTInfo;
-         _taskRTInfo->taskLog = dlog;
-         _taskRTInfo->rtTI = &currentTaskDescriptor;
+       #if VERBOSE_INFO
+       cout << "Creating Task " << taskInfo.fP.name << "." << endl;
+       #endif
+       pid_t pid = fork();
+       if (pid == 0) // proc fils
+       {
+           currentTaskDescriptor = taskInfo;
+           TaskDataLogger* dlog = new TaskDataLogger(&currentTaskDescriptor);
+           taskRTInfo* _taskRTInfo = new taskRTInfo;
+           _taskRTInfo->taskLog = dlog;
+           _taskRTInfo->rtTI = &currentTaskDescriptor;
 
-         MacroTask macroRT(taskInfo, enableAgent);
-         ERROR_MNG(rt_sem_p(&syncSem, TM_INFINITE));
-         sleep(1);
-         if (currentTaskDescriptor.fP.isHRT == 0) {
+           MacroTask macroRT(taskInfo, enableAgent);
+           ERROR_MNG(rt_sem_p(&syncSem, TM_INFINITE));
+           sleep(1);
+           if (currentTaskDescriptor.fP.isHRT == 0) {
            macroRT.executeRun_besteffort();
-         }
-         else {
-           macroRT.executeRun();
-         }
-         return 0;
+            }
+            else {
+                macroRT.executeRun();
+            }
 
-      }
-      else // pid = forked task pid_t
-      {
+       exit(EXIT_SUCCESS);
+        }
+        else // pid = forked task pid_t
+        {
 
          tasks.push_back(new RT_TASK);
          rt_task_bind(tasks.back(), taskInfo.fP.name, TM_INFINITE); // A faire dans MoCoAgent ?
 
-      }
+        }
 
-   }
-   return 0;
+    }
+    return 0;
 }
 
 int TaskLauncher::runAgent()
