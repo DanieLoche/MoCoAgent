@@ -9,7 +9,7 @@
 # NOTE: Written Part of testing for Ubuntu answer:
 #       https://askubuntu.com/questions/942728/disable-hyper-threading-in-ubuntu/942843#942843
 
-# PARM: 1="0" turn off hyper threading, "1" turn it on.
+# PARM: 1 = "0" turn off hyper threading, "1" turn it on.
 
 if [[ $# -ne 1 ]]; then
     echo 'One argument required. 0 to turn off hyper-threading or'
