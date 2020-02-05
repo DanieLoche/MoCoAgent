@@ -1,13 +1,4 @@
-#include "tools.h"
 #include "taskLauncher.h"
-#include "macroTask.h"
-#include "sched.h"
-#include "edf.h"
-
-#include <iomanip>
-
-#define SEM_NAME   "Start_Sem"
-#define MCA_PERIOD 2 // ms
 
 TaskLauncher::TaskLauncher(string _outputFileName, int _schedMode)
 {
@@ -152,52 +143,52 @@ int TaskLauncher::createMutexes(int _nprocs)
 }
 */
 
-int TaskLauncher::createTasks()
+int TaskLauncher::runTasks(long expeDuration)
 {
    #if VERBOSE_INFO
    cout << endl << "CREATING TASKS : " << endl;
    #endif
    //for (auto taskInfo = taskSetInfos.rtTIs.begin(); taskInfo != taskSetInfos.rtTIs.end(); ++taskInfo)
-   rt_sem_create(&syncSem, SEM_NAME, 0, S_PRIO);
+   rt_sem_create(&_syncSem, SEM_NAME, 0, S_PRIO);
    for (auto& taskInfo : tasksSet)
    {
-       #if VERBOSE_INFO
-       cout << "Creating Task " << taskInfo.fP.name << "." << endl;
-       #endif
-       pid_t pid = fork();
-       if (pid == 0) // proc fils
-       {
-           currentTaskDescriptor = taskInfo;
-           TaskDataLogger* dlog = new TaskDataLogger(&currentTaskDescriptor);
-           taskRTInfo* _taskRTInfo = new taskRTInfo;
-           _taskRTInfo->taskLog = dlog;
-           _taskRTInfo->rtTI = &currentTaskDescriptor;
+      #if VERBOSE_INFO
+      cout << "Creating Task " << taskInfo.fP.name << "." << endl;
+      #endif
+      pid_t pid = fork();
+      if (pid == 0) // proc fils
+      {
+         currentTaskDescriptor = taskInfo;
+         TaskDataLogger* dlog = new TaskDataLogger(&currentTaskDescriptor);
+         taskRTInfo* _taskRTInfo = new taskRTInfo;
+         _taskRTInfo->taskLog = dlog;
+         _taskRTInfo->rtTI = &currentTaskDescriptor;
 
-           MacroTask macroRT(taskInfo, enableAgent);
-           ERROR_MNG(rt_sem_p(&syncSem, TM_INFINITE));
-           sleep(1);
-           if (currentTaskDescriptor.fP.isHRT == 0) {
+         MacroTask macroRT(taskInfo, enableAgent);
+         ERROR_MNG(rt_alarm_create(&_endAlarm, ALARM_NAME, /*HANDLER*/, NULL)); //ms to ns
+         ERROR_MNG(rt_sem_p(&_syncSem, TM_INFINITE));
+         rt_alarm_start(&_endAlarm, expeDuration*1e-6, TM_INFINITE);
+         rt_task_yield();
+         if (currentTaskDescriptor.fP.isHRT == 0) {
            macroRT.executeRun_besteffort();
             }
             else {
-                macroRT.executeRun();
+               macroRT.executeRun();
             }
+            exit(EXIT_SUCCESS);
+         }
+         else // pid = forked task pid_t
+         {
+            tasks.push_back(new RT_TASK);
+            rt_task_bind(tasks.back(), taskInfo.fP.name, TM_INFINITE); // A faire dans MoCoAgent ?
 
-       exit(EXIT_SUCCESS);
-        }
-        else // pid = forked task pid_t
-        {
+         }
 
-         tasks.push_back(new RT_TASK);
-         rt_task_bind(tasks.back(), taskInfo.fP.name, TM_INFINITE); // A faire dans MoCoAgent ?
-
-        }
-
-    }
-    return 0;
+      }
+      return 0;
 }
 
-int TaskLauncher::runAgent()
+int TaskLauncher::runAgent(long expeDuration)
 {
   int ret = 0;
    #if VERBOSE_INFO
@@ -221,7 +212,11 @@ int TaskLauncher::runAgent()
    if (enableAgent == 2) monitor = FALSE;
    moCoAgent = new MCAgent(MoCoAgentParams, monitor, e2eDD, tasksSet);
 
-   rt_sem_broadcast(&syncSem);
+   rt_sem_broadcast(&_syncSem); // Start alarms.
+   ERROR_MNG(rt_alarm_create(&_endAlarm, ALARM_NAME, /*HANDLER*/, outputFileName)); //ms to ns
+   rt_alarm_start(&_endAlarm, expeDuration*1e-6, TM_INFINITE);
+   rt_task_yield();
+
    moCoAgent->executeRun();
    return ret;
 }
@@ -264,8 +259,7 @@ void TaskLauncher::saveData(string file)
    //cout << "Max name size is : " << nameMaxSize << endl;
 
    std::ofstream myFile;
-   string dataFileName = file + "_Expe.csv";
-   myFile.open (dataFileName);    // TO APPEND :  //,ios_base::app);
+   myFile.open (file + "_Expe.csv");    // TO APPEND :  //,ios_base::app);
    myFile << std::setw(15) << "timestamp" << " ; "
           << std::setw(nameMaxSize) << "name"     << " ; "
           << std::setw(2)  << "ID"       << " ; "

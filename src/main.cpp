@@ -4,7 +4,6 @@
 // #define VERBOSE_ASK   1 // cout explicitement demandés dans le code
 
 #include "tools.h"
-#include "sched.h"
 
 #include "taskLauncher.h"
 #include <sys/sysinfo.h>
@@ -138,17 +137,16 @@ int main(int argc, char* argv[])
 
    tln->printTasksInfos();
 
-   if(tln->createTasks()) {cerr << "Failed to create all tasks" << endl; return -4;}
+   if(tln->runTasks(expeDuration)) {cerr << "Failed to create all tasks" << endl; return -4;}
    if (enableAgent)
    {
       sleep(1);
-      tln->runAgent();
+      tln->runAgent(expeDuration);
    }
-
 
    //sleeping the time that all tasks will be started
    sleep(2);
-   cout << "Wake up all tasks." << endl;
+   //cout << "Wake up all tasks." << endl;
    /*
       int bak_fd = dup(1);
       fflush(stdout);
@@ -163,10 +161,10 @@ int main(int argc, char* argv[])
    //    string ss;
    //    while (ss != "STOP") cin >> ss;
 
-   if (expeDuration) sleep(expeDuration);
-   else pause();
+   //if (expeDuration) sleep(expeDuration);
+   //else pause();
 
-   sleep(2);
+   //sleep(2);
    //fflush(stdout);
    /*
       dup2(bak_fd, 1);

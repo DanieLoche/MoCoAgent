@@ -1,8 +1,5 @@
-#include "tools.h"
 #include "dataLogger.h"
-
 #include <iomanip>
-
 
 DataLogger::DataLogger(){}
 
@@ -100,18 +97,18 @@ RTIME DataLogger::logExec( )
 
 void TaskDataLogger::saveData(string file, int nameSize)
 {
-  std::ofstream outputFileTasksData;
-  string outputFileName = file + "_Expe.csv";
-  outputFileTasksData.open (outputFileName, std::ios::app);    // TO APPEND :  //,ios_base::app);
+   std::ofstream outputFileTasksData;
+   string outputFileName = file + "_Expe.csv";
+   outputFileTasksData.open (outputFileName, std::ios::app);    // TO APPEND :  //,ios_base::app);
 
-  RTIME average_runtime = 0;
-  RTIME max_runtime = 0;
-  RTIME min_runtime = 1.e9;
-  double somme = 0;
+   RTIME average_runtime = 0;
+   RTIME max_runtime = 0;
+   RTIME min_runtime = 1.e9;
+   double somme = 0;
 
-  if (!(cptExecutions > 0)) cerr << "[" << getName() << "] -" << "Error : no logs to print !" << endl;
-  else for (int i = 0; i < cptExecutions; i++)
-  {
+   if (!(cptExecutions > 0)) cerr << "[" << getName() << "] -" << "Error : no logs to print !" << endl;
+   else for (int i = 0; i < cptExecutions; i++)
+   {
     RTIME _dur = execLogs[i].duration;
 
     outputFileTasksData << std::setw(15) << execLogs[i].timestamp << " ; "
@@ -126,34 +123,33 @@ void TaskDataLogger::saveData(string file, int nameSize)
     somme += _dur;
     if (_dur < min_runtime) min_runtime = _dur;
     if (_dur > max_runtime) max_runtime = _dur;
-  }
-  outputFileTasksData.close();
+   }
+   outputFileTasksData.close();
 
-  #if VERBOSE_INFO
-  std::ofstream outputFileResume;
-  outputFileName = file + "_Resume.txt";
-  outputFileResume.open (outputFileName, std::ios::app);    // TO APPEND :  //,ios_base::app);
+   #if VERBOSE_INFO
+   std::ofstream outputFileResume;
+   outputFileName = file + "_Resume.txt";
+   outputFileResume.open (outputFileName, std::ios::app);    // TO APPEND :  //,ios_base::app);
 
-  average_runtime = somme / cptExecutions;
-  if (taskInfos->rtP._t != NULL)
-  {
-    RT_TASK_INFO cti;
-    rt_task_inquire(taskInfos->rtP._t, &cti);
+   average_runtime = somme / cptExecutions;
+   RT_TASK _t;
+   ERROR_MNG(rt_task_bind(&_t, getName(), TM_INFINITE));
+   RT_TASK_INFO cti;
+   rt_task_inquire(&_t, &cti);
 
-    outputFileResume << "\nRunning summary for task " << getName() << ". (" << cti.pid << ", " << cti.prio << ", " << cti.name << ")" << "\n"
-         << "Deadline : " << deadline / 1.0e6     << " ms.  Missed"     << " | "                 << "(2) | " << "Executions " << "\n"
-         << "                    " << std::setw(6) <<  cptOutOfDeadline << " | " << std::setw(3) << overruns << " | " << cptExecutions << " times" << "\n"
-         << "Primary Mode execution time - " << cti.stat.xtime/1.0e6 << " ms. Timeouts : " << cti.stat.timeout << "\n"
-         <<         "  MIN  "   << " | " <<        "  AVG  "        << " | " <<      "  MAX"        << "\n"
-         << min_runtime / 1.0e6 << " | " << average_runtime / 1.0e6 << " | " << max_runtime / 1.0e6 << " (ms)" << "\n"
-         << "   Mode Switches - " << cti.stat.msw << "\n"
-         << "Context Switches - " << cti.stat.csw << "\n"
-         << "Cobalt Sys calls - " << cti.stat.xsc
-         << endl;
-    } else cout << "No task identifier found for : " << getName() << endl;
+   outputFileResume << "\nRunning summary for task " << getName() << ". (" << cti.pid << ", " << cti.prio << ", " << cti.name << ")" << "\n"
+      << "Deadline : " << deadline / 1.0e6     << " ms.  Missed"     << " | "                 << "(2) | " << "Executions " << "\n"
+      << "                    " << std::setw(6) <<  cptOutOfDeadline << " | " << std::setw(3) << overruns << " | " << cptExecutions << " times" << "\n"
+      << "Primary Mode execution time - " << cti.stat.xtime/1.0e6 << " ms. Timeouts : " << cti.stat.timeout << "\n"
+      <<         "  MIN  "   << " | " <<        "  AVG  "        << " | " <<      "  MAX"        << "\n"
+      << min_runtime / 1.0e6 << " | " << average_runtime / 1.0e6 << " | " << max_runtime / 1.0e6 << " (ms)" << "\n"
+      << "   Mode Switches - " << cti.stat.msw << "\n"
+      << "Context Switches - " << cti.stat.csw << "\n"
+      << "Cobalt Sys calls - " << cti.stat.xsc
+      << endl;
 
-    outputFileResume.close();
-    #endif
+   outputFileResume.close();
+   #endif
 
 }
 

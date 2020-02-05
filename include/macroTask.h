@@ -3,14 +3,21 @@
 
 #include "tools.h"
 #include "dataLogger.h"
-#include "taskLauncher.h"
-#include <algorithm>
+//#include "taskLauncher.h"
+#include <fcntl.h>      // gestion systèmes de fichiers ( dup() )
+
 #define   MODE_OVERLOADED     1
 
 #define   TRUE    1
 #define   FALSE   0
 #define   MODE_NOMINAL        -1
 #define   MODE_DISABLE        0
+
+#define CHANGE_MODE_EVENT_NAME   "/modeChangeTopic"
+#define MESSAGE_TOPIC_NAME       "/monitoringTopic"
+
+#define EXECTIME   2e8   // execution time in ns
+#define SPINTIME   1e7   // spin time in ns
 
 const RTIME t_RT = 000*1.0e6;  // time to trigger the Control Agent
 const RTIME Wmax = 400*1.0e6;    // next slice max time
@@ -67,7 +74,8 @@ class taskChain
 class TaskProcess
 {
    protected:
-      RT_EVENT	event;
+      RT_EVENT	_event;
+      RT_EVENT_INFO _eventInfos;
       monitoringMsg msg ;
       std::vector<char*> _argv;
       char stdIn[35];
@@ -78,6 +86,7 @@ class TaskProcess
       void setAffinity (int _aff, int mode);
       void setRTtask(rtPStruct, char*);
       void parseParameters(string _arguments);
+      void saveData();
 
    public:
       RT_TASK* _task;

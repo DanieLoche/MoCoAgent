@@ -41,9 +41,9 @@ MCAgent::MCAgent(rtTaskInfosStruct _taskInfo, bool enable,
 
 void MCAgent::initCommunications()
 {
-   rt_buffer_create(&bf, "/monitoringTopic", 20*sizeof(monitoringMsg), B_FIFO);
+   rt_buffer_create(&bf, MESSAGE_TOPIC_NAME, 20*sizeof(monitoringMsg), B_FIFO);
    // u_int flagMask = 0;
-   rt_event_create(&event, "/modeChangeTopic", 0, EV_PRIO);
+   rt_event_create(&_event, CHANGE_MODE_EVENT_NAME, 0, EV_PRIO);
 }
 
 void MCAgent::executeRun()
@@ -198,7 +198,7 @@ void MCAgent::setMode(int mode)
     {
         if (mode >= MODE_OVERLOADED && runtimeMode <= MODE_NOMINAL)
         { // Pause Best Effort Tasks sur front montant changement de mode.
-            rt_event_signal(&event, 1);
+            rt_event_signal(&_event, MODE_OVERLOADED);
             for (auto& bestEffortTask : bestEffortTasks)
             {   // Publier message pour dire à stopper
                 if (rt_task_suspend(bestEffortTask))
@@ -215,7 +215,7 @@ void MCAgent::setMode(int mode)
         }
         else if (mode <= MODE_NOMINAL && runtimeMode >= MODE_OVERLOADED)
         { // runtimeMode NOMINAL
-            rt_event_signal(&event, 0);
+            rt_event_signal(&_event, MODE_NOMINAL);
             for (auto& bestEffortTask : bestEffortTasks)
             {  // relancer Best Effort Tasks;
                 rt_task_resume(bestEffortTask);

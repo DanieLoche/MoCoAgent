@@ -2,8 +2,14 @@
 #define TASKLAUNCHER_H
 
 #include "tools.h"
-#include "dataLogger.h"
 #include "macroTask.h"
+#include "dataLogger.h"
+#include "sched.h"
+#include "edf.h"
+
+#define ALARM_NAME   "endOfExpe_Alarm"
+#define SEM_NAME     "Start_Sem"
+#define MCA_PERIOD   2 // ms
 
 class TaskLauncher
 {
@@ -17,7 +23,8 @@ class TaskLauncher
       int schedPolicy;
 
       MCAgent* moCoAgent;
-      RT_SEM syncSem;
+      RT_ALARM _endAlarm;
+      RT_SEM _syncSem;
 
    public :
 
@@ -25,10 +32,9 @@ class TaskLauncher
       TaskLauncher(string outputFileName, int schedPolicy);
       int readChainsList(string);
       int readTasksList (int cpuPercent);
-      int createTasks();
 //      int createMutexes(int nprocs);
-      int runTasks();
-      int runAgent();
+      int runTasks(long expeDuration);
+      int runAgent(long expeDuration);
       void stopTasks(bool);
       void saveData(string);
       void printTasksInfos (/* std::vector<rtTaskInfosStruct> _myTasksInfos*/);

@@ -3,6 +3,8 @@
 
 #include "tools.h"
 #include <array>
+#include <iomanip>
+
 
 struct timeLog
 {
@@ -36,7 +38,7 @@ class TaskDataLogger : public DataLogger
 {
    protected:
       rtTaskInfosStruct* taskInfos;
-      char* getName();
+      inline char* getName();
    public :
 
       TaskDataLogger(rtTaskInfosStruct*);
@@ -48,7 +50,7 @@ class ChainDataLogger : public DataLogger
 {
    protected:
       end2endDeadlineStruct* chainInfos;
-      char* getName();
+      inline char* getName();
    public :
       int cptAnticipatedMisses;
 

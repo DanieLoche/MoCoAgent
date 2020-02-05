@@ -32,6 +32,7 @@
 #include <alchemy/sem.h>
 #include <alchemy/timer.h>
 #include <alchemy/buffer.h>
+#include <alchemy/alarm.h>
 #include <alchemy/event.h>
 #include <alchemy/mutex.h>
 

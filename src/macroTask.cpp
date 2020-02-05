@@ -1,13 +1,7 @@
-#include "tools.h"
 #include "macroTask.h"
 //#include <utmpx.h>    // Pour fonction getcpu()
 //#include <spawn.h>
 //#include <sys/wait.h>
-#include <fcntl.h>      // gestion systèmes de fichiers ( dup() )
-
-#define EXECTIME   2e8   // execution time in ns
-#define SPINTIME   1e7   // spin time in ns
-
 
 TaskProcess::TaskProcess(rtTaskInfosStruct _taskInfo, bool MoCo)
 {
@@ -192,14 +186,10 @@ void TaskProcess::setIO(char _stdIn[35], char _stdOut[35])
 {
     /*
           if (stdIn[0] != '\0')
-          {
               std::cin.rdbuf(inStrm.rdbuf()); //redirect std::cin to stdIn!
-          }
 
           if (stdOut[0] != '\0')
-          {
               std::cout.rdbuf(outStrm.rdbuf()); //redirect std::cout to stdOut!
-          }
     */
    if (_stdIn[0] != '\0')
    {
@@ -340,13 +330,7 @@ void MacroTask::executeRun()
   {
      if (MoCoIsAlive)
      {
-        if( rt_buffer_bind (&bf , "/monitoringTopic", 100000) < 0)
-        {
-          rt_buffer_delete(&bf);
-          cerr << "Failed to link to Monitoring Buffer" << endl;
-          MoCoIsAlive = 0;
-          //exit(-1);
-        }
+        ERROR_MNG(rt_buffer_bind (&bf , MESSAGE_TOPIC_NAME, 1*1e9));// 1s timeout
      }
   //cout << "Running..." << endl;
     while (1)
@@ -367,13 +351,9 @@ void MacroTask::executeRun()
 
 int MacroTask::before_besteff()
 {
-//  rt_mutex_acquire(&mutex, TM_INFINITE);
-   //rt_task_set_priority(NULL, priority+1);
   dataLogs->logStart();
-  unsigned int flag;
-  rt_event_wait(&event, sizeof(flag), &flag ,	EV_PRIO,TM_NONBLOCK) 	;
-  //cout << "Task BE " << prop.name << " not executed." << endl;
-  return 0;
+  ERROR_MNG(rt_event_inquire(&_event, &_eventInfos));
+  return _eventInfos.value;
 }
 
 int MacroTask::after_besteff()
@@ -391,13 +371,16 @@ int MacroTask::after_besteff()
 void MacroTask::executeRun_besteffort()
 {
   //cout << "Running..." << endl;
-
-    while (1)
-    {
-      before_besteff(); // Check if execution allowed
-      proceed();  // execute task
+   ERROR_MNG(rt_event_bind(&_event, CHANGE_MODE_EVENT_NAME, 10*1e9)); // 5 seconds timeout
+   unsigned int flag;
+   while (1)
+   {
+      if (before_besteff() == MODE_NOMINAL) // Check if execution allowed
+           proceed();  // execute task
+      else rt_event_wait(&_event, sizeof(flag), &flag , EV_PRIO, TM_INFINITE);
       after_besteff();  // Inform of execution time for the mcAgent
+
       rt_task_wait_period(&dataLogs->overruns);
 
-    }
+   }
 }
