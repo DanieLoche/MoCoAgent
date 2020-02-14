@@ -3,15 +3,11 @@
 // #define VERBOSE_OTHER 1 // Cout autre...
 // #define VERBOSE_ASK   1 // cout explicitement demandés dans le code
 
-#include "tools.h"
-
-#include "taskLauncher.h"
 #include <sys/sysinfo.h>
 #include <iomanip>
 
-#define EXECTIME   2e8   // execution time in ns
-#define SPINTIME   1e7   // spin time in ns
-
+#include "taskLauncher.h"
+#include "tools.h"
 
 long nproc;
 
@@ -22,9 +18,9 @@ long expeDuration = 0;
 string inputFile = "input_chaine.txt", outputFile = "ExpeOutput";
 int schedMode = SCHED_FIFO, cpuFactor = 100;
 
+/*
 std::streambuf *cinbuf;
 std::streambuf *coutbuf;
-
 bool HandleOnce = false;
 void endOfExpeHandler(void){
    if (!HandleOnce)
@@ -38,17 +34,13 @@ void endOfExpeHandler(void){
    sleep(2);
 
 }
-
+*/
 
 int main(int argc, char* argv[])
 {
     nproc = get_nprocs();
 
-    int i = atexit(endOfExpeHandler);
-    if (i != 0) {
-        fprintf(stderr, "cannot set exit function\n");
-        exit(EXIT_FAILURE);
-    }
+    //int i = ERROR_MNG(atexit(endOfExpeHandler));
 
     // Définition fichier d'information des tâches
     // [MoCoAgent Activation] [Experiment duration] [cpuFactor%] [input file : task chains] [outputfile] [sched policy]
@@ -75,16 +67,20 @@ int main(int argc, char* argv[])
     { std::stringstream ss(argv[2]); // EXPE DURATION (s)
         if(ss.str() != "-" && sscanf(argv[2], "%ld", &expeDuration) != 1)
             { printf("Error, %s is not an int", argv[2]); return EXIT_FAILURE; }
+
     if (argc > 3)
     { std::stringstream ss(argv[3]);  // CPU % Factor
         if(ss.str() != "-" && sscanf(argv[3], "%d", &cpuFactor) != 1)
             { printf("Error, %s is not an int", argv[3]); return EXIT_FAILURE; }
+
     if (argc > 4)
     { std::stringstream ss(argv[4]);    // INPUT FILE
         if (ss.str() != "-") inputFile = argv[4];
+
     if (argc > 5)
     { std::stringstream ss(argv[5]);     // OUTPUT FILE
         if (ss.str() != "-") outputFile = argv[5];
+
     if (argc > 6)
     { std::stringstream ss(argv[6]);    // SCHEDULING POLICY
         string _schedMode = ss.str();
@@ -140,7 +136,7 @@ int main(int argc, char* argv[])
    if(tln->runTasks(expeDuration)) {cerr << "Failed to create all tasks" << endl; return -4;}
    if (enableAgent)
    {
-      sleep(1);
+      sleep(2);
       tln->runAgent(expeDuration);
    }
 

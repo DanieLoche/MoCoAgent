@@ -14,24 +14,24 @@ struct timeLog
 
 class DataLogger
 {
-  protected :
-    RTIME deadline;
+   protected :
+      int cptOutOfDeadline;
+      RTIME deadline;
+      int cptExecutions;
+      std::array<timeLog, 4096> execLogs;
 
-  public :
-    DataLogger();
+      virtual char* getName() =0;
 
-    std::array<timeLog, 4096> execLogs;
-    int cptOutOfDeadline;
-    unsigned long overruns;
-    int cptExecutions;
+   public :
+      unsigned long overruns;
+      DataLogger();
 
-    void logStart(RTIME );
-    RTIME logStart();
-    void logExec(RTIME );
-    RTIME logExec();
-    virtual void saveData(string, int) = 0;
+      void logStart(RTIME );
+      RTIME logStart();
+      void logExec(RTIME );
+      RTIME logExec();
+      virtual void saveData(string file, int nameSize) = 0;
 
-    virtual char* getName() =0;
 };
 
 class TaskDataLogger : public DataLogger
@@ -59,10 +59,10 @@ class ChainDataLogger : public DataLogger
 
 };
 
-struct taskRTInfo
+/*struct taskRTInfo
 {
   rtTaskInfosStruct* rtTI;
   TaskDataLogger* taskLog;
-};
+};*/
 
 #endif

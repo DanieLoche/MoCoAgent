@@ -3,14 +3,15 @@
 //#include <spawn.h>
 //#include <sys/wait.h>
 
+bool TaskProcess::MoCoIsAlive = FALSE;
+
 TaskProcess::TaskProcess(rtTaskInfosStruct _taskInfo, bool MoCo)
 {
       MoCoIsAlive = MoCo;
       printTaskInfo(&_taskInfo);
 
-      printInquireInfo(_task);
-
       setRTtask(_taskInfo.rtP, _taskInfo.fP.name);
+      printInquireInfo(_task);
 
       parseParameters(_taskInfo.fP.args);
 }
@@ -40,7 +41,7 @@ void TaskProcess::setAffinity (int _aff, int mode)
 void TaskProcess::setRTtask(rtPStruct _rtInfos, char* _name)
 {
    int ret = 0;
-   ERROR_MNG( rt_task_shadow(_task, _name, _rtInfos.priority, T_WARNSW) );
+   rt_task_shadow(_task, _name, _rtInfos.priority, T_WARNSW);
 
    RT_TASK_INFO curtaskinfo;
    rt_task_inquire(_task, &curtaskinfo);
@@ -272,11 +273,11 @@ int MacroTask::before()
    //rt_task_set_priority(NULL, priority+1);
    msg.time = dataLogs->logStart();
    msg.isExecuted = 0;
-   if(MoCoIsAlive && (rt_buffer_write(&bf , &msg , sizeof(monitoringMsg) , 1e6) < 0))
+   if(MoCoIsAlive && (rt_buffer_write(&_buff , &msg , sizeof(monitoringMsg) , 1e6) < 0))
    {
       //MoCoIsAlive = 0;
       RT_BUFFER_INFO infos;
-      rt_buffer_inquire(&bf, &infos);
+      rt_buffer_inquire(&_buff, &infos);
       cerr << prop.fP.name << " : failed to write BEFORE monitoring message to buffer." << "(Moco : " << MoCoIsAlive << ")" << endl
           << infos.availmem << " / " << infos.totalmem << " available on buffer " << infos.name << " " << infos.owaiters << " waiting too." << endl;
    }
@@ -313,11 +314,11 @@ int MacroTask::after()
    #endif
    msg.time = dataLogs->logExec();
    msg.isExecuted = 1;
-   if(MoCoIsAlive && (rt_buffer_write(&bf , &msg , sizeof(monitoringMsg) , 1e6) < 0))
+   if(MoCoIsAlive && (rt_buffer_write(&_buff , &msg , sizeof(monitoringMsg) , 1e6) < 0))
    {
       //MoCoIsAlive = 0;
       RT_BUFFER_INFO infos;
-      rt_buffer_inquire(&bf, &infos);
+      rt_buffer_inquire(&_buff, &infos);
       cerr << prop.fP.name << " : failed to write AFTER monitoring message to buffer." << "(Moco : " << MoCoIsAlive << ")" << endl
          << infos.availmem << " / " << infos.totalmem << " available on buffer " << infos.name << " " << infos.owaiters << " waiting too." << endl;
    //rt_task_set_priority(NULL, priority);
@@ -327,23 +328,21 @@ int MacroTask::after()
 }
 
 void MacroTask::executeRun()
-  {
-     if (MoCoIsAlive)
-     {
-        ERROR_MNG(rt_buffer_bind (&bf , MESSAGE_TOPIC_NAME, 1*1e9));// 1s timeout
-     }
-  //cout << "Running..." << endl;
-    while (1)
-    {
+{
+   if (MoCoIsAlive)
+   {
+      ERROR_MNG(rt_buffer_bind (&_buff , MESSAGE_TOPIC_NAME, 1*1e9));// 1s timeout
+   }
+   //cout << "Running..." << endl;
+   while (1)
+   {
       //cout << "Task" << prop.name << " working." << endl;
       before(); // Check if execution allowed
       proceed();  // execute task
       after();  // Inform of execution time for the mcAgent
 
       rt_task_wait_period(&dataLogs->overruns);
-
     }
-
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////
@@ -383,4 +382,11 @@ void MacroTask::executeRun_besteffort()
       rt_task_wait_period(&dataLogs->overruns);
 
    }
+}
+
+void MacroTask::finishProcess(void* _task)
+{
+   MacroTask* task = (MacroTask*) _task;
+   task->dataLogs->saveData(task->prop.fP.name, 32);
+
 }

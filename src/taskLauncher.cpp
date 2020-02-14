@@ -1,15 +1,21 @@
 #include "taskLauncher.h"
 
+
+string TaskLauncher::outputFileName = "";
+int TaskLauncher::nameMaxSize = 32;
+std::vector<rtTaskInfosStruct> TaskLauncher::tasksSet = std::vector<rtTaskInfosStruct>();
+std::vector<RT_TASK*> TaskLauncher::tasks = std::vector<RT_TASK*>();
+RT_SEM TaskLauncher::_syncSem = {0};
+
 TaskLauncher::TaskLauncher(string _outputFileName, int _schedMode)
 {
    enableAgent = 0;
    schedPolicy = _schedMode;
 
-   bool trigA = new bool();
-   trigA = 0;
-   triggerSave = trigA;
-   triggerSave = &triggerSave;
+   //triggerSave = FALSE;
+   //triggerSave = &triggerSave;
    outputFileName = _outputFileName;
+   nameMaxSize = 0;
 }
 
 
@@ -122,6 +128,7 @@ int TaskLauncher::readTasksList(int cpuPercent)
             taskInfo->rtP.priority = prio;
          }
       }
+
    }
    return 0;
 }
@@ -149,7 +156,7 @@ int TaskLauncher::runTasks(long expeDuration)
    cout << endl << "CREATING TASKS : " << endl;
    #endif
    //for (auto taskInfo = taskSetInfos.rtTIs.begin(); taskInfo != taskSetInfos.rtTIs.end(); ++taskInfo)
-   rt_sem_create(&_syncSem, SEM_NAME, 0, S_PRIO);
+
    for (auto& taskInfo : tasksSet)
    {
       #if VERBOSE_INFO
@@ -159,33 +166,33 @@ int TaskLauncher::runTasks(long expeDuration)
       if (pid == 0) // proc fils
       {
          currentTaskDescriptor = taskInfo;
-         TaskDataLogger* dlog = new TaskDataLogger(&currentTaskDescriptor);
-         taskRTInfo* _taskRTInfo = new taskRTInfo;
-         _taskRTInfo->taskLog = dlog;
-         _taskRTInfo->rtTI = &currentTaskDescriptor;
 
-         MacroTask macroRT(taskInfo, enableAgent);
-         ERROR_MNG(rt_alarm_create(&_endAlarm, ALARM_NAME, /*HANDLER*/, NULL)); //ms to ns
-         ERROR_MNG(rt_sem_p(&_syncSem, TM_INFINITE));
-         rt_alarm_start(&_endAlarm, expeDuration*1e-6, TM_INFINITE);
+         currentProcess = new MacroTask(currentTaskDescriptor, enableAgent);
+         ERROR_MNG(rt_alarm_create(&_endAlarm, ALARM_NAME, MacroTask::finishProcess, (void*)&currentProcess)); //ms to ns
+
+         ERROR_MNG(rt_sem_bind(&_syncSem, SEM_NAME, TM_INFINITE)); // Wait Semaphor created.
+
+         rt_alarm_start(&_endAlarm, expeDuration*1e-9, TM_INFINITE);
+
+         ERROR_MNG(rt_sem_v(&_syncSem)); // Signal that this task is ready.
          rt_task_yield();
+         ERROR_MNG(rt_sem_p(&_syncSem, TM_INFINITE)); // Wait broadcast to run.
+
          if (currentTaskDescriptor.fP.isHRT == 0) {
-           macroRT.executeRun_besteffort();
-            }
-            else {
-               macroRT.executeRun();
-            }
-            exit(EXIT_SUCCESS);
+            currentProcess->executeRun_besteffort();
          }
-         else // pid = forked task pid_t
-         {
-            tasks.push_back(new RT_TASK);
-            rt_task_bind(tasks.back(), taskInfo.fP.name, TM_INFINITE); // A faire dans MoCoAgent ?
-
+         else {
+            currentProcess->executeRun();
          }
-
+         exit(EXIT_FAILURE); // should never occur.
       }
-      return 0;
+      else // pid = forked task pid_t
+      {
+         tasks.push_back(new RT_TASK);
+         ERROR_MNG(rt_task_bind(tasks.back(), taskInfo.fP.name, mS2T(500)));
+      }
+   }
+   return 0;
 }
 
 int TaskLauncher::runAgent(long expeDuration)
@@ -200,7 +207,6 @@ int TaskLauncher::runAgent(long expeDuration)
       MCA_PERIOD, // periodicity
       99,         // Priority
       SCHED_FIFO, // Scheduling POLICY
-
       99,         // id
       "MoCoAgent", // char[32] name
       "",         // function
@@ -208,16 +214,22 @@ int TaskLauncher::runAgent(long expeDuration)
       99,0,0,     // isHRT/task chain ID,precedency & WCET.
    };
 
-   bool monitor = TRUE;
-   if (enableAgent == 2) monitor = FALSE;
-   moCoAgent = new MCAgent(MoCoAgentParams, monitor, e2eDD, tasksSet);
+   currentProcess = new MCAgent(MoCoAgentParams, e2eDD, tasksSet);
+   ERROR_MNG(rt_alarm_create(&_endAlarm, ALARM_NAME, TaskLauncher::finishProcess, (void*)currentProcess)); //ms to ns
 
-   rt_sem_broadcast(&_syncSem); // Start alarms.
-   ERROR_MNG(rt_alarm_create(&_endAlarm, ALARM_NAME, /*HANDLER*/, outputFileName)); //ms to ns
-   rt_alarm_start(&_endAlarm, expeDuration*1e-6, TM_INFINITE);
-   rt_task_yield();
+   ERROR_MNG(rt_sem_create(&_syncSem, SEM_NAME, 0, S_PRIO)); // sync. #1: ready for alarms.
 
-   moCoAgent->executeRun();
+   rt_alarm_start(&_endAlarm, Sec2T(expeDuration), TM_INFINITE);
+
+   for (auto taskInfo = tasksSet.begin(); taskInfo != tasksSet.end(); ++taskInfo)
+   { // waiting every alarm is set.
+      rt_sem_p(&_syncSem, Sec2T(1)); // => wait for a semaphor release from every task.
+   }
+
+   rt_sem_broadcast(&_syncSem); // Alarms OK. Start Run !
+
+   if (enableAgent == 2) currentProcess->executeRun_besteffort();
+   else currentProcess->executeRun();
    return ret;
 }
 
@@ -225,7 +237,7 @@ void TaskLauncher::stopTasks(bool val)
 {
    if (val)
    {
-      if (enableAgent) rt_task_suspend(moCoAgent->_task);
+      if (enableAgent) rt_task_suspend(currentProcess->_task);
       for (auto& task : tasks)
       {
          rt_task_suspend(task);
@@ -233,7 +245,7 @@ void TaskLauncher::stopTasks(bool val)
    }
    else
    {
-      if (enableAgent) rt_task_resume(moCoAgent->_task);
+      if (enableAgent) rt_task_resume(currentProcess->_task);
       for (auto& task : tasks)
       {
          rt_task_resume(task);
@@ -241,7 +253,40 @@ void TaskLauncher::stopTasks(bool val)
    }
 }
 
+void TaskLauncher::finishProcess(void* _arg)
+{
+   MCAgent* task = (MCAgent*) _arg;
 
+   rt_sem_delete(&_syncSem);
+
+   cout << "Saving tasks data..." << endl;
+   //cout << "Checking tasks names :" << endl;
+   for (auto taskInfo = tasksSet.begin(); taskInfo != tasksSet.end(); ++taskInfo)
+   {
+      int sizeName = strlen(taskInfo->fP.name);
+      if (sizeName > nameMaxSize) nameMaxSize = sizeName;
+   }
+   std::ofstream myFile;
+   myFile.open (outputFileName + "_Expe.csv");    // TO APPEND :  //,ios_base::app);
+   myFile << std::setw(15) << "timestamp" << " ; "
+          << std::setw(nameMaxSize) << "name"     << " ; "
+          << std::setw(2)  << "ID"       << " ; "
+          << std::setw(3)  << "HRT"      << " ; "
+          << std::setw(4) << "Prio"      << " ; "
+          << std::setw(10) << "deadline" << " ; "
+          << std::setw(4)  << "aff."     << " ; "
+          << std::setw(10) << "duration" << "\n";
+   myFile.close();
+
+   task->saveData();
+
+   for (auto& _task : tasks)
+   {
+      rt_task_delete(_task);
+   }
+}
+
+/*
 void TaskLauncher::saveData(string file)
 {
    cout << "Stopping Tasks." << endl;
@@ -249,11 +294,9 @@ void TaskLauncher::saveData(string file)
    sleep (1);
    cout << "Saving tasks data..." << endl;
    //cout << "Checking tasks names :" << endl;
-   int nameMaxSize = 0;
-   for (auto& taskLog : tasksLogsList)
+   for (auto taskInfo = tasksSet.begin(); taskInfo != tasksSet.end(); ++taskInfo)
    {
-      int sizeName = strlen(taskLog->getName());
-      //cout << taskLog->getName() << " - size is : " << sizeName << endl;
+      int sizeName = strlen(taskInfo->fP.name);
       if (sizeName > nameMaxSize) nameMaxSize = sizeName;
    }
    //cout << "Max name size is : " << nameMaxSize << endl;
@@ -277,7 +320,7 @@ void TaskLauncher::saveData(string file)
    if (enableAgent)
    {
      triggerSave = 1;
-     rt_task_resume(moCoAgent->_task);
+     rt_task_resume(currentProcess->_task);
      sleep (2);
    }
 
@@ -287,6 +330,7 @@ void TaskLauncher::saveData(string file)
    }
 
 }
+*/
 
 void TaskLauncher::printTasksInfos ( ) // std::vector<rtTaskInfosStruct> _myTasksInfos)
 {

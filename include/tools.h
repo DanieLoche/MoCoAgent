@@ -1,6 +1,9 @@
 #ifndef TOOLS_H
 #define TOOLS_H
 
+#define   TRUE    1
+#define   FALSE   0
+
 //define    SCHED_FIFO      1 // First-In First-Out
 //define    SCHED_RR        2 // Round-Robin
 //define    SCHED_WEAK      0 // Weak
@@ -12,6 +15,9 @@
 #define     SCHED_RM        7 // Rate-Monotonic
 
 #define   RR_SLICE_TIME     20e9  // clock ticks (=ns)
+#define   SPINTIME          1e7   // spin time in ns
+#define   EXECTIME          2e8   // execution time in ns
+
 
 #define   VERBOSE_INFO      1 // Cout d'informations, démarrage, etc...
 #define   VERBOSE_DEBUG     1 // Cout de débug...
@@ -42,6 +48,11 @@ using std::endl;
 using std::cin;
 using std::cerr;
 
+#define Sec2T(_time)  rt_timer_ns2ticks((_time)*1e9)
+#define mS2T(_time)   rt_timer_ns2ticks((_time)*1e6)
+#define uS2T(_time)   rt_timer_ns2ticks((_time)*1e3)
+#define nS2T(_time)   rt_timer_ns2ticks(_time)
+
 #define ERROR_MNG(fct)                                                 \
 do {                                                                   \
    int err = fct;                                                      \
@@ -51,7 +62,8 @@ do {                                                                   \
       exit(EXIT_FAILURE);                                              \
    }                                                                   \
 } while(0)
-#define TO_STRING(str) convertToString(str)
+
+//#define TO_STRING(str) convertToString(str)
 
 struct rtPStruct // Real-time Parameters
 {
@@ -153,7 +165,7 @@ std::string reduce(const std::string& str,
                    const std::string& fill = " ",
                    const std::string& whitespace = " \t");
 
-string convertToString(const char* a){ string s = a; return s; }
+//string convertToString(const char* a){ std::string s = a; return s; }
 
 void printInquireInfo(RT_TASK*);
 void printTaskInfo(rtTaskInfosStruct* task);
