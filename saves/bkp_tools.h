@@ -42,7 +42,7 @@ using std::endl;
 using std::cin;
 using std::cerr;
 
-#define ERROR_MNG(fct)                                                 \
+#define TRY(fct)                                                 \
 do {                                                                   \
    int err = fct;                                                      \
    if ( err != 0)                                                      \

@@ -47,7 +47,7 @@ class MacroTask
 
   public :
     MacroTask(taskRTInfo*, bool);
-    ~MacroTask();
+    //~MacroTask();
     void configure(rtTaskInfosStruct taskInfo, int schedPolicy);
     void executeRun();
     void executeRun_besteffort();

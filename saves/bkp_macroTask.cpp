@@ -59,7 +59,7 @@ void MacroTask::configure(rtTaskInfosStruct taskInfo, int schedPolicy)
 {
    int ret = 0;
    //taskInfo.task = new RT_TASK;
-   ERROR_MNG( rt_task_shadow(taskInfo.task, taskInfo.name, taskInfo.priority, T_WARNSW) );
+   TRY( rt_task_shadow(taskInfo.task, taskInfo.name, taskInfo.priority, T_WARNSW) );
    /*{
       cerr << "[" << taskInfo.name << "] " << "Failed to create Xenomai task." << endl;
       exit(-1);
@@ -120,7 +120,7 @@ void MacroTask::configure(rtTaskInfosStruct taskInfo, int schedPolicy)
       }
    */
 
-      ERROR_MNG( rt_task_suspend(NULL) );
+      TRY( rt_task_suspend(NULL) );
 
 
    }
