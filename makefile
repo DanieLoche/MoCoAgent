@@ -18,7 +18,7 @@ LIB_DIR = include/libs
 # INCLUDES =  # to include other makefiles
 LIBS =
 #-lboost_system -lboost_chrono -lpthread -lboost_thread
-CXXFLAGS = $(XENO_CFLAGS) -Wall -std=c++11
+CXXFLAGS = $(XENO_CFLAGS) -Wall -g -O3 -std=c++11
  #-I $(HDR_DIR) -L$(LIB_DIR)
 LDFLAGS = $(XENO_LDFLAGS) $(LIBS) -I$(HDR_DIR)
 #-L$(LIB_DIR)
