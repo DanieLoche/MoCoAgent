@@ -134,7 +134,9 @@ void TaskProcess::parseParameters(string _arguments)
             if (nextStr == 1)
             {
                #if VERBOSE_OTHER
-               cout << "[ " << _name << " ] : " << "stdIn = " << _stdIn << "." << endl;
+               RT_TASK_INFO infos;
+               rt_task_inquire(_task, &infos);
+               cout << "[ " << infos.name << " ] : " << "stdIn = " << _stdIn << "." << endl;
                #endif
                token.copy(stdIn, token.size());
                _stdIn[token.size()] = '\0';
@@ -143,7 +145,9 @@ void TaskProcess::parseParameters(string _arguments)
             else if (nextStr == 2)
             {
                #if VERBOSE_OTHER
-               cout << "[ " << _name << " ] : " << "stdOut = " << _stdOut << "." << endl;
+               RT_TASK_INFO infos;
+               rt_task_inquire(_task, &infos);
+               cout << "[ " << infos.name << " ] : " << "stdOut = " << _stdOut << "." << endl;
                #endif
                token.copy(_stdOut, token.size());
                _stdOut[token.size()] = '\0';
@@ -268,7 +272,7 @@ int MacroTask::before()
 {
    //   rt_mutex_acquire(&mutex, TM_INFINITE);
    #if VERBOSE_OTHER
-   cout << "[ " << prop.name << " ] : " << "Executing Before." << endl;
+   cout << "[ " << prop.fP.name << " ] : " << "Executing Before." << endl;
    #endif
    //rt_task_set_priority(NULL, priority+1);
    msg.time = dataLogs->logStart();
@@ -287,7 +291,7 @@ int MacroTask::before()
 void MacroTask::proceed()
 {
       #if VERBOSE_OTHER
-      cout << "[ " << prop.name << " ] : "<< "Executing Proceed." << endl;
+      cout << "[ " << prop.fP.name << " ] : "<< "Executing Proceed." << endl;
       #endif
 
       int ret = proceed_function(_argv.size()-1, &_argv[0]);  // -1 : no need for last element "NULL".
@@ -310,7 +314,7 @@ void MacroTask::proceed()
 int MacroTask::after()
 {
    #if VERBOSE_OTHER
-   cout << "[ " << prop.name << " ] : "<< "Executing After." << endl;
+   cout << "[ " << prop.fP.name << " ] : "<< "Executing After." << endl;
    #endif
    msg.time = dataLogs->logExec();
    msg.isExecuted = 1;
@@ -359,7 +363,7 @@ int MacroTask::after_besteff()
 {
     dataLogs->logExec();
     #if VERBOSE_OTHER
-    cout << "End Task : " << prop.name << endl;
+    cout << "End Task : " << prop.fP.name << endl;
     #endif
 //   rt_mutex_release(&mutex);
    // rt_task_set_priority(NULL, priority);

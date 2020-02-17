@@ -22,7 +22,7 @@ TaskDataLogger::TaskDataLogger(rtTaskInfosStruct* _taskInfos)
   cptOutOfDeadline = 0;
   cptExecutions = 0;
   execLogs = {0};
-//cout << "Init of task logger for task " << name << " is okay." << endl;
+//cout << "Init of task logger for task " << getName() << " is okay." << endl;
 
 }
 
@@ -46,12 +46,12 @@ void DataLogger::logExec(RTIME endTime)
       if(execLogs[cptExecutions].duration > deadline )
       {
         #if VERBOSE_ASK
-        fprintf(stderr, "[  \033[1;31mERROR\033[0m  ] Task : \033[1;31m%s\033[0m - \033[1;36m%.2f ms\033[0m\n",name,execLogs[cptExecutions].duration/1e6);
+        fprintf(stderr, "[  \033[1;31mERROR\033[0m  ] Task : \033[1;31m%s\033[0m - \033[1;36m%.2f ms\033[0m\n",getName(),execLogs[cptExecutions].duration/1e6);
         #endif
         cptOutOfDeadline++;
       }else{
         #if VERBOSE_ASK
-          fprintf(stderr, "[ \033[1;32mPERFECT\033[0m ] Task : \033[1;32m%s\033[0m - \033[1;36m%.2f ms\033[0m\n",name,execLogs[cptExecutions].duration/1e6);
+          fprintf(stderr, "[ \033[1;32mPERFECT\033[0m ] Task : \033[1;32m%s\033[0m - \033[1;36m%.2f ms\033[0m\n",getName(),execLogs[cptExecutions].duration/1e6);
         #endif
       }
       cptExecutions++;
@@ -76,12 +76,12 @@ RTIME DataLogger::logExec( )
       if(execLogs[cptExecutions].duration > deadline )
       {
        #if VERBOSE_ASK
-       fprintf(stderr, "[  \033[1;31mERROR\033[0m  ] Task : \033[1;31m%s\033[0m - \033[1;36m%.2f ms\033[0m\n",name,execLogs[cptExecutions].duration/1e6);
+       fprintf(stderr, "[  \033[1;31mERROR\033[0m  ] Task : \033[1;31m%s\033[0m - \033[1;36m%.2f ms\033[0m\n",getName(),execLogs[cptExecutions].duration/1e6);
        #endif
        cptOutOfDeadline++;
       }else{
        #if VERBOSE_ASK
-       fprintf(stderr, "[ \033[1;32mPERFECT\033[0m ] Task : \033[1;32m%s\033[0m - \033[1;36m%.2f ms\033[0m\n",name,execLogs[cptExecutions].duration/1e6);
+       fprintf(stderr, "[ \033[1;32mPERFECT\033[0m ] Task : \033[1;32m%s\033[0m - \033[1;36m%.2f ms\033[0m\n",getName(),execLogs[cptExecutions].duration/1e6);
        #endif
       }
       cptExecutions++;

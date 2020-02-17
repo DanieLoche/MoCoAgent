@@ -55,11 +55,11 @@ class taskChain
       bool checkPrecedency(int taskID);
       bool checkTaskE2E();
       bool checkIfEnded();
+      void displayTasks();
       void resetChain();
    private:
       RTIME getExecutionTime();
       RTIME getRemWCET();
-      void displayTasks();
 };
 
 class TaskProcess

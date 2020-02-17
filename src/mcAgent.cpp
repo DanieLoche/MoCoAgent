@@ -394,10 +394,10 @@ void MCAgent::displayChains()
   cout << "Displaying MoCoAgent Database : " << "\n";
   for (auto& chain : allTaskChain)
   { // Print chain params
-      cout << "|- Chain #" << chain.chainID << " - " << chain.name
-           << "  |- Deadline: " << chain.end2endDeadline /1.0e6 << " ms."
+      cout << "|- Chain #" << chain->chainID << " - " << chain->name
+           << "  |- Deadline: " << chain->end2endDeadline /1.0e6 << " ms."
            << endl;
-      chain.displayTasks();
+      chain->displayTasks();
   }
   #endif
 }

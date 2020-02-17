@@ -93,7 +93,7 @@ int TaskLauncher::readTasksList(int cpuPercent)
                { cerr << "Failed to read line : " << str << endl; return -1; } // error
             //taskInfo->isHardRealTime = taskSetInfos.e2eDD[i].taskChainID;
             // Traitement du nom de la tâche
-            strncat(ext, name, 64);
+            strncat(ext, name, 32);
             strcpy(taskInfo->fP.name,ext);
 
             getline(iss , taskInfo->fP.args);

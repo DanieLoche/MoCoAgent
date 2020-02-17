@@ -12,7 +12,7 @@
 long nproc;
 
 TaskLauncher* tln;
-MCAgent* mca;
+//MCAgent* mca;
 int enableAgent = 1; // 0 = Disable | 1 = Enable | 2 = Enable for monitoring only
 long expeDuration = 0;
 string inputFile = "input_chaine.txt", outputFile = "ExpeOutput";
@@ -197,12 +197,14 @@ void printTaskInfo(rtTaskInfosStruct* task)
 {
 #if VERBOSE_OTHER
   std::stringstream ss;
-  ss << "Name: "       << task->name
-     << "| path: "     << task->path_task
-     << "| is RT ? "   << task->isHardRealTime
-     << "| Deadline: " << task->wcet
-     << "| affinity: " << task->affinity
-     << "| ID :"       << task->id
+  ss << "Name: "       << task->fP.name
+     << "| func: "     << task->fP.func
+     << "| is RT ? "   << task->fP.isHRT
+     << "| Deadline: " << task->rtP.periodicity
+     << "| affinity: " << task->rtP.affinity
+     << "| priority: " << task->rtP.priority
+     << "| schedPolicy: " << task->rtP.schedPolicy
+     << "| ID :"       << task->fP.id
      << endl;
   cout << ss.rdbuf();
 #endif
