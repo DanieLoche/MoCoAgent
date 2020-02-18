@@ -526,11 +526,10 @@ taskMonitoringStruct::taskMonitoringStruct(rtTaskInfosStruct* _taskInfos)
 
    setState(FALSE);
    //endTime = 0;
-
-   rt_mutex_create(&mtx_taskStatus,
-                  strncat(_taskInfos->fP.name,
-                           "taskStatusMTX",
-                           sizeof(_taskInfos->fP.name)+sizeof("taskStatusMTX")));
+   char mutexName[38];
+   strcpy(mutexName, _taskInfos->fP.name);
+   strncat(mutexName, "_StMTX", 6);
+   rt_mutex_create(&mtx_taskStatus, mutexName);
 
 }
 
