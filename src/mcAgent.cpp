@@ -3,18 +3,18 @@
 
 void messageReceiver(void* arg)
 {
-  MCAgent* mocoAgent = (MCAgent*) arg;
-  monitoringMsg msg;
-  while(TRUE)
-  {
-  //  cout<<"buffer read"<<endl;
-    rt_buffer_read(&mocoAgent->_buff, &msg, sizeof(monitoringMsg), TM_INFINITE);
-  //  cout<<"done buffer read"<<endl;
-    mocoAgent->updateTaskInfo(msg);
-  // rt_task_wait_period(&mocoAgent->overruns);
-  // rt_task_yield();
+   MCAgent* mocoAgent = (MCAgent*) arg;
+   monitoringMsg msg;
+   while(TRUE)
+   {
+      //  cout<<"buffer read"<<endl;
+      rt_buffer_read(&mocoAgent->_buff, &msg, sizeof(monitoringMsg), TM_INFINITE);
+      //  cout<<"done buffer read"<<endl;
+      mocoAgent->updateTaskInfo(msg);
+      // rt_task_wait_period(&mocoAgent->overruns);
+      // rt_task_yield();
 
-  }
+   }
 }
 
 MCAgent::MCAgent(rtTaskInfosStruct _taskInfo,
@@ -75,32 +75,32 @@ void MCAgent::setAllDeadlines(std::vector<end2endDeadlineStruct> _tcDeadlineStru
 ***********************/
 void MCAgent::setAllTasks(std::vector<rtTaskInfosStruct> _TasksInfos)
 {
-  #if VERBOSE_INFO
-  cout << "[MoCoAgent] : setting tasks." << endl;
-  #endif
-  for (auto& _taskInfo : _TasksInfos)
-  {
-    cout << " Adding task " << _taskInfo.fP.name << " (" << _taskInfo.fP.isHRT << ")." << endl;
-    RT_TASK* _t;
-    ERROR_MNG(rt_task_bind(_t, _taskInfo.fP.name, TM_INFINITE));
-    printInquireInfo(_t);
-    if ( !_taskInfo.fP.isHRT )
-    {
-      cout << "Adding to BE list." << endl;
-      bestEffortTasks.push_back(_t);
-      break;
-    }
-    else for (auto& _taskChain : allTaskChain)
-    {
-      if ( _taskInfo.fP.isHRT == _taskChain->chainID )
+   #if VERBOSE_INFO
+   cout << "[MoCoAgent] : setting tasks." << endl;
+   #endif
+   for (auto& _taskInfo : _TasksInfos)
+   {
+      cout << " Adding task " << _taskInfo.fP.name << " (" << _taskInfo.fP.isHRT << ")." << endl;
+      RT_TASK* _t;
+      ERROR_MNG(rt_task_bind(_t, _taskInfo.fP.name, TM_INFINITE));
+      printInquireInfo(_t);
+      if ( !_taskInfo.fP.isHRT )
       {
-         cout << "Adding to HRT chain " << _taskChain->chainID << "." << endl;
-        taskMonitoringStruct* tms = new taskMonitoringStruct(&_taskInfo);
-        _taskChain->taskList.push_back(*tms);
-        break;
+         cout << "Adding to BE list." << endl;
+         bestEffortTasks.push_back(_t);
+         break;
       }
-    }
-  }
+      else for (auto& _taskChain : allTaskChain)
+      {
+         if ( _taskInfo.fP.isHRT == _taskChain->chainID )
+         {
+            cout << "Adding to HRT chain " << _taskChain->chainID << "." << endl;
+            taskMonitoringStruct* tms = new taskMonitoringStruct(&_taskInfo);
+            _taskChain->taskList.push_back(*tms);
+            break;
+         }
+      }
+   }
 }
 
 /***********************
@@ -112,18 +112,18 @@ void MCAgent::setAllTasks(std::vector<rtTaskInfosStruct> _TasksInfos)
 /* USELESS ?
 int MCAgent::checkTaskChains()
 {
-  int tasksID = 0;
-  for (auto _taskChain = allTaskChain.begin(); _taskChain != allTaskChain.end(); ++_taskChain)
-  {
-    if ( _taskChain->checkTaskE2E() )
-    {
-      setMode(MODE_OVERLOADED);
-      _taskChain->isAtRisk = TRUE;
-      _taskChain->cptAnticipatedMisses++;
-      tasksID = _taskChain->id;
-    }
-  }
-  return tasksID;
+   int tasksID = 0;
+   for (auto _taskChain = allTaskChain.begin(); _taskChain != allTaskChain.end(); ++_taskChain)
+   {
+      if ( _taskChain->checkTaskE2E() )
+      {
+         setMode(MODE_OVERLOADED);
+         _taskChain->isAtRisk = TRUE;
+         _taskChain->cptAnticipatedMisses++;
+         tasksID = _taskChain->id;
+      }
+   }
+   return tasksID;
 }
 */
 
@@ -136,43 +136,43 @@ int MCAgent::checkTaskChains()
 ***********************/
 void MCAgent::setMode(int mode)
 {
-    //cout << "[MONITORING & CONTROL AGENT] Change mode to " << ((mode>0)?"OVERLOADED":"NOMINAL") << ". " << endl;
-    if (!mode)  runtimeMode = mode;
-    else if (bestEffortTasks.size() != 0)
-    {
-        if (mode >= MODE_OVERLOADED && runtimeMode <= MODE_NOMINAL)
-        { // Pause Best Effort Tasks sur front montant changement de mode.
-            rt_event_signal(&_event, MODE_OVERLOADED);
-            for (auto& bestEffortTask : bestEffortTasks)
-            {   // Publier message pour dire à stopper
-                if (rt_task_suspend(bestEffortTask))
-                {
-                    #if VERBOSE_DEBUG
-                    cerr << "Failed to stop task "; // ==1?"OVERLOADED":"NOMINAL"
-                    #endif
-                    //printInquireInfo(bestEffortTask);
-                }
+   //cout << "[MONITORING & CONTROL AGENT] Change mode to " << ((mode>0)?"OVERLOADED":"NOMINAL") << ". " << endl;
+   if (!mode)  runtimeMode = mode;
+   else if (bestEffortTasks.size() != 0)
+   {
+      if (mode >= MODE_OVERLOADED && runtimeMode <= MODE_NOMINAL)
+      { // Pause Best Effort Tasks sur front montant changement de mode.
+         rt_event_signal(&_event, MODE_OVERLOADED);
+         for (auto& bestEffortTask : bestEffortTasks)
+         {   // Publier message pour dire à stopper
+            if (rt_task_suspend(bestEffortTask))
+            {
+               #if VERBOSE_DEBUG
+               cerr << "Failed to stop task "; // ==1?"OVERLOADED":"NOMINAL"
+               #endif
+               //printInquireInfo(bestEffortTask);
             }
-            #if VERBOSE_DEBUG
-            cerr << "Stopped BE tasks." << endl; // ==1?"OVERLOADED":"NOMINAL"
-            #endif
-        }
-        else if (mode <= MODE_NOMINAL && runtimeMode >= MODE_OVERLOADED)
-        { // runtimeMode NOMINAL
-            rt_event_signal(&_event, MODE_NOMINAL);
-            for (auto& bestEffortTask : bestEffortTasks)
-            {  // relancer Best Effort Tasks;
-                rt_task_resume(bestEffortTask);
-            }
-           #if VERBOSE_DEBUG // ==1?"OVERLOADED":"NOMINAL"
-           cerr << "Re-started BE tasks." << endl;
-           #endif
-        }
-        runtimeMode = mode;
-        #if VERBOSE_ASK // ==1?"OVERLOADED":"NOMINAL"
-        cerr << "MoCoAgent Triggered to mode " << ((mode>0)?"OVERLOADED":"NOMINAL") << "!" << endl;
-        #endif
-    }
+         }
+         #if VERBOSE_DEBUG
+         cerr << "Stopped BE tasks." << endl; // ==1?"OVERLOADED":"NOMINAL"
+         #endif
+      }
+      else if (mode <= MODE_NOMINAL && runtimeMode >= MODE_OVERLOADED)
+      { // runtimeMode NOMINAL
+         rt_event_signal(&_event, MODE_NOMINAL);
+         for (auto& bestEffortTask : bestEffortTasks)
+         {  // relancer Best Effort Tasks;
+            rt_task_resume(bestEffortTask);
+         }
+         #if VERBOSE_DEBUG // ==1?"OVERLOADED":"NOMINAL"
+         cerr << "Re-started BE tasks." << endl;
+         #endif
+      }
+      runtimeMode = mode;
+      #if VERBOSE_ASK // ==1?"OVERLOADED":"NOMINAL"
+      cerr << "MoCoAgent Triggered to mode " << ((mode>0)?"OVERLOADED":"NOMINAL") << "!" << endl;
+      #endif
+   }
 }
 
 const timespec noWait_time = {0,0};
@@ -185,73 +185,24 @@ void MCAgent::executeRun()
       switch(ret_msg)
       {
          case -EWOULDBLOCK : // no message received
-            for (auto& _taskChain : allTaskChain)
+         for (auto& _taskChain : allTaskChain)
+         {
+            if ( _taskChain->checkTaskE2E() && !_taskChain->isAtRisk)
             {
-               if ( _taskChain->checkTaskE2E() && !_taskChain->isAtRisk)
-               {
-                  _taskChain->isAtRisk = TRUE;
-                  _taskChain->logger->cptAnticipatedMisses++;
-                  setMode(MODE_OVERLOADED);
-               }
+               _taskChain->isAtRisk = TRUE;
+               _taskChain->logger->cptAnticipatedMisses++;
+               setMode(MODE_OVERLOADED);
             }
+         }
          break;
          case -ETIMEDOUT :
          case -EINTR :
          case -EINVAL :
          case -EIDRM :
          case -EPERM :
-            cerr << "[MOCOAGENT] Error on receiving message, code [" << ret_msg << "]" << endl;
+         cerr << "[MOCOAGENT] Error on receiving message, code [" << ret_msg << "]" << endl;
          break;
          default :
-            for (auto& _taskChain : allTaskChain)
-            {
-               for (auto& _task : _taskChain->taskList)
-               {
-                  //cout << "Logged chain end at : " << _taskChain->currentEndTime/1.0e6 << endl;
-                  //cout << "Logged chain start at : " << msg.time/1.0e6 << endl;
-                  if( _task.id == msg.ID )
-                  {
-                     if (_task.precedencyID == 0 && _taskChain->startTime == 0)
-                     { // First task of the chain
-                        _taskChain->startTime = msg.time;
-                        _taskChain->logger->logStart(msg.time);
-                        _task.setState(TRUE);
-                     }
-                     else if (msg.isExecuted && _taskChain->checkPrecedency(_task.precedencyID))
-                     { // Next task of the chain
-                        _taskChain->currentEndTime = msg.time;
-                        _task.setState(TRUE);
-                        if (_taskChain->checkIfEnded())
-                        {
-                           _taskChain->logger->logExec(_taskChain->currentEndTime);
-                           if (_taskChain->isAtRisk) setMode(MODE_NOMINAL);
-                           _taskChain->resetChain();
-                        }
-                     }
-                     break;
-                  }
-               }
-               // Execute part //
-               if ( _taskChain->checkTaskE2E() && !_taskChain->isAtRisk)
-               {
-                  _taskChain->isAtRisk = TRUE;
-                  _taskChain->logger->cptAnticipatedMisses++;
-                  setMode(MODE_OVERLOADED);
-               }
-            }
-
-      }
-
-      rt_task_wait_period(&overruns);
-   }
-}
-
-void MCAgent::executeRun_besteffort()
-{
-   while(TRUE)
-   {
-         // Update Msg part //
-         rt_buffer_read(&_buff, &msg, sizeof(monitoringMsg), TM_INFINITE);
          for (auto& _taskChain : allTaskChain)
          {
             for (auto& _task : _taskChain->taskList)
@@ -273,6 +224,7 @@ void MCAgent::executeRun_besteffort()
                      if (_taskChain->checkIfEnded())
                      {
                         _taskChain->logger->logExec(_taskChain->currentEndTime);
+                        if (_taskChain->isAtRisk) setMode(MODE_NOMINAL);
                         _taskChain->resetChain();
                      }
                   }
@@ -284,8 +236,56 @@ void MCAgent::executeRun_besteffort()
             {
                _taskChain->isAtRisk = TRUE;
                _taskChain->logger->cptAnticipatedMisses++;
+               setMode(MODE_OVERLOADED);
             }
          }
+
+      }
+
+      rt_task_wait_period(&overruns);
+   }
+}
+
+void MCAgent::executeRun_besteffort()
+{
+   while(TRUE)
+   {
+      // Update Msg part //
+      rt_buffer_read(&_buff, &msg, sizeof(monitoringMsg), TM_INFINITE);
+      for (auto& _taskChain : allTaskChain)
+      {
+         for (auto& _task : _taskChain->taskList)
+         {
+            //cout << "Logged chain end at : " << _taskChain->currentEndTime/1.0e6 << endl;
+            //cout << "Logged chain start at : " << msg.time/1.0e6 << endl;
+            if( _task.id == msg.ID )
+            {
+               if (_task.precedencyID == 0 && _taskChain->startTime == 0)
+               { // First task of the chain
+                  _taskChain->startTime = msg.time;
+                  _taskChain->logger->logStart(msg.time);
+                  _task.setState(TRUE);
+               }
+               else if (msg.isExecuted && _taskChain->checkPrecedency(_task.precedencyID))
+               { // Next task of the chain
+                  _taskChain->currentEndTime = msg.time;
+                  _task.setState(TRUE);
+                  if (_taskChain->checkIfEnded())
+                  {
+                     _taskChain->logger->logExec(_taskChain->currentEndTime);
+                     _taskChain->resetChain();
+                  }
+               }
+               break;
+            }
+         }
+         // Execute part //
+         if ( _taskChain->checkTaskE2E() && !_taskChain->isAtRisk)
+         {
+            _taskChain->isAtRisk = TRUE;
+            _taskChain->logger->cptAnticipatedMisses++;
+         }
+      }
       rt_task_wait_period(&overruns);
    }
 }
@@ -306,14 +306,14 @@ void MCAgent::updateTaskInfo(monitoringMsg msg)
          //cout << "Logged chain start at : " << msg.time/1.0e6 << endl;
          if( _task.id == msg.ID )
          {
-             if (_task.precedencyID == 0 && _taskChain->startTime == 0)
-             { // First task of the chain
-                _taskChain->startTime = msg.time;
-                _taskChain->logger->logStart(msg.time);
-                _task.setState(TRUE);
-             }
-             else if (msg.isExecuted && _taskChain->checkPrecedency(_task.precedencyID))
-             { // Next task of the chain
+            if (_task.precedencyID == 0 && _taskChain->startTime == 0)
+            { // First task of the chain
+               _taskChain->startTime = msg.time;
+               _taskChain->logger->logStart(msg.time);
+               _task.setState(TRUE);
+            }
+            else if (msg.isExecuted && _taskChain->checkPrecedency(_task.precedencyID))
+            { // Next task of the chain
                _taskChain->currentEndTime = std::max(_taskChain->currentEndTime, msg.time);
                _task.setState(TRUE);
                if (_taskChain->checkIfEnded())
@@ -322,8 +322,8 @@ void MCAgent::updateTaskInfo(monitoringMsg msg)
                   if (_taskChain->isAtRisk) setMode(MODE_NOMINAL);
                   _taskChain->resetChain();
                }
-             }
-             return;
+            }
+            return;
          }
       }
    }
@@ -364,18 +364,18 @@ void MCAgent::saveData()
 void MCAgent::displaySystemInfo(std::vector<end2endDeadlineStruct> _e2eDD,
                                  std::vector<rtTaskInfosStruct> _tasksSet)
 {
-  #if VERBOSE_INFO
-  cout << "INPUT Informations : " << endl;
-  for (auto &taskdd : _e2eDD)
-  { // Print chain params
+   #if VERBOSE_INFO
+   cout << "INPUT Informations : " << endl;
+   for (auto &taskdd : _e2eDD)
+   { // Print chain params
       cout << "|- Chain: "      << taskdd.name       << "\n"
            << " ‾|- ID      : " << taskdd.taskChainID       << "\n"
            << "  |- Deadline: " << taskdd.deadline /1.0e6   << "\n"
            << "  |- Path    : " << taskdd.Path             // << "\n"
            << endl;
-  }
-  for (auto &taskParam : _tasksSet)
-  { // Print task Params
+   }
+   for (auto &taskParam : _tasksSet)
+   { // Print task Params
       cout << "  |- Task    : "  << taskParam.fP.name            << "\n"
            << "   ‾|- ID      : " << taskParam.fP.id               << "\n"
            << "     |- Period  : " << taskParam.rtP.periodicity /1.0e6  << "\n"
@@ -384,22 +384,22 @@ void MCAgent::displaySystemInfo(std::vector<end2endDeadlineStruct> _e2eDD,
            << "     |- RealTime: " << taskParam.fP.isHRT   << "\n"
            << "     |- path    : " << taskParam.fP.func      //  << "\n"
            << endl;
-  }
-  #endif
+   }
+   #endif
 }
 
 void MCAgent::displayChains()
 {
-  #if VERBOSE_ASK
-  cout << "Displaying MoCoAgent Database : " << "\n";
-  for (auto& chain : allTaskChain)
-  { // Print chain params
+   #if VERBOSE_ASK
+   cout << "Displaying MoCoAgent Database : " << "\n";
+   for (auto& chain : allTaskChain)
+   { // Print chain params
       cout << "|- Chain #" << chain->chainID << " - " << chain->name
            << "  |- Deadline: " << chain->end2endDeadline /1.0e6 << " ms."
            << endl;
       chain->displayTasks();
-  }
-  #endif
+   }
+   #endif
 }
 
 //////////////////////////////////////////
@@ -448,7 +448,7 @@ bool taskChain::checkIfEnded()
    bool ended = TRUE;
    for (auto& task : taskList)
    { // only one FALSE is enough
-    ended = ended & task.getState();
+      ended = ended & task.getState();
    }
    return ended;
 }
@@ -467,7 +467,7 @@ void taskChain::resetChain()
 
 RTIME taskChain::getExecutionTime()
 {
-    return (rt_timer_read() - startTime);
+   return (rt_timer_read() - startTime);
 }
 
 /***********************
@@ -478,15 +478,15 @@ RTIME taskChain::getExecutionTime()
 ***********************/
 RTIME taskChain::getRemWCET()
 {
-  RTIME RemWCET = 0;
-  for (auto& task : taskList)
-  {
-    bool state = task.getState();
-    //cout << state << "-";
-    if (!state)
+   RTIME RemWCET = 0;
+   for (auto& task : taskList)
+   {
+      bool state = task.getState();
+      //cout << state << "-";
+      if (!state)
       RemWCET += task.rwcet;
-  }
-  return RemWCET;
+   }
+   return RemWCET;
 }
 
 void taskChain::displayTasks()
@@ -536,15 +536,15 @@ taskMonitoringStruct::taskMonitoringStruct(rtTaskInfosStruct* _taskInfos)
 
 void taskMonitoringStruct::setState(bool state)
 {
-  rt_mutex_acquire(&mtx_taskStatus, TM_INFINITE);
-  isExecuted = state;
-  rt_mutex_release(&mtx_taskStatus);
+   rt_mutex_acquire(&mtx_taskStatus, TM_INFINITE);
+   isExecuted = state;
+   rt_mutex_release(&mtx_taskStatus);
 }
 
 bool taskMonitoringStruct::getState()
 {
-  rt_mutex_acquire(&mtx_taskStatus, TM_INFINITE);
-  bool state = isExecuted;
-  rt_mutex_release(&mtx_taskStatus);
-  return state;
+   rt_mutex_acquire(&mtx_taskStatus, TM_INFINITE);
+   bool state = isExecuted;
+   rt_mutex_release(&mtx_taskStatus);
+   return state;
 }

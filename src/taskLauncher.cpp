@@ -41,9 +41,9 @@ int TaskLauncher::readChainsList(string input_file)
       if (str.substr(0,2) != "//")
       {
          if (!(iss >> chaineInfo.name
-                   >> chaineInfo.taskChainID
-                   >> chaineInfo.Path
-                   >> chaineInfo.deadline ))
+                  >> chaineInfo.taskChainID
+                  >> chaineInfo.Path
+                  >> chaineInfo.deadline ))
             { cerr << "Failed to read line : " << str << endl; return -1; } // error
          chaineInfo.deadline *= 1.0e6;
          e2eDD.push_back(chaineInfo);
@@ -90,7 +90,7 @@ int TaskLauncher::readTasksList(int cpuPercent)
                       >> taskInfo->rtP.affinity
                       >> taskInfo->fP.prec
                       >> taskInfo->fP.func ) )
-               { cerr << "Failed to read line : " << str << endl; return -1; } // error
+            { cerr << "Failed to read line : " << str << endl; return -1; } // error
             //taskInfo->isHardRealTime = taskSetInfos.e2eDD[i].taskChainID;
             // Traitement du nom de la tâche
             strncat(ext, name, 32);
@@ -133,22 +133,7 @@ int TaskLauncher::readTasksList(int cpuPercent)
    return 0;
 }
 
-/* createMutexes
-int TaskLauncher::createMutexes(int _nprocs)
-{
-   cout << "Creating mutexes." << endl;
-   int ret = 0;
-   string mutexName = "mutCore";
-   for (int i = 0; i < _nprocs; i++)
-   {
-      string name = mutexName + std::to_string(i);
-      ret += rt_mutex_create(&mutexes[i], &name[0]);
-      cout << "Created mutex " << name << endl;
-   }
 
-   return ret;
-}
-*/
 
 int TaskLauncher::runTasks(long expeDuration)
 {
@@ -197,7 +182,7 @@ int TaskLauncher::runTasks(long expeDuration)
 
 int TaskLauncher::runAgent(long expeDuration)
 {
-  int ret = 0;
+   int ret = 0;
    #if VERBOSE_INFO
    cout << endl << "LAUNCHING MoCoAgent." << endl;
    #endif
@@ -319,9 +304,9 @@ void TaskLauncher::saveData(string file)
 
    if (enableAgent)
    {
-     triggerSave = 1;
-     rt_task_resume(currentProcess->_task);
-     sleep (2);
+      triggerSave = 1;
+      rt_task_resume(currentProcess->_task);
+      sleep (2);
    }
 
    for (auto& task : tasks)

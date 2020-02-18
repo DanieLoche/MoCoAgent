@@ -129,7 +129,7 @@ int main(int argc, char* argv[])
    #endif
    if(tln->readChainsList(inputFile)) {cerr << "Failed to read task chains." << endl; return -1;}
    if(tln->readTasksList(cpuFactor)) {cerr << "Failed to read tasks list." << endl; return -2;}
-//   if(tln->createMutexes(nproc)) {cout << "Failed to read tasks list." << endl; return -3;}
+   //   if(tln->createMutexes(nproc)) {cout << "Failed to read tasks list." << endl; return -3;}
 
    tln->printTasksInfos();
 
@@ -176,7 +176,7 @@ int main(int argc, char* argv[])
 
 void printInquireInfo(RT_TASK* task)
 {
-#if VERBOSE_INFO
+   #if VERBOSE_INFO
    RT_TASK_INFO curtaskinfo;
    int ret = 0;
    if ((ret = rt_task_inquire(task, &curtaskinfo)))
@@ -184,45 +184,45 @@ void printInquireInfo(RT_TASK* task)
       if (ret == -EINVAL) cerr << "\n - Invalid Task Descriptor or invalid Prio." << endl;
       if (ret == -EPERM) cerr << "\n - Task is NULL, and service called from invalid context." << endl;
    } else {
-   std::stringstream ss;
-   ss << "[ " << curtaskinfo.name
-     << " ] (PID : " << curtaskinfo.pid << "), of priority "
-     << curtaskinfo.prio << endl;
-   cout << ss.rdbuf();
+      std::stringstream ss;
+      ss << "[ " << curtaskinfo.name
+      << " ] (PID : " << curtaskinfo.pid << "), of priority "
+      << curtaskinfo.prio << endl;
+      cout << ss.rdbuf();
    }
-#endif
+   #endif
 }
 
 void printTaskInfo(rtTaskInfosStruct* task)
 {
-#if VERBOSE_OTHER
-  std::stringstream ss;
-  ss << "Name: "       << task->fP.name
-     << "| func: "     << task->fP.func
-     << "| is RT ? "   << task->fP.isHRT
-     << "| Deadline: " << task->rtP.periodicity
-     << "| affinity: " << task->rtP.affinity
-     << "| priority: " << task->rtP.priority
-     << "| schedPolicy: " << task->rtP.schedPolicy
-     << "| ID :"       << task->fP.id
-     << endl;
-  cout << ss.rdbuf();
-#endif
+   #if VERBOSE_OTHER
+   std::stringstream ss;
+   ss << "Name: "       << task->fP.name
+   << "| func: "     << task->fP.func
+   << "| is RT ? "   << task->fP.isHRT
+   << "| Deadline: " << task->rtP.periodicity
+   << "| affinity: " << task->rtP.affinity
+   << "| priority: " << task->rtP.priority
+   << "| schedPolicy: " << task->rtP.schedPolicy
+   << "| ID :"       << task->fP.id
+   << endl;
+   cout << ss.rdbuf();
+   #endif
 }
 
 void print_affinity(pid_t _pid)
 {
-#if VERBOSE_ASK
-  int pid = _pid;
-  if (!_pid)
-  {
-   RT_TASK_INFO curtaskinfo;
-   rt_task_inquire(NULL, &curtaskinfo);
-   pid = curtaskinfo.pid;
-  }
-  cpu_set_t mask;
+   #if VERBOSE_ASK
+   int pid = _pid;
+   if (!_pid)
+   {
+      RT_TASK_INFO curtaskinfo;
+      rt_task_inquire(NULL, &curtaskinfo);
+      pid = curtaskinfo.pid;
+   }
+   cpu_set_t mask;
 
-  if (sched_getaffinity(_pid, sizeof(cpu_set_t), &mask) == -1) {
+   if (sched_getaffinity(_pid, sizeof(cpu_set_t), &mask) == -1) {
       perror("sched_getaffinity");
       assert(false);
   } else {

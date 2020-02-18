@@ -7,13 +7,13 @@ bool TaskProcess::MoCoIsAlive = FALSE;
 
 TaskProcess::TaskProcess(rtTaskInfosStruct _taskInfo, bool MoCo)
 {
-      MoCoIsAlive = MoCo;
-      printTaskInfo(&_taskInfo);
+   MoCoIsAlive = MoCo;
+   printTaskInfo(&_taskInfo);
 
-      setRTtask(_taskInfo.rtP, _taskInfo.fP.name);
-      printInquireInfo(_task);
+   setRTtask(_taskInfo.rtP, _taskInfo.fP.name);
+   printInquireInfo(_task);
 
-      parseParameters(_taskInfo.fP.args);
+   parseParameters(_taskInfo.fP.args);
 }
 
 void TaskProcess::setAffinity (int _aff, int mode)
@@ -76,7 +76,7 @@ void TaskProcess::setRTtask(rtPStruct _rtInfos, char* _name)
    setAffinity(_rtInfos.affinity, 0);
 
    if ((ret = rt_task_set_priority(_task, _rtInfos.priority)))
-      { cerr << "[" << _name << "] " << "Set_Priority Error : " << ret << " ." << endl; exit(-5); }
+   { cerr << "[" << _name << "] " << "Set_Priority Error : " << ret << " ." << endl; exit(-5); }
    /* Gestion EDF Scheduling
    RT_TASK_INFO curtaskinfo;
    rt_task_inquire(taskInfo->task, &curtaskinfo);
@@ -92,99 +92,99 @@ void TaskProcess::setRTtask(rtPStruct _rtInfos, char* _name)
    rt_task_inquire(taskInfo->task, &curtaskinfo);
    if( sched_setattr(curtaskinfo.pid, &para, 0) != 0)
    {
-      fprintf(stderr,"error setting scheduler ... are you root? : %d \n", errno);
-      exit(errno);
-   }
+   fprintf(stderr,"error setting scheduler ... are you root? : %d \n", errno);
+   exit(errno);
+}
 */
 
-   //ERROR_MNG( rt_task_suspend(NULL) );
+//ERROR_MNG( rt_task_suspend(NULL) );
 
 }
 
 void TaskProcess::parseParameters(string _arguments)
 {
-      //cout << "[ " << _name << " ] : " << "Started parsing params." << endl;
-      char _stdIn[35]; char _stdOut[35];
-      _stdIn[0] = '\0'; _stdOut[0] = '\0';
+   //cout << "[ " << _name << " ] : " << "Started parsing params." << endl;
+   char _stdIn[35]; char _stdOut[35];
+   _stdIn[0] = '\0'; _stdOut[0] = '\0';
 
-      //new_fd = dup(1);
-      _arguments = reduce(_arguments);
-      int chr;
-      for (chr = 0; _arguments[chr] != '\0'; chr++)
-      {
-        if (_arguments[chr] == '\n' || _arguments[chr] == '\r')
-          { _arguments[chr] = ' '; cout << "/!\\ Strange ASCII char found !!" << endl; }
-      }
+   //new_fd = dup(1);
+   _arguments = reduce(_arguments);
+   int chr;
+   for (chr = 0; _arguments[chr] != '\0'; chr++)
+   {
+      if (_arguments[chr] == '\n' || _arguments[chr] == '\r')
+      { _arguments[chr] = ' '; cout << "/!\\ Strange ASCII char found !!" << endl; }
+   }
 
-      std::istringstream iss( _arguments);
-      //cout << "Managing arguments : [" << _arguments << "]" << endl;
-      string token;
-      int nextStr = 0;
-      //_argc = 1;
-      while (getline(iss, token, ' '))
+   std::istringstream iss( _arguments);
+   //cout << "Managing arguments : [" << _arguments << "]" << endl;
+   string token;
+   int nextStr = 0;
+   //_argc = 1;
+   while (getline(iss, token, ' '))
+   {
+      token = reduce(token);
+      //cout << "[ " << _name << " ] : " << "Managing token [" << token << "]." << endl;
+      if (token == "<")
+      nextStr = 1;
+      else if (token == ">")
+      nextStr = 2;
+      else if (token != "")
       {
-         token = reduce(token);
-         //cout << "[ " << _name << " ] : " << "Managing token [" << token << "]." << endl;
-         if (token == "<")
-            nextStr = 1;
-         else if (token == ">")
-            nextStr = 2;
-         else if (token != "")
+         if (nextStr == 1)
          {
-            if (nextStr == 1)
-            {
-               #if VERBOSE_OTHER
-               RT_TASK_INFO infos;
-               rt_task_inquire(_task, &infos);
-               cout << "[ " << infos.name << " ] : " << "stdIn = " << _stdIn << "." << endl;
-               #endif
-               token.copy(stdIn, token.size());
-               _stdIn[token.size()] = '\0';
-               //inStrm.open(_stdIn);
-            }
-            else if (nextStr == 2)
-            {
-               #if VERBOSE_OTHER
-               RT_TASK_INFO infos;
-               rt_task_inquire(_task, &infos);
-               cout << "[ " << infos.name << " ] : " << "stdOut = " << _stdOut << "." << endl;
-               #endif
-               token.copy(_stdOut, token.size());
-               _stdOut[token.size()] = '\0';
-               //new_fd = open(_stdOut, O_RDWR | O_CREAT, S_IRUSR | S_IWUSR);
-               //outStrm.open(_stdOut);
-            }
-            else
-            {
-               char *arg = new char[token.size() +1];  // +1
-               copy(token.begin(), token.end(), arg);
-               arg[token.size()]= '\0';
-               #if VERBOSE_OTHER
-               cout << "token : [" << token << "] (" << token.size() << ") copied to [" << arg << "] (" << strlen(arg) << ")." << endl;
-               #endif
-
-               _argv.push_back(arg);
-               //argc++;
-            }
-            nextStr = 0;
+            #if VERBOSE_OTHER
+            RT_TASK_INFO infos;
+            rt_task_inquire(_task, &infos);
+            cout << "[ " << infos.name << " ] : " << "stdIn = " << _stdIn << "." << endl;
+            #endif
+            token.copy(stdIn, token.size());
+            _stdIn[token.size()] = '\0';
+            //inStrm.open(_stdIn);
          }
-      }
-      _argv.push_back(0);
+         else if (nextStr == 2)
+         {
+            #if VERBOSE_OTHER
+            RT_TASK_INFO infos;
+            rt_task_inquire(_task, &infos);
+            cout << "[ " << infos.name << " ] : " << "stdOut = " << _stdOut << "." << endl;
+            #endif
+            token.copy(_stdOut, token.size());
+            _stdOut[token.size()] = '\0';
+            //new_fd = open(_stdOut, O_RDWR | O_CREAT, S_IRUSR | S_IWUSR);
+            //outStrm.open(_stdOut);
+         }
+         else
+         {
+            char *arg = new char[token.size() +1];  // +1
+            copy(token.begin(), token.end(), arg);
+            arg[token.size()]= '\0';
+            #if VERBOSE_OTHER
+            cout << "token : [" << token << "] (" << token.size() << ") copied to [" << arg << "] (" << strlen(arg) << ")." << endl;
+            #endif
 
-      setIO(stdIn, stdOut);
-      //token.copy(argv[i], token.size()); // arguments list must end with a null.
-      #if VERBOSE_OTHER
-      int i = 0;
-      for (auto arg : _argv)
-      {
-         string toPrint;
-         if (arg==NULL)toPrint = "null";
-         else toPrint = arg;
-         cout << "Arg #" << i << " = " << toPrint << " ; ";
-         i++;
+            _argv.push_back(arg);
+            //argc++;
+         }
+         nextStr = 0;
       }
-      cout << endl;
-      #endif
+   }
+   _argv.push_back(0);
+
+   setIO(stdIn, stdOut);
+   //token.copy(argv[i], token.size()); // arguments list must end with a null.
+   #if VERBOSE_OTHER
+   int i = 0;
+   for (auto arg : _argv)
+   {
+      string toPrint;
+      if (arg==NULL)toPrint = "null";
+      else toPrint = arg;
+      cout << "Arg #" << i << " = " << toPrint << " ; ";
+      i++;
+   }
+   cout << endl;
+   #endif
 }
 
 void TaskProcess::setIO(char _stdIn[35], char _stdOut[35])
@@ -283,32 +283,32 @@ int MacroTask::before()
       RT_BUFFER_INFO infos;
       rt_buffer_inquire(&_buff, &infos);
       cerr << prop.fP.name << " : failed to write BEFORE monitoring message to buffer." << "(Moco : " << MoCoIsAlive << ")" << endl
-          << infos.availmem << " / " << infos.totalmem << " available on buffer " << infos.name << " " << infos.owaiters << " waiting too." << endl;
+      << infos.availmem << " / " << infos.totalmem << " available on buffer " << infos.name << " " << infos.owaiters << " waiting too." << endl;
    }
    return 0;
 }
 
 void MacroTask::proceed()
 {
-      #if VERBOSE_OTHER
-      cout << "[ " << prop.fP.name << " ] : "<< "Executing Proceed." << endl;
-      #endif
+   #if VERBOSE_OTHER
+   cout << "[ " << prop.fP.name << " ] : "<< "Executing Proceed." << endl;
+   #endif
 
-      int ret = proceed_function(_argv.size()-1, &_argv[0]);  // -1 : no need for last element "NULL".
-      if (ret != 0)
+   int ret = proceed_function(_argv.size()-1, &_argv[0]);  // -1 : no need for last element "NULL".
+   if (ret != 0)
+   {
+      cerr << "["<< prop.fP.name << " ("<< getpid() << ")] - Error during proceed ! [" << ret << "]. Function was : ";
+      int i = 0;
+      for (auto arg : _argv)
       {
-        cerr << "["<< prop.fP.name << " ("<< getpid() << ")] - Error during proceed ! [" << ret << "]. Function was : ";
-        int i = 0;
-        for (auto arg : _argv)
-        {
-           string toPrint;
-           if (arg==NULL)toPrint = "null";
-           else toPrint = arg;
-           cerr << "Arg #" << i << " = " << toPrint << " ; ";
-           i++;
-        }
-        cerr << " with (" << _argv.size()-1 << ") elements." << endl;
+         string toPrint;
+         if (arg==NULL)toPrint = "null";
+         else toPrint = arg;
+         cerr << "Arg #" << i << " = " << toPrint << " ; ";
+         i++;
       }
+      cerr << " with (" << _argv.size()-1 << ") elements." << endl;
+   }
 }
 
 int MacroTask::after()
@@ -324,8 +324,8 @@ int MacroTask::after()
       RT_BUFFER_INFO infos;
       rt_buffer_inquire(&_buff, &infos);
       cerr << prop.fP.name << " : failed to write AFTER monitoring message to buffer." << "(Moco : " << MoCoIsAlive << ")" << endl
-         << infos.availmem << " / " << infos.totalmem << " available on buffer " << infos.name << " " << infos.owaiters << " waiting too." << endl;
-   //rt_task_set_priority(NULL, priority);
+      << infos.availmem << " / " << infos.totalmem << " available on buffer " << infos.name << " " << infos.owaiters << " waiting too." << endl;
+      //rt_task_set_priority(NULL, priority);
    }
    //  rt_mutex_release(&mutex);
    return 0;
@@ -346,7 +346,7 @@ void MacroTask::executeRun()
       after();  // Inform of execution time for the mcAgent
 
       rt_task_wait_period(&dataLogs->overruns);
-    }
+   }
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////
@@ -354,34 +354,35 @@ void MacroTask::executeRun()
 
 int MacroTask::before_besteff()
 {
-  dataLogs->logStart();
-  ERROR_MNG(rt_event_inquire(&_event, &_eventInfos));
-  return _eventInfos.value;
+   dataLogs->logStart();
+   ERROR_MNG(rt_event_inquire(&_event, &_eventInfos));
+   return _eventInfos.value;
 }
 
 int MacroTask::after_besteff()
 {
-    dataLogs->logExec();
-    #if VERBOSE_OTHER
-    cout << "End Task : " << prop.fP.name << endl;
-    #endif
-//   rt_mutex_release(&mutex);
+   dataLogs->logExec();
+   #if VERBOSE_OTHER
+   cout << "End Task : " << prop.fP.name << endl;
+   #endif
+   //   rt_mutex_release(&mutex);
    // rt_task_set_priority(NULL, priority);
-  return 0;
+   return 0;
 }
 
 
 void MacroTask::executeRun_besteffort()
 {
-  //cout << "Running..." << endl;
+   //cout << "Running..." << endl;
    ERROR_MNG(rt_event_bind(&_event, CHANGE_MODE_EVENT_NAME, 10*1e9)); // 5 seconds timeout
    unsigned int flag;
    while (1)
    {
       if (before_besteff() == MODE_NOMINAL) // Check if execution allowed
-           proceed();  // execute task
+         proceed();  // execute task
       else rt_event_wait(&_event, sizeof(flag), &flag , EV_PRIO, TM_INFINITE);
-      after_besteff();  // Inform of execution time for the mcAgent
+
+         after_besteff();  // Inform of execution time for the mcAgent
 
       rt_task_wait_period(&dataLogs->overruns);
 

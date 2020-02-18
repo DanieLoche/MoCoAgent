@@ -33,7 +33,7 @@ class TaskLauncher
 
       int readChainsList(string);
       int readTasksList (int cpuPercent);
-//      int createMutexes(int nprocs);
+      //  int createMutexes(int nprocs);
       int runTasks(long expeDuration);
       int runAgent(long expeDuration);
       void stopTasks(bool);
@@ -43,8 +43,8 @@ class TaskLauncher
 
 };
 
-extern void RunmcAgentMain(void *arg);
-extern void TaskMain(void* arg);
+//extern void RunmcAgentMain(void *arg);
+//extern void TaskMain(void* arg);
 extern void print_affinity(pid_t _pid);
 extern void printTaskInfo(rtTaskInfosStruct* task);
 

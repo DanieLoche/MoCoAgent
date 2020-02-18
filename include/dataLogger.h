@@ -8,8 +8,8 @@
 
 struct timeLog
 {
-  RTIME timestamp;
-  RTIME duration;
+   RTIME timestamp;
+   RTIME duration;
 };
 
 class DataLogger
@@ -24,7 +24,7 @@ class DataLogger
 
    public :
       unsigned long overruns;
-      DataLogger();
+      DataLogger( );
 
       void logStart(RTIME );
       RTIME logStart();
@@ -39,8 +39,8 @@ class TaskDataLogger : public DataLogger
    protected:
       rtTaskInfosStruct* taskInfos;
       inline char* getName();
-   public :
 
+   public :
       TaskDataLogger(rtTaskInfosStruct*);
       void saveData(string, int);
 
@@ -51,6 +51,7 @@ class ChainDataLogger : public DataLogger
    protected:
       end2endDeadlineStruct* chainInfos;
       inline char* getName();
+
    public :
       int cptAnticipatedMisses;
 
