@@ -4,7 +4,7 @@ RM = rm -if
 XENO_CONFIG = /usr/xenomai/bin/xeno-config
 XENO_CFLAGS = $(shell $(XENO_CONFIG) --alchemy --posix --cflags) #--skin native
 
-XENO_LDFLAGS = $(shell $(XENO_CONFIG) --alchemy --posix --ldflags)
+XENO_LDFLAGS = $(shell $(XENO_CONFIG) --no-auto-init --alchemy --posix --ldflags)
 
 ## PROJECT ##
 EXEC_NAME = MoCoAgent.out
