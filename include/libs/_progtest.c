@@ -5,6 +5,17 @@
 #include <string.h>
 #include <vector>
 #include <chrono>
+
+#include <sys/types.h>
+#include <unistd.h>
+#include <stdlib.h>
+
+#include <alchemy/task.h>
+#include <alchemy/timer.h>
+
+#include <xenomai/init.h>
+
+
 using namespace std::chrono;
 using namespace std;
 
@@ -32,6 +43,24 @@ extern "C" {
 	int fft               (int argc, char *argv[]);
 	int gsm_func          (int argc, char *argv[]);
 }
+
+/*
+* make sure everybody is in the same session and that
+* we have registry sharing.
+*/
+void do_xeno_init(void) {
+   const char *args[] = {
+      "program",
+      "--shared-registry",
+      "--session=test",
+      NULL
+   } ;
+   const char **argv = args ;
+   int argc = (sizeof args/sizeof args[0])-1 ; /* exclude NULL */
+
+   xenomai_init(&argc,(char * const **)&argv) ;
+}
+#define XENO_INIT() do_xeno_init()
 
 std::string trim(const std::string& str, const std::string& whitespace = " ")
 {
@@ -125,6 +154,63 @@ int main(int argc, char *argv[])
 {
 	printf("Debut test\n");
 
+	const char* taskNames[3] = {"task0", "task1", "task2"};
+
+   setvbuf(stdout,NULL,_IOLBF,4096) ;
+
+   for (int i = 0 ; i < 3 ; ++i)
+   {
+      pid_t pid = fork() ;
+
+      if (pid < 0) {
+         perror("fork") ;
+         continue ;
+      }
+      else if (pid) // fork OK, we're parent
+      {
+         //sleep(1); // wait a little before going through another fork.
+      } else { // child process
+         RT_TASK _t;
+         int ret = 0 ;
+
+         printf("calling xenomai_init()\n") ;
+         XENO_INIT() ;
+         rt_printf("process for %s running, pid %lu\n",
+         taskNames[i],getpid()) ;
+         ret = rt_task_shadow(&_t, taskNames[i], 50, 0);
+         rt_printf("shadow task %s returns %d\n", taskNames[i], ret) ;
+         ret = rt_task_sleep(1e9*30) ;
+         rt_printf("sleep returned status %d\n",ret) ;
+         exit(EXIT_SUCCESS);
+      }
+
+   }
+
+   // Only "main" process goes here.
+
+   printf("launching done, sleeping 5\n") ;
+   sleep(5) ;
+   printf("resuming, binding...\n") ;
+
+   printf("dumping the registry\n") ;
+   system("find /run/xenomai") ; // see what the registry is looking like
+
+   XENO_INIT() ;
+
+   for (int i = 0 ; i < 3 ; ++i)
+   {
+      RT_TASK _t;
+      int ret ;
+      printf("binding to %s\n",taskNames[i]) ;
+      ret = rt_task_bind(&_t, taskNames[i], TM_NONBLOCK); // <== HERE. TM_NONBLOCK, TM_INFINITE or a time value, changes nothing.... never goes here.
+      if (ret) printf("Error : could not bind task. Error #%d\n", ret);
+      else printf("Bind to task %s done.\n", taskNames[i]);
+   }
+   /* Do stuff here on the binded tasks */
+   exit(EXIT_SUCCESS);
+
+
+
 	  int i = 0;
 	  _argv.push_back(argv[0]);
 	  _argc++;
@@ -146,11 +232,19 @@ int main(int argc, char *argv[])
 	  cerr << "Total : " << _argv.size()-1 << " arguments." << endl;
 
 	int ret = 0;
-	auto start = high_resolution_clock::now();
-// ret += basicmath_small( argc, argv);
+	// auto start = high_resolution_clock::now();
+	std::cerr << "Reading timer Start." << std::endl;
+	auto start = rt_timer_read();
+
+	std::cerr << "Shadowing..." << std::endl;
+	RT_TASK task;
+	ret += rt_task_shadow(&task, "Testing", 50, 0);
+	std::cerr << "Task shadowed." << std::endl;
+	auto mid = rt_timer_read();
+ ret += basicmath_small( _argv.size()-1, &_argv[0]);
 // ret += basicmath_large( argc, argv);
 //	ret += bitcount_func( argc, argv);
-	ret += qsort_small(  _argv.size()-1, &_argv[0]) ;
+//	ret += qsort_small(  _argv.size()-1, &_argv[0]) ;
 //	ret += qsort_large( argc, argv) ;
 //	ret += susan( argc, argv);
 //	ret += djpeg_func( argc, argv);
@@ -164,17 +258,17 @@ int main(int argc, char *argv[])
 //	ret += rijndael( argc, argv);
 //	ret += sha( argc, argv);
 // ret += rawdaudio( argc, argv);
-	auto mid = high_resolution_clock::now();
+
 // ret += rawcaudio( argc, argv);
 //	ret += crc( argc, argv);
 //	ret += fft( argc, argv) ;
 //	ret += typeset_func( argc, argv);
 //	ret += gsm_func ( argc, argv);
-	auto end = high_resolution_clock::now();
+	auto end = rt_timer_read();
 	printf("Fin test : %d.\n", ret);
-	auto duration = duration_cast<microseconds>(end - start);
-	auto midTime = duration_cast<microseconds>(mid - start);
-	std::cout << "Total duration = " << duration.count() << "us. Miduration = " << midTime.count() <<"us." << std::endl;
+	auto duration = end - start;
+	auto midTime = mid-start; //duration_cast<microseconds>(mid - start);
+	std::cout << "Total duration = " << duration << "ns. Miduration = " << midTime <<"ns." << std::endl;
 	return ret;
 
 }
