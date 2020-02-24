@@ -1,7 +1,32 @@
+#include <xenomai/init.h>
+
 #include "macroTask.h"
 //#include <utmpx.h>    // Pour fonction getcpu()
 //#include <spawn.h>
 //#include <sys/wait.h>
+
+/*
+* make sure everybody is in the same session and that
+* we have registry sharing.
+*/
+int do_xeno_init(char* _name)
+{
+   const char* args[] = {
+      "program",
+      //"--enable-registry"
+      //"--registry-root=/usr/xenomai",
+      "--shared-registry",
+      "--session=test",
+      //"--dump-config",
+      NULL
+   };
+   const char **argv = args ;
+   int argc = (sizeof args/sizeof args[0])-1 ; /* exclude NULL */
+
+   xenomai_init(&argc,(char * const **)&argv) ;
+   return 0;
+}
+#define XENO_INIT(_name) do_xeno_init(_name)
 
 bool TaskProcess::MoCoIsAlive = FALSE;
 
@@ -10,73 +35,62 @@ TaskProcess::TaskProcess(rtTaskInfosStruct _taskInfo, bool MoCo)
    MoCoIsAlive = MoCo;
    printTaskInfo(&_taskInfo);
 
+   cout << "[ "<< _taskInfo.fP.name << " ] - "<< "Setting Real-time parameters..." << endl;
    setRTtask(_taskInfo.rtP, _taskInfo.fP.name);
-   printInquireInfo(_task);
+
+   printInquireInfo(&_task);
 
    parseParameters(_taskInfo.fP.args);
-}
-
-void TaskProcess::setAffinity (int _aff, int mode)
-{ // mode 0 : replace | mode 1 : add | mode -1 : remove
-   cpu_set_t mask;
-   if (mode == 0) { CPU_ZERO(&mask); CPU_SET(_aff, &mask); }
-   else if (mode > 1) CPU_SET(_aff, &mask);
-   else if (mode < -1) CPU_CLR(_aff, &mask);
-
-   RT_TASK_INFO curtaskinfo;
-   rt_task_inquire(_task, &curtaskinfo);
-
-   if (int ret = rt_task_set_affinity(_task, &mask))
-   {
-      cerr << "Error while setting (" << mode << ") affinity for task "
-      << curtaskinfo.name << " to CPU " << _aff << ": " <<  ret << "."<< endl;
-   }
-   #if VERBOSE_ASK
-   if (mode == 0) cout << "Switched affinity for task " << curtaskinfo.name << " = CPU " << _aff << endl;
-   else if (mode == 1) cout << "Added affinity for task " << curtaskinfo.name << " +CPU " << _aff << endl;
-   else if (mode == -1) cout << "Removed affinity for task " << curtaskinfo.name << " -CPU " << _aff << endl;
-   #endif
+   rt_print_flush_buffers();
+   setIO( );
 }
 
 void TaskProcess::setRTtask(rtPStruct _rtInfos, char* _name)
 {
+   //system("find /proc/xenomai");
+   XENO_INIT(_name) ;
+
    int ret = 0;
-   rt_task_shadow(_task, _name, _rtInfos.priority, T_WARNSW);
+   //ERROR_MNG(rt_task_shadow(_task, _name, _rtInfos.priority, 0));
+   ret = rt_task_shadow(&_task, _name, _rtInfos.priority, 0);
+   rt_print_flush_buffers();
+   rt_printf("[ %s ] - shadowed : %d (%s).\n", _name, ret, getErrorName(ret)); //cout << "["<< _name << "]"<< " shadowed." << endl;
 
    RT_TASK_INFO curtaskinfo;
-   rt_task_inquire(_task, &curtaskinfo);
-   struct sched_param_ex para;
-   para.sched_priority = _rtInfos.priority;
+   rt_task_inquire(0, &curtaskinfo);
+   struct sched_param_ex param;
+   param.sched_priority = _rtInfos.priority;
    /* sched_param
-   para.sched_flags= 0;
-   para.sched_runtime = taskInfo.periodicity;;
-   para.sched_deadline = taskInfo.periodicity;
-   para.sched_period = taskInfo->periodicity;
-   para.size=sizeof(sched_attr);
+   param.sched_flags= 0;
+   param.sched_runtime = taskInfo.periodicity;;
+   param.sched_deadline = taskInfo.periodicity;
+   param.sched_period = taskInfo->periodicity;
+   param.size=sizeof(sched_attr);
    old... */
+   const char* schedName = getSchedPolicyName(_rtInfos.schedPolicy);
+   rt_printf("[ %s ] - Managing Scheduling Policy %s (%d).\n", _name, schedName, _rtInfos.schedPolicy); //cout << "["<< _name << "]"<< "Managing Scheduling policy " << getSchedPolicyName(_rtInfos.schedPolicy) << endl;
 
    if (_rtInfos.schedPolicy == SCHED_RM) _rtInfos.schedPolicy = SCHED_FIFO;
-
-   if( (ret = sched_setscheduler_ex(curtaskinfo.pid, _rtInfos.schedPolicy, &para)) != 0)
+   if( (ret = sched_setscheduler_ex(curtaskinfo.pid, _rtInfos.schedPolicy, &param)) != 0)
    {
-      cerr << "[" << _name << "] " << "error setting scheduling policy " << _rtInfos.schedPolicy << ", Error #" << ret;
+      cerr << "[ " << _name << " ] "<< curtaskinfo.pid << " : error setting scheduling policy " << _rtInfos.schedPolicy << ", Error #" << strerror(ret) << endl;
       exit(ret);
    }
 
    if (_rtInfos.schedPolicy == SCHED_RR)
    { //#if defined SCHED_POLICY  &&  SCHED_POLICY == SCHED_RR
-      if ((ret = rt_task_slice(_task, RR_SLICE_TIME)))
-      { cerr << "[" << _name << "] " << "Slice Error : " << ret << " ." << endl; exit(-4); }
+      if ((ret = rt_task_slice(&_task, RR_SLICE_TIME)))
+      { cerr << "[ " << _name << " ] " << "Slice Error : " << ret << " ." << endl; exit(-4); }
    } //#endif
 
    //Periodicity
-   if ((ret = rt_task_set_periodic(_task, TM_NOW, _rtInfos.periodicity)))
-   {  cerr << "[" << _name << "] " << "Set_Period Error : " << ret << " ." << endl; exit(-2); }
+   if ((ret = rt_task_set_periodic(&_task, TM_NOW, _rtInfos.periodicity)))
+   {  cerr << "[ " << _name << " ] " << "Set_Period Error : " << ret << " ." << endl; exit(-2); }
 
    setAffinity(_rtInfos.affinity, 0);
 
-   if ((ret = rt_task_set_priority(_task, _rtInfos.priority)))
-   { cerr << "[" << _name << "] " << "Set_Priority Error : " << ret << " ." << endl; exit(-5); }
+   if ((ret = rt_task_set_priority(&_task, _rtInfos.priority)))
+   { cerr << "[ " << _name << " ] " << "Set_Priority Error : " << ret << " ." << endl; exit(-5); }
    /* Gestion EDF Scheduling
    RT_TASK_INFO curtaskinfo;
    rt_task_inquire(taskInfo->task, &curtaskinfo);
@@ -101,20 +115,42 @@ void TaskProcess::setRTtask(rtPStruct _rtInfos, char* _name)
 
 }
 
+void TaskProcess::setAffinity (int _aff, int mode)
+{ // mode 0 : replace | mode 1 : add | mode -1 : remove
+   cpu_set_t mask;
+   if (mode == 0) { CPU_ZERO(&mask); CPU_SET(_aff, &mask); }
+   else if (mode > 1) CPU_SET(_aff, &mask);
+   else if (mode < -1) CPU_CLR(_aff, &mask);
+
+   RT_TASK_INFO curtaskinfo;
+   rt_task_inquire(&_task, &curtaskinfo);
+
+   if (int ret = rt_task_set_affinity(&_task, &mask))
+   {
+      cerr << "Error while setting (" << mode << ") affinity for task "
+      << curtaskinfo.name << " to CPU " << _aff << ": " <<  ret << "."<< endl;
+   }
+   #if VERBOSE_ASK
+   if (mode == 0) rt_printf("[ %s ] - Switched affinity : CPU %d.\n", curtaskinfo.name, _aff);
+   else if (mode == 1) rt_printf("[ %s ] - Added affinity : +CPU %d.\n", curtaskinfo.name, _aff);
+   else if (mode == -1) rt_printf("[ %s ] - Removed affinity : -CPU %d.\n", curtaskinfo.name, _aff);
+   #endif
+}
+
 void TaskProcess::parseParameters(string _arguments)
 {
-   //cout << "[ " << _name << " ] : " << "Started parsing params." << endl;
-   char _stdIn[35]; char _stdOut[35];
    _stdIn[0] = '\0'; _stdOut[0] = '\0';
 
-   //new_fd = dup(1);
-   _arguments = reduce(_arguments);
-   int chr;
+   /*int chr;
    for (chr = 0; _arguments[chr] != '\0'; chr++)
    {
-      if (_arguments[chr] == '\n' || _arguments[chr] == '\r')
-      { _arguments[chr] = ' '; cout << "/!\\ Strange ASCII char found !!" << endl; }
-   }
+      if ((_arguments[chr] <= 0x20 || _arguments[chr] >= 0x7A) && _arguments[chr] != ' ')
+      {
+         _arguments[chr] = ' ';
+         rt_fprintf(stderr, "/!\\ Strange ASCII char found !! (%c)\n", _arguments[chr]);
+      }
+   }*/
+   _arguments = reduce(_arguments);
 
    std::istringstream iss( _arguments);
    //cout << "Managing arguments : [" << _arguments << "]" << endl;
@@ -133,26 +169,24 @@ void TaskProcess::parseParameters(string _arguments)
       {
          if (nextStr == 1)
          {
+            token.copy(_stdIn, token.size());
+            _stdIn[token.size()] = '\0';
             #if VERBOSE_OTHER
             RT_TASK_INFO infos;
-            rt_task_inquire(_task, &infos);
-            cout << "[ " << infos.name << " ] : " << "stdIn = " << _stdIn << "." << endl;
+            rt_task_inquire(&_task, &infos);
+            rt_printf("[ %s ] - stdIn = %s.\n", infos.name, _stdIn);
             #endif
-            token.copy(stdIn, token.size());
-            _stdIn[token.size()] = '\0';
             //inStrm.open(_stdIn);
          }
          else if (nextStr == 2)
          {
-            #if VERBOSE_OTHER
-            RT_TASK_INFO infos;
-            rt_task_inquire(_task, &infos);
-            cout << "[ " << infos.name << " ] : " << "stdOut = " << _stdOut << "." << endl;
-            #endif
             token.copy(_stdOut, token.size());
             _stdOut[token.size()] = '\0';
-            //new_fd = open(_stdOut, O_RDWR | O_CREAT, S_IRUSR | S_IWUSR);
-            //outStrm.open(_stdOut);
+            #if VERBOSE_OTHER
+            RT_TASK_INFO infos;
+            rt_task_inquire(&_task, &infos);
+            rt_printf("[ %s ] - stdOut = %s.\n", infos.name, _stdOut);
+            #endif
          }
          else
          {
@@ -160,7 +194,8 @@ void TaskProcess::parseParameters(string _arguments)
             copy(token.begin(), token.end(), arg);
             arg[token.size()]= '\0';
             #if VERBOSE_OTHER
-            cout << "token : [" << token << "] (" << token.size() << ") copied to [" << arg << "] (" << strlen(arg) << ")." << endl;
+            rt_printf("Token : [%s] (%d) copied to [%s] (%d).\n", token.c_str(), token.size(), arg, strlen(arg));
+            //cout << "token : [" << token << "] (" << token.size() << ") copied to [" << arg << "] (" << strlen(arg) << ")." << endl;
             #endif
 
             _argv.push_back(arg);
@@ -171,7 +206,6 @@ void TaskProcess::parseParameters(string _arguments)
    }
    _argv.push_back(0);
 
-   setIO(stdIn, stdOut);
    //token.copy(argv[i], token.size()); // arguments list must end with a null.
    #if VERBOSE_OTHER
    int i = 0;
@@ -180,14 +214,14 @@ void TaskProcess::parseParameters(string _arguments)
       string toPrint;
       if (arg==NULL)toPrint = "null";
       else toPrint = arg;
-      cout << "Arg #" << i << " = " << toPrint << " ; ";
+      rt_printf("Arg #%d = %s ; ", i, toPrint.c_str());
       i++;
    }
-   cout << endl;
+   rt_printf("\n");
    #endif
 }
 
-void TaskProcess::setIO(char _stdIn[35], char _stdOut[35])
+void TaskProcess::setIO( )
 {
     /*
           if (stdIn[0] != '\0')
@@ -199,39 +233,38 @@ void TaskProcess::setIO(char _stdIn[35], char _stdOut[35])
    if (_stdIn[0] != '\0')
    {
       #if VERBOSE_OTHER
-      cout << "Changed Input to : " << _stdIn << endl;
+      rt_printf("Changed Input to : %s .\n", _stdIn);
       #endif
       int fdIn = open(_stdIn, O_RDWR | O_CREAT, S_IRUSR | S_IWUSR);
       dup2(fdIn, 0);
       close(fdIn);
    }
    #if VERBOSE_OTHER
-   else cout << "Unchanged Input." << endl;
+   else rt_printf("Unchanged Input.\n");
    #endif
 
 
-   if (stdOut[0] != '\0')
+   if (_stdOut[0] != '\0')
    {
       #if VERBOSE_OTHER
-      cout << "Changed Output to : " << _stdOut << endl;
+      rt_printf("Changed Output to : %s .\n", _stdOut);
       #endif
       int fdOut = open(_stdOut, O_RDWR | O_CREAT, S_IRUSR | S_IWUSR);
       dup2(fdOut, 1);
       close(fdOut);
    }
    #if VERBOSE_OTHER
-   else
-   cout << "Unchanged Output." << endl;
+   else rt_printf("Unchanged Output.\n");
    #endif
 }
 
 MacroTask::MacroTask(rtTaskInfosStruct _taskInfo, bool MoCo) : TaskProcess(_taskInfo, MoCo)
 {
    prop = _taskInfo;
-   dataLogs = new TaskDataLogger(&prop);
+   dataLogs = new TaskDataLogger(&prop, _stdOut);
    findFunction(_taskInfo.fP.func);
 
-   msg.task    = _task;
+   msg.task    = &_task;
    msg.ID      = prop.fP.id;
    msg.time    = 0;
    msg.isExecuted = 0;
@@ -394,4 +427,80 @@ void MacroTask::finishProcess(void* _task)
    MacroTask* task = (MacroTask*) _task;
    task->dataLogs->saveData(task->prop.fP.name, 32);
 
+}
+
+const char* getSchedPolicyName(int schedPol)
+{
+   switch (schedPol)
+   {
+      case SCHED_FIFO      :
+         return "FIFO\0";
+      break;
+      case SCHED_RR        :
+         return "Round-Robin\0";
+      break;
+      case SCHED_WEAK      :
+         return "Weak\0";
+      break;
+      case SCHED_COBALT    :
+         return "Cobalt\0";
+      break;
+      case SCHED_SPORADIC  :
+         return "Sporadic\0";
+      break;
+      case SCHED_TP        :
+         return "TimePartitioning\0";
+      break;
+      case SCHED_QUOTA     :
+         return "QUOTA\0";
+      break;
+      case SCHED_EDF       :
+         return "Earliest Deadline First\0";
+      break;
+      case SCHED_RM        :
+         return "Rate-Monotonic\0";
+      break;
+      default : return "Undefined Policy\0";
+      break;
+   }
+};
+
+const char* getErrorName(int err)
+{
+   switch (err)
+   {
+      case 0   :
+         return "No Error.\0";
+      case -EINTR  :
+         return "EINTR\0";
+         break;
+      case -EWOULDBLOCK  :
+         return "EWOULDBLOCK\0";
+         break;
+      case -ETIMEDOUT :
+         return "ETIMEDOUT\0";
+         break;
+      case -EPERM  :
+         return "EPERM\0";
+         break;
+      case -EEXIST :
+         return "EEXIST\0";
+         break;
+      case -ENOMEM :
+         return "ENOMEM\0";
+         break;
+      case -EINVAL :
+         return "EINVAL\0";
+         break;
+      case -EDEADLK   :
+         return "EDEADLK\0";
+         break;
+      case -ESRCH  :
+         return "ESRCH\0";
+         break;
+      case -EBUSY  :
+         return "EBUSY\0";
+         break;
+      default: return "Undefined Error Code.\0";
+   }
 }

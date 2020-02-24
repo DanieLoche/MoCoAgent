@@ -17,6 +17,8 @@
 const RTIME t_RT = 000*1.0e6;  // time to trigger the Control Agent
 const RTIME Wmax = 000*1.0e6;    // next slice max time
 
+const char* getSchedPolicyName(int schedPol);
+
 class taskMonitoringStruct
 {
    private :
@@ -25,14 +27,14 @@ class taskMonitoringStruct
 
    public :
       int precedencyID;
-      RT_TASK* xenoTask;
+      RT_TASK xenoTask;
       int id;
       //RTIME endTime;     // Run-time - received
       RTIME deadline;    // Static
       RTIME rwcet;       // Static
       //bool operator <(const taskMonitoringStruct& tms) const {return (id < tms.id);}
 
-      taskMonitoringStruct(rtTaskInfosStruct* rtTaskInfos);
+      taskMonitoringStruct(rtTaskInfosStruct rtTaskInfos);
       void setState(bool state);
       bool getState();
 };
@@ -50,7 +52,7 @@ class taskChain
       bool isAtRisk;         // Runtime - deduced
       std::vector<taskMonitoringStruct> taskList;
 
-      taskChain(end2endDeadlineStruct _tcDeadline);
+      taskChain(end2endDeadlineStruct _tcDeadline, string outfile);
 
       bool checkPrecedency(int taskID);
       bool checkTaskE2E();
@@ -68,18 +70,18 @@ class TaskProcess
       RT_EVENT	_event;
       RT_EVENT_INFO _eventInfos;
       monitoringMsg msg ;
+      char _stdIn[35];
+      char _stdOut[35];
       std::vector<char*> _argv;
-      char stdIn[35];
-      char stdOut[35];
       static bool MoCoIsAlive;
 
       void setAffinity (int _aff, int mode);
       void setRTtask(rtPStruct, char*);
       void parseParameters(string _arguments);
-      void setIO(char _stdIn[35], char _stdOut[35]);
+      void setIO( );
 
    public:
-      RT_TASK* _task;
+      RT_TASK _task;
       RT_BUFFER _buff;
 
       TaskProcess(rtTaskInfosStruct _taskInfo, bool MoCo);
@@ -117,8 +119,8 @@ class MCAgent : public TaskProcess
       bool enable;
       short runtimeMode;    // NOMINAL or OVERLOADED
       ulong overruns;
-      std::vector<taskChain*> allTaskChain;
-      std::vector<RT_TASK*> bestEffortTasks;
+      std::vector<taskChain> allTaskChain;
+      std::vector<RT_TASK> bestEffortTasks;
 
       void initCommunications();
       void setAllDeadlines(std::vector<end2endDeadlineStruct> _tcDeadlineStructs);

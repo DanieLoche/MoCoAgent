@@ -21,9 +21,6 @@ MCAgent::MCAgent(rtTaskInfosStruct _taskInfo,
                   std::vector<end2endDeadlineStruct> e2eDD,
                   std::vector<rtTaskInfosStruct> tasksSet) : TaskProcess (_taskInfo, TRUE)
 {
-    //printInquireInfo();
-    //print_affinity(0);
-    //TasksInformations = rtTI;
     displaySystemInfo(e2eDD, tasksSet);
     runtimeMode = MODE_NOMINAL;
     initCommunications();
@@ -31,17 +28,17 @@ MCAgent::MCAgent(rtTaskInfosStruct _taskInfo,
     setAllDeadlines(e2eDD);
     setAllTasks(tasksSet);
     displayChains();
-    sleep(1);
+    //sleep(1);
 
     #if VERBOSE_INFO
-    cout << "MoCoAgent Ready." << endl;
+    rt_printf("[ MoCoAgent ] : READY.\n");
+
     #endif
 }
 
 void MCAgent::initCommunications()
 {
    rt_buffer_create(&_buff, MESSAGE_TOPIC_NAME, 20*sizeof(monitoringMsg), B_FIFO);
-   // u_int flagMask = 0;
    rt_event_create(&_event, CHANGE_MODE_EVENT_NAME, 0, EV_PRIO);
 }
 
@@ -54,14 +51,14 @@ void MCAgent::initCommunications()
 void MCAgent::setAllDeadlines(std::vector<end2endDeadlineStruct> _tcDeadlineStructs)
 {
    #if VERBOSE_INFO
-   cout << "[MoCoAgent] : setting deadlines." << endl;
+   rt_printf("[ MoCoAgent ] - setting deadlines.\n");
    #endif
    for (auto& tcDeadlineStruct : _tcDeadlineStructs)
    {
       if (tcDeadlineStruct.taskChainID)
       {
-         taskChain* tc = new taskChain(tcDeadlineStruct);
-         allTaskChain.push_back(tc);
+         taskChain* tc = new taskChain(tcDeadlineStruct, _stdOut);
+         allTaskChain.push_back(*tc);
       }
    }
 }
@@ -76,27 +73,27 @@ void MCAgent::setAllDeadlines(std::vector<end2endDeadlineStruct> _tcDeadlineStru
 void MCAgent::setAllTasks(std::vector<rtTaskInfosStruct> _TasksInfos)
 {
    #if VERBOSE_INFO
-   cout << "[MoCoAgent] : setting tasks." << endl;
+   rt_printf("[ MoCoAgent ] - setting tasks.\n");
    #endif
    for (auto& _taskInfo : _TasksInfos)
    {
-      cout << " Adding task " << _taskInfo.fP.name << " (" << _taskInfo.fP.isHRT << ")." << endl;
-      RT_TASK* _t;
-      ERROR_MNG(rt_task_bind(_t, _taskInfo.fP.name, TM_INFINITE));
-      printInquireInfo(_t);
+      rt_printf(" Adding task %s (%d).\n", _taskInfo.fP.name, _taskInfo.fP.isHRT);
       if ( !_taskInfo.fP.isHRT )
       {
-         cout << "Adding to BE list." << endl;
+         rt_printf("Adding %s to BE list.\n", _taskInfo.fP.name);
+         RT_TASK _t;
+         ERROR_MNG(rt_task_bind(&_t, _taskInfo.fP.name, TM_NONBLOCK));
+         printInquireInfo(&_t);
          bestEffortTasks.push_back(_t);
          break;
       }
       else for (auto& _taskChain : allTaskChain)
       {
-         if ( _taskInfo.fP.isHRT == _taskChain->chainID )
+         if ( _taskInfo.fP.isHRT == _taskChain.chainID )
          {
-            cout << "Adding to HRT chain " << _taskChain->chainID << "." << endl;
-            taskMonitoringStruct* tms = new taskMonitoringStruct(&_taskInfo);
-            _taskChain->taskList.push_back(*tms);
+            rt_printf("Adding %s to HRT chain %d.\n", _taskInfo.fP.name, _taskChain.chainID);
+            taskMonitoringStruct* tms = new taskMonitoringStruct(_taskInfo);
+            _taskChain.taskList.push_back(*tms);
             break;
          }
       }
@@ -145,7 +142,7 @@ void MCAgent::setMode(int mode)
          rt_event_signal(&_event, MODE_OVERLOADED);
          for (auto& bestEffortTask : bestEffortTasks)
          {   // Publier message pour dire à stopper
-            if (rt_task_suspend(bestEffortTask))
+            if (rt_task_suspend(&bestEffortTask))
             {
                #if VERBOSE_DEBUG
                cerr << "Failed to stop task "; // ==1?"OVERLOADED":"NOMINAL"
@@ -162,7 +159,7 @@ void MCAgent::setMode(int mode)
          rt_event_signal(&_event, MODE_NOMINAL);
          for (auto& bestEffortTask : bestEffortTasks)
          {  // relancer Best Effort Tasks;
-            rt_task_resume(bestEffortTask);
+            rt_task_resume(&bestEffortTask);
          }
          #if VERBOSE_DEBUG // ==1?"OVERLOADED":"NOMINAL"
          cerr << "Re-started BE tasks." << endl;
@@ -187,10 +184,10 @@ void MCAgent::executeRun()
          case -EWOULDBLOCK : // no message received
          for (auto& _taskChain : allTaskChain)
          {
-            if ( _taskChain->checkTaskE2E() && !_taskChain->isAtRisk)
+            if ( _taskChain.checkTaskE2E() && !_taskChain.isAtRisk)
             {
-               _taskChain->isAtRisk = TRUE;
-               _taskChain->logger->cptAnticipatedMisses++;
+               _taskChain.isAtRisk = TRUE;
+               _taskChain.logger->cptAnticipatedMisses++;
                setMode(MODE_OVERLOADED);
             }
          }
@@ -205,37 +202,37 @@ void MCAgent::executeRun()
          default :
          for (auto& _taskChain : allTaskChain)
          {
-            for (auto& _task : _taskChain->taskList)
+            for (auto& _task : _taskChain.taskList)
             {
                //cout << "Logged chain end at : " << _taskChain->currentEndTime/1.0e6 << endl;
                //cout << "Logged chain start at : " << msg.time/1.0e6 << endl;
                if( _task.id == msg.ID )
                {
-                  if (_task.precedencyID == 0 && _taskChain->startTime == 0)
+                  if (_task.precedencyID == 0 && _taskChain.startTime == 0)
                   { // First task of the chain
-                     _taskChain->startTime = msg.time;
-                     _taskChain->logger->logStart(msg.time);
+                     _taskChain.startTime = msg.time;
+                     _taskChain.logger->logStart(msg.time);
                      _task.setState(TRUE);
                   }
-                  else if (msg.isExecuted && _taskChain->checkPrecedency(_task.precedencyID))
+                  else if (msg.isExecuted && _taskChain.checkPrecedency(_task.precedencyID))
                   { // Next task of the chain
-                     _taskChain->currentEndTime = msg.time;
+                     _taskChain.currentEndTime = msg.time;
                      _task.setState(TRUE);
-                     if (_taskChain->checkIfEnded())
+                     if (_taskChain.checkIfEnded())
                      {
-                        _taskChain->logger->logExec(_taskChain->currentEndTime);
-                        if (_taskChain->isAtRisk) setMode(MODE_NOMINAL);
-                        _taskChain->resetChain();
+                        _taskChain.logger->logExec(_taskChain.currentEndTime);
+                        if (_taskChain.isAtRisk) setMode(MODE_NOMINAL);
+                        _taskChain.resetChain();
                      }
                   }
                   break;
                }
             }
             // Execute part //
-            if ( _taskChain->checkTaskE2E() && !_taskChain->isAtRisk)
+            if ( _taskChain.checkTaskE2E() && !_taskChain.isAtRisk)
             {
-               _taskChain->isAtRisk = TRUE;
-               _taskChain->logger->cptAnticipatedMisses++;
+               _taskChain.isAtRisk = TRUE;
+               _taskChain.logger->cptAnticipatedMisses++;
                setMode(MODE_OVERLOADED);
             }
          }
@@ -254,36 +251,36 @@ void MCAgent::executeRun_besteffort()
       rt_buffer_read(&_buff, &msg, sizeof(monitoringMsg), TM_INFINITE);
       for (auto& _taskChain : allTaskChain)
       {
-         for (auto& _task : _taskChain->taskList)
+         for (auto& _task : _taskChain.taskList)
          {
             //cout << "Logged chain end at : " << _taskChain->currentEndTime/1.0e6 << endl;
             //cout << "Logged chain start at : " << msg.time/1.0e6 << endl;
             if( _task.id == msg.ID )
             {
-               if (_task.precedencyID == 0 && _taskChain->startTime == 0)
+               if (_task.precedencyID == 0 && _taskChain.startTime == 0)
                { // First task of the chain
-                  _taskChain->startTime = msg.time;
-                  _taskChain->logger->logStart(msg.time);
+                  _taskChain.startTime = msg.time;
+                  _taskChain.logger->logStart(msg.time);
                   _task.setState(TRUE);
                }
-               else if (msg.isExecuted && _taskChain->checkPrecedency(_task.precedencyID))
+               else if (msg.isExecuted && _taskChain.checkPrecedency(_task.precedencyID))
                { // Next task of the chain
-                  _taskChain->currentEndTime = msg.time;
+                  _taskChain.currentEndTime = msg.time;
                   _task.setState(TRUE);
-                  if (_taskChain->checkIfEnded())
+                  if (_taskChain.checkIfEnded())
                   {
-                     _taskChain->logger->logExec(_taskChain->currentEndTime);
-                     _taskChain->resetChain();
+                     _taskChain.logger->logExec(_taskChain.currentEndTime);
+                     _taskChain.resetChain();
                   }
                }
                break;
             }
          }
          // Execute part //
-         if ( _taskChain->checkTaskE2E() && !_taskChain->isAtRisk)
+         if ( _taskChain.checkTaskE2E() && !_taskChain.isAtRisk)
          {
-            _taskChain->isAtRisk = TRUE;
-            _taskChain->logger->cptAnticipatedMisses++;
+            _taskChain.isAtRisk = TRUE;
+            _taskChain.logger->cptAnticipatedMisses++;
          }
       }
       rt_task_wait_period(&overruns);
@@ -300,27 +297,27 @@ void MCAgent::updateTaskInfo(monitoringMsg msg)
    // printInquireInfo((RT_TASK*) msg.task);
    for (auto& _taskChain : allTaskChain)
    {
-      for (auto& _task : _taskChain->taskList)
+      for (auto& _task : _taskChain.taskList)
       {
          //cout << "Logged chain end at : " << _taskChain->currentEndTime/1.0e6 << endl;
          //cout << "Logged chain start at : " << msg.time/1.0e6 << endl;
          if( _task.id == msg.ID )
          {
-            if (_task.precedencyID == 0 && _taskChain->startTime == 0)
+            if (_task.precedencyID == 0 && _taskChain.startTime == 0)
             { // First task of the chain
-               _taskChain->startTime = msg.time;
-               _taskChain->logger->logStart(msg.time);
+               _taskChain.startTime = msg.time;
+               _taskChain.logger->logStart(msg.time);
                _task.setState(TRUE);
             }
-            else if (msg.isExecuted && _taskChain->checkPrecedency(_task.precedencyID))
+            else if (msg.isExecuted && _taskChain.checkPrecedency(_task.precedencyID))
             { // Next task of the chain
-               _taskChain->currentEndTime = std::max(_taskChain->currentEndTime, msg.time);
+               _taskChain.currentEndTime = std::max(_taskChain.currentEndTime, msg.time);
                _task.setState(TRUE);
-               if (_taskChain->checkIfEnded())
+               if (_taskChain.checkIfEnded())
                {
-                  _taskChain->logger->logExec(_taskChain->currentEndTime);
-                  if (_taskChain->isAtRisk) setMode(MODE_NOMINAL);
-                  _taskChain->resetChain();
+                  _taskChain.logger->logExec(_taskChain.currentEndTime);
+                  if (_taskChain.isAtRisk) setMode(MODE_NOMINAL);
+                  _taskChain.resetChain();
                }
             }
             return;
@@ -333,7 +330,7 @@ void MCAgent::saveData()
 {
    cout << "SAVING MoCoAgent datas" << endl;
    std::ofstream outputFileResume;
-   string s = stdOut;
+   string s = _stdOut;
    string file = s + "_Resume.txt";
    outputFileResume.open (file, std::ios::app);    // TO APPEND :  //,ios_base::app);
    RT_TASK_INFO cti;
@@ -350,7 +347,7 @@ void MCAgent::saveData()
 
     for (auto _taskChain : allTaskChain)
     {
-        _taskChain->logger->saveData(stdOut, 0);
+        _taskChain.logger->saveData(_stdOut, 0);
     }
 
 }
@@ -365,24 +362,26 @@ void MCAgent::displaySystemInfo(std::vector<end2endDeadlineStruct> _e2eDD,
                                  std::vector<rtTaskInfosStruct> _tasksSet)
 {
    #if VERBOSE_INFO
-   cout << "INPUT Informations : " << endl;
+   cout << "- MoCoAgent input database -" << endl;
+   cout << "------- Task  Chains -------" << endl;
    for (auto &taskdd : _e2eDD)
    { // Print chain params
       cout << "|- Chain: "      << taskdd.name       << "\n"
-           << " ‾|- ID      : " << taskdd.taskChainID       << "\n"
+           << "‾|- ID      : " << taskdd.taskChainID       << "\n"
            << "  |- Deadline: " << taskdd.deadline /1.0e6   << "\n"
            << "  |- Path    : " << taskdd.Path             // << "\n"
            << endl;
    }
+   cout << "-------- Tasks List --------" << endl;
    for (auto &taskParam : _tasksSet)
    { // Print task Params
       cout << "  |- Task    : "  << taskParam.fP.name            << "\n"
-           << "   ‾|- ID      : " << taskParam.fP.id               << "\n"
-           << "     |- Period  : " << taskParam.rtP.periodicity /1.0e6  << "\n"
-           << "     |- WCET    : " << taskParam.fP.wcet /1.0e6      << "\n"
-           << "     |- affinity: " << taskParam.rtP.affinity         << "\n"
-           << "     |- RealTime: " << taskParam.fP.isHRT   << "\n"
-           << "     |- path    : " << taskParam.fP.func      //  << "\n"
+           << "  ‾|- ID      : " << taskParam.fP.id               << "\n"
+           << "    |- Period  : " << taskParam.rtP.periodicity /1.0e6  << "\n"
+           << "    |- WCET    : " << taskParam.fP.wcet /1.0e6      << "\n"
+           << "    |- affinity: " << taskParam.rtP.affinity         << "\n"
+           << "    |- RealTime: " << taskParam.fP.isHRT   << "\n"
+           << "    |- path    : " << taskParam.fP.func      //  << "\n"
            << endl;
    }
    #endif
@@ -394,22 +393,22 @@ void MCAgent::displayChains()
    cout << "Displaying MoCoAgent Database : " << "\n";
    for (auto& chain : allTaskChain)
    { // Print chain params
-      cout << "|- Chain #" << chain->chainID << " - " << chain->name
-           << "  |- Deadline: " << chain->end2endDeadline /1.0e6 << " ms."
+      cout << "|- Chain #" << chain.chainID << " - " << chain.name
+           << "  |- Deadline: " << chain.end2endDeadline /1.0e6 << " ms."
            << endl;
-      chain->displayTasks();
+      chain.displayTasks();
    }
    #endif
 }
 
 //////////////////////////////////////////
 /////////// TASK CHAIN CLASS /////////////
-taskChain::taskChain(end2endDeadlineStruct _tcDeadline)
+taskChain::taskChain(end2endDeadlineStruct _tcDeadline, string outfile)
 {
    strcpy(name, _tcDeadline.name);
    chainID = _tcDeadline.taskChainID;
    end2endDeadline = _tcDeadline.deadline;
-   logger = new ChainDataLogger(&_tcDeadline);
+   logger = new ChainDataLogger(&_tcDeadline, outfile);
    startTime = 0;
    currentEndTime = 0;
 }
@@ -496,7 +495,7 @@ void taskChain::displayTasks()
   for (auto &_task : taskList)
   { // Print task Params
       RT_TASK_INFO xenoInfos;
-      rt_task_inquire(_task.xenoTask, &xenoInfos);
+      rt_task_inquire(&_task.xenoTask, &xenoInfos);
       cout << "  |- Task    : "  << xenoInfos.name            << "\n"
            << "   ‾‾|- ID      : " << _task.id               << "\n"
            << "     |- Deadline: " << _task.deadline /1.0e6  << "\n"
@@ -516,18 +515,18 @@ void taskChain::displayTasks()
 * @params : vec<rtTaskInfosStruct> rtTasks
 * @returns : [ vector<taskMonitoringStruct> taskList ]
 ***********************/
-taskMonitoringStruct::taskMonitoringStruct(rtTaskInfosStruct* _taskInfos)
+taskMonitoringStruct::taskMonitoringStruct(rtTaskInfosStruct _taskInfos)
 {
-   ERROR_MNG(rt_task_bind(xenoTask,_taskInfos->fP.name, TM_INFINITE));
-   deadline = _taskInfos->rtP.periodicity;
-   rwcet = _taskInfos->fP.wcet;
-   id = _taskInfos->fP.id;
-   precedencyID = _taskInfos->fP.prec;
+   ERROR_MNG(rt_task_bind(&xenoTask, _taskInfos.fP.name, TM_NONBLOCK));
+   deadline = _taskInfos.rtP.periodicity;
+   rwcet = _taskInfos.fP.wcet;
+   id = _taskInfos.fP.id;
+   precedencyID = _taskInfos.fP.prec;
 
    setState(FALSE);
    //endTime = 0;
    char mutexName[38];
-   strcpy(mutexName, _taskInfos->fP.name);
+   strcpy(mutexName, _taskInfos.fP.name);
    strncat(mutexName, "_StMTX", 6);
    rt_mutex_create(&mtx_taskStatus, mutexName);
 

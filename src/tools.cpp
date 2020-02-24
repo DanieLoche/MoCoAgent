@@ -18,8 +18,17 @@ std::string reduce(const std::string& str,
                    const std::string& fill,
                    const std::string& whitespace)
 {
+   string tmp = str;
+   for (int chr = 0; tmp[chr] != '\0'; chr++)
+   {
+      if ((tmp[chr] <= 0x20 || tmp[chr] >= 0x7A) && tmp[chr] != ' ')
+      {
+         tmp[chr] = ' ';
+         rt_fprintf(stderr, "/!\\ Strange ASCII char found !! (%c)\n", tmp[chr]);
+      }
+   }
     // trim first
-    auto result = trim(str, whitespace);
+    auto result = trim(tmp, whitespace);
 
     // replace sub ranges
     auto beginSpace = result.find_first_of(whitespace);

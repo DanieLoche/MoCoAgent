@@ -24,15 +24,16 @@
 #define   VERBOSE_OTHER     1 // Cout autre...
 #define   VERBOSE_ASK       1 // cout explicitement demandés dans le code
 
+#include <unistd.h>
+#include <cstdlib>
 #include <fstream>
 #include <sstream>
 #include <iostream>
 #include <string>
 #include <vector>
 #include <algorithm>
-#include <unistd.h>
 #include <signal.h>
-#include <cstdlib>
+#include <sys/types.h>
 
 #include <alchemy/task.h>
 #include <alchemy/sem.h>
@@ -48,20 +49,33 @@ using std::endl;
 using std::cin;
 using std::cerr;
 
-#define Sec2T(_time)  rt_timer_ns2ticks((_time)*1e9)
-#define mS2T(_time)   rt_timer_ns2ticks((_time)*1e6)
-#define uS2T(_time)   rt_timer_ns2ticks((_time)*1e3)
-#define nS2T(_time)   rt_timer_ns2ticks(_time)
+
+#define _SEC(_time)    ((_time)*1000 * 1000 * 1000)
+#define _mSEC(_time)   ((_time)*1000 * 1000)
+#define _uSEC(_time)   ((_time)*1000)
+
+const char* getErrorName(int error);
 
 #define ERROR_MNG(fct)                                                 \
 do {                                                                   \
    int err = fct;                                                      \
    if ( err != 0)                                                      \
    {                                                                   \
-      rt_fprintf(stderr, "%s-%s error %d\n", __FUNCTION__, #fct, err); \
+      const char* errName = getErrorName(err);                              \
+      rt_fprintf(stderr, "%s-%s error %s (%d)\n", __FUNCTION__, #fct, errName, err); \
       exit(EXIT_FAILURE);                                              \
    }                                                                   \
 } while(0)
+
+#define TRY_CONV(name, from, to)                                                \
+   if (i+1 < argc) {                                                            \
+      if (sscanf(from[++i], "%d", &to) != 1)                                    \
+      {   printf("Error, value for %s (%s) is not an int.\n", name, from[i-1]); \
+          show_usage(EXIT_FAILURE);     }                                       \
+   } else { printf("Error : argument missing after option for %s.\n", name);    \
+          show_usage(EXIT_FAILURE);  }
+
+
 
 //#define TO_STRING(str) convertToString(str)
 
@@ -70,7 +84,7 @@ struct rtPStruct // Real-time Parameters
    //RT_TASK* _t;  //
 
    int affinity; //
-   RTIME periodicity; //
+   RTIME periodicity; // in clock ticks, inputed as ms !
    int priority;      //
    int schedPolicy;   //
 
@@ -92,6 +106,58 @@ struct rtTaskInfosStruct
    rtPStruct rtP;
    funcPStruct fP;
 };
+
+struct sortAscendingPeriod {
+   inline bool operator() (const rtTaskInfosStruct& struct1, const rtTaskInfosStruct& struct2)
+   {
+      return (struct1.rtP.periodicity < struct2.rtP.periodicity);
+   }
+};
+struct sortDescendingPeriod {
+   inline bool operator() (const rtTaskInfosStruct& struct1, const rtTaskInfosStruct& struct2)
+   {
+      return (struct1.rtP.periodicity > struct2.rtP.periodicity);
+   }
+};
+
+struct end2endDeadlineStruct
+{
+  char name[32];
+  int taskChainID;
+  string Path;
+  RTIME deadline;
+};
+
+struct monitoringMsg
+{
+  RT_TASK* task;
+  int ID;
+  RTIME time;   // Run-time - received
+  bool isExecuted;    // Run-time - computed
+};
+
+
+std::string trim(const std::string& str,
+                 const std::string& whitespace = " \t");
+
+std::string reduce(const std::string& str,
+                   const std::string& fill = " ",
+                   const std::string& whitespace = " \t");
+
+//string convertToString(const char* a){ std::string s = a; return s; }
+
+void printInquireInfo(RT_TASK*);
+void printTaskInfo(rtTaskInfosStruct* task);
+void print_affinity(pid_t _pid);
+
+// struct systemRTInfo
+// {
+//   std::vector<end2endDeadlineStruct> e2eDD;
+//   std::vector<rtTaskInfosStruct> rtTIs;
+//   //bool* triggerSave;
+//   //string outputFileName;
+// };
+
 /*
 struct logData
 {
@@ -119,58 +185,6 @@ struct logData
    int priority;      //
    int schedPolicy;   //
 };*/
-
-struct sortAscendingPeriod {
-   inline bool operator() (const rtTaskInfosStruct& struct1, const rtTaskInfosStruct& struct2)
-   {
-      return (struct1.rtP.periodicity < struct2.rtP.periodicity);
-   }
-};
-struct sortDescendingPeriod {
-   inline bool operator() (const rtTaskInfosStruct& struct1, const rtTaskInfosStruct& struct2)
-   {
-      return (struct1.rtP.periodicity > struct2.rtP.periodicity);
-   }
-};
-
-struct end2endDeadlineStruct
-{
-  char name[32];
-  int taskChainID;
-  string Path;
-  RTIME deadline;
-};
-
-// struct systemRTInfo
-// {
-//   std::vector<end2endDeadlineStruct> e2eDD;
-//   std::vector<rtTaskInfosStruct> rtTIs;
-//   //bool* triggerSave;
-//   //string outputFileName;
-// };
-
-struct monitoringMsg
-{
-  RT_TASK* task;
-  int ID;
-  RTIME time;   // Run-time - received
-  bool isExecuted;    // Run-time - computed
-};
-
-
-std::string trim(const std::string& str,
-                 const std::string& whitespace = " \t");
-
-std::string reduce(const std::string& str,
-                   const std::string& fill = " ",
-                   const std::string& whitespace = " \t");
-
-//string convertToString(const char* a){ std::string s = a; return s; }
-
-void printInquireInfo(RT_TASK*);
-void printTaskInfo(rtTaskInfosStruct* task);
-void print_affinity(pid_t _pid);
-
 
 /* To create a task :
  * Arguments : &task,

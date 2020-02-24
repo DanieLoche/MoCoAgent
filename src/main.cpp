@@ -7,34 +7,27 @@
 #include <iomanip>
 
 #include "taskLauncher.h"
+#include "NanoLog.h"
 #include "tools.h"
 
 long nproc;
 
 TaskLauncher* tln;
 //MCAgent* mca;
-int enableAgent = 1; // 0 = Disable | 1 = Enable | 2 = Enable for monitoring only
-long expeDuration = 0;
+
 string inputFile = "input_chaine.txt", outputFile = "ExpeOutput";
+int enableAgent = 1; // 0 = Disable | 1 = Enable | 2 = Enable for monitoring only
+int expeDuration = 60;
 int schedMode = SCHED_FIFO, cpuFactor = 100;
 
-/*
-std::streambuf *cinbuf;
-std::streambuf *coutbuf;
-bool HandleOnce = false;
-void endOfExpeHandler(void){
-   if (!HandleOnce)
-   {
-      HandleOnce = true;
-      tln->saveData(outputFile);
-      #if VERBOSE_INFO
-      cout << "\n------------------------------" << endl;
-      #endif
-   }
-   sleep(2);
-
+static void show_usage(bool status)
+{
+   cout  << "Format should be : " << '\n' << program_invocation_name
+         << " [-h | --help] | [-i input] [-o output] [-d duration] [-l load] [-e enable] [[]-s schedPolicy] | [-RR | -FIFO | -RM | -EDF]] " << '\n';
+   cout  << std::setw(sizeof(program_invocation_name)) << "Default is : "
+         << inputFile << " | " << outputFile << " | " << "No end time" << " | " << " 100% " << " | " << enableAgent << " | " << schedMode << " | " << endl;
+   exit(status);
 }
-*/
 
 int main(int argc, char* argv[])
 {
@@ -42,58 +35,49 @@ int main(int argc, char* argv[])
 
     //int i = ERROR_MNG(atexit(endOfExpeHandler));
 
-    // Définition fichier d'information des tâches
-    // [MoCoAgent Activation] [Experiment duration] [cpuFactor%] [input file : task chains] [outputfile] [sched policy]
-    //// "--" to set everything as default.
-    if (argc > 1)
-    { std::stringstream ss(argv[1]); // HELP or Agent Enable
-        if (ss.str() == "-h" || ss.str() == "help" || ss.str() == "--help")
-        { // HELP message
-            cout  << "Format should be : " << endl
-                << argv[0] << " [MoCoAgent Activation] " << " | " << " [duration] " << " | " << "[wcet %]" << " | "
-                << std::setw(inputFile.length()) << "[input file]" << " | "
-                << std::setw(outputFile.length()) << "[output file]" << '\n';
-            cout  << std::boolalpha << "Default using \"-\" : "
-                << std::setw(11) << enableAgent << std::setw(11) << " | " << "No end time." << " | " << " 100 %  "
-                << std::setw(inputFile.length()) << inputFile << " | "
-                << std::setw(outputFile.length()) << outputFile << endl;
-            return 0;
-        }
-        else if(ss.str() != "-" && sscanf(argv[1], "%d", &enableAgent) != 1)
-        { // ENABLE MoCoAgent - parse true/false as bool
-            printf("Error, %s is not an int ?!", argv[1]); return EXIT_FAILURE;
-        }
-    if (argc > 2)
-    { std::stringstream ss(argv[2]); // EXPE DURATION (s)
-        if(ss.str() != "-" && sscanf(argv[2], "%ld", &expeDuration) != 1)
-            { printf("Error, %s is not an int", argv[2]); return EXIT_FAILURE; }
+    for( int i = 1; i < argc; ++i)
+    {
+      std::string arg = argv[i];
+      cout << "Doing argument #" << i << " = " << arg << "." << endl;
+      if (arg == "-h" || arg == "--help" || arg == "help")
+         show_usage(EXIT_SUCCESS);
+      else if (arg == "-i" || arg == "--input")
+      {
+         if (i+1 < argc) inputFile = argv[++i];
+         else {printf("Error : argument missing after option for Input file name.\n");
+               show_usage(EXIT_FAILURE); }
+      }
+      else if (arg == "-o" || arg == "--output")
+      {
+         if (i+1 < argc) outputFile = argv[++i];
+         else {printf("Error : argument missing after option for Output file name.\n");
+               show_usage(EXIT_FAILURE); }
+      }
+      else if (arg == "-d" || arg == "--duration")
+      { // EXPE DURATION (s)
+         TRY_CONV("Expe. duration", argv, expeDuration);
+      }
 
-    if (argc > 3)
-    { std::stringstream ss(argv[3]);  // CPU % Factor
-        if(ss.str() != "-" && sscanf(argv[3], "%d", &cpuFactor) != 1)
-            { printf("Error, %s is not an int", argv[3]); return EXIT_FAILURE; }
+      else if (arg == "-l" || arg == "--load")
+      { // CPU % Factor
+         TRY_CONV("cpu factor", argv, cpuFactor);
+      }
 
-    if (argc > 4)
-    { std::stringstream ss(argv[4]);    // INPUT FILE
-        if (ss.str() != "-") inputFile = argv[4];
+      else if (arg == "-e" || arg == "--enable")
+      {// ENABLE MoCoAgent - parse true/false as bool
+         TRY_CONV("MoCoAgent mode", argv, enableAgent);
+      }
 
-    if (argc > 5)
-    { std::stringstream ss(argv[5]);     // OUTPUT FILE
-        if (ss.str() != "-") outputFile = argv[5];
+      else if (arg == "-s" || arg == "--schedPolicy")
+      { // Sched policy by value.
+         TRY_CONV("scheduling policy", argv, schedMode);
+      }
+      else if (arg == "-FIFO")   schedMode = SCHED_FIFO;
+      else if  (arg == "-RM")    schedMode = SCHED_RM;
+      else if  (arg == "-RR")    schedMode = SCHED_RR;
+      else if  (arg == "-EDF")   schedMode = SCHED_EDF; // NOT MANAGED !!
 
-    if (argc > 6)
-    { std::stringstream ss(argv[6]);    // SCHEDULING POLICY
-        string _schedMode = ss.str();
-        if (_schedMode == "FIFO")     schedMode = SCHED_FIFO;
-        else if  (_schedMode == "RM") schedMode = SCHED_RM;
-        else if  (_schedMode == "RR") schedMode = SCHED_RR;
-        else if  (_schedMode == "EDF") schedMode = SCHED_RM;
-    } // if arg 6
-    } // if arg 5
-    } // if arg 4
-    } // if arg 3
-    } // if arg 2
-    } // if arg 1
+    }
 
     cout << "Experiment made with parameters : \n"
       << " MoCoAgent: " << enableAgent  << "\n"
@@ -180,15 +164,11 @@ void printInquireInfo(RT_TASK* task)
    RT_TASK_INFO curtaskinfo;
    int ret = 0;
    if ((ret = rt_task_inquire(task, &curtaskinfo)))
-   {  cout << ret;
-      if (ret == -EINVAL) cerr << "\n - Invalid Task Descriptor or invalid Prio." << endl;
-      if (ret == -EPERM) cerr << "\n - Task is NULL, and service called from invalid context." << endl;
+   {  cout << "\n Inquire Error (" << ret;
+      if (ret == -EINVAL) cerr << ") - Invalid Task Descriptor or invalid Prio." << endl;
+      if (ret == -EPERM) cerr << ") - Task is NULL, and service called from invalid context." << endl;
    } else {
-      std::stringstream ss;
-      ss << "[ " << curtaskinfo.name
-      << " ] (PID : " << curtaskinfo.pid << "), of priority "
-      << curtaskinfo.prio << endl;
-      cout << ss.rdbuf();
+      rt_printf("[ %s ] - (PID : %d) - Priority = %d.\n", curtaskinfo.name, curtaskinfo.pid, curtaskinfo.prio);
    }
    #endif
 }
@@ -197,14 +177,13 @@ void printTaskInfo(rtTaskInfosStruct* task)
 {
    #if VERBOSE_OTHER
    std::stringstream ss;
-   ss << "Name: "       << task->fP.name
-   << "| func: "     << task->fP.func
-   << "| is RT ? "   << task->fP.isHRT
-   << "| Deadline: " << task->rtP.periodicity
-   << "| affinity: " << task->rtP.affinity
-   << "| priority: " << task->rtP.priority
-   << "| schedPolicy: " << task->rtP.schedPolicy
-   << "| ID :"       << task->fP.id
+   ss << "___ ["       << task->fP.name << "] - parameter summary : "
+      << "\n" << "  |- ID :"       << task->fP.id << " (isHRT : " << task->fP.isHRT << ")"
+      << "\n" << "  |- func : "     << task->fP.func << " | Args : " << task->fP.args
+      << "\n" << "  |- Period: "   << task->rtP.periodicity
+              << " | on core : " << task->rtP.affinity
+              << " | at priority : " << task->rtP.priority << " | Policy: "   << getSchedPolicyName(task->rtP.schedPolicy) << "(" << task->rtP.schedPolicy << ")"
+      << "\n" << "  |- WCET = " << task->fP.wcet << " | Precedent task ID : " << task->fP.prec
    << endl;
    cout << ss.rdbuf();
    #endif

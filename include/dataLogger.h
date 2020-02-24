@@ -24,7 +24,7 @@ class DataLogger
 
    public :
       unsigned long overruns;
-      DataLogger( );
+      DataLogger(string expeName );
 
       void logStart(RTIME );
       RTIME logStart();
@@ -41,7 +41,7 @@ class TaskDataLogger : public DataLogger
       inline char* getName();
 
    public :
-      TaskDataLogger(rtTaskInfosStruct*);
+      TaskDataLogger(rtTaskInfosStruct*, string expeName);
       void saveData(string, int);
 
 };
@@ -55,7 +55,7 @@ class ChainDataLogger : public DataLogger
    public :
       int cptAnticipatedMisses;
 
-      ChainDataLogger(end2endDeadlineStruct*);
+      ChainDataLogger(end2endDeadlineStruct*, string expeName);
       void saveData(string, int);
 
 };

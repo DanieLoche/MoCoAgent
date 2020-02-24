@@ -2,9 +2,14 @@
 #include "dataLogger.h"
 #include "NanoLog.h"
 
-DataLogger::DataLogger(){}
+DataLogger::DataLogger(string expeName){
+   //nanolog::initialize(nanolog::GuaranteedLogger(), ".", "nanolog", 1);
+   //LOG_INFO << "This is a Information Log test !";
+   //LOG_WARN << "This is a WARNING log.";
+   //LOG_CRIT << "This is a CRITical log message.";
+}
 
-ChainDataLogger::ChainDataLogger(end2endDeadlineStruct* chainInfos)
+ChainDataLogger::ChainDataLogger(end2endDeadlineStruct* chainInfos, string expeName) : DataLogger(expeName)
 {
    deadline = chainInfos->deadline;
 
@@ -15,7 +20,7 @@ ChainDataLogger::ChainDataLogger(end2endDeadlineStruct* chainInfos)
    //cout << "Init of Chains logger is okay." << endl;
 }
 
-TaskDataLogger::TaskDataLogger(rtTaskInfosStruct* _taskInfos)
+TaskDataLogger::TaskDataLogger(rtTaskInfosStruct* _taskInfos, string expeName) : DataLogger(expeName)
 {
    taskInfos = _taskInfos;
    deadline = taskInfos->rtP.periodicity;
@@ -193,7 +198,7 @@ void ChainDataLogger::saveData(string file, int nameSize)
    outputFileResume << "\nRunning summary for Chain " << getName() << ". ( " << chainInfos->taskChainID << " )" << "\n"
                     << "Deadline : " << deadline / 1.0e6     << " ms." << " Anticipated Misses" << " | "
                     <<   " Missed "     << " | " << " Chain loops " << "\n"
-                    
+
                     << "                  "         << std::setw(20) <<  cptAnticipatedMisses << " | "
                     << std::setw(10) << cptOutOfDeadline << " | " << cptExecutions << " times" << "\n"
 
