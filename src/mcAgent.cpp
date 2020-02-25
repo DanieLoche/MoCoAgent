@@ -38,8 +38,11 @@ MCAgent::MCAgent(rtTaskInfosStruct _taskInfo,
 
 void MCAgent::initCommunications()
 {
-   rt_buffer_create(&_buff, MESSAGE_TOPIC_NAME, 20*sizeof(monitoringMsg), B_FIFO);
-   rt_event_create(&_event, CHANGE_MODE_EVENT_NAME, 0, EV_PRIO);
+   //int ret = 0;
+   ERROR_MNG(rt_buffer_create(&_buff, MESSAGE_TOPIC_NAME, 20*sizeof(monitoringMsg), B_PRIO));
+   //rt_printf("Buffer %s creation : %s (%d).\n", MESSAGE_TOPIC_NAME, getErrorName(ret), ret);
+   ERROR_MNG(rt_event_create(&_event, CHANGE_MODE_EVENT_NAME, 0, EV_PRIO));
+   //rt_printf("Event %s creation : %s (%d).\n",CHANGE_MODE_EVENT_NAME, getErrorName(ret), ret);
 }
 
 /***********************
@@ -328,6 +331,8 @@ void MCAgent::updateTaskInfo(monitoringMsg msg)
 
 void MCAgent::saveData()
 {
+   rt_mutex_create(&_mut, LOG_MUTEX_NAME);
+   rt_mutex_acquire(&_mut, TM_INFINITE);
    cout << "SAVING MoCoAgent datas" << endl;
    std::ofstream outputFileResume;
    string s = _stdOut;
@@ -345,10 +350,13 @@ void MCAgent::saveData()
                     << endl;
    outputFileResume.close();
 
-    for (auto _taskChain : allTaskChain)
-    {
-        _taskChain.logger->saveData(_stdOut, 0);
-    }
+   if (!allTaskChain.empty())
+      for (auto _taskChain : allTaskChain)
+      {
+         _taskChain.logger->saveData(_stdOut, 32);
+      }
+
+   rt_mutex_release(&_mut);
 
 }
 

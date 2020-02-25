@@ -16,7 +16,7 @@ int do_xeno_init(char* _name)
       //"--enable-registry"
       //"--registry-root=/usr/xenomai",
       "--shared-registry",
-      "--session=test",
+      "--session=MoCoAgent",
       //"--dump-config",
       NULL
    };
@@ -42,7 +42,7 @@ TaskProcess::TaskProcess(rtTaskInfosStruct _taskInfo, bool MoCo)
 
    parseParameters(_taskInfo.fP.args);
    rt_print_flush_buffers();
-   setIO( );
+   //setIO( );
 }
 
 void TaskProcess::setRTtask(rtPStruct _rtInfos, char* _name)
@@ -260,11 +260,11 @@ void TaskProcess::setIO( )
 
 MacroTask::MacroTask(rtTaskInfosStruct _taskInfo, bool MoCo) : TaskProcess(_taskInfo, MoCo)
 {
+   setIO( );
    prop = _taskInfo;
    dataLogs = new TaskDataLogger(&prop, _stdOut);
    findFunction(_taskInfo.fP.func);
 
-   msg.task    = &_task;
    msg.ID      = prop.fP.id;
    msg.time    = 0;
    msg.isExecuted = 0;
@@ -368,7 +368,7 @@ void MacroTask::executeRun()
 {
    if (MoCoIsAlive)
    {
-      ERROR_MNG(rt_buffer_bind (&_buff , MESSAGE_TOPIC_NAME, 1*1e9));// 1s timeout
+      ERROR_MNG(rt_buffer_bind(&_buff, MESSAGE_TOPIC_NAME, _mSEC(500)));
    }
    //cout << "Running..." << endl;
    while (1)
@@ -407,7 +407,11 @@ int MacroTask::after_besteff()
 void MacroTask::executeRun_besteffort()
 {
    //cout << "Running..." << endl;
-   ERROR_MNG(rt_event_bind(&_event, CHANGE_MODE_EVENT_NAME, 10*1e9)); // 5 seconds timeout
+   if (MoCoIsAlive)
+   {
+      ERROR_MNG(rt_event_bind(&_event, CHANGE_MODE_EVENT_NAME, _mSEC(500)));
+   }
+
    unsigned int flag;
    while (1)
    {
@@ -425,82 +429,10 @@ void MacroTask::executeRun_besteffort()
 void MacroTask::finishProcess(void* _task)
 {
    MacroTask* task = (MacroTask*) _task;
+   rt_mutex_bind(&(task->_mut), LOG_MUTEX_NAME, TM_INFINITE);
+
+   rt_mutex_acquire(&(task->_mut), TM_INFINITE);
    task->dataLogs->saveData(task->prop.fP.name, 32);
+   rt_mutex_release(&(task->_mut));
 
-}
-
-const char* getSchedPolicyName(int schedPol)
-{
-   switch (schedPol)
-   {
-      case SCHED_FIFO      :
-         return "FIFO\0";
-      break;
-      case SCHED_RR        :
-         return "Round-Robin\0";
-      break;
-      case SCHED_WEAK      :
-         return "Weak\0";
-      break;
-      case SCHED_COBALT    :
-         return "Cobalt\0";
-      break;
-      case SCHED_SPORADIC  :
-         return "Sporadic\0";
-      break;
-      case SCHED_TP        :
-         return "TimePartitioning\0";
-      break;
-      case SCHED_QUOTA     :
-         return "QUOTA\0";
-      break;
-      case SCHED_EDF       :
-         return "Earliest Deadline First\0";
-      break;
-      case SCHED_RM        :
-         return "Rate-Monotonic\0";
-      break;
-      default : return "Undefined Policy\0";
-      break;
-   }
-};
-
-const char* getErrorName(int err)
-{
-   switch (err)
-   {
-      case 0   :
-         return "No Error.\0";
-      case -EINTR  :
-         return "EINTR\0";
-         break;
-      case -EWOULDBLOCK  :
-         return "EWOULDBLOCK\0";
-         break;
-      case -ETIMEDOUT :
-         return "ETIMEDOUT\0";
-         break;
-      case -EPERM  :
-         return "EPERM\0";
-         break;
-      case -EEXIST :
-         return "EEXIST\0";
-         break;
-      case -ENOMEM :
-         return "ENOMEM\0";
-         break;
-      case -EINVAL :
-         return "EINVAL\0";
-         break;
-      case -EDEADLK   :
-         return "EDEADLK\0";
-         break;
-      case -ESRCH  :
-         return "ESRCH\0";
-         break;
-      case -EBUSY  :
-         return "EBUSY\0";
-         break;
-      default: return "Undefined Error Code.\0";
-   }
 }

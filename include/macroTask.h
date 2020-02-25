@@ -11,13 +11,13 @@
 #define   MODE_NOMINAL        -1
 #define   MODE_DISABLE        0
 
-#define CHANGE_MODE_EVENT_NAME   "/modeChangeTopic"
-#define MESSAGE_TOPIC_NAME       "/monitoringTopic"
+#define CHANGE_MODE_EVENT_NAME   "modeChangeEvent"
+#define MESSAGE_TOPIC_NAME       "monitoringTopic"
+#define LOG_MUTEX_NAME           "logToFileMutex"
 
 const RTIME t_RT = 000*1.0e6;  // time to trigger the Control Agent
 const RTIME Wmax = 000*1.0e6;    // next slice max time
 
-const char* getSchedPolicyName(int schedPol);
 
 class taskMonitoringStruct
 {
@@ -81,6 +81,7 @@ class TaskProcess
       void setIO( );
 
    public:
+      RT_MUTEX _mut;
       RT_TASK _task;
       RT_BUFFER _buff;
 

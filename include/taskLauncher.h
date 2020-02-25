@@ -8,7 +8,7 @@
 
 #define ALARM_NAME   "endOfExpe_Alarm"
 #define SEM_NAME     "Start_Sem"
-#define MCA_PERIOD   2 // ms
+#define MCA_PERIOD   20 // ms
 
 class TaskLauncher
 {

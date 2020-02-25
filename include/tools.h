@@ -1,29 +1,6 @@
 #ifndef TOOLS_H
 #define TOOLS_H
 
-#define   TRUE    1
-#define   FALSE   0
-
-//define    SCHED_FIFO      1 // First-In First-Out
-//define    SCHED_RR        2 // Round-Robin
-//define    SCHED_WEAK      0 // Weak
-//define    SCHED_COBALT    3 // Cobalt
-//define    SCHED_SPORADIC  4 // Sporadic
-//define    SCHED_TP        5 // TP
-//define    SCHED_QUOTA     8 // Quota
-#define     SCHED_EDF       6 // Not Implemented
-#define     SCHED_RM        7 // Rate-Monotonic
-
-#define   RR_SLICE_TIME     20e9  // clock ticks (=ns)
-#define   SPINTIME          1e7   // spin time in ns
-#define   EXECTIME          2e8   // execution time in ns
-
-
-#define   VERBOSE_INFO      1 // Cout d'informations, démarrage, etc...
-#define   VERBOSE_DEBUG     1 // Cout de débug...
-#define   VERBOSE_OTHER     1 // Cout autre...
-#define   VERBOSE_ASK       1 // cout explicitement demandés dans le code
-
 #include <unistd.h>
 #include <cstdlib>
 #include <fstream>
@@ -49,12 +26,35 @@ using std::endl;
 using std::cin;
 using std::cerr;
 
+#define   TRUE    1
+#define   FALSE   0
+
+//define    SCHED_FIFO      1 // First-In First-Out
+//define    SCHED_RR        2 // Round-Robin
+//define    SCHED_WEAK      0 // Weak
+//define    SCHED_COBALT    3 // Cobalt
+//define    SCHED_SPORADIC  4 // Sporadic
+//define    SCHED_TP        5 // TP
+//define    SCHED_QUOTA     8 // Quota
+#define     SCHED_EDF       6 // Not Implemented
+#define     SCHED_RM        7 // Rate-Monotonic
+
+#define   RR_SLICE_TIME     20e9  // clock ticks (=ns)
+#define   SPINTIME          1e7   // spin time in ns
+#define   EXECTIME          2e8   // execution time in ns
+
+
+#define   VERBOSE_INFO      1 // Cout d'informations, démarrage, etc...
+#define   VERBOSE_DEBUG     1 // Cout de débug...
+#define   VERBOSE_OTHER     1 // Cout autre...
+#define   VERBOSE_ASK       1 // cout explicitement demandés dans le code
 
 #define _SEC(_time)    ((_time)*1000 * 1000 * 1000)
 #define _mSEC(_time)   ((_time)*1000 * 1000)
 #define _uSEC(_time)   ((_time)*1000)
 
 const char* getErrorName(int error);
+const char* getSchedPolicyName(int schedPol);
 
 #define ERROR_MNG(fct)                                                 \
 do {                                                                   \
@@ -130,7 +130,7 @@ struct end2endDeadlineStruct
 
 struct monitoringMsg
 {
-  RT_TASK* task;
+  //RT_TASK* task;
   int ID;
   RTIME time;   // Run-time - received
   bool isExecuted;    // Run-time - computed

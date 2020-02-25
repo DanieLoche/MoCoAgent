@@ -156,24 +156,24 @@ int TaskLauncher::runTasks(long expeDuration)
          //ERROR_MNG(rt_task_shadow(&_t, "TOTO", 1, 0));
          //sleep(50);
          currentProcess = new MacroTask(currentTaskDescriptor, enableAgent);
-         rt_printf("[ %s ] - Process created (pid = %d).\n", currentTaskDescriptor.fP.name, getpid());
+         //rt_printf("[ %s ] - Process created (pid = %d).\n", currentTaskDescriptor.fP.name, getpid());
 
          ERROR_MNG(rt_alarm_create(&_endAlarm, ALARM_NAME, MacroTask::finishProcess, (void*)&currentProcess)); //ms to ns
-         rt_printf("[ %s ] - Alarm %s created.\n", currentTaskDescriptor.fP.name, ALARM_NAME);
+         //rt_printf("[ %s ] - Alarm %s created.\n", currentTaskDescriptor.fP.name, ALARM_NAME);
 
          ERROR_MNG(rt_sem_bind(&_syncSem, SEM_NAME, TM_INFINITE)); // Wait Semaphor created.
-         rt_printf("[ %s ] - Semaphor %s joined.\n", currentTaskDescriptor.fP.name, SEM_NAME);
+         //rt_printf("[%llu][ %s ] - Semaphor %s joined.\n", rt_timer_read(), currentTaskDescriptor.fP.name, SEM_NAME);
 
          rt_alarm_start(&_endAlarm, _SEC(expeDuration), TM_INFINITE);
-         rt_printf("[ %s ] - Alarm %s set.\n", currentTaskDescriptor.fP.name, ALARM_NAME);
+         //rt_printf("[ %s ] - Alarm %s set.\n", currentTaskDescriptor.fP.name, ALARM_NAME);
 
          ERROR_MNG(rt_sem_v(&_syncSem)); // Signal that this task is ready.
-         rt_printf("[ %s ] - Semaphor %s released !\n", currentTaskDescriptor.fP.name, SEM_NAME);
+         //rt_printf("[%llu][ %s ] - Semaphor %s released !\n", rt_timer_read(), currentTaskDescriptor.fP.name, SEM_NAME);
+         rt_task_sleep(_mSEC(20));
          rt_task_wait_period(0);
          ERROR_MNG(rt_sem_p(&_syncSem, TM_INFINITE)); // Wait broadcast to run.
-         rt_printf("[ %s ] - Semaphor %s signal received, go !\n", currentTaskDescriptor.fP.name, SEM_NAME);
+         //rt_printf("[%llu][ %s ] - Semaphor %s signal received, go !\n", rt_timer_read(), currentTaskDescriptor.fP.name, SEM_NAME);
 
-exit(0);
          if (currentTaskDescriptor.fP.isHRT == 0) {
             currentProcess->executeRun_besteffort();
          }
@@ -184,7 +184,10 @@ exit(0);
       }
       else // pid = forked task pid_t
       {
-         sleep(1);
+         //RT_TASK _t;
+         //int ret = rt_task_bind(&_t, taskInfo.fP.name, _mSEC(500));
+         //cout << "Waiting to bind to " << taskInfo.fP.name << "..." << getErrorName(ret) << " (" << ret << ")" << endl;
+         sleep(0.5);
       }
    }
    return 0;
@@ -205,34 +208,30 @@ int TaskLauncher::runAgent(long expeDuration)
       99,         // id
       "MoCoAgent", // char[32] name
       "",         // function
-      " ", //+outputFileName,    // arguments
+      " > "+outputFileName,    // arguments
       99,0,0,     // isHRT/task chain ID,precedency & WCET.
    };
    currentTaskDescriptor = MoCoAgentParams;
    printTaskInfo(&currentTaskDescriptor);
+
+   //printf("dumping the registry\n") ;
+   //system("find /run/xenomai") ; // see what the registry is looking like
+   sleep(5);
    currentProcess = new MCAgent(currentTaskDescriptor, e2eDD, tasksSet);
-   rt_printf("[ %s ] - Process created (pid = %d).\n", currentTaskDescriptor.fP.name, getpid()); //cout << "["<< currentTaskDescriptor.fP.name << "]"<< "Macro task created." << endl;
+   //rt_printf("[ %s ] - Process created (pid = %d).\n", currentTaskDescriptor.fP.name, getpid()); //cout << "["<< currentTaskDescriptor.fP.name << "]"<< "Macro task created." << endl;
 
-   /*for (auto& taskInfo : tasksSet)
+   for (auto& taskInfo : tasksSet)
    {
-      RT_TASK _t;   //tasks.push_back(new RT_TASK);
-      int ret2 = 1;
-
-      while(ret2)
-      {
-         cout << "Trying..." << endl;
-         ret2 = rt_task_bind(&_t, taskInfo.fP.name, mS2T(500));
-         cout << "Waiting to bind to " << taskInfo.fP.name << "... (" << ret2 << ")" << endl;
-      }
-      tasks.push_back(&_t);
-      //ERROR_MNG(rt_task_bind(tasks.back(), taskInfo.fP.name, TM_INFINITE));
-      cout << "Task " << taskInfo.fP.name << " binded." << endl;
-   }*/
+      RT_TASK* _t = new RT_TASK;
+      ERROR_MNG(rt_task_bind(_t, taskInfo.fP.name, _mSEC(500)));
+      tasks.push_back(_t);
+   }
+   //sleep(50);
 
    ERROR_MNG(rt_alarm_create(&_endAlarm, ALARM_NAME, TaskLauncher::finishProcess, (void*)currentProcess)); //ms to ns
    rt_printf("[ %s ] - Alarm %s created.\n", currentTaskDescriptor.fP.name, ALARM_NAME); //cout << "["<< currentTaskDescriptor.fP.name << "]"<< "Alarm created." << endl;
    ERROR_MNG(rt_sem_create(&_syncSem, SEM_NAME, 0, S_PRIO)); // sync. #1: ready for alarms.
-   rt_printf("[ %s ] - Semaphor %s created.\n", currentTaskDescriptor.fP.name, SEM_NAME); //cout << "["<< currentTaskDescriptor.fP.name << "]"<< "Semaphor Created." << endl;
+   rt_printf("[%llu][ %s ] - Semaphor %s created.\n", rt_timer_read(), currentTaskDescriptor.fP.name, SEM_NAME); //cout << "["<< currentTaskDescriptor.fP.name << "]"<< "Semaphor Created." << endl;
    rt_task_wait_period(0);
    rt_alarm_start(&_endAlarm, _SEC(expeDuration), TM_INFINITE);
    rt_printf("[ %s ] - Alarm %s set.\n", currentTaskDescriptor.fP.name, ALARM_NAME); //cout << "["<< currentTaskDescriptor.fP.name << "]"<< "Alarm set." << endl;
@@ -240,13 +239,13 @@ int TaskLauncher::runAgent(long expeDuration)
    for (auto taskInfo = tasksSet.begin(); taskInfo != tasksSet.end(); ++taskInfo)
    { // waiting every alarm is set.
       rt_sem_p(&_syncSem, TM_INFINITE); // => wait for a semaphor release from every task.
-      rt_printf("[ %s ] - Semaphor %s catched !\n", currentTaskDescriptor.fP.name, SEM_NAME); //cout << "["<< currentTaskDescriptor.fP.name << "]"<< "Semaphor catched !" << endl;
+      rt_printf("[%llu][ %s ] - Semaphor %s catched !\n", rt_timer_read(), currentTaskDescriptor.fP.name, SEM_NAME); //cout << "["<< currentTaskDescriptor.fP.name << "]"<< "Semaphor catched !" << endl;
 
    }
 
    rt_sem_broadcast(&_syncSem); // Alarms OK. Start Run !
-   rt_printf("[ %s ] - Semaphor %s Broadcasted.\n", currentTaskDescriptor.fP.name, SEM_NAME); //cout << "["<< currentTaskDescriptor.fP.name << "]"<< "Semaphor Released (broadcast !)." << endl;
-exit(0);
+   rt_printf("[%llu][ %s ] - semaphor %s Broadcasted.\n", rt_timer_read(), currentTaskDescriptor.fP.name, SEM_NAME); //cout << "["<< currentTaskDescriptor.fP.name << "]"<< "Semaphor Released (broadcast !)." << endl;
+
    if (enableAgent == 2) currentProcess->executeRun_besteffort();
    else currentProcess->executeRun();
    return ret;
@@ -275,7 +274,6 @@ void TaskLauncher::stopTasks(bool val)
 void TaskLauncher::finishProcess(void* _arg)
 {
    MCAgent* task = (MCAgent*) _arg;
-
    rt_sem_delete(&_syncSem);
 
    cout << "Saving tasks data..." << endl;
