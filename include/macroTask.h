@@ -7,22 +7,26 @@
 #include "dataLogger.h"
 //#include "taskLauncher.h"
 
-#define   MODE_OVERLOADED     1
-#define   MODE_NOMINAL        -1
-#define   MODE_DISABLE        0
+#define  MODE_OVERLOADED          1
+#define  MODE_NOMINAL            -1
+#define  MODE_DISABLE             0
 
-#define CHANGE_MODE_EVENT_NAME   "modeChangeEvent"
-#define MESSAGE_TOPIC_NAME       "monitoringTopic"
-#define LOG_MUTEX_NAME           "logToFileMutex"
+#define  CHANGE_MODE_EVENT_NAME  "modeChangeEvent"
+#define  MESSAGE_TOPIC_NAME      "monitoringTopic"
+#define  LOG_MUTEX_NAME          "logToFileMutex"
 
-const RTIME t_RT = 000*1.0e6;  // time to trigger the Control Agent
-const RTIME Wmax = 000*1.0e6;    // next slice max time
+#define  USE_MUTEX               0
 
+#define   MCA_PERIOD             5 // ms
+const RTIME t_RT     =     000*1.0e6;  // time to trigger the Control Agent
+const RTIME Wmax     =     _mSEC(MCA_PERIOD);    // next slice max time
 
 class taskMonitoringStruct
 {
    private :
+      #if USE_MUTEX
       RT_MUTEX mtx_taskStatus;
+      #endif
       bool isExecuted; // Run-time - computed
 
    public :
@@ -73,7 +77,6 @@ class TaskProcess
       char _stdIn[35];
       char _stdOut[35];
       std::vector<char*> _argv;
-      static bool MoCoIsAlive;
 
       void setAffinity (int _aff, int mode);
       void setRTtask(rtPStruct, char*);
@@ -81,11 +84,11 @@ class TaskProcess
       void setIO( );
 
    public:
-      RT_MUTEX _mut;
+      static bool MoCoIsAlive;
       RT_TASK _task;
       RT_BUFFER _buff;
 
-      TaskProcess(rtTaskInfosStruct _taskInfo, bool MoCo);
+      TaskProcess(rtTaskInfosStruct _taskInfo);
       virtual void executeRun() = 0;
       virtual void executeRun_besteffort() = 0;
 };
@@ -93,7 +96,8 @@ class TaskProcess
 class MacroTask : public TaskProcess
 {
    protected :
-      rtTaskInfosStruct prop;
+      int ret;
+      TaskDataLogger* dataLogs;
       int (*proceed_function)(int Argc, char *argv[]);
 
       //void setRTtask(rtPStruct _rtInfos, char*);
@@ -105,10 +109,10 @@ class MacroTask : public TaskProcess
       inline int after_besteff();
 
    public :
-      TaskDataLogger* dataLogs;
+      rtTaskInfosStruct prop;
 
-      MacroTask(rtTaskInfosStruct, bool);
-      static void finishProcess(void* _task /*TaskProcess* task*/);
+      MacroTask(rtTaskInfosStruct taskInfos, bool MoCoMode, string name);
+      void saveData(int maxNameSize);
       void executeRun();
       void executeRun_besteffort();
 
@@ -117,7 +121,8 @@ class MacroTask : public TaskProcess
 class MCAgent : public TaskProcess
 {
    protected :
-      bool enable;
+      RT_TASK msgReceiverTask;
+      //bool enable;
       short runtimeMode;    // NOMINAL or OVERLOADED
       ulong overruns;
       std::vector<taskChain> allTaskChain;
@@ -168,12 +173,5 @@ extern "C" {
    int fft               (int argc, char *argv[]);
    int gsm_func          (int argc, char *argv[]);
 }
-
-extern void print_affinity(pid_t _pid);
-extern void printTaskInfo(rtTaskInfosStruct* task);
-//extern std::streambuf *cinbuf, *coutbuf;
-
-
-//extern void printTaskInfo(rtTaskInfosStruct* task);
 
 #endif

@@ -15,10 +15,11 @@ struct timeLog
 class DataLogger
 {
    protected :
+      string outputFileName;
       int cptOutOfDeadline;
-      RTIME deadline;
       int cptExecutions;
       std::array<timeLog, 4096> execLogs;
+      RTIME deadline;
 
       virtual char* getName() =0;
 
@@ -30,7 +31,7 @@ class DataLogger
       RTIME logStart();
       void logExec(RTIME );
       RTIME logExec();
-      virtual void saveData(string file, int nameSize) = 0;
+      virtual void saveData(int nameSize) = 0;
 
 };
 
@@ -42,21 +43,21 @@ class TaskDataLogger : public DataLogger
 
    public :
       TaskDataLogger(rtTaskInfosStruct*, string expeName);
-      void saveData(string, int);
+      void saveData(int nameSize);
 
 };
 
 class ChainDataLogger : public DataLogger
 {
    protected:
-      end2endDeadlineStruct* chainInfos;
+      end2endDeadlineStruct chainInfos;
       inline char* getName();
 
    public :
       int cptAnticipatedMisses;
 
-      ChainDataLogger(end2endDeadlineStruct*, string expeName);
-      void saveData(string, int);
+      ChainDataLogger(end2endDeadlineStruct, string expeName);
+      void saveData(int nameSize);
 
 };
 

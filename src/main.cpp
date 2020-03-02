@@ -1,21 +1,12 @@
-// #define VERBOSE_INFO  1 // Cout d'informations, démarrage, etc...
-// #define VERBOSE_DEBUG 0 // Cout de débug...
-// #define VERBOSE_OTHER 1 // Cout autre...
-// #define VERBOSE_ASK   1 // cout explicitement demandés dans le code
-
-#include <sys/sysinfo.h>
 #include <iomanip>
 
 #include "taskLauncher.h"
 #include "NanoLog.h"
 #include "tools.h"
 
-long nproc;
-
-TaskLauncher* tln;
 //MCAgent* mca;
 
-string inputFile = "input_chaine.txt", outputFile = "ExpeOutput";
+string inputFile = "input_chaine.txt", outputFile = "RES_60_1_FIFO_100";
 int enableAgent = 1; // 0 = Disable | 1 = Enable | 2 = Enable for monitoring only
 int expeDuration = 60;
 int schedMode = SCHED_FIFO, cpuFactor = 100;
@@ -31,8 +22,8 @@ static void show_usage(bool status)
 
 int main(int argc, char* argv[])
 {
-    nproc = get_nprocs();
-
+    //nproc = get_nprocs();
+    //setvbuf(stderr, NULL, _IOLBF, 4096) ;
     //int i = ERROR_MNG(atexit(endOfExpeHandler));
 
     for( int i = 1; i < argc; ++i)
@@ -80,21 +71,23 @@ int main(int argc, char* argv[])
     }
 
     cout << "Experiment made with parameters : \n"
-      << " MoCoAgent: " << enableAgent  << "\n"
+      << " MoCoAgent mode: " << enableAgent  << "\n"
       << "  Duration: " << expeDuration << "\n"
       << "CPU Factor: " << cpuFactor    << "\n"
+      << "Scheduling Policy: " << getSchedPolicyName(schedMode) << "("<< schedMode <<")" << "\n"
       << "Input  file: " << inputFile   << "\n"
-      << "Output files: " << outputFile << "_Expe.csv & "
-      << outputFile       << "_Chains.csv"  << " & "
-      << outputFile       << "_Resume.txt"    << endl;
+      << "Output files: "  << outputFile << RESUME_FILE << " & "
+                           << outputFile << CHAIN_FILE  << " & "
+                           << outputFile << TASKS_FILE  << endl;
 
    std::ofstream outputFileResume;
-   string outputFileName = outputFile + "_Resume.txt";
+   string outputFileName = outputFile + RESUME_FILE;
    outputFileResume.open (outputFileName, std::ios::app);    // TO APPEND :  //,ios_base::app);
    outputFileResume << "Experiment made with parameters : \n"
       << " MoCoAgent: " << enableAgent  << "\n"
       << "  Duration: " << expeDuration << "\n"
       << "CPU Factor: " << cpuFactor    << "\n"
+      << "Scheduling Policy: " << getSchedPolicyName(schedMode) << "("<< schedMode <<")" << "\n"
       << "Input  file: " << inputFile   << "\n"
       << "Output files: " << outputFile << "_Expe.csv & "
       << outputFile       << "_Chains.csv"  << " & "
@@ -105,7 +98,7 @@ int main(int argc, char* argv[])
    //cout << "Press a key to start (PID: " << getpid() << ")!" << endl;
    //cin.get();
 
-   tln = new TaskLauncher(outputFile, schedMode);
+   TaskLauncher* tln = new TaskLauncher(enableAgent, outputFile, schedMode);
 
    #if VERBOSE_INFO
    cout << "\n------------------------------" << endl;
@@ -113,11 +106,9 @@ int main(int argc, char* argv[])
    #endif
    if(tln->readChainsList(inputFile)) {cerr << "Failed to read task chains." << endl; return -1;}
    if(tln->readTasksList(cpuFactor)) {cerr << "Failed to read tasks list." << endl; return -2;}
-   //   if(tln->createMutexes(nproc)) {cout << "Failed to read tasks list." << endl; return -3;}
-
-   tln->printTasksInfos();
 
    if(tln->runTasks(expeDuration)) {cerr << "Failed to create all tasks" << endl; return -4;}
+
    if (enableAgent)
    {
       sleep(2);
@@ -153,72 +144,7 @@ int main(int argc, char* argv[])
    */
    //std::cin.rdbuf(cinbuf);   //reset to standard input again
    //std::cout.rdbuf(coutbuf); //reset to standard output again
-   cout << "End of Experimentation." << endl;
+   cout << "THIS IS A FAIL !!" << endl;
 
    exit(EXIT_SUCCESS);
-}
-
-void printInquireInfo(RT_TASK* task)
-{
-   #if VERBOSE_INFO
-   RT_TASK_INFO curtaskinfo;
-   int ret = 0;
-   if ((ret = rt_task_inquire(task, &curtaskinfo)))
-   {  cout << "\n Inquire Error (" << ret;
-      if (ret == -EINVAL) cerr << ") - Invalid Task Descriptor or invalid Prio." << endl;
-      if (ret == -EPERM) cerr << ") - Task is NULL, and service called from invalid context." << endl;
-   } else {
-      rt_printf("[ %s ] - (PID : %d) - Priority = %d.\n", curtaskinfo.name, curtaskinfo.pid, curtaskinfo.prio);
-   }
-   #endif
-}
-
-void printTaskInfo(rtTaskInfosStruct* task)
-{
-   #if VERBOSE_OTHER
-   std::stringstream ss;
-   ss << "___ ["       << task->fP.name << "] - parameter summary : "
-      << "\n" << "  |- ID :"       << task->fP.id << " (isHRT : " << task->fP.isHRT << ")"
-      << "\n" << "  |- func : "     << task->fP.func << " | Args : " << task->fP.args
-      << "\n" << "  |- Period: "   << task->rtP.periodicity
-              << " | on core : " << task->rtP.affinity
-              << " | at priority : " << task->rtP.priority << " | Policy: "   << getSchedPolicyName(task->rtP.schedPolicy) << "(" << task->rtP.schedPolicy << ")"
-      << "\n" << "  |- WCET = " << task->fP.wcet << " | Precedent task ID : " << task->fP.prec
-   << endl;
-   cout << ss.rdbuf();
-   #endif
-}
-
-void print_affinity(pid_t _pid)
-{
-   #if VERBOSE_ASK
-   int pid = _pid;
-   if (!_pid)
-   {
-      RT_TASK_INFO curtaskinfo;
-      rt_task_inquire(NULL, &curtaskinfo);
-      pid = curtaskinfo.pid;
-   }
-   cpu_set_t mask;
-
-   if (sched_getaffinity(_pid, sizeof(cpu_set_t), &mask) == -1) {
-      perror("sched_getaffinity");
-      assert(false);
-  } else {
-    long i;
-    std::stringstream ss;
-    ss << "Affinity of thread " << pid << " = ";
-    for (i = 0; i < nproc; i++)
-        ss << CPU_ISSET(i, &mask);
-    ss << endl;
-    cout << ss.rdbuf();
-    /* using printf
-    printf("sched_getaffinity = ");
-    for (i = 0; i < nproc; i++) {
-        printf("%d ", CPU_ISSET(i, &mask));
-    }
-    printf("\n");
-    */
-  }
-#endif
 }

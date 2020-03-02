@@ -8,7 +8,6 @@
 
 #define ALARM_NAME   "endOfExpe_Alarm"
 #define SEM_NAME     "Start_Sem"
-#define MCA_PERIOD   20 // ms
 
 class TaskLauncher
 {
@@ -28,24 +27,21 @@ class TaskLauncher
 
    public :
       //bool triggerSave;
-      TaskLauncher(string outputFileName, int schedPolicy);
+      TaskLauncher(int agentMode, string outputFileName, int schedPolicy);
       ~TaskLauncher(){};
 
       int readChainsList(string);
       int readTasksList (int cpuPercent);
-      //  int createMutexes(int nprocs);
       int runTasks(long expeDuration);
       int runAgent(long expeDuration);
-      void stopTasks(bool);
-      static void finishProcess(void* _arg /*MCAgent* task*/);
+      static void finishMoCoAgent(void* _arg /*MCAgent* task*/);
+      static void finishTask(void* _arg /*MCAgent* task*/);
+      //void stopTasks(bool);
       //void saveData(string);
-      void printTasksInfos (/* std::vector<rtTaskInfosStruct> _myTasksInfos*/);
+      void printTaskSetInfos (/* std::vector<rtTaskInfosStruct> _myTasksInfos*/);
+      void printChainSetInfos (/* std::vector<rtTaskInfosStruct> _myTasksInfos*/);
 
 };
 
-//extern void RunmcAgentMain(void *arg);
-//extern void TaskMain(void* arg);
-extern void print_affinity(pid_t _pid);
-extern void printTaskInfo(rtTaskInfosStruct* task);
 
 #endif

@@ -1,4 +1,5 @@
 #include "tools.h"
+#include <sys/sysinfo.h>
 
 const char* getSchedPolicyName(int schedPol)
 {
@@ -38,39 +39,42 @@ const char* getSchedPolicyName(int schedPol)
 
 const char* getErrorName(int err)
 {
-   switch (err)
+   switch (abs(err))
    {
       case 0   :
          return "No Error.\0";
-      case -EINTR  :
+      case EINTR  :
          return "EINTR\0";
          break;
-      case -EWOULDBLOCK  :
-         return "EWOULDBLOCK\0";
+      case EWOULDBLOCK  : // = EAGAIN
+         return "EWOULDBLOCK or EAGAIN\0";
          break;
-      case -ETIMEDOUT :
+      case ETIMEDOUT :
          return "ETIMEDOUT\0";
          break;
-      case -EPERM  :
+      case EPERM  :
          return "EPERM\0";
          break;
-      case -EEXIST :
+      case EEXIST :
          return "EEXIST\0";
          break;
-      case -ENOMEM :
+      case ENOMEM :
          return "ENOMEM\0";
          break;
-      case -EINVAL :
+      case EINVAL :
          return "EINVAL\0";
          break;
-      case -EDEADLK   :
+      case EDEADLK   :
          return "EDEADLK\0";
          break;
-      case -ESRCH  :
+      case ESRCH  :
          return "ESRCH\0";
          break;
-      case -EBUSY  :
+      case EBUSY  :
          return "EBUSY\0";
+         break;
+      case EFAULT  :
+         return "EFAULT\0";
          break;
       default: return "Undefined Error Code.\0";
    }
@@ -99,7 +103,7 @@ std::string reduce(const std::string& str,
       if ((tmp[chr] <= 0x20 || tmp[chr] >= 0x7A) && tmp[chr] != ' ')
       {
          tmp[chr] = ' ';
-         rt_fprintf(stderr, "/!\\ Strange ASCII char found !! (%c)\n", tmp[chr]);
+         fprintf(stderr, "/!\\ Strange ASCII char found !! (%c)\n", tmp[chr]);
       }
    }
     // trim first
@@ -121,25 +125,68 @@ std::string reduce(const std::string& str,
     return result;
 }
 
-
-/*
-int main(void)
+void printInquireInfo(RT_TASK* task)
 {
-    const std::string foo = "    too much\t   \tspace\t\t\t  ";
-    const std::string bar = "one\ntwo";
-
-    std::cout << "[" << trim(foo) << "]" << std::endl;
-    std::cout << "[" << reduce(foo) << "]" << std::endl;
-    std::cout << "[" << reduce(foo, "-") << "]" << std::endl;
-
-    std::cout << "[" << trim(bar) << "]" << std::endl;
+   #if VERBOSE_INFO
+   RT_TASK_INFO curtaskinfo;
+   int ret = 0;
+   if ((ret = rt_task_inquire(task, &curtaskinfo)))
+   {  cout << "\n Inquire Error (" << ret;
+      if (ret == -EINVAL) cerr << ") - Invalid Task Descriptor or invalid Prio." << endl;
+      if (ret == -EPERM) cerr << ") - Task is NULL, and service called from invalid context." << endl;
+   } else {
+      rt_printf("[ %s ] - (PID : %d) - Priority = %d.\n", curtaskinfo.name, curtaskinfo.pid, curtaskinfo.prio);
+   }
+   #endif
 }
 
-Result:
+void printTaskInfo(rtTaskInfosStruct* task)
+{
+   #if VERBOSE_OTHER
+   std::stringstream ss;
+   ss << "   ___ ["       << task->fP.name << "] - parameter summary : "
+      << "\n" << "     |- ID :"       << task->fP.id << " (isHRT : " << task->fP.isHRT << ")"
+      << "\n" << "     |- func : "     << task->fP.func << " | Args : " << task->fP.args
+      << "\n" << "     |- Period: "   << task->rtP.periodicity
+              << " | on core : " << task->rtP.affinity
+              << " | at priority : " << task->rtP.priority << " | Policy: "   << getSchedPolicyName(task->rtP.schedPolicy) << "(" << task->rtP.schedPolicy << ")"
+      << "\n" << "     |- WCET = " << task->fP.wcet << " | Precedent task ID : " << task->fP.prec
+   << endl;
+   cout << ss.rdbuf();
+   #endif
+}
 
-[too much               space]
-[too much space]
-[too-much-space]
-[one
-two]
-*/
+void print_affinity(pid_t _pid)
+{
+   long nproc = get_nprocs();
+   #if VERBOSE_ASK
+   int pid = _pid;
+   if (!_pid)
+   {
+      RT_TASK_INFO curtaskinfo;
+      rt_task_inquire(NULL, &curtaskinfo);
+      pid = curtaskinfo.pid;
+   }
+   cpu_set_t mask;
+
+   if (sched_getaffinity(_pid, sizeof(cpu_set_t), &mask) == -1) {
+      perror("sched_getaffinity");
+      assert(false);
+  } else {
+    long i;
+    std::stringstream ss;
+    ss << "Affinity of thread " << pid << " = ";
+    for (i = 0; i < nproc; i++)
+        ss << CPU_ISSET(i, &mask);
+    ss << endl;
+    cout << ss.rdbuf();
+    /* using printf
+    printf("sched_getaffinity = ");
+    for (i = 0; i < nproc; i++) {
+        printf("%d ", CPU_ISSET(i, &mask));
+    }
+    printf("\n");
+    */
+  }
+#endif
+}

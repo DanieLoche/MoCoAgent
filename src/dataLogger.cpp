@@ -3,33 +3,28 @@
 #include "NanoLog.h"
 
 DataLogger::DataLogger(string expeName){
+
+   outputFileName = expeName;
+   cptOutOfDeadline = 0;
+   cptExecutions = 0;
+   execLogs = {0};
    //nanolog::initialize(nanolog::GuaranteedLogger(), ".", "nanolog", 1);
    //LOG_INFO << "This is a Information Log test !";
    //LOG_WARN << "This is a WARNING log.";
    //LOG_CRIT << "This is a CRITical log message.";
 }
 
-ChainDataLogger::ChainDataLogger(end2endDeadlineStruct* chainInfos, string expeName) : DataLogger(expeName)
+ChainDataLogger::ChainDataLogger(end2endDeadlineStruct _chainInfos, string expeName) : DataLogger(expeName)
 {
-   deadline = chainInfos->deadline;
-
+   chainInfos = _chainInfos;
+   deadline = _chainInfos.deadline;
    cptAnticipatedMisses = 0;
-   cptOutOfDeadline = 0;
-   cptExecutions = 0;
-   execLogs = {0};
-   //cout << "Init of Chains logger is okay." << endl;
 }
 
 TaskDataLogger::TaskDataLogger(rtTaskInfosStruct* _taskInfos, string expeName) : DataLogger(expeName)
 {
    taskInfos = _taskInfos;
-   deadline = taskInfos->rtP.periodicity;
-
-   cptOutOfDeadline = 0;
-   cptExecutions = 0;
-   execLogs = {0};
-   //cout << "Init of task logger for task " << getName() << " is okay." << endl;
-
+   deadline = _taskInfos->rtP.periodicity;
 }
 
 void DataLogger::logStart(RTIME startTime)
@@ -57,7 +52,7 @@ void DataLogger::logExec(RTIME endTime)
          cptOutOfDeadline++;
       }else{
          #if VERBOSE_ASK
-         fprintf(stderr, "[ \033[1;32mPERFECT\033[0m ] Task : \033[1;32m%s\033[0m - \033[1;36m%.2f ms\033[0m\n",getName(),execLogs[cptExecutions].duration/1e6);
+         //fprintf(stderr, "[ \033[1;32mPERFECT\033[0m ] Task : \033[1;32m%s\033[0m - \033[1;36m%.2f ms\033[0m\n",getName(),execLogs[cptExecutions].duration/1e6);
          #endif
       }
       cptExecutions++;
@@ -65,10 +60,10 @@ void DataLogger::logExec(RTIME endTime)
       if (cptExecutions > 4095)
       {
          cptExecutions = 0;
-         cerr << "[" << getName() << "] " << "WARNING - Measured more than allowed buffer size." << endl;
+         rt_fprintf(stderr, "[ WARNING ][ %s ] - Measured more Logs than allowed buffer size.\n", getName());
       }
    }
-   else cerr << "[" << getName() << "] " << "- WARNING : Exec not logged as timestamp was not set yet." << endl;
+   else  rt_fprintf(stderr, "[ WARNING ][ %s ] - Exec #%ld not logged as timestamp was not set yet.\n", getName());
 
 }
 
@@ -87,24 +82,24 @@ RTIME DataLogger::logExec( )
          cptOutOfDeadline++;
       }else{
          #if VERBOSE_ASK
-         fprintf(stderr, "[ \033[1;32mPERFECT\033[0m ] Task : \033[1;32m%s\033[0m - \033[1;36m%.2f ms\033[0m\n",getName(),execLogs[cptExecutions].duration/1e6);
+         //fprintf(stderr, "[ \033[1;32mPERFECT\033[0m ] Task : \033[1;32m%s\033[0m - \033[1;36m%.2f ms\033[0m\n",getName(),execLogs[cptExecutions].duration/1e6);
          #endif
       }
       cptExecutions++;
       if (cptExecutions > 4095)
       {
          cptExecutions = 0;
-         cerr << "[" << getName() << "] " << "WARNING - Measured more than allowed buffer size." << endl;
+         rt_fprintf(stderr, "[ WARNING ][ %s ] - Measured more Logs than allowed buffer size.\n", getName());
       }
    }
-   else cerr << "[" << getName() << "] " << "- WARNING : Exec not logged as timestamp was not set yet." << endl;
+   else  rt_fprintf(stderr, "[ WARNING ][ %s ] - Exec #%ld not logged as timestamp was not set yet.\n", getName());
    return _logTime;
 }
 
-void TaskDataLogger::saveData(string file, int nameSize)
+void TaskDataLogger::saveData(int nameSize)
 {
    std::ofstream outputFileTasksData;
-   outputFileTasksData.open (file + "_Expe.csv", std::ios::app);    // TO APPEND :  //,ios_base::app);
+   outputFileTasksData.open (outputFileName + TASKS_FILE, std::ios::app);    // TO APPEND :  //,ios_base::app);
 
    RTIME average_runtime = 0;
    RTIME max_runtime = 0;
@@ -131,58 +126,60 @@ void TaskDataLogger::saveData(string file, int nameSize)
    }
    outputFileTasksData.close();
 
-   #if VERBOSE_INFO
-   std::ofstream outputFileResume;
-   outputFileResume.open (file + "_Resume.txt", std::ios::app);    // TO APPEND :  //,ios_base::app);
+   if (cptExecutions > 0)
+   {
+      std::ofstream outputFileResume;
+      outputFileResume.open (outputFileName + RESUME_FILE, std::ios::app);    // TO APPEND :  //,ios_base::app);
 
-   average_runtime = somme / cptExecutions;
-   RT_TASK _t;
-   ERROR_MNG(rt_task_bind(&_t, getName(), TM_INFINITE));
-   RT_TASK_INFO cti;
-   rt_task_inquire(&_t, &cti);
+      average_runtime = somme / cptExecutions;
+      RT_TASK _t;
+      ERROR_MNG(rt_task_bind(&_t, getName(), TM_INFINITE));
+      RT_TASK_INFO cti;
+      rt_task_inquire(&_t, &cti);
 
-   outputFileResume
-      << "\nRunning summary for task " << getName() << ". (" << cti.pid << ", " << cti.prio << ", " << cti.name << ")" << "\n"
-      << "Deadline : " << deadline / 1.0e6     << " ms.  Missed"     << " | "                 << "(2) | " << "Executions " << "\n"
-      << "                    " << std::setw(6) <<  cptOutOfDeadline << " | " << std::setw(3) << overruns << " | " << cptExecutions << " times" << "\n"
-      << "Primary Mode execution time - " << cti.stat.xtime/1.0e6 << " ms. Timeouts : " << cti.stat.timeout << "\n"
-      <<         "  MIN  "   << " | " <<        "  AVG  "        << " | " <<      "  MAX"        << "\n"
-      << min_runtime / 1.0e6 << " | " << average_runtime / 1.0e6 << " | " << max_runtime / 1.0e6 << " (ms)" << "\n"
-      << "   Mode Switches - " << cti.stat.msw << "\n"
-      << "Context Switches - " << cti.stat.csw << "\n"
-      << "Cobalt Sys calls - " << cti.stat.xsc
-   << endl;
+      outputFileResume
+         << "\nRunning summary for task " << getName() << ". (" << cti.pid << ", " << cti.prio << ", " << cti.name << ")" << "\n"
+         << "Deadline : " << deadline / 1.0e6     << " ms.  Missed"     << " | "                 << "(2) | " << "Executions " << "\n"
+         << "                    " << std::setw(6) <<  cptOutOfDeadline << " | " << std::setw(3) << overruns << " | " << cptExecutions << " times" << "\n"
+         << "Primary Mode execution time - " << cti.stat.xtime/1.0e6 << " ms. Timeouts : " << cti.stat.timeout << "\n"
+         <<         "  MIN  "   << " | " <<        "  AVG  "        << " | " <<      "  MAX"        << "\n"
+         << min_runtime / 1.0e6 << " | " << average_runtime / 1.0e6 << " | " << max_runtime / 1.0e6 << " (ms)" << "\n"
+         << "   Mode Switches - " << cti.stat.msw << "\n"
+         << "Context Switches - " << cti.stat.csw << "\n"
+         << "Cobalt Sys calls - " << cti.stat.xsc
+      << endl;
 
-   outputFileResume.close();
-   #endif
+      outputFileResume.close();
+   }
 
 }
 
-void ChainDataLogger::saveData(string file, int nameSize)
+void ChainDataLogger::saveData(int nameSize )
 {
+   cerr << "Saving Chain " << getName() << " data." << endl;
    std::ofstream outputFileChainData;
-   outputFileChainData.open (file + "_Chains.csv", std::ios::app);    // TO APPEND :  //,ios_base::app);
+   outputFileChainData.open (outputFileName + CHAIN_FILE, std::ios::app);    // TO APPEND :  //,ios_base::app);
 
    double average_runtime = 0;
    RTIME max_runtime = 0;
-   RTIME min_runtime = 1.e9;
+   RTIME min_runtime = _SEC(1);
    double sommeTime = 0;
-   outputFileChainData << std::setw(15)      << "timestamp" << " ; "
+   outputFileChainData << std::setw(15)           << "timestamp" << " ; "
                        << std::setw(strlen(getName())) << "Chain"     << " ; "
                        << std::setw(2)            << "ID"        << " ; "
                        << std::setw(10)           << "deadline"  << " ; "
                        << std::setw(10)           << "duration"  << endl;
 
-   if (cptExecutions <= 0) cerr << "[" << getName() << "] -" << "Error : no logs to print !" << endl;
+   if (cptExecutions <= 0) cerr << "[" << getName() << "] - " << "Error : no logs to print !" << endl;
    else for (int i = 0; i < cptExecutions; i++)
    {
-      RTIME _dur = execLogs[i].duration;
+      const RTIME _dur = execLogs[i].duration;
 
-      outputFileChainData << std::setw(15) << execLogs[i].timestamp << " ; "
+      outputFileChainData << std::setw(15)      << execLogs[i].timestamp << " ; "
                           << std::setw(strlen(getName())) << getName()        << " ; "
-                          << std::setw(2)         << chainInfos->taskChainID  << " ; "
-                          << std::setw(10)        << deadline    << " ; "
-                          << std::setw(10)        << _dur        << "\n";
+                          << std::setw(2)       << chainInfos.taskChainID  << " ; "
+                          << std::setw(10)      << chainInfos.deadline    << " ; "
+                          << std::setw(10)      << _dur        << "\n";
 
       sommeTime += _dur;
       if (_dur < min_runtime) min_runtime = _dur;
@@ -190,29 +187,33 @@ void ChainDataLogger::saveData(string file, int nameSize)
    }
    outputFileChainData.close();
 
-   std::ofstream outputFileResume;
-   outputFileResume.open (file + "_Resume.txt", std::ios::app);    // TO APPEND :  //,ios_base::app);
+   if (cptExecutions > 0)
+   {
+      std::ofstream outputFileResume;
+      outputFileResume.open (outputFileName + RESUME_FILE, std::ios::app);    // TO APPEND :  //,ios_base::app);
 
-   average_runtime = sommeTime / cptExecutions;
-   #if VERBOSE_INFO
-   outputFileResume << "\nRunning summary for Chain " << getName() << ". ( " << chainInfos->taskChainID << " )" << "\n"
-                    << "Deadline : " << deadline / 1.0e6     << " ms." << " Anticipated Misses" << " | "
-                    <<   " Missed "     << " | " << " Chain loops " << "\n"
+      average_runtime = sommeTime / cptExecutions;
+      #if VERBOSE_INFO
+      outputFileResume
+         << "\n[CHAIN] Summary for " << getName() << ". ( " << chainInfos.taskChainID << " )" << "\n"
+         << "Deadline : " << deadline / 1.0e6     << " ms." << " Anticipated Misses" << " | "
+         <<   " Missed "     << " | " << " Chain loops " << "\n"
 
-                    << "                  "         << std::setw(20) <<  cptAnticipatedMisses << " | "
-                    << std::setw(10) << cptOutOfDeadline << " | " << cptExecutions << " times" << "\n"
+         << "                  "         << std::setw(20) <<  cptAnticipatedMisses << " | "
+         << std::setw(10) << cptOutOfDeadline << " | " << cptExecutions << " times" << "\n"
 
-                    <<         "  MIN  "   << " | " <<        "  AVG  "        << " | " <<      "  MAX"        << "\n"
-                    << std::setw(7) << min_runtime / 1.0e6 << " | " << average_runtime / 1.0e6 << " | " << max_runtime / 1.0e6 << " runtimes (ms)"
-                    << endl;
-   #endif
+         <<         "  MIN  "   << " | " <<        "  AVG  "        << " | " <<      "  MAX"        << "\n"
+         << std::setw(7) << min_runtime / 1.0e6 << " | " << average_runtime / 1.0e6 << " | " << max_runtime / 1.0e6 << " runtimes (ms)"
+         << endl;
+      #endif
 
-   outputFileResume.close();
+      outputFileResume.close();
+   }
 }
 
 char* ChainDataLogger::getName()
 {
-   return chainInfos->name;
+   return chainInfos.name;
 }
 
 

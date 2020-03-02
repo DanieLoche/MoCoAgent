@@ -26,6 +26,10 @@ using std::endl;
 using std::cin;
 using std::cerr;
 
+#define RESUME_FILE "_resume.txt"
+#define CHAIN_FILE   "_chains.csv"
+#define TASKS_FILE   "_expe.csv"
+
 #define   TRUE    1
 #define   FALSE   0
 
@@ -53,16 +57,14 @@ using std::cerr;
 #define _mSEC(_time)   ((_time)*1000 * 1000)
 #define _uSEC(_time)   ((_time)*1000)
 
-const char* getErrorName(int error);
-const char* getSchedPolicyName(int schedPol);
-
 #define ERROR_MNG(fct)                                                 \
 do {                                                                   \
    int err = fct;                                                      \
    if ( err != 0)                                                      \
    {                                                                   \
       const char* errName = getErrorName(err);                              \
-      rt_fprintf(stderr, "%s-%s error %s (%d)\n", __FUNCTION__, #fct, errName, err); \
+      rt_fprintf(stderr, "[ERROR] %s-%s error %s (%d)\n", __FUNCTION__, #fct, errName, err); \
+      rt_print_flush_buffers();                                        \
       exit(EXIT_FAILURE);                                              \
    }                                                                   \
 } while(0)
@@ -75,7 +77,12 @@ do {                                                                   \
    } else { printf("Error : argument missing after option for %s.\n", name);    \
           show_usage(EXIT_FAILURE);  }
 
-
+#define CASES(_fn1, _fn2, _fn3, _fn4, _fn5) \
+   case _fn1 : \
+   case _fn2 : \
+   case _fn3 : \
+   case _fn4 : \
+   case _fn5 :
 
 //#define TO_STRING(str) convertToString(str)
 
@@ -136,7 +143,11 @@ struct monitoringMsg
   bool isExecuted;    // Run-time - computed
 };
 
-
+const char* getErrorName(int error);
+const char* getSchedPolicyName(int schedPol);
+void printInquireInfo(RT_TASK*);
+void printTaskInfo(rtTaskInfosStruct* task);
+void print_affinity(pid_t _pid);
 std::string trim(const std::string& str,
                  const std::string& whitespace = " \t");
 
@@ -145,18 +156,6 @@ std::string reduce(const std::string& str,
                    const std::string& whitespace = " \t");
 
 //string convertToString(const char* a){ std::string s = a; return s; }
-
-void printInquireInfo(RT_TASK*);
-void printTaskInfo(rtTaskInfosStruct* task);
-void print_affinity(pid_t _pid);
-
-// struct systemRTInfo
-// {
-//   std::vector<end2endDeadlineStruct> e2eDD;
-//   std::vector<rtTaskInfosStruct> rtTIs;
-//   //bool* triggerSave;
-//   //string outputFileName;
-// };
 
 /*
 struct logData
@@ -170,21 +169,6 @@ struct logData
   int cptExecutions;
 };
 */
-/*struct rtTaskInfosStruct
-{
-   RT_TASK* _t;  //
-   char name[32]; //
-   char function[128];
-   string arguments;
-   int isHardRealTime;     // task chain ID or best effort if null
-   int id;
-   int precedency;
-   RTIME wcet;   //
-   RTIME periodicity; //
-   int affinity; //
-   int priority;      //
-   int schedPolicy;   //
-};*/
 
 /* To create a task :
  * Arguments : &task,
