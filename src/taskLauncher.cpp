@@ -161,7 +161,9 @@ int TaskLauncher::runTasks(long expeDuration)
       pid_t pid = fork();
       if (pid == 0) // proc fils
       {
-         setvbuf(stdout, NULL, _IOLBF, 4096) ;
+         setvbuf(stdout, NULL, _IONBF, 4096) ; // _IOLBF
+         setvbuf(stderr, NULL, _IONBF, 4096) ; // _IOLBF
+
          currentTaskDescriptor = taskInfo;
          //RT_TASK _t;
          //ERROR_MNG(rt_task_shadow(&_t, "TOTO", 1, 0));
@@ -235,7 +237,7 @@ int TaskLauncher::runAgent(long expeDuration)
       0,          // Affinity
       _mSEC(MCA_PERIOD), // periodicity
       98,         // Priority
-      SCHED_FIFO, // Scheduling POLICY
+      SCHED_RR, // Scheduling POLICY
       99,         // id
       "MoCoAgent", // char[32] name
       "",         // function
@@ -300,6 +302,7 @@ int TaskLauncher::runAgent(long expeDuration)
       while (ret)
       {
          ret = rt_task_inquire(_task, NULL);
+         rt_task_sleep(_mSEC(5));
          //rt_task_sleep(_mSEC(2));
       }
    }
@@ -314,8 +317,12 @@ void TaskLauncher::finishMoCoAgent(void* _arg)
 {
    MCAgent* MoCoAgent_task = (MCAgent*) _arg;
 
+   MoCoAgent_task->MoCoIsAlive = 0;
+
    cout << "Saving Data..." << endl;
    //cout << "Checking tasks names :" << endl;
+   MoCoAgent_task->saveData();
+
    if (!tasksSet.empty())
       for (auto taskInfo = tasksSet.begin(); taskInfo != tasksSet.end(); ++taskInfo)
       {
@@ -335,14 +342,11 @@ void TaskLauncher::finishMoCoAgent(void* _arg)
          << std::setw(10) << "duration" << "\n";
    myFile.close();
 
-   MoCoAgent_task->saveData();
-
    RTIME time = rt_timer_read();
    rt_sem_v(&_syncSem);
    rt_fprintf(stderr, "[ %llu ] [ MoCoAgent ]- Giving Semaphor...\n", time);
    rt_print_flush_buffers();
 
-   MoCoAgent_task->MoCoIsAlive = 0;
    //ERROR_MNG(rt_task_sleep(_mSEC(500)));
 }
 
@@ -351,6 +355,7 @@ void TaskLauncher::finishTask(void* _MacroTask)
    MacroTask* task = (MacroTask*) _MacroTask;
 
    rt_fprintf(stderr, "[ %llu ][ %s ] - Waiting Semaphor...\n", rt_timer_read(), task->prop.fP.name);
+   rt_print_flush_buffers();
 
    rt_sem_p(&_syncSem, TM_INFINITE);
    rt_fprintf(stderr, "[ %llu ][ %s ] - Got a Semaphor...\n", rt_timer_read(), task->prop.fP.name);

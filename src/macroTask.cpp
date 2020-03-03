@@ -196,15 +196,8 @@ void TaskProcess::parseParameters(string _arguments)
 
 }
 
-void TaskProcess::setIO( )
+void TaskProcess::setIO()
 {
-    /*
-          if (stdIn[0] != '\0')
-              std::cin.rdbuf(inStrm.rdbuf()); //redirect std::cin to stdIn!
-
-          if (stdOut[0] != '\0')
-              std::cout.rdbuf(outStrm.rdbuf()); //redirect std::cout to stdOut!
-    */
    if (_stdIn[0] != '\0')
    {
       #if VERBOSE_OTHER
@@ -286,11 +279,13 @@ void MacroTask::findFunction (char* _func)
 int MacroTask::before()
 {
    #if VERBOSE_OTHER
-   //rt_fprintf(stderr, "[ %s ] - Executing Before.\n", prop.fP.name);
+   rt_fprintf(stderr, "[ %s ] - Executing Before.\n", prop.fP.name);
    #endif
    msg.time = dataLogs->logStart();
    msg.isExecuted = 0;
+   ERROR_MNG(rt_mutex_acquire(&_bufMtx, TM_INFINITE));
    ret = rt_buffer_write(&_buff , &msg , sizeof(monitoringMsg) , _mSEC(1));
+   ERROR_MNG(rt_mutex_release(&_bufMtx));
    if(MoCoIsAlive && ret)
    {
       //MoCoIsAlive = 0;
@@ -305,7 +300,7 @@ int MacroTask::before()
 void MacroTask::proceed()
 {
    #if VERBOSE_OTHER
-   //rt_fprintf(stderr, "[ %s ] - Executing Proceed.\n", prop.fP.name);
+   rt_fprintf(stderr, "[ %s ] - Executing Proceed.\n", prop.fP.name);
    #endif
 
    int ret = proceed_function(_argv.size()-1, &_argv[0]);  // -1 : no need for last element "NULL".
@@ -328,11 +323,13 @@ void MacroTask::proceed()
 int MacroTask::after()
 {
    #if VERBOSE_OTHER
-   //rt_fprintf(stderr, "[ %s ] - Executing After.\n", prop.fP.name);
+   rt_fprintf(stderr, "[ %s ] - Executing After.\n", prop.fP.name);
    #endif
    msg.time = dataLogs->logExec();
    msg.isExecuted = 1;
+   ERROR_MNG(rt_mutex_acquire(&_bufMtx, TM_INFINITE));
    ret = rt_buffer_write(&_buff , &msg , sizeof(monitoringMsg) , _mSEC(1));
+   ERROR_MNG(rt_mutex_release(&_bufMtx));
    if(ret)
    {
       //MoCoIsAlive = 0;
@@ -349,15 +346,17 @@ void MacroTask::executeRun()
    if (MoCoIsAlive)
    {
       ERROR_MNG(rt_buffer_bind(&_buff, MESSAGE_TOPIC_NAME, _mSEC(500)));
+      string mutexName = (string) MESSAGE_TOPIC_NAME + "_mtx";
+      ERROR_MNG(rt_mutex_bind(&_bufMtx, mutexName.c_str(), _mSEC(500)));
    }
-   rt_fprintf(stderr, "Running...\n");
+   //rt_fprintf(stderr, "Running...\n");
    while (1)
    {
       //cout << "Task" << prop.name << " working." << endl;
       before(); // Check if execution allowed
       proceed();  // execute task
       after();  // Inform of execution time for the mcAgent
-
+      rt_print_flush_buffers();
       rt_task_wait_period(&dataLogs->overruns);
    }
 }

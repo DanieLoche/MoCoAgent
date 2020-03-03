@@ -149,7 +149,7 @@ void printTaskInfo(rtTaskInfosStruct* task)
       << "\n" << "     |- func : "     << task->fP.func << " | Args : " << task->fP.args
       << "\n" << "     |- Period: "   << task->rtP.periodicity
               << " | on core : " << task->rtP.affinity
-              << " | at priority : " << task->rtP.priority << " | Policy: "   << getSchedPolicyName(task->rtP.schedPolicy) << "(" << task->rtP.schedPolicy << ")"
+              << " | at priority : " << task->rtP.priority << " | Policy: "   << getSchedPolicyName(task->rtP.schedPolicy) << " (" << task->rtP.schedPolicy << ")"
       << "\n" << "     |- WCET = " << task->fP.wcet << " | Precedent task ID : " << task->fP.prec
    << endl;
    cout << ss.rdbuf();

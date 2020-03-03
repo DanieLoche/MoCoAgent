@@ -21,6 +21,7 @@ MCAgent::MCAgent(rtTaskInfosStruct _taskInfo,
                   std::vector<end2endDeadlineStruct> e2eDD,
                   std::vector<rtTaskInfosStruct> tasksSet) : TaskProcess (_taskInfo)
 {
+      MoCoIsAlive = TRUE;
     displaySystemInfo(e2eDD, tasksSet);
     runtimeMode = MODE_NOMINAL;
     initCommunications();
@@ -29,7 +30,7 @@ MCAgent::MCAgent(rtTaskInfosStruct _taskInfo,
     setAllTasks(tasksSet);
     displayChains();
     //sleep(1);
-    ERROR_MNG(rt_task_spawn(&msgReceiverTask, "MonitoringTask", 0, 99, 0, messageReceiver, this));
+    //ERROR_MNG(rt_task_spawn(&msgReceiverTask, "MonitoringTask", 0, 99, 0, messageReceiver, this));
     #if VERBOSE_INFO
     rt_printf("[ MoCoAgent ] : READY.\n");
 
@@ -40,6 +41,8 @@ void MCAgent::initCommunications()
 {
    //int ret = 0;
    ERROR_MNG(rt_buffer_create(&_buff, MESSAGE_TOPIC_NAME, 20*sizeof(monitoringMsg), B_PRIO));
+   string mutexName = (string) MESSAGE_TOPIC_NAME + "_mtx";
+   ERROR_MNG(rt_mutex_create(&_bufMtx, mutexName.c_str()));
    //rt_printf("Buffer %s creation : %s (%d).\n", MESSAGE_TOPIC_NAME, getErrorName(ret), ret);
    ERROR_MNG(rt_event_create(&_event, CHANGE_MODE_EVENT_NAME, 0, EV_PRIO));
    //rt_printf("Event %s creation : %s (%d).\n",CHANGE_MODE_EVENT_NAME, getErrorName(ret), ret);
@@ -178,10 +181,10 @@ void MCAgent::setMode(int mode)
 const timespec noWait_time = {0,0};
 void MCAgent::executeRun()
 {
-   //int ret_msg = 0;
+   int ret_msg = 0;
    while(MoCoIsAlive)
    {
-      /*
+      ///*
       ret_msg = rt_buffer_read(&_buff, &msg, sizeof(monitoringMsg), TM_NONBLOCK);
       switch(ret_msg)
       {
@@ -201,7 +204,7 @@ void MCAgent::executeRun()
             rt_fprintf(stderr, "[ MOCOAGENT ] Error on receiving message, code %s [%d]", getErrorName(ret_msg), ret_msg);
          break;
          default :
-         */
+         //*/
             for (auto& _taskChain : allTaskChain)
             {
                for (auto& _task : _taskChain.taskList)
@@ -238,16 +241,16 @@ void MCAgent::executeRun()
                   setMode(MODE_OVERLOADED);
                }
             }
-      //}
+      }
 
       rt_task_wait_period(&overruns);
    }
-   
+
 }
 
 void MCAgent::executeRun_besteffort()
 {
-   while(TRUE)
+   while(MoCoIsAlive)
    {
       // Update Msg part //
       rt_buffer_read(&_buff, &msg, sizeof(monitoringMsg), TM_INFINITE);
@@ -334,8 +337,7 @@ void MCAgent::saveData()
 
    rt_task_delete(&msgReceiverTask);
    string file = _stdOut;
-   file +=  RESUME_FILE;
-   outputFileResume.open (file, std::ios::app);    // TO APPEND :  //,ios_base::app);
+   outputFileResume.open (file + RESUME_FILE, std::ios::app);    // TO APPEND :  //,ios_base::app);
    RT_TASK_INFO cti;
    rt_task_inquire(NULL, &cti);
    outputFileResume << "\n Monitoring and Control Agent Stats : \n"
@@ -346,6 +348,25 @@ void MCAgent::saveData()
                     << "Cobalt Sys calls - " << cti.stat.xsc
                     << endl;
    outputFileResume.close();
+
+   int nameMaxSize = 32;
+   if (!allTaskChain.empty())
+      for (auto taskInfo = allTaskChain.begin(); taskInfo != allTaskChain.end(); ++taskInfo)
+      {
+         int sizeName = strlen(taskInfo->name);
+         if (sizeName > nameMaxSize) nameMaxSize = sizeName;
+      }
+      else cerr << "WOAW !! Chain set is empty !!" << endl;
+   std::ofstream outputFileChainData;
+   outputFileChainData.open (file + CHAIN_FILE);    // TO APPEND :  //,ios_base::app);
+
+   outputFileChainData << std::setw(15)           << "timestamp" << " ; "
+                       << std::setw(nameMaxSize) << "Chain"     << " ; "
+                       << std::setw(2)            << "ID"        << " ; "
+                       << std::setw(10)           << "deadline"  << " ; "
+                       << std::setw(10)           << "duration"  << endl;
+
+   outputFileChainData.close();
 
    if (!allTaskChain.empty())
    {   for (auto _taskChain : allTaskChain)

@@ -43,7 +43,7 @@ using std::cerr;
 #define     SCHED_EDF       6 // Not Implemented
 #define     SCHED_RM        7 // Rate-Monotonic
 
-#define   RR_SLICE_TIME     20e9  // clock ticks (=ns)
+#define   RR_SLICE_TIME     _mSEC(5)  // clock ticks (=ns)
 #define   SPINTIME          1e7   // spin time in ns
 #define   EXECTIME          2e8   // execution time in ns
 
@@ -65,6 +65,7 @@ do {                                                                   \
       const char* errName = getErrorName(err);                              \
       rt_fprintf(stderr, "[ERROR] %s-%s error %s (%d)\n", __FUNCTION__, #fct, errName, err); \
       rt_print_flush_buffers();                                        \
+      rt_task_sleep(_mSEC(10));                                        \
       exit(EXIT_FAILURE);                                              \
    }                                                                   \
 } while(0)
