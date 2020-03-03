@@ -1,84 +1,6 @@
 #include "tools.h"
 #include <sys/sysinfo.h>
 
-const char* getSchedPolicyName(int schedPol)
-{
-   switch (schedPol)
-   {
-      case SCHED_FIFO      :
-         return "FIFO\0";
-      break;
-      case SCHED_RR        :
-         return "Round-Robin\0";
-      break;
-      case SCHED_WEAK      :
-         return "Weak\0";
-      break;
-      case SCHED_COBALT    :
-         return "Cobalt\0";
-      break;
-      case SCHED_SPORADIC  :
-         return "Sporadic\0";
-      break;
-      case SCHED_TP        :
-         return "TimePartitioning\0";
-      break;
-      case SCHED_QUOTA     :
-         return "QUOTA\0";
-      break;
-      case SCHED_EDF       :
-         return "Earliest Deadline First\0";
-      break;
-      case SCHED_RM        :
-         return "Rate-Monotonic\0";
-      break;
-      default : return "Undefined Policy\0";
-      break;
-   }
-};
-
-const char* getErrorName(int err)
-{
-   switch (abs(err))
-   {
-      case 0   :
-         return "No Error.\0";
-      case EINTR  :
-         return "EINTR\0";
-         break;
-      case EWOULDBLOCK  : // = EAGAIN
-         return "EWOULDBLOCK or EAGAIN\0";
-         break;
-      case ETIMEDOUT :
-         return "ETIMEDOUT\0";
-         break;
-      case EPERM  :
-         return "EPERM\0";
-         break;
-      case EEXIST :
-         return "EEXIST\0";
-         break;
-      case ENOMEM :
-         return "ENOMEM\0";
-         break;
-      case EINVAL :
-         return "EINVAL\0";
-         break;
-      case EDEADLK   :
-         return "EDEADLK\0";
-         break;
-      case ESRCH  :
-         return "ESRCH\0";
-         break;
-      case EBUSY  :
-         return "EBUSY\0";
-         break;
-      case EFAULT  :
-         return "EFAULT\0";
-         break;
-      default: return "Undefined Error Code.\0";
-   }
-}
 
 std::string trim(const std::string& str,
                  const std::string& whitespace)
@@ -189,4 +111,88 @@ void print_affinity(pid_t _pid)
     */
   }
 #endif
+}
+const char* getSchedPolicyName(int schedPol)
+{
+   switch (schedPol)
+   {
+      case SCHED_FIFO      :
+         return "FIFO\0";
+      break;
+      case SCHED_RR        :
+         return "Round-Robin\0";
+      break;
+      case SCHED_WEAK      :
+         return "Weak\0";
+      break;
+      case SCHED_COBALT    :
+         return "Cobalt\0";
+      break;
+      case SCHED_SPORADIC  :
+         return "Sporadic\0";
+      break;
+      case SCHED_TP        :
+         return "TimePartitioning\0";
+      break;
+      case SCHED_QUOTA     :
+         return "QUOTA\0";
+      break;
+      case SCHED_EDF       :
+         return "Earliest Deadline First\0";
+      break;
+      case SCHED_RM        :
+         return "Rate-Monotonic\0";
+      break;
+      default : return "Undefined Policy\0";
+      break;
+   }
+};
+
+const char* getErrorName(int err)
+{
+   switch (abs(err))
+   {
+      case 0   :
+         return "No Error.\0";
+      case EINTR  :
+         return "EINTR\0";
+         break;
+      case EWOULDBLOCK  : // = EAGAIN
+         return "EWOULDBLOCK or EAGAIN\0";
+         break;
+      case ETIMEDOUT :
+         return "ETIMEDOUT\0";
+         break;
+      case EPERM  :
+         return "EPERM\0";
+         break;
+      case EEXIST :
+         return "EEXIST\0";
+         break;
+      case ENOMEM :
+         return "ENOMEM\0";
+         break;
+      case EINVAL :
+         return "EINVAL\0";
+         break;
+      case EDEADLK   :
+         return "EDEADLK\0";
+         break;
+      case ESRCH  :
+         return "ESRCH\0";
+         break;
+      case EBUSY  :
+         return "EBUSY\0";
+         break;
+      case EFAULT  :
+         return "EFAULT\0";
+         break;
+      case EIDRM  :
+         return "EIDRM\0";
+         break;
+      case EMFILE  :
+         return "EMFILE\0";
+         break;
+      default: return "Undefined Error Code.\0";
+   }
 }

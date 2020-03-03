@@ -213,6 +213,10 @@ int TaskLauncher::runTasks(long expeDuration)
 
             currentProcess->executeRun();
          }
+
+         rt_fprintf(stderr, "Oh FUCK, I should not go here..!\n");
+         rt_print_flush_buffers();
+         rt_task_yield();
          exit(EXIT_FAILURE); // should never occur.
       }
       else // pid = forked task pid_t
@@ -235,14 +239,14 @@ int TaskLauncher::runAgent(long expeDuration)
 
    rtTaskInfosStruct MoCoAgentParams = {
       0,          // Affinity
-      _mSEC(MCA_PERIOD), // periodicity
       98,         // Priority
       SCHED_RR, // Scheduling POLICY
+      _mSEC(MCA_PERIOD), // periodicity
       99,         // id
+      99,0,0,     // isHRT/task chain ID,precedency & WCET.
       "MoCoAgent", // char[32] name
       "",         // function
       " > "+outputFileName,    // stdOut will be used for the log file name here ..!
-      99,0,0,     // isHRT/task chain ID,precedency & WCET.
    };
    currentTaskDescriptor = MoCoAgentParams;
    printTaskInfo(&currentTaskDescriptor);
@@ -291,25 +295,24 @@ int TaskLauncher::runAgent(long expeDuration)
    #endif
 
    rt_sem_broadcast(&_syncSem); // Alarms OK. Start Run !
-   //rt_printf("[%llu][ %s ] - semaphor %s Broadcasted.\n", rt_timer_read(), currentTaskDescriptor.fP.name, SEM_NAME); //cout << "["<< currentTaskDescriptor.fP.name << "]"<< "Semaphor Released (broadcast !)." << endl;
    rt_task_wait_period(0);
    if (enableAgent == 2) currentProcess->executeRun_besteffort();
    else currentProcess->executeRun();
 
-   ret = 1;
+
+
+   ret = 0;
    for (auto& _task : tasks)
    {
-      while (ret)
+      while (!ret)
       {
          ret = rt_task_inquire(_task, NULL);
          rt_task_sleep(_mSEC(5));
          //rt_task_sleep(_mSEC(2));
       }
    }
-   rt_sem_p(&_syncSem, TM_INFINITE);
+   //rt_sem_p(&_syncSem, TM_INFINITE);
 
-   cout << " ======= END OF EXPERIMENTATION ======" << endl;
-   exit(EXIT_SUCCESS);
    return ret;
 }
 
@@ -319,7 +322,7 @@ void TaskLauncher::finishMoCoAgent(void* _arg)
 
    MoCoAgent_task->MoCoIsAlive = 0;
 
-   cout << "Saving Data..." << endl;
+   rt_printf("====== End of Expe. Saving Data. ======\n");
    //cout << "Checking tasks names :" << endl;
    MoCoAgent_task->saveData();
 
@@ -368,8 +371,6 @@ void TaskLauncher::finishTask(void* _MacroTask)
 
    rt_fprintf(stderr, "[ %llu ][ %s ] - Finished.\n", time, task->prop.fP.name);
    rt_print_flush_buffers();
-
-   cerr << "Task " << task->prop.fP.name << " Finished." << endl;
 
    //ERROR_MNG(rt_task_sleep(_SEC(1)));
    exit(EXIT_SUCCESS);

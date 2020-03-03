@@ -82,7 +82,7 @@ int main(int argc, char* argv[])
 
    std::ofstream outputFileResume;
    string outputFileName = outputFile + RESUME_FILE;
-   outputFileResume.open (outputFileName, std::ios::app);    // TO APPEND :  //,ios_base::app);
+   outputFileResume.open (outputFileName);    // TO APPEND :  //,ios_base::app);
    outputFileResume << "Experiment made with parameters : \n"
       << " MoCoAgent: " << enableAgent  << "\n"
       << "  Duration: " << expeDuration << "\n"
@@ -116,7 +116,7 @@ int main(int argc, char* argv[])
    }
 
    //sleeping the time that all tasks will be started
-   sleep(2);
+   //sleep(2);
    //cout << "Wake up all tasks." << endl;
    /*
       int bak_fd = dup(1);
@@ -144,7 +144,6 @@ int main(int argc, char* argv[])
    */
    //std::cin.rdbuf(cinbuf);   //reset to standard input again
    //std::cout.rdbuf(coutbuf); //reset to standard output again
-   cout << "THIS IS A FAIL !!" << endl;
-
+   cout << " ======= END OF EXPERIMENTATION ======" << endl;
    exit(EXIT_SUCCESS);
 }

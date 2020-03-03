@@ -1,9 +1,6 @@
-#include <xenomai/init.h>
-
 #include "macroTask.h"
 //#include <utmpx.h>    // Pour fonction getcpu()
-//#include <spawn.h>
-//#include <sys/wait.h>
+
 
 /*
 * make sure everybody is in the same session and that
@@ -44,11 +41,12 @@ TaskProcess::TaskProcess(rtTaskInfosStruct _taskInfo)
 void TaskProcess::setRTtask(rtPStruct _rtInfos, char* _name)
 {
    //system("find /proc/xenomai");
-   XENO_INIT(_name) ;
+   XENO_INIT(_name);
 
    int ret = 0;
    ERROR_MNG(rt_task_shadow(&_task, _name, _rtInfos.priority, 0));
    //ret = rt_task_shadow(&_task, _name, _rtInfos.priority, 0);
+
    rt_print_flush_buffers();
    rt_printf("[ %s ] - shadowed : %d (%s).\n", _name, ret, getErrorName(ret)); //cout << "["<< _name << "]"<< " shadowed." << endl;
 
@@ -279,20 +277,22 @@ void MacroTask::findFunction (char* _func)
 int MacroTask::before()
 {
    #if VERBOSE_OTHER
-   rt_fprintf(stderr, "[ %s ] - Executing Before.\n", prop.fP.name);
+   //rt_fprintf(stderr, "[ %s ] - Executing Before.\n", prop.fP.name);
    #endif
    msg.time = dataLogs->logStart();
    msg.isExecuted = 0;
-   ERROR_MNG(rt_mutex_acquire(&_bufMtx, TM_INFINITE));
+   //ERROR_MNG(rt_mutex_acquire(&_bufMtx, TM_INFINITE));
    ret = rt_buffer_write(&_buff , &msg , sizeof(monitoringMsg) , _mSEC(1));
-   ERROR_MNG(rt_mutex_release(&_bufMtx));
-   if(MoCoIsAlive && ret)
+   //ERROR_MNG(rt_mutex_release(&_bufMtx));
+   if(MoCoIsAlive && (ret != sizeof(monitoringMsg)))
    {
       //MoCoIsAlive = 0;
       RT_BUFFER_INFO infos;
-      rt_buffer_inquire(&_buff, &infos);
-      rt_fprintf(stderr, "[ %s ] - ERROR %s (%d) - failed to write BEFORE monitoring message to buffer %d. (MoCo mode : %d)\n", getErrorName(ret), ret, prop.fP.name, MoCoIsAlive);
-      rt_fprintf(stderr, "Memory Available on buffer %s : %llu / %llu. %llu waiting too.\n", infos.name, infos.availmem, infos.totalmem, infos.owaiters);
+      ERROR_MNG(rt_buffer_inquire(&_buff, &infos));
+      fprintf(stderr, "[ %s ] - ERROR %s (%d) - failed to write BEFORE monitoring message to buffer %s. (MoCo mode : %d)\n",
+                     prop.fP.name, getErrorName(ret), ret, MESSAGE_TOPIC_NAME, MoCoIsAlive);
+      fprintf(stderr, "Memory Available on buffer : %lu / %lu. %d waiting too.\n", infos.availmem, infos.totalmem, infos.owaiters);
+      rt_print_flush_buffers();
    }
    return 0;
 }
@@ -300,7 +300,7 @@ int MacroTask::before()
 void MacroTask::proceed()
 {
    #if VERBOSE_OTHER
-   rt_fprintf(stderr, "[ %s ] - Executing Proceed.\n", prop.fP.name);
+   //rt_fprintf(stderr, "[ %s ] - Executing Proceed.\n", prop.fP.name);
    #endif
 
    int ret = proceed_function(_argv.size()-1, &_argv[0]);  // -1 : no need for last element "NULL".
@@ -323,20 +323,22 @@ void MacroTask::proceed()
 int MacroTask::after()
 {
    #if VERBOSE_OTHER
-   rt_fprintf(stderr, "[ %s ] - Executing After.\n", prop.fP.name);
+   //rt_fprintf(stderr, "[ %s ] - Executing After.\n", prop.fP.name);
    #endif
    msg.time = dataLogs->logExec();
    msg.isExecuted = 1;
-   ERROR_MNG(rt_mutex_acquire(&_bufMtx, TM_INFINITE));
+   //ERROR_MNG(rt_mutex_acquire(&_bufMtx, TM_INFINITE));
    ret = rt_buffer_write(&_buff , &msg , sizeof(monitoringMsg) , _mSEC(1));
-   ERROR_MNG(rt_mutex_release(&_bufMtx));
-   if(ret)
+   //ERROR_MNG(rt_mutex_release(&_bufMtx));
+   if(MoCoIsAlive && (ret != sizeof(monitoringMsg)))
    {
       //MoCoIsAlive = 0;
       RT_BUFFER_INFO infos;
-      rt_buffer_inquire(&_buff, &infos);
-      rt_fprintf(stderr, "[ %s ] - ERROR %s (%d) - failed to write BEFORE monitoring message to buffer %d. (MoCo mode : %d)\n", getErrorName(ret), ret, prop.fP.name, MoCoIsAlive);
-      rt_fprintf(stderr, "Memory Available on buffer %s : %llu / %llu. %llu waiting too.\n", infos.name, infos.availmem, infos.totalmem, infos.owaiters);
+      ERROR_MNG(rt_buffer_inquire(&_buff, &infos));
+      fprintf(stderr, "[ %s ] - ERROR %s (%d) - failed to write AFTER monitoring message to buffer %s. (MoCo mode : %d)\n",
+                     prop.fP.name, getErrorName(ret), ret, MESSAGE_TOPIC_NAME, MoCoIsAlive);
+      fprintf(stderr, "Memory Available on buffer : %lu / %lu. %d waiting too.\n", infos.availmem, infos.totalmem, infos.owaiters);
+      rt_print_flush_buffers();
    }
    return 0;
 }
@@ -346,8 +348,8 @@ void MacroTask::executeRun()
    if (MoCoIsAlive)
    {
       ERROR_MNG(rt_buffer_bind(&_buff, MESSAGE_TOPIC_NAME, _mSEC(500)));
-      string mutexName = (string) MESSAGE_TOPIC_NAME + "_mtx";
-      ERROR_MNG(rt_mutex_bind(&_bufMtx, mutexName.c_str(), _mSEC(500)));
+      //string mutexName = (string) MESSAGE_TOPIC_NAME + "_mtx";
+      //ERROR_MNG(rt_mutex_bind(&_bufMtx, mutexName.c_str(), _mSEC(500)));
    }
    //rt_fprintf(stderr, "Running...\n");
    while (1)
@@ -356,7 +358,6 @@ void MacroTask::executeRun()
       before(); // Check if execution allowed
       proceed();  // execute task
       after();  // Inform of execution time for the mcAgent
-      rt_print_flush_buffers();
       rt_task_wait_period(&dataLogs->overruns);
    }
 }

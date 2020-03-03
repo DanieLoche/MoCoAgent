@@ -71,7 +71,6 @@ class taskChain
 class TaskProcess
 {
    protected:
-      RT_MUTEX _bufMtx;
       RT_EVENT	_event;
       RT_EVENT_INFO _eventInfos;
       monitoringMsg msg ;
@@ -86,6 +85,7 @@ class TaskProcess
 
    public:
       static bool MoCoIsAlive;
+      //RT_MUTEX _bufMtx;
       RT_TASK _task;
       RT_BUFFER _buff;
 

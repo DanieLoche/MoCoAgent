@@ -20,6 +20,8 @@
 #include <alchemy/event.h>
 #include <alchemy/mutex.h>
 
+#include <xenomai/init.h>
+
 using std::string;
 using std::cout;
 using std::endl;
@@ -62,7 +64,7 @@ do {                                                                   \
    int err = fct;                                                      \
    if ( err != 0)                                                      \
    {                                                                   \
-      const char* errName = getErrorName(err);                              \
+      const char* errName = strerror(err);                             \
       rt_fprintf(stderr, "[ERROR] %s-%s error %s (%d)\n", __FUNCTION__, #fct, errName, err); \
       rt_print_flush_buffers();                                        \
       rt_task_sleep(_mSEC(10));                                        \
@@ -92,21 +94,21 @@ struct rtPStruct // Real-time Parameters
    //RT_TASK* _t;  //
 
    int affinity; //
-   RTIME periodicity; // in clock ticks, inputed as ms !
    int priority;      //
    int schedPolicy;   //
+   RTIME periodicity; // in clock ticks, inputed as ms !
 
 };
 
 struct funcPStruct   // Functional parameters
 {
    int id;
-   char name[32]; //
-   char func[128];
-   string args;
    int isHRT;     // task chain ID or best effort if null
    int prec;
    RTIME wcet;   //
+   char name[32]; //
+   char func[128];
+   string args;
 };
 
 struct rtTaskInfosStruct

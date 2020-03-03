@@ -8,9 +8,12 @@ void messageReceiver(void* arg)
    while(TRUE)
    {
       //  cout<<"buffer read"<<endl;
-      rt_buffer_read(&mocoAgent->_buff, &msg, sizeof(monitoringMsg), TM_INFINITE);
+      //rt_mutex_acquire(&mocoAgent->_bufMtx, TM_INFINITE);
+      ERROR_MNG(rt_buffer_read(&(mocoAgent->_buff), &msg, sizeof(monitoringMsg), TM_INFINITE));
+      //rt_mutex_release(&mocoAgent->_bufMtx);
       //cout<<"done buffer read"<<endl;
       mocoAgent->updateTaskInfo(msg);
+      rt_task_yield();
       // rt_task_wait_period(&mocoAgent->overruns);
       // rt_task_yield();
 
@@ -21,28 +24,27 @@ MCAgent::MCAgent(rtTaskInfosStruct _taskInfo,
                   std::vector<end2endDeadlineStruct> e2eDD,
                   std::vector<rtTaskInfosStruct> tasksSet) : TaskProcess (_taskInfo)
 {
-      MoCoIsAlive = TRUE;
-    displaySystemInfo(e2eDD, tasksSet);
-    runtimeMode = MODE_NOMINAL;
-    initCommunications();
+   MoCoIsAlive = TRUE;
+   displaySystemInfo(e2eDD, tasksSet);
+   runtimeMode = MODE_NOMINAL;
+   initCommunications();
 
-    setAllDeadlines(e2eDD);
-    setAllTasks(tasksSet);
-    displayChains();
-    //sleep(1);
-    //ERROR_MNG(rt_task_spawn(&msgReceiverTask, "MonitoringTask", 0, 99, 0, messageReceiver, this));
-    #if VERBOSE_INFO
-    rt_printf("[ MoCoAgent ] : READY.\n");
-
-    #endif
+   setAllDeadlines(e2eDD);
+   setAllTasks(tasksSet);
+   displayChains();
+   //rt_task_sleep(1);
+   //ERROR_MNG(rt_task_spawn(&msgReceiverTask, "MonitoringTask", 0, 99, 0, messageReceiver, this));
+   #if VERBOSE_INFO
+   rt_printf("[ MoCoAgent ] - READY.\n");
+   #endif
 }
 
 void MCAgent::initCommunications()
 {
    //int ret = 0;
-   ERROR_MNG(rt_buffer_create(&_buff, MESSAGE_TOPIC_NAME, 20*sizeof(monitoringMsg), B_PRIO));
-   string mutexName = (string) MESSAGE_TOPIC_NAME + "_mtx";
-   ERROR_MNG(rt_mutex_create(&_bufMtx, mutexName.c_str()));
+   ERROR_MNG(rt_buffer_create(&_buff, MESSAGE_TOPIC_NAME, 20*sizeof(monitoringMsg), B_FIFO));
+   //string mutexName = (string) MESSAGE_TOPIC_NAME + "_mtx";
+   //ERROR_MNG(rt_mutex_create(&_bufMtx, mutexName.c_str()));
    //rt_printf("Buffer %s creation : %s (%d).\n", MESSAGE_TOPIC_NAME, getErrorName(ret), ret);
    ERROR_MNG(rt_event_create(&_event, CHANGE_MODE_EVENT_NAME, 0, EV_PRIO));
    //rt_printf("Event %s creation : %s (%d).\n",CHANGE_MODE_EVENT_NAME, getErrorName(ret), ret);
@@ -178,7 +180,7 @@ void MCAgent::setMode(int mode)
    }
 }
 
-const timespec noWait_time = {0,0};
+//const timespec noWait_time = {0,0};
 void MCAgent::executeRun()
 {
    int ret_msg = 0;
@@ -199,11 +201,7 @@ void MCAgent::executeRun()
                }
             }
          break;
-         //case -ETIMEDOUT : case -EINTR : case -EINVAL : case -EIDRM : case -EPERM :
-         CASES(-ETIMEDOUT, -EINTR, -EINVAL, -EIDRM, -EPERM)
-            rt_fprintf(stderr, "[ MOCOAGENT ] Error on receiving message, code %s [%d]", getErrorName(ret_msg), ret_msg);
-         break;
-         default :
+         case sizeof(monitoringMsg) :
          //*/
             for (auto& _taskChain : allTaskChain)
             {
@@ -241,6 +239,11 @@ void MCAgent::executeRun()
                   setMode(MODE_OVERLOADED);
                }
             }
+            break;
+            //CASES(-ETIMEDOUT, -EINTR, -EINVAL, -EIDRM, -EPERM)
+            default :
+               rt_fprintf(stderr, "[ MOCOAGENT ] Error on receiving message, code %s [%d].\n", getErrorName(ret_msg), ret_msg);
+            break;
       }
 
       rt_task_wait_period(&overruns);
@@ -335,7 +338,7 @@ void MCAgent::saveData()
 {
    std::ofstream outputFileResume;
 
-   rt_task_delete(&msgReceiverTask);
+   //rt_task_delete(&msgReceiverTask);
    string file = _stdOut;
    outputFileResume.open (file + RESUME_FILE, std::ios::app);    // TO APPEND :  //,ios_base::app);
    RT_TASK_INFO cti;
@@ -349,7 +352,7 @@ void MCAgent::saveData()
                     << endl;
    outputFileResume.close();
 
-   int nameMaxSize = 32;
+   int nameMaxSize = 8;
    if (!allTaskChain.empty())
       for (auto taskInfo = allTaskChain.begin(); taskInfo != allTaskChain.end(); ++taskInfo)
       {

@@ -164,11 +164,6 @@ void ChainDataLogger::saveData(int nameSize )
    RTIME max_runtime = 0;
    RTIME min_runtime = _SEC(1);
    double sommeTime = 0;
-   outputFileChainData << std::setw(15)           << "timestamp" << " ; "
-                       << std::setw(strlen(getName())) << "Chain"     << " ; "
-                       << std::setw(2)            << "ID"        << " ; "
-                       << std::setw(10)           << "deadline"  << " ; "
-                       << std::setw(10)           << "duration"  << endl;
 
    if (cptExecutions <= 0) cerr << "[" << getName() << "] - " << "Error : no logs to print !" << endl;
    else for (int i = 0; i < cptExecutions; i++)
