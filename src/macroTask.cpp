@@ -233,7 +233,7 @@ MacroTask::MacroTask(rtTaskInfosStruct _taskInfo, bool MoCo, string _name) : Tas
 {
    MoCoIsAlive = MoCo;
    prop = _taskInfo;
-   dataLogs = new TaskDataLogger(&_taskInfo, _name);
+   dataLogs = new TaskDataLogger(_taskInfo, _name);
 
    setIO( );
    findFunction(_taskInfo.fP.func);
@@ -352,7 +352,7 @@ void MacroTask::executeRun()
       //ERROR_MNG(rt_mutex_bind(&_bufMtx, mutexName.c_str(), _mSEC(500)));
    }
    //rt_fprintf(stderr, "Running...\n");
-   while (1)
+   while (MoCoIsAlive)
    {
       //cout << "Task" << prop.name << " working." << endl;
       before(); // Check if execution allowed
@@ -404,7 +404,8 @@ void MacroTask::executeRun_besteffort()
    }
 }
 
-void MacroTask::saveData(int maxNameSize)
+void MacroTask::saveData(int maxNameSize, RT_TASK_INFO* cti)
 {
-   dataLogs->saveData(maxNameSize);
+   dataLogs->saveData(maxNameSize, cti);
+   MoCoIsAlive = 0;
 }

@@ -15,14 +15,13 @@ class TaskLauncher
       static RT_SEM _syncSem;
       static string outputFileName;
       static int nameMaxSize;
-      std::vector<end2endDeadlineStruct> e2eDD;
+      static std::vector<end2endDeadlineStruct> chainSet;
       static std::vector<rtTaskInfosStruct> tasksSet;
-      static std::vector<RT_TASK*> tasks;
       rtTaskInfosStruct currentTaskDescriptor;
       int enableAgent;
       int schedPolicy;
 
-      TaskProcess* currentProcess;
+      //TaskProcess* currentProcess;
       RT_ALARM _endAlarm;
 
    public :

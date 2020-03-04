@@ -17,7 +17,7 @@
 
 #define  USE_MUTEX               0
 
-#define   MCA_PERIOD             5 // ms
+#define   MCA_PERIOD             2 // ms
 const RTIME t_RT     =     000*1.0e6;  // time to trigger the Control Agent
 const RTIME Wmax     =     _mSEC(MCA_PERIOD);    // next slice max time
 
@@ -92,6 +92,7 @@ class TaskProcess
       TaskProcess(rtTaskInfosStruct _taskInfo);
       virtual void executeRun() = 0;
       virtual void executeRun_besteffort() = 0;
+      void saveData(int nameMaxSize);
 };
 
 class MacroTask : public TaskProcess
@@ -113,7 +114,7 @@ class MacroTask : public TaskProcess
       rtTaskInfosStruct prop;
 
       MacroTask(rtTaskInfosStruct taskInfos, bool MoCoMode, string name);
-      void saveData(int maxNameSize);
+      void saveData(int maxNameSize, RT_TASK_INFO* cti = NULL);
       void executeRun();
       void executeRun_besteffort();
 

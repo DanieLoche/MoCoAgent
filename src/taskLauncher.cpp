@@ -2,20 +2,21 @@
 
 
 string TaskLauncher::outputFileName = "";
-int TaskLauncher::nameMaxSize = 32;
+int TaskLauncher::nameMaxSize = 0;
 std::vector<rtTaskInfosStruct> TaskLauncher::tasksSet = std::vector<rtTaskInfosStruct>();
-std::vector<RT_TASK*> TaskLauncher::tasks = std::vector<RT_TASK*>();
+std::vector<end2endDeadlineStruct> TaskLauncher::chainSet = std::vector<end2endDeadlineStruct>();
+
 RT_SEM TaskLauncher::_syncSem = {0};
 
 TaskLauncher::TaskLauncher(int _agentMode, string _outputFileName, int _schedMode)
 {
    enableAgent = _agentMode;
    schedPolicy = _schedMode;
+   outputFileName = _outputFileName;
 
    //triggerSave = FALSE;
    //triggerSave = &triggerSave;
-   outputFileName = _outputFileName;
-   nameMaxSize = 0;
+   //nameMaxSize = 32;
 }
 
 
@@ -46,7 +47,7 @@ int TaskLauncher::readChainsList(string input_file)
                   >> chaineInfo.deadline ))
             { cerr << "Failed to read line : " << str << endl; return -1; } // error
          chaineInfo.deadline *= 1.0e6;
-         e2eDD.push_back(chaineInfo);
+         chainSet.push_back(chaineInfo);
       }
       #if VERBOSE_ASK
       else cout << " ==> line ignored.";
@@ -65,12 +66,12 @@ int TaskLauncher::readTasksList(int cpuPercent)
    cout << "====== READING TASKS FILE ======"<< endl;
    cout << "CPU use factor = " << cpuFactor <<  endl;
    #endif
-   for(int i=0; i < (int)e2eDD.size(); ++i )
+   for(int i=0; i < (int) chainSet.size(); ++i )
    {
-      std::ifstream myFile(e2eDD[i].Path);
+      std::ifstream myFile(chainSet[i].Path);
       if (!myFile.is_open())
       {
-         cerr << "Failed to open file : " << e2eDD[i].Path << endl;
+         cerr << "Failed to open file : " << chainSet[i].Path << endl;
          exit(EXIT_FAILURE);
       }
       string str;
@@ -141,6 +142,13 @@ int TaskLauncher::readTasksList(int cpuPercent)
 
    }
 
+   if (!tasksSet.empty())
+      for (auto taskInfo = tasksSet.begin(); taskInfo != tasksSet.end(); ++taskInfo)
+      {
+         int sizeName = strlen(taskInfo->fP.name);
+         if (sizeName > nameMaxSize) nameMaxSize = sizeName;
+      }
+   else cerr << "WOAW !! Task set is empty !!" << endl;
    printTaskSetInfos();
 
    return 0;
@@ -161,14 +169,14 @@ int TaskLauncher::runTasks(long expeDuration)
       pid_t pid = fork();
       if (pid == 0) // proc fils
       {
-         setvbuf(stdout, NULL, _IONBF, 4096) ; // _IOLBF
-         setvbuf(stderr, NULL, _IONBF, 4096) ; // _IOLBF
+         setvbuf(stdout, NULL, _IOLBF, 4096) ; // _IONBF
+         setvbuf(stderr, NULL, _IOLBF, 4096) ; // _IOLBF
 
          currentTaskDescriptor = taskInfo;
          //RT_TASK _t;
          //ERROR_MNG(rt_task_shadow(&_t, "TOTO", 1, 0));
          //sleep(50);
-         currentProcess = new MacroTask(currentTaskDescriptor, enableAgent, outputFileName);
+         MacroTask* currentProcess = new MacroTask(currentTaskDescriptor, enableAgent, outputFileName);
 
          #if VERBOSE_DEBUG
          //rt_printf("[ %s ] - Process created (pid = %d).\n", currentTaskDescriptor.fP.name, getpid());
@@ -213,17 +221,28 @@ int TaskLauncher::runTasks(long expeDuration)
 
             currentProcess->executeRun();
          }
-
-         rt_fprintf(stderr, "Oh FUCK, I should not go here..!\n");
+///////////////////////////////////////////////////////////
+/////////////// END OF EXPERIMENT /////////////////////////
+         rt_fprintf(stderr, "[ %llu ][ %s ] - Waiting Semaphor...\n", rt_timer_read(), currentProcess->prop.fP.name);
          rt_print_flush_buffers();
-         rt_task_yield();
-         exit(EXIT_FAILURE); // should never occur.
+
+         rt_sem_p(&_syncSem, TM_INFINITE);
+         rt_fprintf(stderr, "[ %llu ][ %s ] - Got a Semaphor...\n", rt_timer_read(), currentProcess->prop.fP.name);
+
+         RT_TASK_INFO cti;
+         rt_task_inquire(&currentProcess->_task, &cti);
+         currentProcess->saveData(nameMaxSize, &cti);
+
+         RTIME time = rt_timer_read();
+         rt_sem_v(&_syncSem);
+         rt_fprintf(stderr, "[ %llu ][ %s ] - Semaphor released.\n", time, currentProcess->prop.fP.name);
+
+         rt_fprintf(stderr, "[ %llu ][ %s ] - Finished.\n", time, currentProcess->prop.fP.name);
+         rt_print_flush_buffers();
+         exit(EXIT_SUCCESS);
       }
       else // pid = forked task pid_t
       {
-         //RT_TASK _t;
-         //int ret = rt_task_bind(&_t, taskInfo.fP.name, _mSEC(500));
-         //cout << "Waiting to bind to " << taskInfo.fP.name << "..." << getErrorName(ret) << " (" << ret << ")" << endl;
          sleep(0.5);
       }
    }
@@ -232,7 +251,6 @@ int TaskLauncher::runTasks(long expeDuration)
 
 int TaskLauncher::runAgent(long expeDuration)
 {
-   int ret = 0;
    #if VERBOSE_INFO
    cout << "====== LAUNCHING MoCoAgent ======" << endl;
    #endif
@@ -255,14 +273,8 @@ int TaskLauncher::runAgent(long expeDuration)
    //sleep(2);
    //system("find /run/xenomai") ; // see what the registry is looking like
    cout << std::flush;
-   currentProcess = new MCAgent(MoCoAgentParams, e2eDD, tasksSet);
+   MCAgent* currentProcess = new MCAgent(MoCoAgentParams, chainSet, tasksSet);
    rt_printf("[ %s ] - Process created (pid = %d).\n", currentTaskDescriptor.fP.name, getpid()); //cout << "["<< currentTaskDescriptor.fP.name << "]"<< "Macro task created." << endl;
-   for (auto& taskInfo : tasksSet)
-   {
-      RT_TASK* _t = new RT_TASK;
-      ERROR_MNG(rt_task_bind(_t, taskInfo.fP.name, _mSEC(500)));
-      tasks.push_back(_t);
-   }
    //sleep(50);
 
    ERROR_MNG(rt_alarm_create(&_endAlarm, ALARM_NAME, TaskLauncher::finishMoCoAgent, (void*)currentProcess)); //ms to ns
@@ -270,7 +282,7 @@ int TaskLauncher::runAgent(long expeDuration)
    rt_printf("[ %s ] - Alarm %s created.\n", currentTaskDescriptor.fP.name, ALARM_NAME); //cout << "["<< currentTaskDescriptor.fP.name << "]"<< "Alarm created." << endl;
    #endif
 
-   ERROR_MNG(rt_sem_create(&_syncSem, SEM_NAME, 0, S_PRIO)); // sync. #1: ready for alarms.
+   ERROR_MNG(rt_sem_create(&_syncSem, SEM_NAME, 0, S_FIFO)); // sync. #1: ready for alarms.
    #if VERBOSE_DEBUG
    rt_printf("[ %s ] - Semaphor %s created.\n", currentTaskDescriptor.fP.name, SEM_NAME); //cout << "["<< currentTaskDescriptor.fP.name << "]"<< "Semaphor Created." << endl;
    #endif
@@ -299,40 +311,62 @@ int TaskLauncher::runAgent(long expeDuration)
    if (enableAgent == 2) currentProcess->executeRun_besteffort();
    else currentProcess->executeRun();
 
+///////////////////////////////////////////////////////////
+/////////////// END OF EXPERIMENT /////////////////////////
 
-
-   ret = 0;
-   for (auto& _task : tasks)
+   RT_TASK_INFO cti;
+   if (!rt_task_inquire(NULL, &cti))
    {
-      while (!ret)
-      {
-         ret = rt_task_inquire(_task, NULL);
-         rt_task_sleep(_mSEC(5));
-         //rt_task_sleep(_mSEC(2));
-      }
+      std::ofstream outputFileResume;
+      outputFileResume.open (outputFileName + RESUME_FILE, std::ios::app);    // TO APPEND :  //,ios_base::app);
+      outputFileResume << "\n Monitoring and Control Agent Stats : \n"
+                    << "Primary Mode execution time - " << cti.stat.xtime/1.0e6 << " ms."
+                    << " Timeouts : " << cti.stat.timeout << "\n"
+                    << "   Mode Switches - " << cti.stat.msw << "\n"
+                    << "Context Switches - " << cti.stat.csw << "\n"
+                    << "Cobalt Sys calls - " << cti.stat.xsc
+                    << endl;
+      outputFileResume.close();
    }
-   //rt_sem_p(&_syncSem, TM_INFINITE);
 
-   return ret;
+   /*std::vector<RT_TASK*> rtTasks;
+   for (auto& taskInfo : tasksSet)
+   {
+      RT_TASK* _t;
+      ERROR_MNG(rt_task_bind(_t, taskInfo.fP.name, _mSEC(500)));
+      rtTasks.push_back(new RT_TASK(*_t));
+   }*/
+
+   RTIME time = rt_timer_read();
+   rt_sem_v(&_syncSem);
+   rt_fprintf(stderr, "[ %llu ] [ MoCoAgent ]- Giving Semaphor...\n", time);
+   rt_print_flush_buffers();
+
+   /*if (!rtTasks.empty())
+   for (auto _task : rtTasks)
+   {
+      ERROR_MNG(rt_task_join(_task));
+      //rt_task_sleep(_mSEC(5));
+   } else rt_printf("ERROR ! No task set to cheeeck..!\n");
+   rt_print_flush_buffers();*/
+
+   rt_task_sleep(_SEC(1));
+   rt_sem_p(&_syncSem, TM_INFINITE);
+
+   rt_printf(" ======= END OF EXPERIMENTATION ======\n");
+   rt_print_flush_buffers();
+
+   exit(EXIT_SUCCESS);
 }
 
 void TaskLauncher::finishMoCoAgent(void* _arg)
 {
    MCAgent* MoCoAgent_task = (MCAgent*) _arg;
 
-   MoCoAgent_task->MoCoIsAlive = 0;
-
-   rt_printf("====== End of Expe. Saving Data. ======\n");
+   rt_printf("====== End of Experimentation. Saving Data. ======\n");
    //cout << "Checking tasks names :" << endl;
    MoCoAgent_task->saveData();
 
-   if (!tasksSet.empty())
-      for (auto taskInfo = tasksSet.begin(); taskInfo != tasksSet.end(); ++taskInfo)
-      {
-         int sizeName = strlen(taskInfo->fP.name);
-         if (sizeName > nameMaxSize) nameMaxSize = sizeName;
-      }
-      else cerr << "WOAW !! Task set is empty !!" << endl;
    std::ofstream myFile;
    myFile.open (outputFileName + TASKS_FILE);    // TO APPEND :  //,ios_base::app);
    myFile << std::setw(15) << "timestamp" << " ; "
@@ -345,35 +379,31 @@ void TaskLauncher::finishMoCoAgent(void* _arg)
          << std::setw(10) << "duration" << "\n";
    myFile.close();
 
-   RTIME time = rt_timer_read();
-   rt_sem_v(&_syncSem);
-   rt_fprintf(stderr, "[ %llu ] [ MoCoAgent ]- Giving Semaphor...\n", time);
-   rt_print_flush_buffers();
-
    //ERROR_MNG(rt_task_sleep(_mSEC(500)));
 }
 
 void TaskLauncher::finishTask(void* _MacroTask)
 {
-   MacroTask* task = (MacroTask*) _MacroTask;
+   MacroTask* currentProcess = (MacroTask*) _MacroTask;
 
-   rt_fprintf(stderr, "[ %llu ][ %s ] - Waiting Semaphor...\n", rt_timer_read(), task->prop.fP.name);
+   currentProcess->MoCoIsAlive = 0;
+   return;
+   rt_fprintf(stderr, "[ %llu ][ %s ] - Waiting Semaphor...\n", rt_timer_read(), currentProcess->prop.fP.name);
    rt_print_flush_buffers();
 
    rt_sem_p(&_syncSem, TM_INFINITE);
-   rt_fprintf(stderr, "[ %llu ][ %s ] - Got a Semaphor...\n", rt_timer_read(), task->prop.fP.name);
+   rt_fprintf(stderr, "[ %llu ][ %s ] - Got a Semaphor...\n", rt_timer_read(), currentProcess->prop.fP.name);
 
-      task->saveData(nameMaxSize);
+   currentProcess->saveData(nameMaxSize);
 
    RTIME time = rt_timer_read();
    rt_sem_v(&_syncSem);
-   rt_fprintf(stderr, "[ %llu ][ %s ] - Semaphor released.\n", time, task->prop.fP.name);
+   rt_fprintf(stderr, "[ %llu ][ %s ] - Semaphor released.\n", time, currentProcess->prop.fP.name);
 
-   rt_fprintf(stderr, "[ %llu ][ %s ] - Finished.\n", time, task->prop.fP.name);
+   rt_fprintf(stderr, "[ %llu ][ %s ] - Finished.\n", time, currentProcess->prop.fP.name);
    rt_print_flush_buffers();
-
    //ERROR_MNG(rt_task_sleep(_SEC(1)));
-   exit(EXIT_SUCCESS);
+   //exit(EXIT_SUCCESS);
 }
 
 
@@ -401,9 +431,9 @@ void TaskLauncher::printTaskSetInfos ( ) // std::vector<rtTaskInfosStruct> _myTa
 void TaskLauncher::printChainSetInfos ( ) // std::vector<rtTaskInfosStruct> _myTasksInfos)
 {
    #if VERBOSE_INFO
-   cout << "Resume of Chain set information : " << e2eDD.size() << " elements." << endl;
-   if (!e2eDD.empty())
-      for (auto &chainInfo : e2eDD)
+   cout << "Resume of Chain set information : " << chainSet.size() << " elements." << endl;
+   if (!chainSet.empty())
+      for (auto &chainInfo : chainSet)
       {
          cout << "Name: " << chainInfo.name
          << "  | ID: "<< chainInfo.taskChainID

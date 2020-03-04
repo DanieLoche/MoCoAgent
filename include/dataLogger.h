@@ -31,19 +31,18 @@ class DataLogger
       RTIME logStart();
       void logExec(RTIME );
       RTIME logExec();
-      virtual void saveData(int nameSize) = 0;
-
+      virtual void saveData(int nameSize, RT_TASK_INFO* cti) = 0;
 };
 
 class TaskDataLogger : public DataLogger
 {
    protected:
-      rtTaskInfosStruct* taskInfos;
+      rtTaskInfosStruct taskInfos;
       inline char* getName();
 
    public :
-      TaskDataLogger(rtTaskInfosStruct*, string expeName);
-      void saveData(int nameSize);
+      TaskDataLogger(rtTaskInfosStruct, string expeName);
+      void saveData(int nameSize, RT_TASK_INFO* cti = NULL);
 
 };
 
@@ -57,7 +56,7 @@ class ChainDataLogger : public DataLogger
       int cptAnticipatedMisses;
 
       ChainDataLogger(end2endDeadlineStruct, string expeName);
-      void saveData(int nameSize);
+      void saveData(int nameSize, RT_TASK_INFO* cti = NULL);
 
 };
 
