@@ -1,0 +1,67 @@
+[ RT_CT_fft_S ] - Semaphor Start_Sem signal received, go !
+[ RT_CT_dijkstra_L ] - Semaphor Start_Sem signal received, go !
+[ RT_CT_fft_inv_S ] - Semaphor Start_Sem signal received, go !
+[ RT_CT_basicmath_S ] - Semaphor Start_Sem signal received, go !
+[ RT_CT_sha_L ] - Semaphor Start_Sem signal received, go !
+[ RT_CT_bitcount_S ] - Semaphor Start_Sem signal received, go !
+[ RT_CT_CRC32_S ] - Semaphor Start_Sem signal received, go !
+[ Warning ] [ RT_CT_fft_S ] - Executed in 21.55 ms.
+[ Warning ] [ RT_CT_dijkstra_L ] - Executed in 418.30 ms.
+[ Warning ] [ RT_CT_fft_inv_S ] - Executed in 521.78 ms.
+[ Warning ] [ RT_CT_basicmath_S ] - Executed in 32.35 ms.
+[ Warning ] [ RT_CT_basicmath_S ] - Executed in 64.14 ms.
+[ Warning ] [ RT_CT_CRC32_S ] - Executed in 2522.49 ms.
+[ Warning ] [ RT_CT_bitcount_S ] - Executed in 2490.36 ms.
+[ RT_CT_fft_S ] - ERROR ETIMEDOUT (-110) - failed to write BEFORE monitoring message to buffer monitoringTopic. (MoCo mode : 1)
+[ RT_CT_fft_inv_S ] - ERROR ETIMEDOUT (-110) - failed to write BEFORE monitoring message to buffer monitoringTopic. (MoCo mode : 1)
+Memory Available on buffer : 0 / 480. 1 waiting too.
+Memory Available on buffer : 0 / 480. 0 waiting too.
+[ Warning ] [ RT_CT_dijkstra_L ] - Executed in 2153.46 ms.
+[ Warning ] [ RT_CT_fft_S ] - Executed in 124.04 ms.
+[ Warning ] [ RT_CT_fft_inv_S ] - Executed in 222.75 ms.
+[ Warning ] [ RT_CT_basicmath_S ] - Executed in 152.50 ms.
+[ Warning ] [ RT_CT_basicmath_S ] - Executed in 146.27 ms.
+[ Warning ] [ RT_CT_basicmath_S ] - Executed in 61.56 ms.
+[ Warning ] [ RT_CT_basicmath_S ] - Executed in 61.59 ms.
+[ Warning ] [ RT_CT_basicmath_S ] - Executed in 61.61 ms.
+[ Warning ] [ RT_CT_basicmath_S ] - Executed in 61.58 ms.
+[ Warning ] [ RT_CT_basicmath_S ] - Executed in 61.55 ms.
+[ Warning ] [ RT_CT_basicmath_S ] - Executed in 75.58 ms.
+[ Warning ] [ RT_CT_basicmath_S ] - Executed in 302.20 ms.
+[ Warning ] [ RT_CT_basicmath_S ] - Executed in 153.35 ms.
+[ Warning ] [ RT_CT_basicmath_S ] - Executed in 30.59 ms.
+[ Warning ] [ RT_CT_basicmath_S ] - Executed in 256.97 ms.
+[ 10317939885833 ][ RT_CT_basicmath_S ] - Waiting Semaphor...
+Saving Chain ComputeTraj data.
+[ ComputeTraj ] - Error : no logs to print !
+[ 10317940523815 ] [ MoCoAgent ]- Giving Semaphor...
+[ Warning ] [ RT_CT_CRC32_S ] - Executed in 7506.45 ms.
+[ 10317981571739 ][ RT_CT_CRC32_S ] - Waiting Semaphor...
+[ Warning ] [ RT_CT_bitcount_S ] - Executed in 7503.59 ms.
+[ 10317946528619 ][ RT_CT_bitcount_S ] - Waiting Semaphor...
+[ Warning ] [ RT_CT_sha_L ] - Executed in 9987.47 ms.
+[ 10317939977037 ][ RT_CT_sha_L ] - Waiting Semaphor...
+[ 10317939889069 ][ RT_CT_fft_S ] - Waiting Semaphor...
+[ Warning ] [ RT_CT_dijkstra_L ] - Executed in 7507.75 ms.
+[ 10318026795769 ][ RT_CT_dijkstra_L ] - Waiting Semaphor...
+[ 10318026803196 ][ RT_CT_fft_inv_S ] - Got a Semaphor...
+[ 10318027629639 ][ RT_CT_fft_inv_S ] - Semaphor released.
+[ 10318027629639 ][ RT_CT_fft_inv_S ] - Finished.
+[ 10318027633184 ][ RT_CT_basicmath_S ] - Got a Semaphor...
+[ 10318027925274 ][ RT_CT_basicmath_S ] - Semaphor released.
+[ 10318027925274 ][ RT_CT_basicmath_S ] - Finished.
+[ 10318027928622 ][ RT_CT_fft_S ] - Got a Semaphor...
+[ 10318036818585 ][ RT_CT_fft_S ] - Semaphor released.
+[ 10318036818585 ][ RT_CT_fft_S ] - Finished.
+[ 10318036824369 ][ RT_CT_sha_L ] - Got a Semaphor...
+[ 10318039097720 ][ RT_CT_sha_L ] - Semaphor released.
+[ 10318039097720 ][ RT_CT_sha_L ] - Finished.
+[ 10318039104075 ][ RT_CT_bitcount_S ] - Got a Semaphor...
+[ 10318039209289 ][ RT_CT_bitcount_S ] - Semaphor released.
+[ 10318039209289 ][ RT_CT_bitcount_S ] - Finished.
+[ 10318039213252 ][ RT_CT_CRC32_S ] - Got a Semaphor...
+[ 10318041158497 ][ RT_CT_CRC32_S ] - Semaphor released.
+[ 10318041158497 ][ RT_CT_CRC32_S ] - Finished.
+[ 10318041163047 ][ RT_CT_dijkstra_L ] - Got a Semaphor...
+[ 10318042989491 ][ RT_CT_dijkstra_L ] - Semaphor released.
+[ 10318042989491 ][ RT_CT_dijkstra_L ] - Finished.

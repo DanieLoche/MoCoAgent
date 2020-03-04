@@ -1,6 +1,0 @@
-Experiment made with parameters : 
- MoCoAgent: 0
-  Duration: 600
-CPU Factor: 80
-Input  file: ./inputFile
-Output files: ./Experimentations/Expe_19-05-19h/Chain2IP_0_600_80_RR.csv & ./Experimentations/Expe_19-05-19h/Chain2IP_0_600_80_RR_MoCoLogs.csv & ./Experimentations/Expe_19-05-19h/Chain2IP_0_600_80_RR_Resume.cvs

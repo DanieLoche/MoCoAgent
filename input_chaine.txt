@@ -4,4 +4,4 @@ ComputeTraj              1          ./chain_ComputeTraj.in             10000    
 //SignalDataProcessing     1          ./chain_SignalDataProcess.in       10000    SD
 //VoiceRecognition         1          ./chain_VoiceRecognition.in        10000    VR
 //ImageProcessing          1          ./chain_ImageProcessing.in         10000    IP
-NonCritical             0           ./bestEffort_tasks.in              9999     BE
+//NonCritical             1           ./bestEffort_tasks.in              9999     BE

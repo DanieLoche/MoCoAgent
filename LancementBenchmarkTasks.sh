@@ -32,6 +32,6 @@ then
 fi
 
 ./runBashTestTasks.sh -i $input -s FIFO -d $duration -l $load; 
-FIFO=$? ; 
+result=$? ; 
 #rm ./bench/output/*
-echo "Result FIFO : $FIFO"
+echo "Result : $result"

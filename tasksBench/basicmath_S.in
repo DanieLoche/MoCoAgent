@@ -1,2 +1,1 @@
-ID name 		   meanET  wcet   isHRT aff  prec  path               arguments
-1  basicmath_S 2       30     1     1    0     basicmath_small    > ./bench/output/o_basmth_small.txt
+ID  name 		     meanET  wcet    isHRT aff  prec path                       arguments

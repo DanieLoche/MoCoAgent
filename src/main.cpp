@@ -29,7 +29,7 @@ int main(int argc, char* argv[])
     for( int i = 1; i < argc; ++i)
     {
       std::string arg = argv[i];
-      cout << "Doing argument #" << i << " = " << arg << "." << endl;
+      //cout << "Doing argument #" << i << " = " << arg << "." << endl;
       if (arg == "-h" || arg == "--help" || arg == "help")
          show_usage(EXIT_SUCCESS);
       else if (arg == "-i" || arg == "--input")
