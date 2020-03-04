@@ -62,7 +62,7 @@ void do_xeno_init(void) {
       "program",
       "--shared-registry",
       "--session=test",
-		"--dump-config",
+		//"--dump-config",
       NULL
    } ;
    const char **argv = args ;
@@ -85,12 +85,14 @@ std::vector<char*> _argv;
 
 int main(int argc, char *argv[])
 {
-	int ret = 0;
+	int ret = 0, toto = 0;
+	RT_BUFFER buf;
+
 	printf("Debut test\n");
 
 	const char* taskNames[3] = {"task0", "task1", "task2"};
 
-   setvbuf(stdout,NULL,_IOLBF,4096) ;
+   setvbuf(stdout,NULL,_IONBF,4096) ;
 
    for (int i = 0 ; i < 3 ; ++i)
    {
@@ -112,8 +114,14 @@ int main(int argc, char *argv[])
          taskNames[i],getpid()) ;
          ret = rt_task_shadow(&_t, taskNames[i], 50, 0);
          rt_printf("shadow task %s returns %d\n", taskNames[i], ret) ;
-         ret = rt_task_sleep(1e9*15) ;
-         rt_printf("sleep returned status %d\n",ret) ;
+         ret = rt_task_sleep(1e9*1) ;
+			ret = rt_buffer_bind(&buf, "xeno-buffer", TM_INFINITE);
+			rt_printf("Bind Buffer status %d (%s)\n", ret, symerror(ret)) ;
+			toto = 10+i;
+			ret = rt_buffer_write(&buf, &toto, sizeof(toto), TM_INFINITE);
+         rt_printf("Write Buffer status %d (%s)\n", ret, getErrorName(ret)) ;
+			rt_print_flush_buffers();
+			ret = rt_task_sleep(1e9*1) ;
          exit(EXIT_SUCCESS);
       }
 
@@ -121,8 +129,8 @@ int main(int argc, char *argv[])
 
    // Only "main" process goes here.
 
-   printf("launching done, sleeping 5\n") ;
-   sleep(5) ;
+   printf("launching done, sleeping 2\n") ;
+   sleep(2) ;
    printf("resuming, binding...\n") ;
 
    printf("dumping the registry\n") ;
@@ -131,20 +139,29 @@ int main(int argc, char *argv[])
    XENO_INIT() ;
 
 
-	RT_BUFFER buf;
 	RT_EVENT event;
-   for (int i = 0 ; i < 3 ; ++i)
+   if (0) for (int i = 0 ; i < 3 ; ++i)
    {
       RT_TASK _t;
       rt_printf("binding to %s\n",taskNames[i]) ;
-      ret = rt_task_bind(&_t, taskNames[i], TM_NONBLOCK); // <== HERE. TM_NONBLOCK, TM_INFINITE or a time value, changes nothing.... never goes here.
+      ret = rt_task_bind(&_t, taskNames[i], TM_INFINITE); // <== HERE. TM_NONBLOCK, TM_INFINITE or a time value, changes nothing.... never goes here.
       if (ret) rt_printf("Error : could not bind task. Error #%d\n", ret);
       else rt_printf("Bind to task %s done.\n", taskNames[i]);
    }
-	ret = rt_buffer_create(&buf, "xeno-buffer", 20*sizeof(monitoringMsg), B_PRIO);
-	rt_printf("Buffer created. (%d).\n", ret);
+	ret = rt_buffer_create(&buf, "xeno-buffer", 10*sizeof(toto), B_FIFO);
+	rt_printf("Buffer created. %d (%s)\n", ret, getErrorName(ret));
+
+	ret = rt_buffer_read(&buf, &toto, sizeof(toto), TM_INFINITE);
+	rt_printf("Buffer read : got toto = %d, %d (%s)\n", toto, ret, getErrorName(ret));
+	ret = rt_buffer_read(&buf, &toto, sizeof(toto), TM_INFINITE);
+	rt_printf("Buffer read : got toto = %d, %d (%s)\n", toto, ret, getErrorName(ret));
+	ret = rt_buffer_read(&buf, &toto, sizeof(toto), TM_INFINITE);
+	rt_printf("Buffer read : got toto = %d, %d (%s)\n", toto, ret, getErrorName(ret));
+
 	ret = rt_event_create(&event, "xeno-event", 0, EV_PRIO);
-	rt_printf("Event created. (%d).\n", ret);
+	rt_printf("Event created. %d (%s)\n", ret, getErrorName(ret));
+
+	rt_task_sleep(1e9*5);
    /* Do stuff here on the binded tasks */
    exit(EXIT_SUCCESS);
 
@@ -216,39 +233,48 @@ int main(int argc, char *argv[])
 // ================================= //
 const char* getErrorName(int err)
 {
-   switch (err)
+   switch (abs(err))
    {
       case 0   :
          return "No Error.\0";
-      case -EINTR  :
+      case EINTR  :
          return "EINTR\0";
          break;
-      case -EWOULDBLOCK  :
-         return "EWOULDBLOCK\0";
+      case EWOULDBLOCK  : // = EAGAIN
+         return "EWOULDBLOCK or EAGAIN\0";
          break;
-      case -ETIMEDOUT :
+      case ETIMEDOUT :
          return "ETIMEDOUT\0";
          break;
-      case -EPERM  :
+      case EPERM  :
          return "EPERM\0";
          break;
-      case -EEXIST :
+      case EEXIST :
          return "EEXIST\0";
          break;
-      case -ENOMEM :
+      case ENOMEM :
          return "ENOMEM\0";
          break;
-      case -EINVAL :
+      case EINVAL :
          return "EINVAL\0";
          break;
-      case -EDEADLK   :
+      case EDEADLK   :
          return "EDEADLK\0";
          break;
-      case -ESRCH  :
+      case ESRCH  :
          return "ESRCH\0";
          break;
-      case -EBUSY  :
+      case EBUSY  :
          return "EBUSY\0";
+         break;
+      case EFAULT  :
+         return "EFAULT\0";
+         break;
+      case EIDRM  :
+         return "EIDRM\0";
+         break;
+      case EMFILE  :
+         return "EMFILE\0";
          break;
       default: return "Undefined Error Code.\0";
    }

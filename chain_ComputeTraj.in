@@ -1,8 +1,10 @@
 ID  name          WCET wcet isHRT aff  prec  task            arguments
-1 CT_bitcount_S    5    15  1      1   0     bitcnts         75000 > ./bench/output/o_btcnt_small.txt 
-2 CT_CRC32_S       6.5  15  1      1   1     crc             ./bench/data/small.pcm > ./bench/output/o_crc_small.txt 
-3 CT_fft_inv_S     8    15  1      1   1     fft             8 8192 -i > ./bench/output/o_ffti_small.inv.txt 
-4 CT_basicmath_S   15   30  1      1   3     basicmath_small > ./bench/output/o_basmth_small.txt 
-5 CT_dijkstra_L    35   60  1      1   4     dijkstra_large  ./bench/dijkstra/input.dat > ./bench/output/o_dijk_large.dat 
+1 CT_bitcount_S    5    15  1      1   0     bitcnts         75000 > ./bench/output/o_btcnt_small.txt
+2 CT_CRC32_S       6.5  15  1      1   1     crc             ./bench/data/small.pcm > ./bench/output/o_crc_small.txt
+3 CT_fft_inv_S     8    15  1      1   1     fft             8 8192 -i > /dev/null
+4 CT_basicmath_S   15   30  1      1   3     basicmath_small > ./bench/output/o_basmth_small.txt
+5 CT_dijkstra_L    35   60  1      1   4     dijkstra_large  ./bench/dijkstra/input.dat > ./bench/output/o_dijk_large.dat
 6 CT_sha_L         25   60  1      1   5     sha_bin         ./bench/sha/input_large.asc > ./bench/output/o_sha_large.txt
-7 CT_fft_S         8    15  1      1   6     fft             8 4096 > ./bench/output/o_fft_small.txt 
+7 CT_fft_S         8    15  1      1   6     fft             8 4096 > /dev/null
+// ./bench/output/o_ffti_small.inv.txt
+//./bench/output/o_fft_small.txt

@@ -1,5 +1,5 @@
 name             chaineID   Path                        deadline
-blowfishE_S      9       ./tasksBench/blowfishE_S.in       5000      BNCH
-bitcount_S       1       ./tasksBench/bitcount_S.in        5000      BNCH
+//blowfishE_S      9       ./tasksBench/blowfishE_S.in       5000      BNCH
+//bitcount_S       1       ./tasksBench/bitcount_S.in        5000      BNCH
 basicmath_S      1       ./tasksBench/basicmath_S.in       5000      BNCH
-adpcmCaudio_S    11      ./tasksBench/adpcmCaudio_S.in     5000      BNCH
+//adpcmCaudio_S    11      ./tasksBench/adpcmCaudio_S.in     5000      BNCH
