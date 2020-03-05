@@ -1,0 +1,16 @@
+Experiment made with parameters : 
+ MoCoAgent: 0
+  Duration: 300
+CPU Factor: 100
+Input  file: ./inputFile
+Output files: ./Experimentations/Expe_20-08-17h/CR_S_0_300_100_FIFO_Expe.csv & ./Experimentations/Expe_20-08-17h/CR_S_0_300_100_FIFO_Chains.csv & ./Experimentations/Expe_20-08-17h/CR_S_0_300_100_FIFO_Resume.txt
+
+Running summary for task RT_CRC32_S. (11708, 50, RT_CRC32_S)
+Deadline : 50 ms.  Missed | Executions 
+                         0 | 1906 times
+Primary Mode execution time - 14.3385 ms. Timeouts : 0
+  MIN   |   AVG   |   MAX
+5.20243 | 5.3992 | 5.74524 (ms)
+   Mode Switches - 6005
+Context Switches - 12009
+Cobalt Sys calls - 6017

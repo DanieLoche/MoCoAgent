@@ -1,0 +1,6 @@
+Experiment made with parameters : 
+ MoCoAgent: 0
+  Duration: 600
+CPU Factor: 80
+Input  file: ./inputFile
+Output files: ./Experimentations/Expe_30-07-19h/CT_0_600_80_RR.csv & ./Experimentations/Expe_30-07-19h/CT_0_600_80_RR_MoCoLogs.csv & ./Experimentations/Expe_30-07-19h/CT_0_600_80_RR_Resume.cvs

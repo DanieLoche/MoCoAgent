@@ -1,0 +1,12 @@
+
+ Monitoring and Control Agent Stats : 
+Primary Mode execution time - 400.826 ms. Timeouts : 0
+   Mode Switches - 17
+Context Switches - 185553
+Cobalt Sys calls - 150065
+
+Running summary for Chain SignalDataProcessing. ( 1 )
+Deadline : 10000 ms. Anticipated Misses |  Missed  |  Chain loops 
+                                     0 |          0 | 805 times
+  MIN   |   AVG   |   MAX
+78.8472 | 696.499 | 2750.21 runtimes (ms)

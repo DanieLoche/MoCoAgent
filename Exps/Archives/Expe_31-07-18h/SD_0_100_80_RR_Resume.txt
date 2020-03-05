@@ -1,0 +1,56 @@
+Experiment made with parameters : 
+ MoCoAgent: 0
+  Duration: 100
+CPU Factor: 80
+Input  file: ./inputFile
+Output files: ./Experimentations/Expe_31-07-18h/SD_0_100_80_RR_Expe.csv & ./Experimentations/Expe_31-07-18h/SD_0_100_80_RR_Chains.csv & ./Experimentations/Expe_31-07-18h/SD_0_100_80_RR_Resume.txt
+
+Running summary for task RT_SDP_bitcount_S. (13029, 50, RT_SDP_bitcount_S)
+Deadline : 189.6 ms.  Missed | Executions 
+                       256 | 256 times
+Primary Mode execution time - 2.01561 ms. Timeouts : 0
+  MIN   |   AVG   |   MAX
+381.219 | 385.535 | 451.119 (ms)
+   Mode Switches - 260
+Context Switches - 1426
+Cobalt Sys calls - 270
+
+Running summary for task RT_SDP_fft_S. (13030, 50, RT_SDP_fft_S)
+Deadline : 275.2 ms.  Missed | Executions 
+                       256 | 256 times
+Primary Mode execution time - 1.82931 ms. Timeouts : 0
+  MIN   |   AVG   |   MAX
+381.194 | 385.536 | 450.958 (ms)
+   Mode Switches - 260
+Context Switches - 1480
+Cobalt Sys calls - 270
+
+Running summary for task RT_SDP_CRC32_L. (13031, 50, RT_SDP_CRC32_L)
+Deadline : 3551.2 ms.  Missed | Executions 
+                         0 | 256 times
+Primary Mode execution time - 1.26402 ms. Timeouts : 0
+  MIN   |   AVG   |   MAX
+381.219 | 385.534 | 451.595 (ms)
+   Mode Switches - 260
+Context Switches - 1122
+Cobalt Sys calls - 270
+
+Running summary for task RT_SDP_basicmath_S. (13032, 50, RT_SDP_basicmath_S)
+Deadline : 231.2 ms.  Missed | Executions 
+                       256 | 256 times
+Primary Mode execution time - 1.35675 ms. Timeouts : 0
+  MIN   |   AVG   |   MAX
+381.088 | 385.535 | 443.968 (ms)
+   Mode Switches - 260
+Context Switches - 1124
+Cobalt Sys calls - 270
+
+Running summary for task RT_SDP_qsort_L. (13033, 50, RT_SDP_qsort_L)
+Deadline : 555.2 ms.  Missed | Executions 
+                         0 | 257 times
+Primary Mode execution time - 1.38475 ms. Timeouts : 0
+  MIN   |   AVG   |   MAX
+195.46 | 384.017 | 411.987 (ms)
+   Mode Switches - 261
+Context Switches - 1002
+Cobalt Sys calls - 271

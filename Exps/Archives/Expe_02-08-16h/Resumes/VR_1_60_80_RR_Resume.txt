@@ -1,0 +1,48 @@
+Experiment made with parameters : 
+ MoCoAgent: 1
+  Duration: 60
+CPU Factor: 80
+Input  file: ./inputFile
+Output files: ./Experimentations/Expe_02-08-16h/VR_1_60_80_RR_Expe.csv & ./Experimentations/Expe_02-08-16h/VR_1_60_80_RR_Chains.csv & ./Experimentations/Expe_02-08-16h/VR_1_60_80_RR_Resume.txt
+
+Running summary for task RT_VR_bitcount_S. (18458, 50, RT_VR_bitcount_S)
+Deadline : 189.6 ms.  Missed | Executions 
+                        92 | 102 times
+Primary Mode execution time - 1.22667 ms. Timeouts : 0
+  MIN   |   AVG   |   MAX
+19.6169 | 591.932 | 4940.1 (ms)
+   Mode Switches - 106
+Context Switches - 388
+Cobalt Sys calls - 422
+
+Running summary for task RT_VR_basicmath_L. (18459, 50, RT_VR_basicmath_L)
+Deadline : 2592 ms.  Missed | Executions 
+                         1 | 90 times
+Primary Mode execution time - 1.48312 ms. Timeouts : 0
+  MIN   |   AVG   |   MAX
+410.1 | 671.402 | 4940.15 (ms)
+   Mode Switches - 93
+Context Switches - 418
+Cobalt Sys calls - 372
+
+Running summary for task RT_VR_stringsearch_L. (18460, 50, RT_VR_stringsearch_L)
+Deadline : 153.6 ms.  Missed | Executions 
+                        93 | 102 times
+Primary Mode execution time - 1.10466 ms. Timeouts : 0
+  MIN   |   AVG   |   MAX
+13.4121 | 591.943 | 4940.11 (ms)
+   Mode Switches - 105
+Context Switches - 351
+Cobalt Sys calls - 420
+
+ Monitoring and Control Agent Stats : 
+Primary Mode execution time - 31.6983 ms. Timeouts : 0
+   Mode Switches - 304
+Context Switches - 16432
+Cobalt Sys calls - 15455
+
+Running summary for Chain VoiceRecognition. ( 1 )
+Deadline : 10000 ms. Anticipated Misses |  Missed  |  Chain loops 
+                                     0 |          0 | 90 times
+  MIN   |   AVG   |   MAX
+408.539 | 667.48 | 4964.88 runtimes (ms)

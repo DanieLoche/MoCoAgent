@@ -1,0 +1,6 @@
+Experiment made with parameters : 
+ MoCoAgent: 0
+  Duration: 200
+CPU Factor: 100
+Input  file: ./inputFile
+Output files: ./Experimentations/Expe_06-08-19h/IP_0_200_100_RM_Expe.csv & ./Experimentations/Expe_06-08-19h/IP_0_200_100_RM_Chains.csv & ./Experimentations/Expe_06-08-19h/IP_0_200_100_RM_Resume.txt

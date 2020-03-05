@@ -1,0 +1,16 @@
+Experiment made with parameters : 
+ MoCoAgent: 0
+  Duration: 20
+CPU Factor: 100
+Input  file: ./inputFile
+Output files: ./Experimentations/Expe_15-10-12h/BM_S_0_20_100_FIFO_Expe.csv & ./Experimentations/Expe_15-10-12h/BM_S_0_20_100_FIFO_Chains.csv & ./Experimentations/Expe_15-10-12h/BM_S_0_20_100_FIFO_Resume.txt
+
+Running summary for task RT_basicmath_S. (23172, 50, RT_basicmath_S)
+Deadline : 30 ms.  Missed | (2) | Executions 
+                         0 |  65 | 735 times
+Primary Mode execution time - 1.36467 ms. Timeouts : 0
+  MIN   |   AVG   |   MAX
+1.72743 | 1.79279 | 1.85197 (ms)
+   Mode Switches - 739
+Context Switches - 1476
+Cobalt Sys calls - 750

@@ -1,0 +1,56 @@
+Experiment made with parameters : 
+ MoCoAgent: 0
+  Duration: 60
+CPU Factor: 80
+Input  file: ./inputFile
+Output files: ./Experimentations/Expe_05-08-14h/DE_0_60_80_FIFO_Expe.csv & ./Experimentations/Expe_05-08-14h/DE_0_60_80_FIFO_Chains.csv & ./Experimentations/Expe_05-08-14h/DE_0_60_80_FIFO_Resume.txt
+
+Running summary for task RT_DE_bitcount_S. (8761, 50, RT_DE_bitcount_S)
+Deadline : 189.6 ms.  Missed | Executions 
+                        73 | 401 times
+Primary Mode execution time - 1.77363 ms. Timeouts : 0
+  MIN   |   AVG   |   MAX
+29.8405 | 145.613 | 892.768 (ms)
+   Mode Switches - 405
+Context Switches - 1675
+Cobalt Sys calls - 415
+
+Running summary for task RT_DE_CRC32_S. (8762, 50, RT_DE_CRC32_S)
+Deadline : 196 ms.  Missed | Executions 
+                        63 | 401 times
+Primary Mode execution time - 1.27604 ms. Timeouts : 0
+  MIN   |   AVG   |   MAX
+29.8424 | 145.614 | 892.742 (ms)
+   Mode Switches - 405
+Context Switches - 1499
+Cobalt Sys calls - 415
+
+Running summary for task RT_DE_patricia_L. (8763, 50, RT_DE_patricia_L)
+Deadline : 3352 ms.  Missed | Executions 
+                         0 | 398 times
+Primary Mode execution time - 2.47922 ms. Timeouts : 0
+  MIN   |   AVG   |   MAX
+96.3264 | 146.67 | 892.768 (ms)
+   Mode Switches - 402
+Context Switches - 1631
+Cobalt Sys calls - 412
+
+Running summary for task RT_DE_basicmath_S. (8764, 50, RT_DE_basicmath_S)
+Deadline : 231.2 ms.  Missed | Executions 
+                        17 | 400 times
+Primary Mode execution time - 1.5019 ms. Timeouts : 0
+  MIN   |   AVG   |   MAX
+32.355 | 145.987 | 852.283 (ms)
+   Mode Switches - 404
+Context Switches - 1335
+Cobalt Sys calls - 414
+
+Running summary for task RT_DE_blowfish_S. (8765, 50, RT_DE_blowfish_S)
+Deadline : 243.2 ms.  Missed | Executions 
+                        14 | 279 times
+Primary Mode execution time - 2.67923 ms. Timeouts : 0
+  MIN   |   AVG   |   MAX
+25.6351 | 210.592 | 793.766 (ms)
+   Mode Switches - 283
+Context Switches - 2222
+Cobalt Sys calls - 293

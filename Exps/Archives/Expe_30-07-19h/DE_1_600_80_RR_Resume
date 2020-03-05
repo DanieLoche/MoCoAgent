@@ -1,0 +1,50 @@
+
+Running summary for task RT_DE_bitcount_S. (3418, 50, RT_DE_bitcount_S)
+Deadline : 189.6 ms.  Missed | Executions 
+                      2514 | 2626 times
+Primary Mode execution time - 32.0757 ms. Timeouts : 0
+  MIN   |   AVG   |   MAX
+26.4797 | 224.591 | 1107.54 (ms)
+   Mode Switches - 2630
+Context Switches - 10979
+Cobalt Sys calls - 10519
+
+Running summary for task RT_DE_CRC32_S. (3419, 50, RT_DE_CRC32_S)
+Deadline : 196 ms.  Missed | Executions 
+                      1717 | 2625 times
+Primary Mode execution time - 31.4188 ms. Timeouts : 0
+  MIN   |   AVG   |   MAX
+33.309 | 224.683 | 1089.03 (ms)
+   Mode Switches - 2629
+Context Switches - 11205
+Cobalt Sys calls - 10515
+
+Running summary for task RT_DE_patricia_L. (3420, 50, RT_DE_patricia_L)
+Deadline : 3352 ms.  Missed | Executions 
+                         0 | 2603 times
+Primary Mode execution time - 53.6699 ms. Timeouts : 0
+  MIN   |   AVG   |   MAX
+162.753 | 226.608 | 1106.9 (ms)
+   Mode Switches - 2607
+Context Switches - 15711
+Cobalt Sys calls - 10427
+
+Running summary for task RT_DE_blowfish_S. (3421, 50, RT_DE_blowfish_S)
+Deadline : 243.2 ms.  Missed | Executions 
+                      1175 | 2130 times
+Primary Mode execution time - 50.4656 ms. Timeouts : 0
+  MIN   |   AVG   |   MAX
+38.253 | 277.713 | 1637.33 (ms)
+   Mode Switches - 2134
+Context Switches - 15137
+Cobalt Sys calls - 8536
+
+Running summary for task RT_DE_basicmath_S. (3422, 50, RT_DE_basicmath_S)
+Deadline : 231.2 ms.  Missed | Executions 
+                       787 | 2628 times
+Primary Mode execution time - 36.7635 ms. Timeouts : 0
+  MIN   |   AVG   |   MAX
+41.9327 | 224.366 | 1581.69 (ms)
+   Mode Switches - 2632
+Context Switches - 10440
+Cobalt Sys calls - 10527

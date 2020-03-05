@@ -1,0 +1,58 @@
+Experiment made with parameters : 
+ MoCoAgent: 1
+  Duration: 60
+CPU Factor: 80
+Input  file: ./inputFile
+Output files: ./Experimentations/Expe_02-08-10h/DE_1_60_80_FIFO_Expe.csv & ./Experimentations/Expe_02-08-10h/DE_1_60_80_FIFO_Chains.csv & ./Experimentations/Expe_02-08-10h/DE_1_60_80_FIFO_Resume.txt
+
+Running summary for task RT_DE_bitcount_S. (23787, 50, RT_DE_bitcount_S)
+Deadline : 189.6 ms.  Missed | Executions 
+                        65 | 318 times
+Primary Mode execution time - 3.98565 ms. Timeouts : 0
+  MIN   |   AVG   |   MAX
+32.8668 | 185.927 | 269.258 (ms)
+   Mode Switches - 321
+Context Switches - 1466
+Cobalt Sys calls - 1285
+
+Running summary for task RT_DE_CRC32_S. (23788, 50, RT_DE_CRC32_S)
+Deadline : 196 ms.  Missed | Executions 
+                        55 | 318 times
+Primary Mode execution time - 2.46876 ms. Timeouts : 0
+  MIN   |   AVG   |   MAX
+29.1304 | 185.925 | 269.249 (ms)
+   Mode Switches - 321
+Context Switches - 1082
+Cobalt Sys calls - 1285
+
+Running summary for task RT_DE_patricia_L. (23789, 50, RT_DE_patricia_L)
+Deadline : 3352 ms.  Missed | Executions 
+                         0 | 315 times
+Primary Mode execution time - 4.72493 ms. Timeouts : 0
+  MIN   |   AVG   |   MAX
+173.093 | 187.735 | 283.287 (ms)
+   Mode Switches - 318
+Context Switches - 1746
+Cobalt Sys calls - 1273
+
+Running summary for task RT_DE_basicmath_S. (23790, 50, RT_DE_basicmath_S)
+Deadline : 231.2 ms.  Missed | Executions 
+                        29 | 316 times
+Primary Mode execution time - 3.89106 ms. Timeouts : 0
+  MIN   |   AVG   |   MAX
+43.1144 | 187.13 | 283.726 (ms)
+   Mode Switches - 319
+Context Switches - 1543
+Cobalt Sys calls - 1276
+
+ Monitoring and Control Agent Stats : 
+Primary Mode execution time - 33.5012 ms. Timeouts : 0
+   Mode Switches - 1278
+Context Switches - 20406
+Cobalt Sys calls - 16221
+
+Running summary for Chain DatabaseEncryption. ( 3 )
+Deadline : 10000 ms. Anticipated Misses |  Missed  |  Chain loops 
+                                     0 |          0 | 0 times
+  MIN   |   AVG   |   MAX
+   1000 | 9.22337e+12 | 0 runtimes (ms)
