@@ -3,8 +3,8 @@ adpcmCaudio_L    11      ./tasksBench/adpcmCaudio_L.in     5000      ADc_L
 adpcmCaudio_S    11      ./tasksBench/adpcmCaudio_S.in     5000      ADc_S
 adpcmDaudio_L    11      ./tasksBench/adpcmDaudio_L.in     5000      ADd_L
 adpcmDaudio_S    11      ./tasksBench/adpcmDaudio_S.in     5000      ADd_S
-bitcount_L       1       ./tasksBench/bitcount_L.in        5000      BC_L   !!
-bitcount_S       1       ./tasksBench/bitcount_S.in        5000      BC_S   !!
+bitcount_L       1       ./tasksBench/bitcount_L.in        5000      BC_L
+bitcount_S       1       ./tasksBench/bitcount_S.in        5000      BC_S
 blowfishD_L      9       ./tasksBench/blowfishD_L.in       5000      BLd_L
 blowfishD_S      9       ./tasksBench/blowfishD_S.in       5000      BLd_Sq
 blowfishE_L      9       ./tasksBench/blowfishE_L.in       5000      BLe_L

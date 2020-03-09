@@ -50,9 +50,9 @@ echo $schedPolicy
 
 if test -f $Infile
 then
-    dirName=./Experimentations/Expe_`date +%d-%m-%Hh`
-    mkdir $dirName
-    for toExecute in {2..45} # exécuter toutes les chaines
+    dirName=./Exps/Expe_`date +%d-%m-%Hh`
+    mkdir -p $dirName
+    for toExecute in {2..49} # exécuter toutes les chaines
     do
         #echo $toExecute
         numLigne=1
@@ -66,17 +66,19 @@ then
                 echo "${commentaire}$line"
             fi
             numLigne=`expr $numLigne + 1`
-        done < $Infile > inputFile
+        done < $Infile > _inputFile.in
         #echo "Name is "$name
 #        sudo sar -o ${dirName}/IODatas${name}_1_${duration}_${load}_${schedPolicy} -P 0-3 1 $duration > /dev/null 2>&1 & 
-#        ./MoCoAgent.out true  $duration $load ./inputFile ${dirName}/${name}_1_${duration}_${load}_${schedPolicy} $schedPolicy
+#        ./MoCoAgent.out true  $duration $load _inputFile.in ${dirName}/${name}_1_${duration}_${load}_${schedPolicy} $schedPolicy
 #        expe1Out=$?
 #        rm ./bench/output/*
 
-        sudo sar -o ${dirName}/IODatas${name}_0_${duration}_${load}_${schedPolicy} -P 0-3 1 $duration > /dev/null 2>&1 & 
-        sudo ./MoCoAgent.out -e 2 -d $duration -l $load -i ./inputFile -o ${dirName}/${name}_0_${duration}_${load}_${schedPolicy}   
+        #sudo sar -o ${dirName}/IODatas${name}_0_${duration}_${load}_${schedPolicy} -P 0-3 1 $duration > /dev/null 2>&1 & 
+        echo "> ./MoCoAgent.out -e 2 -d $duration -l $load -i ./inputFile.in -o ${dirName}/${name}_0_${duration}_${load}_${schedPolicy}"
+        sudo ./MoCoAgent.out -e 2 -d $duration -l $load -i _inputFile.in -o ${dirName}/${name}_0_${duration}_${load}_${schedPolicy}   
         expe0Out=$?
-        rm -f ./inputFile
+        rm -f ./_inputFile.in
+        ./bench/output/eraseOutputs.sh
 #        echo "expe1out : $expe1Out"
         echo "expe0out : $expe0Out"
     done
