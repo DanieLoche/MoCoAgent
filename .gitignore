@@ -78,6 +78,7 @@ Thumbs.db
 trace-cmd/
 #bench/
 Experimentations/
+Exps/
 
 # Output files
 *output*
