@@ -75,7 +75,7 @@ class TaskProcess
       RT_EVENT_INFO _eventInfos;
       monitoringMsg msg ;
       char _stdIn[35];
-      char _stdOut[35];
+      char _stdOut[50];
       std::vector<char*> _argv;
 
       void setAffinity (int _aff, int mode);

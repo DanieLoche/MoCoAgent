@@ -80,6 +80,18 @@ int main(int argc, char* argv[])
                            << outputFile << CHAIN_FILE  << " & "
                            << outputFile << TASKS_FILE  << endl;
 
+   //cout << "Press a key to start (PID: " << getpid() << ")!" << endl;
+   //cin.get();
+
+   TaskLauncher* tln = new TaskLauncher(enableAgent, outputFile, schedMode);
+
+   #if VERBOSE_INFO
+   cout << "\n------------------------------" << endl;
+   cout << " Generating Task Set ..." << endl;
+   #endif
+   if(tln->readChainsList(inputFile)) {cerr << "Failed to read task chains or no chain found." << endl; return -1;}
+   if(tln->readTasksList(cpuFactor)) {cerr << "Failed to read tasks list or no tasks found." << endl; return -2;}
+
    std::ofstream outputFileResume;
    string outputFileName = outputFile + RESUME_FILE;
    outputFileResume.open (outputFileName);    // TO APPEND :  //,ios_base::app);
@@ -94,19 +106,6 @@ int main(int argc, char* argv[])
       << outputFile       << "_Resume.txt"    << endl;
 
    outputFileResume.close();
-
-   //cout << "Press a key to start (PID: " << getpid() << ")!" << endl;
-   //cin.get();
-
-   TaskLauncher* tln = new TaskLauncher(enableAgent, outputFile, schedMode);
-
-   #if VERBOSE_INFO
-   cout << "\n------------------------------" << endl;
-   cout << " Generating Task Set ..." << endl;
-   #endif
-   if(tln->readChainsList(inputFile)) {cerr << "Failed to read task chains." << endl; return -1;}
-   if(tln->readTasksList(cpuFactor)) {cerr << "Failed to read tasks list." << endl; return -2;}
-
    if(tln->runTasks(expeDuration)) {cerr << "Failed to create all tasks" << endl; return -4;}
 
    if (enableAgent)

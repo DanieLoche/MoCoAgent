@@ -51,12 +51,15 @@ int TaskLauncher::readChainsList(string input_file)
       }
       #if VERBOSE_ASK
       else cout << " ==> line ignored.";
-      #endif
        cout << endl;
+       #endif
    }
 
-   printChainSetInfos ( );
-   return 0;
+   if (!chainSet.empty())
+   {
+      printChainSetInfos ( );
+      return 0;
+   } else return -1;
 }
 
 int TaskLauncher::readTasksList(int cpuPercent)
@@ -117,8 +120,13 @@ int TaskLauncher::readTasksList(int cpuPercent)
          }
          #if VERBOSE_ASK
          else cout << " ==> line ignored.";
-         #endif
          cout << endl;
+         #endif
+      }
+
+      if (tasksSet.empty())
+      {
+         return -1;
       }
 
       if (schedPolicy == SCHED_RM)
@@ -142,13 +150,12 @@ int TaskLauncher::readTasksList(int cpuPercent)
 
    }
 
-   if (!tasksSet.empty())
-      for (auto taskInfo = tasksSet.begin(); taskInfo != tasksSet.end(); ++taskInfo)
-      {
-         int sizeName = strlen(taskInfo->fP.name);
-         if (sizeName > nameMaxSize) nameMaxSize = sizeName;
-      }
-   else cerr << "WOAW !! Task set is empty !!" << endl;
+   for (auto taskInfo = tasksSet.begin(); taskInfo != tasksSet.end(); ++taskInfo)
+   {
+      int sizeName = strlen(taskInfo->fP.name);
+      if (sizeName > nameMaxSize) nameMaxSize = sizeName;
+   }
+
    printTaskSetInfos();
 
    return 0;
