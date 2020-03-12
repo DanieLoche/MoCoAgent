@@ -17,16 +17,16 @@ djpeg_S	25	100	1	1	0	djpeg	-dct	int	-ppm	-outfile	./bench/output/o_small_decode.
 djpeg_L	260	100	1	1	0	djpeg	-dct	int	-ppm	-outfile	./bench/output/o_large_decode.ppm	./bench/jpg/input_large.jpg							
 typeset_S	36	100	1	1	0	lout	-I	./bench/typeset/include	-D	./bench/typeset/data	-F	./bench/typeset/font	-C	./bench/typeset/maps	-H	./bench/typeset/hyph	./bench/typeset/small.lout	>	./bench/output/o_typeset_small.ps
 typeset_L	79	100	1	1	0	lout	-I	./bench/typeset/include	-D	./bench/typeset/data	-F	./bench/typeset/font	-C	./bench/typeset/maps	-H	./bench/typeset/hyph	./bench/typeset/large.lout	>	./bench/output/o_typeset_large.ps
-dijkstra_S	9	100	1	1	0	dijkstra_small	./bench/dijkstra/input.dat	>	./bench/output/o_dijk_small.dat										
-dijkstra_L	39	100	1	1	0	dijkstra_large	./bench/dijkstra/input.dat	>	./bench/output/o_dijk_large.dat										
+dijkstra_S	9	100	1	1	0	dijkstra_small	< ./bench/dijkstra/input.dat	>	./bench/output/o_dijk_small.dat										
+dijkstra_L	39	100	1	1	0	dijkstra_large	< ./bench/dijkstra/input.dat	>	./bench/output/o_dijk_large.dat										
 patricia_S	860	100	1	1	0	patricia_bin	./bench/patricia/small.udp	>	./bench/output/o_pat_small.txt										
 patricia_L	4460	100	1	1	0	patricia_bin	./bench/patricia/large.udp	>	./bench/output/o_pat_large.txt										
 stringsearch_L	5	100	1	1	0	search_large	>	./bench/output/o_search_large.txt											
 stringsearch_S	4	100	1	1	0	search_small	>	./bench/output/o_search_small.txt											
-blowfishE_S	7	100	1	1	0	bf	e	./bench/blowfish/input_small.asc	./bench/output/o_small.enc	1234567890abcdeffedcba0987654321									
-blowfishD_S	6.33	100	1	1	0	bf	d	./bench/blowfish/o_small.enc	./bench/output/o_small.asc	1234567890abcdeffedcba0987654321									
-blowfishE_L	69	100	1	1	0	bf	e	./bench/blowfish/input_large.asc	./bench/output/o_large.enc	1234567890abcdeffedcba0987654321									
-blowfishD_L	66	100	1	1	0	bf	d	./bench/blowfish/o_large.enc	./bench/output/o_large.asc	1234567890abcdeffedcba0987654321									
+blowfishE_S	7	100	1	1	0	bf	e	1234567890abcdeffedcba0987654321	<	./bench/blowfish/input_small.asc	>	./bench/output/o_small.enc							
+blowfishD_S	6.33	100	1	1	0	bf	d	1234567890abcdeffedcba0987654321	<	./bench/blowfish/o_small.enc	>	./bench/output/o_small.asc							
+blowfishE_L	69	100	1	1	0	bf	e	1234567890abcdeffedcba0987654321	<	./bench/blowfish/input_large.asc	>	./bench/output/o_large.enc							
+blowfishD_L	66	100	1	1	0	bf	d	1234567890abcdeffedcba0987654321	<	./bench/blowfish/o_large.enc	>	./bench/output/o_large.asc							
 rijndaelE_S	5	100	1	1	0	rijndael	./bench/rijndael/input_small.asc	./bench/output/output_small.enc	e	1234567890abcdeffedcba09876543211234567890abcdeffedcba0987654321									
 rijndaelD_S	5	100	1	1	0	rijndael	./bench/rijndael/output_small.enc	./bench/output/output_small.dec	d	1234567890abcdeffedcba09876543211234567890abcdeffedcba0987654321									
 rijndaelE_L	45	100	1	1	0	rijndael	./bench/rijndael/input_large.asc	./bench/output/output_large.enc	e	1234567890abcdeffedcba09876543211234567890abcdeffedcba0987654321									

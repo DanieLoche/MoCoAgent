@@ -13,6 +13,8 @@
 
 # Ensuite vient la phase de benchmarks :
 
+calc(){ awk "BEGIN { print "$*" }"; }
+
 commentaire="//"
 
 Infile="input_chaine.txt"
@@ -45,14 +47,15 @@ done
 
 echo $Infile
 echo $duration
+$load=calc $load/100
 echo $load
 echo $schedPolicy
 
 if test -f $Infile
 then
-    dirName=./Exps/Expe_`date +%d-%m-%Hh`
+    dirName=./Exps/`date +%d-%m-%Hh`_$duration_$load_$schedPolicy
     mkdir -p $dirName
-    for toExecute in {2..49} # exécuter toutes les chaines
+    for toExecute in {2..50} # exécuter toutes les chaines
     do
         #echo $toExecute
         numLigne=1
