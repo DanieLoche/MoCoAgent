@@ -5,7 +5,7 @@
 #include <array>
 #include <iomanip>
 
-
+#define BUFF_SIZE    4096
 struct timeLog
 {
    RTIME timestamp;
@@ -15,11 +15,12 @@ struct timeLog
 class DataLogger
 {
    protected :
-      string outputFileName;
+      std::array<timeLog, BUFF_SIZE> execLogs;
       int cptOutOfDeadline;
-      int cptExecutions;
-      std::array<timeLog, 4096> execLogs;
+      uint cptExecutions;
+      int logPointer;
       RTIME deadline;
+      string outputFileName;
 
       virtual char* getName() =0;
 

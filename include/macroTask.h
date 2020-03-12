@@ -105,7 +105,7 @@ class MacroTask : public TaskProcess
       //void setRTtask(rtPStruct _rtInfos, char*);
       void findFunction(char* _func);
       inline int before();
-      inline void proceed();
+      inline int proceed();
       inline int after();
       inline int before_besteff();
       inline int after_besteff();

@@ -138,12 +138,16 @@ struct end2endDeadlineStruct
   RTIME deadline;
 };
 
+#define WITH_BOOL   0
 struct monitoringMsg
 {
-  //RT_TASK* task;
-  int ID;
-  RTIME time;   // Run-time - received
-  bool isExecuted;    // Run-time - computed
+   //RT_TASK* task;
+   int ID;
+   RTIME time;   // Run-time - task start received
+   RTIME endTime; // task duration
+   #if WITH_BOOL
+   bool isExecuted;    // Run-time - computed
+   #endif
 };
 
 const char* getErrorName(int error);

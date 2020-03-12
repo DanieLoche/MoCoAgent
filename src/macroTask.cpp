@@ -240,7 +240,9 @@ MacroTask::MacroTask(rtTaskInfosStruct _taskInfo, bool MoCo, string _name) : Tas
 
    msg.ID      = prop.fP.id;
    msg.time    = 0;
-   msg.isExecuted = 0;
+   #if WITH_BOOL
+   msg.isExecuted = 1;
+   #endif
 
 }
 
@@ -280,10 +282,12 @@ int MacroTask::before()
    //rt_fprintf(stderr, "[ %s ] - Executing Before.\n", prop.fP.name);
    #endif
    msg.time = dataLogs->logStart();
+   #if WITH_BOOL
    msg.isExecuted = 0;
-   //ERROR_MNG(rt_mutex_acquire(&_bufMtx, TM_INFINITE));
-   ret = rt_buffer_write(&_buff , &msg , sizeof(monitoringMsg) , _mSEC(1));
-   //ERROR_MNG(rt_mutex_release(&_bufMtx));
+   #endif
+
+/* VERSION AVEC ENVOI DANS BEFORE **ET** AFTER
+   ret = rt_buffer_write(&_buff , &msg , sizeof(monitoringMsg) , _uSEC(500));
    if(MoCoIsAlive && (ret != sizeof(monitoringMsg)))
    {
       //MoCoIsAlive = 0;
@@ -293,11 +297,13 @@ int MacroTask::before()
                      prop.fP.name, getErrorName(ret), ret, MESSAGE_TOPIC_NAME, MoCoIsAlive);
       fprintf(stderr, "Memory Available on buffer : %lu / %lu. %d waiting too.\n", infos.availmem, infos.totalmem, infos.owaiters);
       rt_print_flush_buffers();
+      return -1;
    }
+*/
    return 0;
 }
 
-void MacroTask::proceed()
+int MacroTask::proceed()
 {
    #if VERBOSE_OTHER
    //rt_fprintf(stderr, "[ %s ] - Executing Proceed.\n", prop.fP.name);
@@ -306,18 +312,19 @@ void MacroTask::proceed()
    int ret = proceed_function(_argv.size()-1, &_argv[0]);  // -1 : no need for last element "NULL".
    if (ret != 0)
    {
-      cerr << "["<< prop.fP.name << " ("<< getpid() << ")] - Error during proceed ! [" << ret << "]. Function was : ";
+      rt_fprintf(stderr, "[ %s ] - Proceed error. (%d) function was : ", prop.fP.name, ret);
       int i = 0;
       for (auto arg : _argv)
       {
          string toPrint;
          if (arg==NULL)toPrint = "null";
          else toPrint = arg;
-         cerr << "Arg #" << i << " = " << toPrint << " ; ";
+         rt_fprintf(stderr, " %s", toPrint.c_str());
          i++;
       }
-      cerr << " with (" << _argv.size()-1 << ") elements." << endl;
+      rt_fprintf(stderr, "(%d elements)\n", _argv.size()-1);
    }
+   return ret;
 }
 
 int MacroTask::after()
@@ -325,11 +332,12 @@ int MacroTask::after()
    #if VERBOSE_OTHER
    //rt_fprintf(stderr, "[ %s ] - Executing After.\n", prop.fP.name);
    #endif
-   msg.time = dataLogs->logExec();
+   msg.endTime = dataLogs->logExec();
+   #if WITH_BOOL
    msg.isExecuted = 1;
-   //ERROR_MNG(rt_mutex_acquire(&_bufMtx, TM_INFINITE));
+   #endif
+
    ret = rt_buffer_write(&_buff , &msg , sizeof(monitoringMsg) , _mSEC(1));
-   //ERROR_MNG(rt_mutex_release(&_bufMtx));
    if(MoCoIsAlive && (ret != sizeof(monitoringMsg)))
    {
       //MoCoIsAlive = 0;
@@ -355,9 +363,9 @@ void MacroTask::executeRun()
    while (MoCoIsAlive)
    {
       //cout << "Task" << prop.name << " working." << endl;
-      before(); // Check if execution allowed
-      proceed();  // execute task
-      after();  // Inform of execution time for the mcAgent
+      if (before() == 0) // Check if execution allowed
+         if (proceed() == 0)  // execute task
+            after();  // Inform of execution time for the mcAgent
       rt_task_wait_period(&dataLogs->overruns);
    }
 }
@@ -367,9 +375,15 @@ void MacroTask::executeRun()
 
 int MacroTask::before_besteff()
 {
-   dataLogs->logStart();
    ERROR_MNG(rt_event_inquire(&_event, &_eventInfos));
-   return _eventInfos.value;
+   if ( _eventInfos.value == (uint) MODE_NOMINAL)
+      return  MODE_NOMINAL;
+   else {
+      dataLogs->logStart();
+      return 0;
+   }
+
+
 }
 
 int MacroTask::after_besteff()
@@ -391,13 +405,15 @@ void MacroTask::executeRun_besteffort()
    }
 
    unsigned int flag;
-   while (1)
+   while (MoCoIsAlive)
    {
       if (before_besteff() == MODE_NOMINAL) // Check if execution allowed
-         proceed();  // execute task
+      {
+         if (proceed() == 0)  // execute task
+            after_besteff();  // Inform of execution time for the mcAgent
+      }
       else rt_event_wait(&_event, sizeof(flag), &flag , EV_PRIO, TM_INFINITE);
 
-         after_besteff();  // Inform of execution time for the mcAgent
 
       rt_task_wait_period(&dataLogs->overruns);
 

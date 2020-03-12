@@ -266,9 +266,13 @@ void MCAgent::updateTaskInfo(monitoringMsg msg)
                _taskChain.logger->logStart(msg.time);
                _task.setState(TRUE);
             }
-            else if (msg.isExecuted && _taskChain.checkPrecedency(_task.precedencyID))
+            #if WITH_BOOL
+            if (msg.isExecuted && _taskChain.checkPrecedency(_task.precedencyID))
+            #else
+            if (_taskChain.checkPrecedency(_task.precedencyID))
+            #endif
             { // Next task of the chain
-               _taskChain.currentEndTime = std::max(_taskChain.currentEndTime, msg.time);
+               _taskChain.currentEndTime = std::max(_taskChain.currentEndTime, msg.endTime);
                _task.setState(TRUE);
                if (_taskChain.checkIfEnded())
                {
@@ -440,7 +444,7 @@ void taskChain::resetChain()
    }
    if (isAtRisk) isAtRisk = FALSE;
    startTime = 0;
-   currentEndTime = 0;
+   currentEndTime = rt_timer_read();
 }
 
 RTIME taskChain::getExecutionTime()

@@ -7,7 +7,7 @@ DataLogger::DataLogger(string expeName){
    outputFileName = expeName;
    cptOutOfDeadline = 0;
    cptExecutions = 0;
-   execLogs = {0};
+   execLogs = {{0}};
    overruns = 0;
    //nanolog::initialize(nanolog::GuaranteedLogger(), ".", "nanolog", 1);
    //LOG_INFO << "This is a Information Log test !";
@@ -30,25 +30,25 @@ TaskDataLogger::TaskDataLogger(rtTaskInfosStruct _taskInfos, string expeName) : 
 
 void DataLogger::logStart(RTIME startTime)
 {
-   execLogs[cptExecutions].timestamp = startTime;
+   execLogs[cptExecutions % BUFF_SIZE].timestamp = startTime;
 }
 
 
 RTIME DataLogger::logStart()
 {
-   return (execLogs[cptExecutions].timestamp = rt_timer_read());
+   return (execLogs[cptExecutions % BUFF_SIZE].timestamp = rt_timer_read());
 }
 
 void DataLogger::logExec(RTIME endTime)
 {
-   if (execLogs[cptExecutions].timestamp)
+   if (execLogs[cptExecutions % BUFF_SIZE].timestamp)
    {
-      execLogs[cptExecutions].duration = endTime - execLogs[cptExecutions].timestamp;
+      execLogs[cptExecutions % BUFF_SIZE].duration = endTime - execLogs[cptExecutions % BUFF_SIZE].timestamp;
 
-      if(execLogs[cptExecutions].duration > deadline )
+      if(execLogs[cptExecutions % BUFF_SIZE].duration > deadline )
       {
          #if VERBOSE_ASK
-         rt_fprintf(stderr, "[ Warning ] [ %s ] - Executed in %.2f ms.\n",getName(),execLogs[cptExecutions].duration/1e6);
+         rt_fprintf(stderr, "[ Warning ] [ %s ] - Executed in %.2f ms.\n",getName(),execLogs[cptExecutions % BUFF_SIZE].duration/1e6);
          #endif
          cptOutOfDeadline++;
       }else{
@@ -58,9 +58,8 @@ void DataLogger::logExec(RTIME endTime)
       }
       cptExecutions++;
       //return execLogs[cptExecutions - 1].duration;
-      if (cptExecutions > 4095)
+      if (cptExecutions == 4096)
       {
-         cptExecutions = 0;
          rt_fprintf(stderr, "[ WARNING ][ %s ] - Measured more Logs than allowed buffer size.\n", getName());
       }
    }
@@ -71,14 +70,14 @@ void DataLogger::logExec(RTIME endTime)
 RTIME DataLogger::logExec( )
 {
    RTIME _logTime = rt_timer_read();
-   if (execLogs[cptExecutions].timestamp)
+   if (execLogs[cptExecutions % BUFF_SIZE].timestamp)
    {
-      execLogs[cptExecutions].duration = _logTime - execLogs[cptExecutions].timestamp;
+      execLogs[cptExecutions % BUFF_SIZE].duration = _logTime - execLogs[cptExecutions % BUFF_SIZE].timestamp;
 
-      if(execLogs[cptExecutions].duration > deadline )
+      if(execLogs[cptExecutions % BUFF_SIZE].duration > deadline )
       {
          #if VERBOSE_ASK
-         rt_fprintf(stderr, "[ Warning ] [ %s ] - Executed in %.2f ms.\n",getName(),execLogs[cptExecutions].duration/1e6);
+         rt_fprintf(stderr, "[ Warning ] [ %s ] - Executed in %.2f ms.\n",getName(),execLogs[cptExecutions % BUFF_SIZE].duration/1e6);
          #endif
          cptOutOfDeadline++;
       }else{
@@ -87,9 +86,8 @@ RTIME DataLogger::logExec( )
          #endif
       }
       cptExecutions++;
-      if (cptExecutions > 4095)
+      if (cptExecutions == 4096)
       {
-         cptExecutions = 0;
          rt_fprintf(stderr, "[ WARNING ][ %s ] - Measured more Logs than allowed buffer size.\n", getName());
       }
    }
@@ -107,8 +105,7 @@ void TaskDataLogger::saveData(int nameSize, RT_TASK_INFO* cti)
    RTIME min_runtime = execLogs[0].duration;
    RTIME somme = 0;
 
-   if (cptExecutions > 0)
-   for (int i = 0; i < cptExecutions; ++i)
+   for (int i = 0; i < BUFF_SIZE; ++i)
    {
       RTIME _dur = execLogs[i].duration;
 
@@ -125,13 +122,12 @@ void TaskDataLogger::saveData(int nameSize, RT_TASK_INFO* cti)
     if (_dur < min_runtime) min_runtime = _dur;
     if (_dur > max_runtime) max_runtime = _dur;
    }
-   else cerr << "[" << getName() << "] -" << "Error : no logs to print !" << endl;
 
    outputFileTasksData.close();
-   if (cptExecutions > 0)
-   {
 
+   if (cptExecutions <= BUFF_SIZE && cptExecutions > 0)
       average_runtime = somme / cptExecutions;
+   else average_runtime = somme / BUFF_SIZE;
 
       int ret = 0;
       if (cti == NULL)
@@ -155,9 +151,7 @@ void TaskDataLogger::saveData(int nameSize, RT_TASK_INFO* cti)
          << endl;
 
          outputFileResume.close();
-      } else rt_fprintf(stderr, "Error inquiring task %s : %s (%d).\n", getName(), getErrorName(ret), ret);
-   }
-
+      } else rt_fprintf(stderr, "[ ERROR ] - Error inquiring task %s : %s (%d).\n", getName(), getErrorName(ret), ret);
 
 }
 

@@ -110,7 +110,7 @@ int TaskLauncher::readTasksList(int cpuPercent)
             taskInfo->fP.args = reduce(taskInfo->fP.args);
 
             taskInfo->fP.wcet = tmp_wcet * 1.0e6;              // conversion ms to RTIME (ns)
-            taskInfo->rtP.priority = 50;
+            taskInfo->rtP.priority = taskInfo->fP.isHRT;
             // Traitement de la périodicité de la tâche
             taskInfo->rtP.periodicity = cpuFactor * _mSEC(tmp_period); //taskInfo->periodicity = taskInfo->periodicity * 1.0e6 * cpuFactor;
             //printTaskInfo(&taskInfo); // Résumé
@@ -135,7 +135,7 @@ int TaskLauncher::readTasksList(int cpuPercent)
          cout << "Updating task informations to use Rate-Monotinic Scheduling." << endl;
          #endif
          std::sort(tasksSet.begin(), tasksSet.end(), sortAscendingPeriod());
-         int prio = 10;
+         int prio = 2;
          RTIME lastPeriod = tasksSet[0].rtP.periodicity;
          for (auto taskInfo = tasksSet.begin(); taskInfo != tasksSet.end(); ++taskInfo)
          {
