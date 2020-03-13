@@ -65,7 +65,7 @@ do {                                                                   \
    if ( err != 0)                                                      \
    {                                                                   \
       const char* errName = strerror(err);                             \
-      rt_fprintf(stderr, "[ERROR] %s-%s error %s (%d)\n", __FUNCTION__, #fct, errName, err); \
+      rt_fprintf(stderr, "[ ERROR ] %s-%s error %s (%d)\n", __FUNCTION__, #fct, errName, err); \
       rt_print_flush_buffers();                                        \
       rt_task_sleep(_mSEC(10));                                        \
       exit(EXIT_FAILURE);                                              \
@@ -75,9 +75,9 @@ do {                                                                   \
 #define TRY_CONV(name, from, to)                                                \
    if (i+1 < argc) {                                                            \
       if (sscanf(from[++i], "%d", &to) != 1)                                    \
-      {   printf("Error, value for %s (%s) is not an int.\n", name, from[i-1]); \
+      {   printf("[ ERROR ] - value for %s (%s) is not an int.\n", name, from[i-1]); \
           show_usage(EXIT_FAILURE);     }                                       \
-   } else { printf("Error : argument missing after option for %s.\n", name);    \
+   } else { printf("[ ERROR ] - argument missing after option for %s.\n", name);    \
           show_usage(EXIT_FAILURE);  }
 
 #define CASES(_fn1, _fn2, _fn3, _fn4, _fn5) \

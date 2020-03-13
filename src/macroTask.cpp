@@ -264,13 +264,14 @@ void MacroTask::findFunction (char* _func)
    else if (!strcmp(_func, "search_small"))    proceed_function = stringsearch_large;
    else if (!strcmp(_func, "bf"))              proceed_function = blowfish;
    else if (!strcmp(_func, "rijndael"))        proceed_function = rijndael;
-   else if (!strcmp(_func, "sha_bin"))         proceed_function = sha;
+   else if (!strcmp(_func, "sha"))             proceed_function = sha;
    else if (!strcmp(_func, "adpcm_rawcaudio")) proceed_function = rawcaudio;
    else if (!strcmp(_func, "adpcm_rawdaudio")) proceed_function = rawdaudio;
    else if (!strcmp(_func, "crc"))             proceed_function = crc;
    else if (!strcmp(_func, "fft"))             proceed_function = fft;
    else if (!strcmp(_func, "toast"))           proceed_function = gsm_func;
    else if (!strcmp(_func, "untoast"))         proceed_function = gsm_func;
+   else                                   proceed_function = do_load;
 
    _argv.insert(_argv.begin(), _func); //argv[0] = _name;
 
@@ -424,4 +425,12 @@ void MacroTask::saveData(int maxNameSize, RT_TASK_INFO* cti)
 {
    dataLogs->saveData(maxNameSize, cti);
    MoCoIsAlive = 0;
+}
+
+int do_load (int argc, char* argv[])
+{
+   RTIME ns = 0;
+   if (argc > 1 && sscanf(argv[1], "%llu", &ns) != 1)
+         rt_timer_spin( (RTIME) argv[1]);
+   return 0;
 }

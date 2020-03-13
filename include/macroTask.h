@@ -150,7 +150,7 @@ class MCAgent : public TaskProcess
       void executeRun_besteffort();
 };
 
-
+   int do_load           (int argc, char* argv[]);
 extern "C" {
    int basicmath_small   (int argc, char *argv[]);
    int basicmath_large   (int argc, char *argv[]);
