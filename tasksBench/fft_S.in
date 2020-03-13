@@ -1,2 +1,2 @@
-ID  name 		     meanET  wcet    isHRT aff  prec path                       arguments
+ID  name 	wcet  period isHRT aff  prec func                       arguments
 1 fft_S 10 100 1 1 0 fft 8 4096 > ./bench/output/o_fft_small.txt

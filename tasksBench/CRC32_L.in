@@ -1,2 +1,2 @@
-ID  name 		     meanET  wcet    isHRT aff  prec path                       arguments
-1 CRC32_L 520 100 1 1 0 crc ./bench/data/large.pcm > ./bench/output/o_crc_large.txt
+ID  name 	wcet  period isHRT aff  prec func                       arguments
+1 CRC32_L 520 100 1 1 0 crc < ./bench/data/large.pcm > ./bench/output/o_crc_large.txt

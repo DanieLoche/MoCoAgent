@@ -1,2 +1,2 @@
-ID  name 		     meanET  wcet    isHRT aff  prec path                       arguments
+ID  name 	wcet  period isHRT aff  prec func                       arguments
 1 blowfishE_S 7 100 1 1 0 bf e 1234567890abcdeffedcba0987654321 < ./bench/blowfish/input_small.asc > ./bench/output/o_small.enc
