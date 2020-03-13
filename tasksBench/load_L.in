@@ -1,0 +1,2 @@
+ID  name 	wcet  period isHRT aff  prec func                       arguments
+1 load_L 0 100 0 1 0 do_load 5000000

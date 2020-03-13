@@ -1,2 +1,2 @@
-ID  name 		     meanET  wcet    isHRT aff  prec path                       arguments
-1 susan_S_corners 0.5 100 1 1 0 susan_bin ./bench/susan/input_small.pgm ./bench/output/o_susan_small.corners.pgm -c
+ID  name 	wcet  period isHRT aff  prec func                       arguments
+1 susan_S_corners 0.5 100 1 1 0 susan_bin -c < ./bench/susan/input_small.pgm > ./bench/output/o_susan_small.corners.pgm

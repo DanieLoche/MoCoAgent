@@ -1,2 +1,2 @@
-ID  name 		     meanET  wcet    isHRT aff  prec path                       arguments
-1 rijndaelD_S 5 100 1 1 0 rijndael ./bench/rijndael/output_small.enc ./bench/output/output_small.dec d 1234567890abcdeffedcba09876543211234567890abcdeffedcba0987654321
+ID  name 	wcet  period isHRT aff  prec func                       arguments
+1 rijndaelD_S 5 100 1 1 0 rijndael d 1234567890abcdeffedcba09876543211234567890abcdeffedcba0987654321 < ./bench/rijndael/output_small.enc > ./bench/output/output_small.dec
