@@ -45,8 +45,8 @@ susan_L_edges    3       ./tasksBench/susan_L_edges.in     5000      SUe_L
 susan_S_edges    3       ./tasksBench/susan_S_edges.in     5000      SUe_S
 susan_L_smooth   3       ./tasksBench/susan_L_smooth.in    5000      SUs_L
 susan_S_smooth   3       ./tasksBench/susan_S_smooth.in    5000      SUs_S
-no_load          20      ./tasksBench/load_S.in            100       Ls
-do_load          20      ./tasksBench/load_L.in            100       Ls
+do_load          20      ./tasksBench/load_L.in            100       Ld_L
+no_load          20      ./tasksBench/load_S.in            100       Ln_S
 typeset_L        5       ./tasksBench/typeset_L.in         5000      TS_L
 typeset_S        5       ./tasksBench/typeset_S.in         5000      TS_S
 //ComputeTraj      15      ./chain_ComputeTraj.in            10000     CT
