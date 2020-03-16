@@ -1,2 +1,0 @@
-ID  name 	wcet  period isHRT aff  prec func                       arguments
-1 stringsearch_L 5 100 1 1 0 search_large > ./bench/output/o_search_large.txt

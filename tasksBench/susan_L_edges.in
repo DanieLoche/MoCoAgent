@@ -1,2 +1,0 @@
-ID  name 	wcet  period isHRT aff  prec func                       arguments
-1 susan_L_edges 12 100 1 1 0 susan_bin -e < ./bench/susan/input_large.pgm > ./bench/output/o_susan_large.edges.pgm

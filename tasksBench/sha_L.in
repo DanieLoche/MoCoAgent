@@ -1,2 +1,0 @@
-ID  name 	wcet  period isHRT aff  prec func                       arguments
-1 sha_L 25 100 1 1 0 sha < ./bench/sha/input_large.asc > ./bench/output/o_sha_large.txt

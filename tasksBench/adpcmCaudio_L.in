@@ -1,2 +1,0 @@
-ID  name 	wcet  period isHRT aff  prec func                       arguments
-1 adpcmCaudio_L 300 100 1 1 0 adpcm_rawcaudio < ./bench/adpcm/large.pcm > ./bench/output/o_large.adpcm

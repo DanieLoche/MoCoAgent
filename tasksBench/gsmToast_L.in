@@ -1,2 +1,0 @@
-ID  name 	wcet  period isHRT aff  prec func                       arguments
-1 gsmToast_L 160 100 1 1 0 toast -fps -c ./bench/gsm/large.au > ./bench/output/o_large.encode.gsm

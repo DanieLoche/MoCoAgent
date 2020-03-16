@@ -1,2 +1,0 @@
-ID  name 	wcet  period isHRT aff  prec func                       arguments
-1 qsort_S 8.5 100 1 1 0 qsort_small < ./bench/qsort/input_small.dat > ./bench/output/o_qsort_small.txt

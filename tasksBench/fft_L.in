@@ -1,2 +1,0 @@
-ID  name 	wcet  period isHRT aff  prec func                       arguments
-1 fft_L 80 100 1 1 0 fft 8 32768 > ./bench/output/o_fft_large.txt

@@ -1,2 +1,0 @@
-ID  name 	wcet  period isHRT aff  prec func                       arguments
-1 bitcount_L 70 100 1 1 0 bitcnts 1125000 > ./bench/output/o_btcnt_large.txt

@@ -1,2 +1,0 @@
-ID  name 	wcet  period isHRT aff  prec func                       arguments
-1 susan_L_smooth 36 100 1 1 0 susan_bin -s < ./bench/susan/input_large.pgm > ./bench/output/o_susan_large.smoothing.pgm

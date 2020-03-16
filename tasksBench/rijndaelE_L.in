@@ -1,2 +1,0 @@
-ID  name 	wcet  period isHRT aff  prec func                       arguments
-1 rijndaelE_L 45 100 1 1 0 rijndael e 1234567890abcdeffedcba09876543211234567890abcdeffedcba0987654321 < ./bench/rijndael/input_large.asc > ./bench/output/output_large.enc

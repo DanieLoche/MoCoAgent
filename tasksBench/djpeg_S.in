@@ -1,2 +1,0 @@
-ID  name 	wcet  period isHRT aff  prec func                       arguments
-1 djpeg_S 25 100 1 1 0 djpeg -dct int -ppm -outfile ./bench/output/o_small_decode.ppm ./bench/jpg/input_small.jpg

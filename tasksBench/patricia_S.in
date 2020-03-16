@@ -1,2 +1,0 @@
-ID  name 	wcet  period isHRT aff  prec func                       arguments
-1 patricia_S 860 100 1 1 0 patricia_bin < ./bench/patricia/small.udp > ./bench/output/o_pat_small.txt

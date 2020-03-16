@@ -1,2 +1,0 @@
-ID  name 	wcet  period isHRT aff  prec func                       arguments
-1 gsmUToast_S 3 100 1 1 0 untoast -dfps -c ./bench/gsm/small.au.run.gsm > ./bench/output/o_small.decode.run

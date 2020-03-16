@@ -1,2 +1,0 @@
-ID  name 	wcet  period isHRT aff  prec func                       arguments
-1 cjpeg_L 18 100 1 1 0 cjpeg -dct int -progressive -opt -outfile ./bench/output/o_large_encode.jpeg ./bench/jpg/input_large.ppm
