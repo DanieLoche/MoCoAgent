@@ -1,4 +1,4 @@
-		name	wcet	period	isHRT	aff	prec	path	parameters												
+	name	For C/P only	wcet	period	isHRT	aff	prec	path	parameters												
 	adpcmCaudio_L	"""adpcmCaudio_L"""	300	100	1	1	0	adpcm_rawcaudio	<	./bench/adpcm/large.pcm	>	./bench/output/o_large.adpcm									
 	adpcmCaudio_S	"""adpcmCaudio_S"""	16	100	1	1	0	adpcm_rawcaudio	<	./bench/adpcm/small.pcm	>	./bench/output/o_small.adpcm									
 	adpcmDaudio_L	"""adpcmDaudio_L"""	95	100	1	1	0	adpcm_rawdaudio	<	./bench/adpcm/large.adpcm	>	./bench/output/o_large.pcm									
@@ -45,7 +45,7 @@
 	susan_S_corners	"""susan_S_corners"""	0.5	100	1	1	0	susan_bin	-c	<	./bench/susan/input_small.pgm	>	./bench/output/o_susan_small.corners.pgm								
 	susan_S_edges	"""susan_S_edges"""	0.5	100	1	1	0	susan_bin	-e	<	./bench/susan/input_small.pgm	>	./bench/output/o_susan_small.edges.pgm								
 	susan_S_smooth	"""susan_S_smooth"""	8	100	1	1	0	susan_bin	-s	<	./bench/susan/input_small.pgm	>	./bench/output/o_susan_small.smoothing.pgm								
-	load_S	"""load_S"""	0	100	0	1	0	do_load													
-	load_L	"""load_L"""	0	100	0	1	0	do_load	5000000												
+	load_S	"""load_S"""	0	100	1	1	0	do_load	0												
+	load_L	"""load_L"""	0	100	1	1	0	do_load	5000000												
 //	typeset_L	"""typeset_L"""	79	100	1	1	0	lout	-I	./bench/typeset/include	-D	./bench/typeset/data	-F	./bench/typeset/font	-C	./bench/typeset/maps	-H	./bench/typeset/hyph	./bench/typeset/large.lout	>	./bench/output/o_typeset_large.ps
 //	typeset_S	"""typeset_S"""	36	100	1	1	0	lout	-I	./bench/typeset/include	-D	./bench/typeset/data	-F	./bench/typeset/font	-C	./bench/typeset/maps	-H	./bench/typeset/hyph	./bench/typeset/small.lout	>	./bench/output/o_typeset_small.ps
