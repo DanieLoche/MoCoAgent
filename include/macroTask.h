@@ -21,6 +21,9 @@
 const RTIME t_RT     =     000*1.0e6;  // time to trigger the Control Agent
 const RTIME Wmax     =     _mSEC(MCA_PERIOD);    // next slice max time
 
+#define XENO_INIT(_name) do_xeno_init(_name)
+int do_xeno_init(char* name);
+
 class taskMonitoringStruct
 {
    private :

@@ -2,29 +2,6 @@
 //#include <utmpx.h>    // Pour fonction getcpu()
 
 
-/*
-* make sure everybody is in the same session and that
-* we have registry sharing.
-*/
-int do_xeno_init(char* _name)
-{
-   const char* args[] = {
-      _name,
-      //"--enable-registry"
-      //"--registry-root=/usr/xenomai",
-      "--shared-registry",
-      "--session=test",
-      //"--dump-config",
-      NULL
-   };
-   const char **argv = args ;
-   int argc = (sizeof args/sizeof args[0])-1 ; /* exclude NULL */
-
-   xenomai_init(&argc,(char * const **)&argv) ;
-   return 0;
-}
-#define XENO_INIT(_name) do_xeno_init(_name)
-
 bool TaskProcess::MoCoIsAlive = FALSE;
 
 TaskProcess::TaskProcess(rtTaskInfosStruct _taskInfo)
@@ -50,25 +27,28 @@ void TaskProcess::setRTtask(rtPStruct _rtInfos, char* _name)
    rt_print_flush_buffers();
    rt_printf("[ %s ] - shadowed : %d (%s).\n", _name, ret, getErrorName(ret)); //cout << "["<< _name << "]"<< " shadowed." << endl;
 
-   RT_TASK_INFO curtaskinfo;
-   rt_task_inquire(0, &curtaskinfo);
-   struct sched_param_ex param;
-   param.sched_priority = _rtInfos.priority;
+   if (_rtInfos.priority != 0 || _rtInfos.schedPolicy == SCHED_OTHER)
+   { // if priority = 0, SCHED_OTHER !!
+      RT_TASK_INFO curtaskinfo;
+      rt_task_inquire(0, &curtaskinfo);
+      struct sched_param_ex param;
+      param.sched_priority = _rtInfos.priority;
 
-   if (_rtInfos.schedPolicy == SCHED_RM) _rtInfos.schedPolicy = SCHED_FIFO;
-   ERROR_MNG(sched_setscheduler_ex(curtaskinfo.pid, _rtInfos.schedPolicy, &param));
-   rt_printf("[ %s ] - Scheduling policy %s (%d) updated.\n", _name, getSchedPolicyName(_rtInfos.schedPolicy), _rtInfos.schedPolicy); //cout << "["<< _name << "]"<< "Managing Scheduling policy " << getSchedPolicyName(_rtInfos.schedPolicy) << endl;
+      if (_rtInfos.schedPolicy == SCHED_RM) _rtInfos.schedPolicy = SCHED_FIFO;
+      ERROR_MNG(sched_setscheduler_ex(curtaskinfo.pid, _rtInfos.schedPolicy, &param));
+      rt_printf("[ %s ] - Scheduling policy %s (%d) updated.\n", _name, getSchedPolicyName(_rtInfos.schedPolicy), _rtInfos.schedPolicy); //cout << "["<< _name << "]"<< "Managing Scheduling policy " << getSchedPolicyName(_rtInfos.schedPolicy) << endl;
 
-   if (_rtInfos.schedPolicy == SCHED_RR)
-   {
-      ERROR_MNG(rt_task_slice(&_task, RR_SLICE_TIME));
-      rt_printf("[ %s ] - Round-Robin slice %d ns updated.\n", _name, RR_SLICE_TIME); //cout << "["<< _name << "]"<< "Managing Scheduling policy " << getSchedPolicyName(_rtInfos.schedPolicy) << endl;
+      if (_rtInfos.schedPolicy == SCHED_RR)
+      {
+         ERROR_MNG(rt_task_slice(&_task, RR_SLICE_TIME));
+         rt_printf("[ %s ] - Round-Robin slice %d ns updated.\n", _name, RR_SLICE_TIME); //cout << "["<< _name << "]"<< "Managing Scheduling policy " << getSchedPolicyName(_rtInfos.schedPolicy) << endl;
+      }
    }
-
-   setAffinity(_rtInfos.affinity, 0);
 
    ERROR_MNG(rt_task_set_priority(&_task, _rtInfos.priority));
    rt_printf("[ %s ] - Task Priority %llu updated.\n", _name, _rtInfos.priority); //cout << "["<< _name << "]"<< "Managing Scheduling policy " << getSchedPolicyName(_rtInfos.schedPolicy) << endl;
+
+   setAffinity(_rtInfos.affinity, 0);
 
    //Periodicity
    ERROR_MNG(rt_task_set_periodic(&_task, TM_NOW, _rtInfos.periodicity));
@@ -427,10 +407,35 @@ void MacroTask::saveData(int maxNameSize, RT_TASK_INFO* cti)
    MoCoIsAlive = 0;
 }
 
+
+
 int do_load (int argc, char* argv[])
 {
    RTIME ns = 0;
-   if (argc > 1 && sscanf(argv[1], "%llu", &ns) != 1)
-         rt_timer_spin( (RTIME) argv[1]);
+   if (argc == 2 && sscanf(argv[1], "%llu", &ns) == 1)
+         rt_timer_spin( ns);
+   else { rt_fprintf(stderr, "Error getting %s argument.(%d args)\n", argv[1], argc); return -1; }
+   return 0;
+}
+
+/*
+* make sure everybody is in the same session and that
+* we have registry sharing.
+*/
+int do_xeno_init(char* _name)
+{
+   const char* args[] = {
+      _name,
+      //"--enable-registry"
+      //"--registry-root=/usr/xenomai",
+      "--shared-registry",
+      "--session=test",
+      //"--dump-config",
+      NULL
+   };
+   const char **argv = args ;
+   int argc = (sizeof args/sizeof args[0])-1 ; /* exclude NULL */
+
+   xenomai_init(&argc,(char * const **)&argv) ;
    return 0;
 }
