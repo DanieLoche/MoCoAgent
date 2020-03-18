@@ -77,7 +77,7 @@ std::string trim(const std::string& str, const std::string& whitespace = " ");
 std::string reduce(const std::string& str,
                    const std::string& fill = " ",
                    const std::string& whitespace = " \t");
-void manageArguments(char* argv[], string arguments);
+void parseParameters(string _arguments);
 
 int _argc = 0;
 std::vector<char*> _argv;
@@ -85,11 +85,11 @@ std::vector<char*> _argv;
 
 int main(int argc, char *argv[])
 {
+	fprintf(stderr, "Debut test\n");
 	int ret = 0, toto = 0;
+
+/*
 	RT_BUFFER buf;
-
-	printf("Debut test\n");
-
 	const char* taskNames[3] = {"task0", "task1", "task2"};
 
    setvbuf(stdout,NULL,_IONBF,4096) ;
@@ -135,10 +135,10 @@ int main(int argc, char *argv[])
 
    printf("dumping the registry\n") ;
    system("find /run/xenomai") ; // see what the registry is looking like
-
+*/
    XENO_INIT() ;
 
-
+/*
 	RT_EVENT event;
    if (0) for (int i = 0 ; i < 3 ; ++i)
    {
@@ -162,42 +162,44 @@ int main(int argc, char *argv[])
 	rt_printf("Event created. %d (%s)\n", ret, getErrorName(ret));
 
 	rt_task_sleep(1e9*5);
-   /* Do stuff here on the binded tasks */
+   // Do stuff here on the binded tasks
    exit(EXIT_SUCCESS);
-
+*/
 
 
 	  int i = 0;
-	  _argv.push_back(argv[0]);
+	  _argv.push_back("rijndael");
 	  _argc++;
+	  string params;
 	  for (i=1; i < argc; i++)
 	  {
 		  std::string toPrint;
-		  if (argv[i]==NULL)toPrint = "null";
-		  else toPrint = argv[i];
-		  std::cerr << "Arg #" << i << " = " << toPrint << " ; ";
-		  manageArguments(argv, argv[i]);
+		  if (argv[i]==NULL) params += "null";
+		  else params += argv[i];
+		  params += " ";
 	  }
-	  std::cerr << " with (" << _argc << ") elements." << std::endl;
-	  cerr << "Bilan paramètres donnés : \n";
+	  parseParameters(params);
+	  fprintf(stderr, "Arguments = %s,", params.c_str());
+	  fprintf(stderr, " with (%d) elements.\n", _argc);
+	  fprintf(stderr, "Bilan parametres donnes : \n");
 	  for (i=0; i < (int)_argv.size()-1; i++)
 	  {
-		  std::cerr << "Arg #" << i << " = " << _argv[i] << " ; ";
+		  fprintf(stderr, "Arg#%d = %s ", i, _argv[i]);
 	  }
-	  cerr << endl;
-	  cerr << "Total : " << _argv.size()-1 << " arguments." << endl;
+	  fprintf(stderr, "\nTotal : %lu arguments. \n", _argv.size()-1);
 
 	ret = 0;
 	// auto start = high_resolution_clock::now();
-	std::cerr << "Reading timer Start." << std::endl;
-	auto start = rt_timer_read();
-
-	std::cerr << "Shadowing..." << std::endl;
+	fprintf(stderr, "Shadowing...\n");
 	RT_TASK task;
 	ret += rt_task_shadow(&task, "Testing", 50, 0);
-	std::cerr << "Task shadowed." << std::endl;
+	fprintf(stderr, "Shadowed.\n");
+
+	fprintf(stderr, "Reading timer Start.\n");
+	auto start = rt_timer_read();
+	ret += rijndael( _argc, &_argv[0]);
 	auto mid = rt_timer_read();
- ret += basicmath_small( _argv.size()-1, &_argv[0]);
+// ret += basicmath_small( _argv.size()-1, &_argv[0]);
 // ret += basicmath_large( argc, argv);
 //	ret += bitcount_func( argc, argv);
 //	ret += qsort_small(  _argv.size()-1, &_argv[0]) ;
@@ -211,20 +213,20 @@ int main(int argc, char *argv[])
 //	ret += stringsearch_small( argc, argv);
 //	ret += stringsearch_large( argc, argv);
 //	ret += blowfish( _argv.size()-1, &_argv[0]);
-//	ret += rijndael( argc, argv);
+	ret += rijndael( _argc, &_argv[0]);
 //	ret += sha( argc, argv);
-// ret += rawdaudio( argc, argv);
-
-// ret += rawcaudio( argc, argv);
+// 	ret += rawdaudio( argc, argv);
+// 	ret += rawcaudio( argc, argv);
 //	ret += crc( argc, argv);
 //	ret += fft( argc, argv) ;
 //	ret += typeset_func( argc, argv);
 //	ret += gsm_func ( argc, argv);
 	auto end = rt_timer_read();
-	printf("Fin test : %d.\n", ret);
+	fprintf(stderr, "Fin test : %d.\n", ret);
 	auto duration = end - start;
 	auto midTime = mid-start; //duration_cast<microseconds>(mid - start);
-	std::cout << "Total duration = " << duration << "ns. Miduration = " << midTime <<"ns." << std::endl;
+	fprintf(stderr, "Total duration = %llu ns. Mid-duration = %llu ns. \n", duration, midTime);
+	fflush(stderr);
 	return ret;
 
 }
@@ -315,52 +317,55 @@ std::string reduce(const std::string& str,
     return result;
 }
 
-void manageArguments(char* argv[], string arguments)
+void parseParameters(string _arguments)
 {
+   _arguments = reduce(_arguments);
 
-	arguments = reduce(arguments);
-	int chr;
-	for (chr = 0; arguments[chr] != '\0'; chr++)
-	{
-	  if (arguments[chr] == '\n' || arguments[chr] == '\r')
-		 arguments[chr] = '\0';
-	}
+   std::istringstream iss( _arguments);
+   //cout << "Managing arguments : [" << _arguments << "]" << endl;
+   string token;
+   int nextStr = 0;
+   //_argc = 1;
+   while (getline(iss, token, ' '))
+   {
+      token = reduce(token);
+      //cout << "[ " << _name << " ] : " << "Managing token [" << token << "]." << endl;
+      if (token == "<")
+      nextStr = 1;
+      else if (token == ">")
+      nextStr = 2;
+      else if (token != "")
+      {
+         char *arg = new char[token.size() +1];  // +1
+         copy(token.begin(), token.end(), arg);
+         arg[token.size()]= '\0';
+         #if VERBOSE_OTHER
+         //rt_printf("Token : [%s] (%d) copied to [%s] (%d).\n", token.c_str(), token.size(), arg, strlen(arg));
+         //cout << "token : [" << token << "] (" << token.size() << ") copied to [" << arg << "] (" << strlen(arg) << ")." << endl;
+         #endif
 
-	std::istringstream iss( arguments);
-	cout << "\nManaging arguments : [" << arguments << "]" << endl;
-	string token;
-	int nextStr = 0;
-	//_argc = 1;
-	while (getline(iss, token, ' '))
-	{
-		token = reduce(token);
-		cout << "Managing token [" << token << "]." << endl;
-		if (token == "<")
-			nextStr = 1;
-		else if (token == ">")
-			nextStr = 2;
-		else if (token != "")
-		{
-			if (nextStr == 1)
-			{
-				cout << "Tried to change StdIn to : " << token << endl;
-			}
-			else if (nextStr == 2)
-			{
-				cout << "Tried to change StdOut to : " << token << endl;
-			}
-			else
-			{
-				char *arg = new char[token.size() +1];  // +1
-				copy(token.begin(), token.end(), arg);
-				arg[token.size()]= '\0';
-				cout << "token : [" << token << "] (" << token.size() << ") copied to [" << arg << "] (" << strlen(arg) << ")." << endl;
+         _argv.push_back(arg);
+         _argc++;
 
-				_argv.push_back(arg);
-				_argc++;
-			}
-			nextStr = 0;
-		}
-	}
-	_argv.push_back(0);
+         nextStr = 0;
+      }
+   }
+   _argv.push_back(0);
+
+   //token.copy(argv[i], token.size()); // arguments list must end with a null.
+   #if VERBOSE_OTHER
+   rt_printf("        Arguments : ");
+   int i = 0;
+   for (auto arg : _argv)
+   {
+      string toPrint;
+      if (arg==NULL)toPrint = "null";
+      else toPrint = arg;
+      fprintf(stderr, "Arg #%d = %s ; ", i, toPrint.c_str());
+      i++;
+   }
+   fprintf(stderr, "\n");
+   #endif
+   rt_print_flush_buffers();
+
 }

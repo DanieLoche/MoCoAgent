@@ -204,6 +204,7 @@ void TaskProcess::setIO()
    #if VERBOSE_OTHER
    else rt_printf("Unchanged Output.\n");
    #endif
+
 }
 
 // ================================================== //
@@ -294,14 +295,12 @@ int MacroTask::proceed()
    if (ret != 0)
    {
       rt_fprintf(stderr, "[ %s ] - Proceed error. (%d) function was : ", prop.fP.name, ret);
-      int i = 0;
       for (auto arg : _argv)
       {
          string toPrint;
          if (arg==NULL)toPrint = "null";
          else toPrint = arg;
          rt_fprintf(stderr, " %s", toPrint.c_str());
-         i++;
       }
       rt_fprintf(stderr, "(%d elements)\n", _argv.size()-1);
    }
