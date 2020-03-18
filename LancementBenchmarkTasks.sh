@@ -9,10 +9,7 @@ while [ "$1" != "" ]; do
                                 input=$1
                                 ;;
         -d | --duration )    	shift
-				duration=$1
-                                ;;
-        -D | --Duration )    	shift
-	                        Duration=$1
+				               duration=$1
                                 ;;
     	-l | --load )           shift
                                 load=$1
@@ -26,12 +23,7 @@ while [ "$1" != "" ]; do
     shift
 done
 
-if (( $Duration > $duration ))
-then
-	duration=`expr $Duration / 3`
-fi
-
-./runBashTestTasks.sh -i $input -s FIFO -d $duration -l $load; 
-result=$? ; 
+./runBashTestTasks.sh -i $input -s FIFO -d $duration -l $load ;
+result=$? ;
 #rm ./bench/output/*
 echo "Result : $result"

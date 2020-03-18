@@ -1,96 +1,80 @@
 #!/usr/bin/env bash
 
-# Il faut :
-# Un fichier chain.txt pour chaque chaine de tâche à benchmarker.
-# Pour chaque fichier, lancer ./MoCoAgent.out - 20min [chaine] [chaineBenchOutput]
-
-# De là, on a :
-# La répartition du temps d'execution des chaines en isolation,
-# et donc le WCET des tâches de la chaine + WCET de la chaîne.
-
-# on fixe donc ces temps dans le fichier général d'informations.
-# ---------------------------------------- #
-
-# Ensuite vient la phase de benchmarks :
+# Script pour lancer plusieurs fichiers de chaine de tâche
+# typiquement un fichier pour la chaine de tâche HRT, et un fichier pour les tâches best effort.
 
 commentaire="//"
 
 Infile="input_chaine.txt"
 duration=100
-dirName=./Experimentations/Expe_`date +%d-%m-%Hh`
+dirName=./Exps
+errorDir="error.log.txt"
 load=80
 schedPolicy=FIFO
+MoCoMode=1
 
 while [ "$1" != "" ]; do
    case $1 in
-      -i | -f | --input )  shift
-                           Infile=$1
-      ;;
-      -d | --duration )    shift
-                           duration=$1
-      ;;
-      -o | --output )      shift
-                           dirName=$1
+      -m | --mode )        shift
+                           MoCoMode=$1
       ;;
       -l | --load )        shift
                            load=$1
       ;;
       -s | --sched )       shift
-                           chedPolicy=$1
+                           schedPolicy=$1
       ;;
-      -h | --help )        echo "usage: runBashTest.sh [[[-f file ] [-d duration] [-l load]] | [-h]]"
+      -d | --duration )    shift
+                           duration=$1
+      ;;
+      -i | -f | --input )  shift
+                           Infile=$1
+      ;;
+      -o | --output )      shift
+                           dirName=$1
+      ;;
+      -o2 | --error )      shift
+                           errorDir=$1
+      ;;
+      -h | --help )        echo "usage: runBashTest.sh [[-m mode] [-d duration] [-l load] [-s sched] [-i inputfile] [-o outputfile] [-o2 logFile]| [-h]]"
                            exit
       ;;
-      * )                  echo "usage: runBashTest.sh [[[-f file ] [-d duration] [-l load]] | [-h]]"
+      * )                  echo "usage: runBashTest.sh [[-m mode] [-d duration] [-l load] [-s sched] [-i inputfile] [-o outputfile] [-o2 logFile]| [-h]]"
                            exit 1
    esac
    shift
 done
 
-echo $Infile
-echo $duration
-echo $load
-echo $schedPolicy
+echo "Duration : $duration | Load : $load | Scheduling : $schedPolicy | Input : $Infile | Output : $dirName"
 
 if test -f $Infile
 then
-    dirName=./Experimentations/Expe_`date +%d-%m-%Hh`
-    mkdir -p $dirName
+   dirName=${dirName}/`date +%d-%m-%Hh`_$duration_$load_$schedPolicy
+   mkdir -p $dirName
 
+# Identification de la chaine de tâche critique pour donner un nom aux fichiers d'output.
+   numLigne=1
+   while read -r line
+   do
+      if test $numLigne -ne 1
+      then
+          HRT=`echo $line | awk '{print $2}'`      # On cherche la chaine ID #I (HRT)
+          if test $HRT -eq 1
+          then
+              name=`echo $line | awk '{print $5}'`
+          fi
+      else
+          numLigne=`expr $numLigne + 1`
+      fi
+   done < $Infile
 
-        numLigne=1
-        while read -r line
-        do
-            if test $numLigne -ne 1
-            then
-                HRT=`echo $line | awk '{print $2}'`
-                if test $HRT -eq 1
-                then
-                    name=`echo $line | awk '{print $5}'`
-                fi
-            else
-                numLigne=`expr $numLigne + 1`
-            fi
-        done < $Infile
-
-   sudo sar -o ${dirName}/IODatas${name}_0_${duration}_${load}_${schedPolicy} -P 0-3 1 $duration > /dev/null 2>&1 &
-   ./MoCoAgent.out 0 $duration $load ./$Infile ${dirName}/${name}_0_${duration}_${load}_${schedPolicy} $schedPolicy 2> errorLog0.txt
-   expe0Out=$?
-    rm ./bench/output/*
-
-   #sudo sar -o ${dirName}/IODatas${name}_1_${duration}_${load}_${schedPolicy} -P 0-3 1 $duration > /dev/null 2>&1 &
-   #./MoCoAgent.out 1  $duration $load ./$Infile ${dirName}/${name}_1_${duration}_${load}_${schedPolicy} $schedPolicy 2> errorLog1.txt
-   #expe1Out=$?
-   #rm ./bench/output/*
-
-   sudo sar -o ${dirName}/IODatas${name}_2_${duration}_${load}_${schedPolicy} -P 0-3 1 $duration > /dev/null 2>&1 &
-   ./MoCoAgent.out 2 $duration $load ./$Infile ${dirName}/${name}_2_${duration}_${load}_${schedPolicy} $schedPolicy 2> errorLog2.txt
+   expeName=${name}_$MoCoMode_${duration}_${load}_${schedPolicy}
+   sar -o ${dirName}/IODatas_$expeName -P 0-3 1 $duration > /dev/null 2>&1 &
+   ./MoCoAgent.out -e $MoCoMode -d $duration -l $load -s $schedPolicy -i ./$Infile -o ${dirName}/$expeName 2> $errorDir
    expe2Out=$?
    rm ./bench/output/*
 
-   echo "expe0out : $expe0Out"
-    #echo "expe1out : $expe1Out"
-   echo "expe2out : $expe2Out"
+   echo "expe${MoCoMode}out : $expe0Out"
 
 exit 0
 

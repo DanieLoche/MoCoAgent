@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 
 # Il faut :
-# Un fichier chain.txt pour chaque chaine de tâche à benchmarker.
-# Pour chaque fichier, lancer ./MoCoAgent.out - 20min [chaine] [chaineBenchOutput]
+# Un fichier chain.in pour chaque chaine de tâche à benchmarker.
+# Pour chaque fichier, lance ./MoCoAgent.out - 20min [chaine] [chaineBenchOutput]
 
 # De là, on a :
 # La répartition du temps d'execution des chaines en isolation,
@@ -12,7 +12,7 @@
 # ---------------------------------------- #
 
 # Ensuite vient la phase de benchmarks :
-
+calc(){ awk "BEGIN { print "$*" }"; }
 commentaire="//"
 
 Infile="input_chaine.txt"
@@ -22,18 +22,18 @@ schedPolicy=FIFO
 
 while [ "$1" != "" ]; do
     case $1 in
-        -i | -f | --input )     shift
-                                Infile=$1
-                                ;;
-        -d | --duration )    	shift
-				duration=$1
-                                ;;
-	-l | --load )		shift
-				load=$1
-				;;
-	-s | --sched )		shift
-				schedPolicy=$1
-				;;
+        -i | -f | --input )  shift
+                             Infile=$1
+        ;;
+        -l | --load )        shift
+                             load=$1
+        ;;
+        -s | --sched )       shift
+                             schedPolicy=$1
+        ;;
+        -d | --duration )    shift
+                             duration=$1
+        ;;
         -h | --help )           echo "usage: runBashTest.sh [[[-f file ] [-d duration] [-l load]] | [-h]]"
                                 exit
                                 ;;
@@ -43,20 +43,21 @@ while [ "$1" != "" ]; do
     shift
 done
 
-echo $Infile
-echo $duration
-echo $load
-echo $schedPolicy
+$iload=`calc $load/100` || $iload=$load
+expeResume=${duration}_${iload}_${schedPolicy}
+dirName=./Exps/`date +%d-%m-%Hh`_$expeResume
+
+echo "Duration : $duration | Load : $load | Scheduling : $schedPolicy | Input : $Infile | Output : $dirName"
+
 
 if test -f $Infile
 then
-    dirName=./Experimentations/Expe_`date +%d-%m-%Hh`
     mkdir $dirName
     for toExecute in {2..6} # exécuter toutes les chaines
     do
         #echo $toExecute
-        numLigne=1
         while read -r line
+        numLigne=1
         do
             if test $numLigne -eq $toExecute
             then
@@ -66,18 +67,18 @@ then
                 echo "${commentaire}$line"
             fi
             numLigne=`expr $numLigne + 1`
-        done < $Infile > inputFile
+        done < $Infile > _inputFile.tmp.in
         #echo "Name is "$name
-        sudo sar -o ${dirName}/IODatas${name}_1_${duration}_${load}_${schedPolicy} -P 0-3 1 $duration > /dev/null 2>&1 & 
-        ./MoCoAgent.out true  $duration $load ./inputFile ${dirName}/${name}_1_${duration}_${load}_${schedPolicy} $schedPolicy
+        sudo sar -o ${dirName}/IODatas${name}_1_${duration}_${load}_${schedPolicy} -P 0-3 1 $duration > /dev/null 2>&1 &
+        ./MoCoAgent.out -e 1  -d $duration -l $load -s $schedPolicy -i ./_inputFile.tmp.in -o ${dirName}/${name}_1_${expeResume}
         expe1Out=$?
         rm ./bench/output/*
 
-        sudo sar -o ${dirName}/IODatas${name}_0_${duration}_${load}_${schedPolicy} -P 0-3 1 $duration > /dev/null 2>&1 & 
-        ./MoCoAgent.out false $duration $load ./inputFile ${dirName}/${name}_0_${duration}_${load}_${schedPolicy} $schedPolicy    
+        sudo sar -o ${dirName}/IODatas${name}_0_${duration}_${load}_${schedPolicy} -P 0-3 1 $duration > /dev/null 2>&1 &
+        ./MoCoAgent.out -e 0 -d $duration -l $load -s $schedPolicy -i ./_inputFile.tmp.in -o ${dirName}/${name}_0_${expeResume}
         expe0Out=$?
         rm ./bench/output/*
-        rm -f ./inputFile
+        rm -f ./_inputFile.tmp.in
         echo "expe1out : $expe1Out"
         echo "expe0out : $expe0Out"
     done
