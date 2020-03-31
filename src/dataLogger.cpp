@@ -106,7 +106,7 @@ void TaskDataLogger::saveData(int nameSize, RT_TASK_INFO* cti)
    RTIME min_runtime = execLogs[0].duration;
    RTIME somme = 0;
 
-   for (int i = 0; i < BUFF_SIZE; ++i)
+   for (int i = 1; i < BUFF_SIZE; ++i)
    {
       RTIME _dur = execLogs[i].duration;
       if (execLogs[i].timestamp != 0)

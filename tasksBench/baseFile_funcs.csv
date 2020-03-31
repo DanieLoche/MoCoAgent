@@ -1,51 +1,51 @@
-	name	For C/P only	wcet	period	isHRT	aff	prec	path	parameters												
-	adpcmCaudio_L	"""adpcmCaudio_L"""	300	100	1	1	0	adpcm_rawcaudio	<	./bench/adpcm/large.pcm	>	./bench/output/o_large.adpcm									
-	adpcmCaudio_S	"""adpcmCaudio_S"""	16	100	1	1	0	adpcm_rawcaudio	<	./bench/adpcm/small.pcm	>	./bench/output/o_small.adpcm									
-	adpcmDaudio_L	"""adpcmDaudio_L"""	95	100	1	1	0	adpcm_rawdaudio	<	./bench/adpcm/large.adpcm	>	./bench/output/o_large.pcm									
-	adpcmDaudio_S	"""adpcmDaudio_S"""	6	100	1	1	0	adpcm_rawdaudio	<	./bench/adpcm/small.adpcm	>	./bench/output/o_small.pcm									
-	basicmath_L	"""basicmath_L"""	250	100	1	1	0	basicmath_large	>	./bench/output/o_basmth_large.txt											
-	basicmath_S	"""basicmath_S"""	15	100	1	1	0	basicmath_small	>	./bench/output/o_basmth_small.txt											
-	bitcount_L	"""bitcount_L"""	70	100	1	1	0	bitcnts	1125000	>	./bench/output/o_btcnt_large.txt										
-	bitcount_S	"""bitcount_S"""	5	100	1	1	0	bitcnts	75000	>	./bench/output/o_btcnt_small.txt										
-	blowfishD_L	"""blowfishD_L"""	66	100	1	1	0	bf	d	1234567890abcdeffedcba0987654321	<	./bench/blowfish/o_large.enc	>	./bench/output/o_large.asc							
-	blowfishD_S	"""blowfishD_S"""	6.33	100	1	1	0	bf	d	1234567890abcdeffedcba0987654321	<	./bench/blowfish/o_small.enc	>	./bench/output/o_small.asc							
-	blowfishE_L	"""blowfishE_L"""	69	100	1	1	0	bf	e	1234567890abcdeffedcba0987654321	<	./bench/blowfish/input_large.asc	>	./bench/output/o_large.enc							
-	blowfishE_S	"""blowfishE_S"""	7	100	1	1	0	bf	e	1234567890abcdeffedcba0987654321	<	./bench/blowfish/input_small.asc	>	./bench/output/o_small.enc							
-	cjpeg_L	"""cjpeg_L"""	18	100	1	1	0	cjpeg	-dct	int	-progressive	-opt	-outfile	./bench/output/o_large_encode.jpeg	./bench/jpg/input_large.ppm						
-	cjpeg_S	"""cjpeg_S"""	7	100	1	1	0	cjpeg	-dct	int	-progressive	-opt	-outfile	./bench/output/o_small_encode.jpeg	./bench/jpg/input_small.ppm						
-	CRC32_L	"""CRC32_L"""	520	100	1	1	0	crc	<	./bench/data/large.pcm	>	./bench/output/o_crc_large.txt									
-	CRC32_S	"""CRC32_S"""	38	100	1	1	0	crc	<	./bench/data/small.pcm	>	./bench/output/o_crc_small.txt									
-	dijkstra_L	"""dijkstra_L"""	39	100	1	1	0	dijkstra_large	<	./bench/dijkstra/input.dat	>	./bench/output/o_dijk_large.dat									
-	dijkstra_S	"""dijkstra_S"""	9	100	1	1	0	dijkstra_small	<	./bench/dijkstra/input.dat	>	./bench/output/o_dijk_small.dat									
-	djpeg_L	"""djpeg_L"""	260	100	1	1	0	djpeg	-dct	int	-ppm	-outfile	./bench/output/o_large_decode.ppm	./bench/jpg/input_large.jpg							
-	djpeg_S	"""djpeg_S"""	25	100	1	1	0	djpeg	-dct	int	-ppm	-outfile	./bench/output/o_small_decode.ppm	./bench/jpg/input_small.jpg							
-	fft_inv_L	"""fft_inv_L"""	80	100	1	1	0	fft	8	65536	-i	>	./bench/output/o_ffti_large.inv.txt								
-	fft_inv_S	"""fft_inv_S"""	15	100	1	1	0	fft	8	8192	-i	>	./bench/output/o_ffti_small.inv.txt								
-	fft_L	"""fft_L"""	80	100	1	1	0	fft	8	32768	>	./bench/output/o_fft_large.txt									
-	fft_S	"""fft_S"""	10	100	1	1	0	fft	8	4096	>	./bench/output/o_fft_small.txt									
-	gsmToast_L	"""gsmToast_L"""	160	100	1	1	0	toast	-fps	-c	./bench/gsm/large.au	>	./bench/output/o_large.encode.gsm								
-	gsmToast_S	"""gsmToast_S"""	3	100	1	1	0	toast	-fps	-c	./bench/gsm/small.au	>	./bench/output/o_small.encode.gsm								
-	gsmUToast_L	"""gsmUToast_L"""	100	100	1	1	0	untoast	-dfps	-c	./bench/gsm/large.au.run.gsm	>	./bench/output/o_large.decode.run								
-	gsmUToast_S	"""gsmUToast_S"""	3	100	1	1	0	untoast	-dfps	-c	./bench/gsm/small.au.run.gsm	>	./bench/output/o_small.decode.run								
-	patricia_L	"""patricia_L"""	4460	100	1	1	0	patricia_bin	<	./bench/patricia/large.udp	>	./bench/output/o_pat_large.txt									
-	patricia_S	"""patricia_S"""	860	100	1	1	0	patricia_bin	<	./bench/patricia/small.udp	>	./bench/output/o_pat_small.txt									
-	qsort_L	"""qsort_L"""	45	100	1	1	0	qsort_large	<	./bench/qsort/input_large.dat	>	./bench/output/o_qsort_large.txt									
-	qsort_S	"""qsort_S"""	8.5	100	1	1	0	qsort_small	<	./bench/qsort/input_small.dat	>	./bench/output/o_qsort_small.txt									
-	rijndaelD_L	"""rijndaelD_L"""	35	100	1	1	0	rijndael	d	1234567890abcdeffedcba09876543211234567890abcdeffedcba0987654321	<	./bench/rijndael/output_large.enc	>	./bench/output/output_large.dec							
-	rijndaelD_S	"""rijndaelD_S"""	5	100	1	1	0	rijndael	d	1234567890abcdeffedcba09876543211234567890abcdeffedcba0987654321	<	./bench/rijndael/output_small.enc	>	./bench/output/output_small.dec							
-	rijndaelE_L	"""rijndaelE_L"""	45	100	1	1	0	rijndael	e	1234567890abcdeffedcba09876543211234567890abcdeffedcba0987654321	<	./bench/rijndael/input_large.asc	>	./bench/output/output_large.enc							
-	rijndaelE_S	"""rijndaelE_S"""	5	100	1	1	0	rijndael	e	1234567890abcdeffedcba09876543211234567890abcdeffedcba0987654321	<	./bench/rijndael/input_small.asc	>	./bench/output/output_small.enc							
-	sha_L	"""sha_L"""	25	100	1	1	0	sha	<	./bench/sha/input_large.asc	>	./bench/output/o_sha_large.txt									
-	sha_S	"""sha_S"""	4	100	1	1	0	sha	<	./bench/sha/input_small.asc	>	./bench/output/o_sha_small.txt									
-	stringsearch_L	"""stringsearch_L"""	5	100	1	1	0	search_large	>	./bench/output/o_search_large.txt											
-	stringsearch_S	"""stringsearch_S"""	4	100	1	1	0	search_small	>	./bench/output/o_search_small.txt											
-	susan_L_corners	"""susan_L_corners"""	15	100	1	1	0	susan_bin	-c	<	./bench/susan/input_large.pgm	>	./bench/output/o_susan_large.corners.pgm								
-	susan_L_edges	"""susan_L_edges"""	12	100	1	1	0	susan_bin	-e	<	./bench/susan/input_large.pgm	>	./bench/output/o_susan_large.edges.pgm								
-	susan_L_smooth	"""susan_L_smooth"""	36	100	1	1	0	susan_bin	-s	<	./bench/susan/input_large.pgm	>	./bench/output/o_susan_large.smoothing.pgm								
-	susan_S_corners	"""susan_S_corners"""	0.5	100	1	1	0	susan_bin	-c	<	./bench/susan/input_small.pgm	>	./bench/output/o_susan_small.corners.pgm								
-	susan_S_edges	"""susan_S_edges"""	0.5	100	1	1	0	susan_bin	-e	<	./bench/susan/input_small.pgm	>	./bench/output/o_susan_small.edges.pgm								
-	susan_S_smooth	"""susan_S_smooth"""	8	100	1	1	0	susan_bin	-s	<	./bench/susan/input_small.pgm	>	./bench/output/o_susan_small.smoothing.pgm								
-	load_S	"""load_S"""	0	100	1	1	0	do_load	0												
-	load_L	"""load_L"""	0	100	1	1	0	do_load	5000000												
-//	typeset_L	"""typeset_L"""	79	100	1	1	0	lout	-I	./bench/typeset/include	-D	./bench/typeset/data	-F	./bench/typeset/font	-C	./bench/typeset/maps	-H	./bench/typeset/hyph	./bench/typeset/large.lout	>	./bench/output/o_typeset_large.ps
-//	typeset_S	"""typeset_S"""	36	100	1	1	0	lout	-I	./bench/typeset/include	-D	./bench/typeset/data	-F	./bench/typeset/font	-C	./bench/typeset/maps	-H	./bench/typeset/hyph	./bench/typeset/small.lout	>	./bench/output/o_typeset_small.ps
+	name	For C/P only	wcet	period	isHRT	aff	prec	path	parameters
+	adpcmCaudio_L	"adpcmCaudio_L"	300	100	1	1	0	adpcm_rawcaudio	< ./bench/adpcm/large.pcm > ./bench/output/o_large.adpcm
+	adpcmCaudio_S	"adpcmCaudio_S"	16	100	1	1	0	adpcm_rawcaudio	< ./bench/adpcm/small.pcm > ./bench/output/o_small.adpcm
+	adpcmDaudio_L	"adpcmDaudio_L"	95	100	1	1	0	adpcm_rawdaudio	< ./bench/adpcm/large.adpcm > ./bench/output/o_large.pcm
+	adpcmDaudio_S	"adpcmDaudio_S"	6	100	1	1	0	adpcm_rawdaudio	< ./bench/adpcm/small.adpcm > ./bench/output/o_small.pcm
+	basicmath_L	"basicmath_L"	250	100	1	1	0	basicmath_large	> ./bench/output/o_basmth_large.txt
+	basicmath_S	"basicmath_S"	15	100	1	1	0	basicmath_small	> ./bench/output/o_basmth_small.txt
+	bitcount_L	"bitcount_L"	70	100	1	1	0	bitcnts	1125000 > ./bench/output/o_btcnt_large.txt
+	bitcount_S	"bitcount_S"	5	100	1	1	0	bitcnts	75000 > ./bench/output/o_btcnt_small.txt
+	blowfishD_L	"blowfishD_L"	66	100	1	1	0	bf	d 1234567890abcdeffedcba0987654321 < ./bench/blowfish/o_large.enc > ./bench/output/o_large.asc
+	blowfishD_S	"blowfishD_S"	6.33	100	1	1	0	bf	d 1234567890abcdeffedcba0987654321 < ./bench/blowfish/o_small.enc > ./bench/output/o_small.asc
+	blowfishE_L	"blowfishE_L"	69	100	1	1	0	bf	e 1234567890abcdeffedcba0987654321 < ./bench/blowfish/input_large.asc > ./bench/output/o_large.enc
+	blowfishE_S	"blowfishE_S"	7	100	1	1	0	bf	e 1234567890abcdeffedcba0987654321 < ./bench/blowfish/input_small.asc > ./bench/output/o_small.enc
+	cjpeg_L	"cjpeg_L"	18	100	1	1	0	cjpeg	-dct int -progressive -opt -outfile ./bench/output/o_large_encode.jpeg ./bench/jpg/input_large.ppm
+	cjpeg_S	"cjpeg_S"	7	100	1	1	0	cjpeg	-dct int -progressive -opt -outfile ./bench/output/o_small_encode.jpeg ./bench/jpg/input_small.ppm
+	CRC32_L	"CRC32_L"	520	100	1	1	0	crc	< ./bench/data/large.pcm > ./bench/output/o_crc_large.txt
+	CRC32_S	"CRC32_S"	38	100	1	1	0	crc	< ./bench/data/small.pcm > ./bench/output/o_crc_small.txt
+	dijkstra_L	"dijkstra_L"	39	100	1	1	0	dijkstra_large	< ./bench/dijkstra/input.dat > ./bench/output/o_dijk_large.dat
+	dijkstra_S	"dijkstra_S"	9	100	1	1	0	dijkstra_small	< ./bench/dijkstra/input.dat > ./bench/output/o_dijk_small.dat
+	djpeg_L	"djpeg_L"	260	100	1	1	0	djpeg	-dct int -ppm -outfile ./bench/output/o_large_decode.ppm ./bench/jpg/input_large.jpg
+	djpeg_S	"djpeg_S"	25	100	1	1	0	djpeg	-dct int -ppm -outfile ./bench/output/o_small_decode.ppm ./bench/jpg/input_small.jpg
+	fft_inv_L	"fft_inv_L"	80	100	1	1	0	fft	8 16384 -i > ./bench/output/o_ffti_large.inv.txt
+	fft_inv_S	"fft_inv_S"	15	100	1	1	0	fft	8 4096 -i > ./bench/output/o_ffti_small.inv.txt
+	fft_L	"fft_L"	80	100	1	1	0	fft	8 8192 > ./bench/output/o_fft_large.txt
+	fft_S	"fft_S"	10	100	1	1	0	fft	8 2048 > ./bench/output/o_fft_small.txt
+	gsmToast_L	"gsmToast_L"	160	100	1	1	0	toast	-fps -c ./bench/gsm/large.au > ./bench/output/o_large.encode.gsm
+	gsmToast_S	"gsmToast_S"	3	100	1	1	0	toast	-fps -c ./bench/gsm/small.au > ./bench/output/o_small.encode.gsm
+	gsmUToast_L	"gsmUToast_L"	100	100	1	1	0	untoast	-dfps -c ./bench/gsm/large.au.run.gsm > ./bench/output/o_large.decode.run
+	gsmUToast_S	"gsmUToast_S"	3	100	1	1	0	untoast	-dfps -c ./bench/gsm/small.au.run.gsm > ./bench/output/o_small.decode.run
+	patricia_L	"patricia_L"	4460	100	1	1	0	patricia_bin	< ./bench/patricia/large.udp > ./bench/output/o_pat_large.txt
+	patricia_S	"patricia_S"	860	100	1	1	0	patricia_bin	< ./bench/patricia/small.udp > ./bench/output/o_pat_small.txt
+	qsort_L	"qsort_L"	45	100	1	1	0	qsort_large	< ./bench/qsort/input_large.dat > ./bench/output/o_qsort_large.txt
+	qsort_S	"qsort_S"	8.5	100	1	1	0	qsort_small	< ./bench/qsort/input_small.dat > ./bench/output/o_qsort_small.txt
+	rijndaelD_L	"rijndaelD_L"	35	100	1	1	0	rijndael	d 1234567890abcdeffedcba09876543211234567890abcdeffedcba0987654321 < ./bench/rijndael/output_large.enc > ./bench/output/output_large.dec
+	rijndaelD_S	"rijndaelD_S"	5	100	1	1	0	rijndael	d 1234567890abcdeffedcba09876543211234567890abcdeffedcba0987654321 < ./bench/rijndael/output_small.enc > ./bench/output/output_small.dec
+	rijndaelE_L	"rijndaelE_L"	45	100	1	1	0	rijndael	e 1234567890abcdeffedcba09876543211234567890abcdeffedcba0987654321 < ./bench/rijndael/input_large.asc > ./bench/output/output_large.enc
+	rijndaelE_S	"rijndaelE_S"	5	100	1	1	0	rijndael	e 1234567890abcdeffedcba09876543211234567890abcdeffedcba0987654321 < ./bench/rijndael/input_small.asc > ./bench/output/output_small.enc
+	sha_L	"sha_L"	25	100	1	1	0	sha	< ./bench/sha/input_large.asc > ./bench/output/o_sha_large.txt
+	sha_S	"sha_S"	4	100	1	1	0	sha	< ./bench/sha/input_small.asc > ./bench/output/o_sha_small.txt
+	stringsearch_L	"stringsearch_L"	5	100	1	1	0	search_large	> ./bench/output/o_search_large.txt
+	stringsearch_S	"stringsearch_S"	4	100	1	1	0	search_small	> ./bench/output/o_search_small.txt
+	susan_L_corners	"susan_L_corners"	15	100	1	1	0	susan_bin	-c < ./bench/susan/input_large.pgm > ./bench/output/o_susan_large.corners.pgm
+	susan_L_edges	"susan_L_edges"	12	100	1	1	0	susan_bin	-e < ./bench/susan/input_large.pgm > ./bench/output/o_susan_large.edges.pgm
+	susan_L_smooth	"susan_L_smooth"	36	100	1	1	0	susan_bin	-s < ./bench/susan/input_large.pgm > ./bench/output/o_susan_large.smoothing.pgm
+	susan_S_corners	"susan_S_corners"	0.5	100	1	1	0	susan_bin	-c < ./bench/susan/input_small.pgm > ./bench/output/o_susan_small.corners.pgm
+	susan_S_edges	"susan_S_edges"	0.5	100	1	1	0	susan_bin	-e < ./bench/susan/input_small.pgm > ./bench/output/o_susan_small.edges.pgm
+	susan_S_smooth	"susan_S_smooth"	8	100	1	1	0	susan_bin	-s < ./bench/susan/input_small.pgm > ./bench/output/o_susan_small.smoothing.pgm
+	load_S	"load_S"	0	100	1	1	0	do_load	0
+	load_L	"load_L"	0	100	1	1	0	do_load	5000000
+//	typeset_L	"typeset_L"	79	100	1	1	0	lout	-I
+//	typeset_S	"typeset_S"	36	100	1	1	0	lout	-I
