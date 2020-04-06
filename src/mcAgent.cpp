@@ -34,7 +34,7 @@ MCAgent::MCAgent(rtTaskInfosStruct _taskInfo,
    setAllTasks(tasksSet);
    displayChains();
    //rt_task_sleep(1);
-   ERROR_MNG(rt_task_spawn(&msgReceiverTask, "MonitoringTask", 0, 99, 0, messageReceiver, this));
+   ERROR_MNG(rt_task_spawn(&msgReceiverTask, "MonitoringTask", 0, 98, 0, messageReceiver, this));
    #if VERBOSE_INFO
    rt_printf("[ MoCoAgent ] - READY.\n");
    #endif
@@ -132,54 +132,6 @@ int MCAgent::checkTaskChains()
    return tasksID;
 }
 */
-
-/***********************
-* Passage du système en mode :
-* MODE_NOMINAL : Toutes les tâches passent.
-* MODE_OVERLOADED : Les tâches BE ne sont pas lancées.
-* Envoi un signal Condition de MODE
-* Parcours toutes les tâches best effort pour Suspend/Resume
-***********************/
-void MCAgent::setMode(int _newMode)
-{
-   //cout << "[MONITORING & CONTROL AGENT] Change mode to " << ((mode>0)?"OVERLOADED":"NOMINAL") << ". " << endl;
-   if (_newMode == MODE_DISABLE)  runtimeMode = _newMode;
-   else if (!bestEffortTasks.empty())
-   {
-      if (_newMode >= MODE_OVERLOADED && runtimeMode <= MODE_NOMINAL)
-      { // Pause Best Effort Tasks sur front montant changement de mode.
-         rt_event_signal(&_event, MODE_OVERLOADED);
-         for (auto& bestEffortTask : bestEffortTasks)
-         {   // Publier message pour dire à stopper
-            if (rt_task_suspend(&bestEffortTask))
-            {
-               #if VERBOSE_DEBUG
-               cerr << "Failed to stop task : "; // ==1?"OVERLOADED":"NOMINAL"
-               #endif
-               printInquireInfo(&bestEffortTask);
-            }
-         }
-         #if VERBOSE_DEBUG
-         cerr << "Stopped BE tasks." << endl; // ==1?"OVERLOADED":"NOMINAL"
-         #endif
-      }
-      else if (_newMode <= MODE_NOMINAL && runtimeMode >= MODE_OVERLOADED)
-      { // runtimeMode NOMINAL
-         rt_event_signal(&_event, MODE_NOMINAL);
-         for (auto& bestEffortTask : bestEffortTasks)
-         {  // relancer Best Effort Tasks;
-            rt_task_resume(&bestEffortTask);
-         }
-         #if VERBOSE_DEBUG // ==1?"OVERLOADED":"NOMINAL"
-         cerr << "Re-started BE tasks." << endl;
-         #endif
-      }
-      runtimeMode = _newMode;
-      #if VERBOSE_ASK // ==1?"OVERLOADED":"NOMINAL"
-      cerr << "MoCoAgent Triggered to mode " << ((_newMode>0)?"OVERLOADED":"NOMINAL") << "!" << endl;
-      #endif
-   }
-}
 
 //const timespec noWait_time = {0,0};
 void MCAgent::executeRun()
@@ -287,6 +239,54 @@ void MCAgent::updateTaskInfo(monitoringMsg msg)
    }
 }
 
+/***********************
+* Passage du système en mode :
+* MODE_NOMINAL : Toutes les tâches passent.
+* MODE_OVERLOADED : Les tâches BE ne sont pas lancées.
+* Envoi un signal Condition de MODE
+* Parcours toutes les tâches best effort pour Suspend/Resume
+***********************/
+void MCAgent::setMode(int _newMode)
+{
+   //cout << "[MONITORING & CONTROL AGENT] Change mode to " << ((mode>0)?"OVERLOADED":"NOMINAL") << ". " << endl;
+   if (_newMode == MODE_DISABLE)  runtimeMode = MODE_DISABLE;
+   else if (!bestEffortTasks.empty())
+   {
+      if (_newMode >= MODE_OVERLOADED && runtimeMode <= MODE_NOMINAL)
+      { // Pause Best Effort Tasks sur front montant changement de mode.
+         rt_event_signal(&_event, MODE_OVERLOADED);
+         for (auto& bestEffortTask : bestEffortTasks)
+         {   // Publier message pour dire à stopper
+            if (rt_task_suspend(&bestEffortTask))
+            {
+               #if VERBOSE_DEBUG
+               cerr << "Failed to stop task : "; // ==1?"OVERLOADED":"NOMINAL"
+               #endif
+               printInquireInfo(&bestEffortTask);
+            }
+         }
+         #if VERBOSE_DEBUG
+         cerr << "Stopped BE tasks." << endl; // ==1?"OVERLOADED":"NOMINAL"
+         #endif
+      }
+      else if (_newMode <= MODE_NOMINAL && runtimeMode >= MODE_OVERLOADED)
+      { // runtimeMode NOMINAL
+         rt_event_signal(&_event, MODE_NOMINAL);
+         for (auto& bestEffortTask : bestEffortTasks)
+         {  // relancer Best Effort Tasks;
+            rt_task_resume(&bestEffortTask);
+         }
+         #if VERBOSE_DEBUG // ==1?"OVERLOADED":"NOMINAL"
+         cerr << "Re-started BE tasks." << endl;
+         #endif
+      }
+      runtimeMode = _newMode;
+      #if VERBOSE_ASK // ==1?"OVERLOADED":"NOMINAL"
+      cerr << "MoCoAgent Triggered to mode " << ((_newMode>0)?"OVERLOADED":"NOMINAL") << "!" << endl;
+      #endif
+   }
+}
+
 void MCAgent::saveData()
 {
    MoCoIsAlive = 0;
@@ -309,29 +309,31 @@ void MCAgent::saveData()
 */
    int nameMaxSize = 8;
    if (!allTaskChain.empty())
+   {
       for (auto taskInfo = allTaskChain.begin(); taskInfo != allTaskChain.end(); ++taskInfo)
       {
          int sizeName = strlen(taskInfo->name);
          if (sizeName > nameMaxSize) nameMaxSize = sizeName;
       }
-   else cerr << "WOAW !! Chain set is empty !!" << endl;
-   std::ofstream outputFileChainData;
-   outputFileChainData.open (file + CHAIN_FILE);    // TO APPEND :  //,ios_base::app);
 
-   outputFileChainData << std::setw(15)           << "timestamp" << " ; "
-                       << std::setw(nameMaxSize) << "Chain"     << " ; "
-                       << std::setw(2)            << "ID"        << " ; "
-                       << std::setw(10)           << "deadline"  << " ; "
-                       << std::setw(10)           << "duration"  << endl;
+      std::ofstream outputFileChainData;
+      outputFileChainData.open (file + CHAIN_FILE);    // TO APPEND :  //,ios_base::app);
 
-   outputFileChainData.close();
+      outputFileChainData << std::setw(15)           << "timestamp" << " ; "
+                          << std::setw(nameMaxSize) << "Chain"     << " ; "
+                          << std::setw(2)            << "ID"        << " ; "
+                          << std::setw(10)           << "deadline"  << " ; "
+                          << std::setw(10)           << "duration"  << endl;
 
-   if (!allTaskChain.empty())
-   {   for (auto _taskChain : allTaskChain)
+      outputFileChainData.close();
+
+      for (auto _taskChain : allTaskChain)
       {
-         _taskChain.logger->saveData(nameMaxSize);
+            _taskChain.logger->saveData(nameMaxSize);
       }
    }
+   else cerr << "WOAW !! Chain set is empty !!" << endl;
+
 }
 
 /***********************
@@ -418,7 +420,7 @@ bool taskChain::checkTaskE2E()
    {
       RTIME execTime = getExecutionTime();
       RTIME remTime = getRemWCET();
-      miss = ( execTime + Wmax + t_RT + remTime > end2endDeadline );
+      miss = ( execTime + Wmax + t_RT + remTime > end2endDeadline ); // TOUT EN ns !!
       //cout << "Exec Time : " << execTime/1e6 << " | Rem Time : " << remTime/1e6 << " | Deadline : " << end2endDeadline/1e6 << endl;
    }
    //if (miss) cptAnticipatedMisses++;
