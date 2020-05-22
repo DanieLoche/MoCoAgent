@@ -1,7 +1,7 @@
 input=input_chaine.txt
 duration=100
 Duration=0
-load=80
+load=100
 
 while [ "$1" != "" ]; do
     case $1 in
@@ -9,7 +9,7 @@ while [ "$1" != "" ]; do
                                 input=$1
                                 ;;
         -d | --duration )    	shift
-				duration=$1
+				                duration=$1
                                 ;;
         -D | --Duration )    	shift
 	                        Duration=$1
@@ -31,13 +31,13 @@ then
 	duration=`expr $Duration / 3`
 fi
 
-./runBashTest.sh -i $input -s FIFO -d $duration -l $load;
+./runBashTest.sh -i $input -s 1 -d $duration -l $load;
 FIFO=$? ;
 
-./runBashTest.sh -i $input -s RR -d $duration -l $load;
+./runBashTest.sh -i $input -s 2 -d $duration -l $load;
 RR=$? ;
 
-./runBashTest.sh -i $input -s RM -d $duration -l $load;
+./runBashTest.sh -i $input -s 7 -d $duration -l $load;
 RM=$? ;
 
 echo "Result FIFO : $FIFO"
