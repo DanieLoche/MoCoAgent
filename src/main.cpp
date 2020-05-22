@@ -6,7 +6,7 @@
 
 //MCAgent* mca;
 
-string inputFile = "input_chaine.txt", outputFile = "RES_60_1_FIFO_100";
+string inputFile = "input_chaine.txt", outputFile = "default";
 int enableAgent = 1; // 0 = Disable | 1 = Enable | 2 = Enable for monitoring only
 int expeDuration = 60;
 int schedMode = SCHED_FIFO, cpuFactor = 100;
@@ -70,6 +70,10 @@ int main(int argc, char* argv[])
 
     }
 
+    if (outputFile == "default")
+    {
+      outputFile = "RES_" + std::to_string(expeDuration) + "_" + std::to_string(enableAgent) + "_" + getSchedPolicyName(schedMode) + "_" + std::to_string(cpuFactor);
+    }
     cout << "Experiment made with parameters : \n"
       << " MoCoAgent mode: " << enableAgent  << "\n"
       << "  Duration: " << expeDuration << "\n"
@@ -95,7 +99,7 @@ int main(int argc, char* argv[])
    std::ofstream outputFileResume;
    string outputFileName = outputFile + RESUME_FILE;
    outputFileResume.open (outputFileName);    // TO APPEND :  //,ios_base::app);
-   outputFileResume << "Experiment made with parameters : \n"
+   outputFileResume << "Experiment made at " << /*ctime(&(time_t)time(0)) << */" with parameters : \n"
       << " MoCoAgent: " << enableAgent  << "\n"
       << "  Duration: " << expeDuration << "\n"
       << "CPU Factor: " << cpuFactor    << "\n"

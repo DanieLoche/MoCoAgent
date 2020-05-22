@@ -142,7 +142,7 @@ void TaskDataLogger::saveData(int nameSize, RT_TASK_INFO* cti)
 
          outputFileResume
             << "\nRunning summary for task "
-            << getName() << ". (" << cti->pid << ", " << cti->prio << ", " << cti->name << ")" << "Deadline : " << deadline / 1.0e6     << " ms.\n"
+            << getName() << ". (" << cti->pid << ", " << cti->prio << ", " << cti->name << ") Deadline : " << deadline / 1.0e6     << " ms.\n"
             << "Missed"     << " | "                 << "(2) | " << "Executions " << "\n"
             << std::setw(6) <<  cptOutOfDeadline << " | " << std::setw(3) << overruns << " | " << cptExecutions << " task times" << "\n"
             << "Primary Mode execution time - " << cti->stat.xtime/1.0e6 << " ms. Timeouts : " << cti->stat.timeout << "\n"
@@ -169,7 +169,7 @@ void ChainDataLogger::saveData(int nameSize, RT_TASK_INFO* cti )
    RTIME min_runtime = execLogs[0].duration;
    RTIME sommeTime = 0;
 
-   for (int i = 0; i < BUFF_SIZE; i++)
+   for (int i = 0; i < BUFF_SIZE-1; i++) // Last element probably not finished !
    {
       const RTIME _dur = execLogs[i].duration;
       if (execLogs[i].timestamp != 0)
