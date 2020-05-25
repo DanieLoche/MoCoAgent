@@ -357,9 +357,10 @@ int MacroTask::before_besteff()
 {
    ERROR_MNG(rt_event_inquire(&_event, &_eventInfos));
    if ( _eventInfos.value == (uint) MODE_NOMINAL)
-      return  MODE_NOMINAL;
-   else {
+   {
       dataLogs->logStart();
+      return  MODE_NOMINAL;
+   } else {
       return 0;
    }
 
