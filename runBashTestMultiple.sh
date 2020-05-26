@@ -18,7 +18,7 @@ commentaire="//"
 Infile="input_chaine.txt"
 duration=100
 load=80
-schedPolicy=FIFO
+schedPolicy=1
 
 while [ "$1" != "" ]; do
     case $1 in
@@ -29,16 +29,19 @@ while [ "$1" != "" ]; do
                              load=$1
         ;;
         -s | --sched )       shift
+                             schedPolicy="-s $1"
+        ;;
+        -FIFO | -RR | -RM | -EDF )
                              schedPolicy=$1
         ;;
         -d | --duration )    shift
                              duration=$1
         ;;
-        -h | --help )           echo "usage: runBashTest.sh [[[-f file ] [-d duration] [-l load]] | [-h]]"
-                                exit
-                                ;;
-        * )                     echo "usage: runBashTest.sh [[[-f file ] [-d duration] [-l load]] | [-h]]"
-                                exit 1
+        -h | --help )        echo "usage: runBashTest.sh [[[-f file ] [-d duration] [-l load]] | [-h]]"
+                             exit 0
+        ;;
+        * )                  echo "usage: runBashTest.sh [[[-f file ] [-d duration] [-l load]] | [-h]]"
+                             exit 1
     esac
     shift
 done
@@ -70,12 +73,12 @@ then
         done < $Infile > _inputFile.tmp.in
         #echo "Name is "$name
         sudo sar -o ${dirName}/IODatas${name}_1_${duration}_${load}_${schedPolicy} -P 0-3 1 $duration > /dev/null 2>&1 &
-        ./MoCoAgent.out -e 1  -d $duration -l $load -s $schedPolicy -i ./_inputFile.tmp.in -o ${dirName}/${name}_1_${expeResume}
+        ./MoCoAgent.out -e 1  -d $duration -l $load $schedPolicy -i ./_inputFile.tmp.in -o ${dirName}/${name}_1_${expeResume}
         expe1Out=$?
         rm ./bench/output/*
 
         sudo sar -o ${dirName}/IODatas${name}_0_${duration}_${load}_${schedPolicy} -P 0-3 1 $duration > /dev/null 2>&1 &
-        ./MoCoAgent.out -e 0 -d $duration -l $load -s $schedPolicy -i ./_inputFile.tmp.in -o ${dirName}/${name}_0_${expeResume}
+        ./MoCoAgent.out -e 0 -d $duration -l $load $schedPolicy -i ./_inputFile.tmp.in -o ${dirName}/${name}_0_${expeResume}
         expe0Out=$?
         rm ./bench/output/*
         rm -f ./_inputFile.tmp.in

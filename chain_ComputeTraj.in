@@ -1,7 +1,7 @@
-ID  name          WCET    T   isHRT  aff  prec  task            arguments
-1 CT_bitcount_S   9700    40  1      1   0     bitcnts         75000 > ./bench/output/o_btcnt_small.txt
-2 CT_fft_inv_S    6600    40  1      1   1     fft             8 16384 -i > ./bench/output/o_ffti_large.inv.txt
-3 CT_basicmath_S  3400    20  1      1   2     basicmath_small > ./bench/output/o_basmth_small.txt
-4 CT_patricia_L   80      20  1      1   3     patricia_bin    < ./bench/patricia/large.udp > ./bench/output/o_pat_large.txt
-5 CT_sha_S        4300    40  1      1   4     sha         < ./bench/sha/input_small.asc > ./bench/output/o_sha_small.txt
-6 CT_fft_S        3400    20  1      1   5     fft             8 8192 > ./bench/output/o_fft_large.txt
+ID  name          WCET    T   prio  aff  prec  task            arguments
+1 CT_bitcount_S   9700    40  10      1   0     bitcnts         75000 > ./bench/output/o_btcnt_small.txt
+2 CT_fft_inv_S    6600    40  10      1   1     fft             8 16384 -i > ./bench/output/o_ffti_large.inv.txt
+3 CT_basicmath_S  3400    20  10      1   2     basicmath_small > ./bench/output/o_basmth_small.txt
+4 CT_patricia_L   80      20  10      1   3     patricia_bin    < ./bench/patricia/large.udp > ./bench/output/o_pat_large.txt
+5 CT_sha_S        4300    40  10      1   4     sha         < ./bench/sha/input_small.asc > ./bench/output/o_sha_small.txt
+6 CT_fft_S        3400    20  10      1   5     fft             8 8192 > ./bench/output/o_fft_large.txt

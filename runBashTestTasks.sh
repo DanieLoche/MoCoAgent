@@ -12,7 +12,10 @@ commentaire="//"
 Infile="input_chaine.txt"
 duration=100
 load=100
-schedPolicy=FIFO
+schedPolicy=1
+# 1 = fifo
+#2 = RR
+#7 = RM
 
 while [ "$1" != "" ]; do
     case $1 in

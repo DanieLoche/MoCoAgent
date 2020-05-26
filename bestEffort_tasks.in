@@ -1,6 +1,6 @@
-ID  name                WCET   T    isHRT  aff  prec  task                 arguments
-29 BE_load1_1            5000  40    0     2     0     do_load              2000000
-30 BE_load2_1            5000  35    0     3     0     do_load              2000000
+ID  name                WCET   T    prio  aff  prec  task                 arguments
+29 BE_load1_1            5000  10    -10     2     0     do_load              200000
+30 BE_load2_1            5000  10    -10     3     0     do_load              200000
 //29  BE_cjpeg_S          7      30     0     1    0    cjpeg                -dct int -progressive -opt -outfile ./bench/output/o_small_encode.jpeg ./bench/jpg/input_small.ppm
 //31  BE_cjpeg_L          18     60     0     3    0    cjpeg                -dct int -progressive -opt -outfile ./bench/output/o_large_encode.jpeg ./bench/jpg/input_large.ppm
 //13  BE_susan_S_smooth   6      30     0     2    0    susan_bin            ./bench/susan/input_small.pgm ./bench/output/o_susan_small.smoothing.pgm -s

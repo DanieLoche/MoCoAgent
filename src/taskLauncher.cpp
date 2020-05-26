@@ -110,7 +110,8 @@ int TaskLauncher::readTasksList(int cpuPercent)
             taskInfo->fP.args = reduce(taskInfo->fP.args);
 
             taskInfo->fP.wcet = _uSEC(tmp_wcet);              // conversion us to RTIME (ns)
-            taskInfo->rtP.priority = taskInfo->fP.isHRT;
+            taskInfo->rtP.priority = abs(taskInfo->fP.isHRT);
+            taskInfo->fP.isHRT = std::max(0,sign(taskInfo->fP.isHRT)); //0 for BE, 1 for HRT
             // Traitement de la périodicité de la tâche
             taskInfo->rtP.periodicity = cpuFactor * _mSEC(tmp_period); //taskInfo->periodicity = taskInfo->periodicity * 1.0e6 * cpuFactor;
             //printTaskInfo(&taskInfo); // Résumé

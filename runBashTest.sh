@@ -10,7 +10,7 @@ duration=100
 dirName=./Exps
 errorDir="error.log.txt"
 load=80
-schedPolicy=FIFO
+schedPolicy=1
 MoCoMode=1
 
 while [ "$1" != "" ]; do

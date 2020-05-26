@@ -90,11 +90,11 @@ void TaskProcess::setAffinity (int _aff, int mode)
    rt_task_inquire(&_task, &curtaskinfo);
 
    ERROR_MNG(rt_task_set_affinity(&_task, &mask));
-   #if VERBOSE_ASK
+   //#if VERBOSE_ASK
    if (mode == 0)       rt_printf("[ %s ] - Changed CPU affinity : CPU #%d.\n", curtaskinfo.name, _aff);
    else if (mode == 1)  rt_printf("[ %s ] - Added CPU affinity : +CPU #%d.\n", curtaskinfo.name, _aff);
    else if (mode == -1) rt_printf("[ %s ] - Removed CPU affinity : -CPU #%d.\n", curtaskinfo.name, _aff);
-   #endif
+   //#endif
 }
 
 void TaskProcess::parseParameters(string _arguments)

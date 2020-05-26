@@ -150,6 +150,10 @@ struct monitoringMsg
    #endif
 };
 
+template <typename T> int sign(T val) {
+      return (T(0) < val) - (val < T(0));
+}
+
 const char* getErrorName(int error);
 const char* getSchedPolicyName(int schedPol);
 void printInquireInfo(RT_TASK*);
