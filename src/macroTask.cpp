@@ -353,14 +353,15 @@ void MacroTask::executeRun()
 ////////////////////////////////////////////////////////////////////////////////////////
 
 
-int MacroTask::before_besteff()
+uint MacroTask::before_besteff()
 {
    ERROR_MNG(rt_event_inquire(&_event, &_eventInfos));
-   if ( _eventInfos.value == (uint) MODE_NOMINAL)
+   if ( _eventInfos.value & MODE_NOMINAL)
    {
       dataLogs->logStart();
       return  MODE_NOMINAL;
    } else {
+      rt_fprintf(stderr, "[%s] [%ld]- Stopped. \n", prop.fP.name, rt_timer_read());
       return 0;
    }
 
@@ -385,20 +386,20 @@ void MacroTask::executeRun_besteffort()
       ERROR_MNG(rt_event_bind(&_event, CHANGE_MODE_EVENT_NAME, _mSEC(500)));
    }
 
-   unsigned int flag;
    while (MoCoIsAlive)
    {
-      if (before_besteff() == MODE_NOMINAL) // Check if execution allowed
+      if (before_besteff() & MODE_NOMINAL) // Check if execution allowed
       {
          if (proceed() == 0)  // execute task
             after_besteff();  // Inform of execution time for the mcAgent
       }
-      else rt_event_wait(&_event, sizeof(flag), &flag , EV_PRIO, TM_INFINITE);
-
-
+      else {
+         rt_event_wait(&_event, MODE_NOMINAL, NULL , EV_PRIO, TM_INFINITE);
+         rt_fprintf(stderr, "[%s] [%ld]- Started back. \n", prop.fP.name, rt_timer_read());
+      }
       rt_task_wait_period(&dataLogs->overruns);
-
    }
+
 }
 
 void MacroTask::saveData(int maxNameSize, RT_TASK_INFO* cti)

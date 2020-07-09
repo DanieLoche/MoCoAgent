@@ -30,27 +30,27 @@ TaskDataLogger::TaskDataLogger(rtTaskInfosStruct _taskInfos, string expeName) : 
 
 void DataLogger::logStart(RTIME startTime)
 {
-   execLogs[cptExecutions % BUFF_SIZE].timestamp = startTime;
+   execLogs[cptExecutions & MASK_SIZE].timestamp = startTime;
 }
 
 
 RTIME DataLogger::logStart()
 {
-   return (execLogs[cptExecutions % BUFF_SIZE].timestamp = rt_timer_read());
+   return (execLogs[cptExecutions & MASK_SIZE].timestamp = rt_timer_read());
 }
 
 void DataLogger::logExec(RTIME endTime)
 {
-   if (execLogs[cptExecutions % BUFF_SIZE].timestamp)
+   if (execLogs[cptExecutions & MASK_SIZE].timestamp)
    {
-      execLogs[cptExecutions % BUFF_SIZE].duration = endTime - execLogs[cptExecutions % BUFF_SIZE].timestamp;
+      execLogs[cptExecutions & MASK_SIZE].duration = endTime - execLogs[cptExecutions & MASK_SIZE].timestamp;
 
-      if(execLogs[cptExecutions % BUFF_SIZE].duration > deadline )
+      if(execLogs[cptExecutions & MASK_SIZE].duration > deadline )
       {
-         #if VERBOSE_ASK
-         rt_fprintf(stderr, "[ Warning ] [ %s ] - Executed in %.2f ms.\n",getName(),execLogs[cptExecutions % BUFF_SIZE].duration/1e6);
-         #endif
          cptOutOfDeadline++;
+         #if VERBOSE_ASK
+         rt_fprintf(stderr, "[ Warning ] [ %s ] - Executed in %.2f ms.\n",getName(),execLogs[cptExecutions & MASK_SIZE].duration/1e6);
+         #endif
       }else{
          #if VERBOSE_ASK
          //fprintf(stderr, "[ \033[1;32mPERFECT\033[0m ] Task : \033[1;32m%s\033[0m - \033[1;36m%.2f ms\033[0m\n",getName(),execLogs[cptExecutions].duration/1e6);
@@ -58,7 +58,7 @@ void DataLogger::logExec(RTIME endTime)
       }
       cptExecutions++;
       //return execLogs[cptExecutions - 1].duration;
-      if (cptExecutions == 4096)
+      if (cptExecutions == BUFF_SIZE)
       {
          rt_fprintf(stderr, "[ WARNING ][ %s ] - Measured more Logs than allowed buffer size.\n", getName());
       }
@@ -70,14 +70,14 @@ void DataLogger::logExec(RTIME endTime)
 RTIME DataLogger::logExec( )
 {
    RTIME _logTime = rt_timer_read();
-   if (execLogs[cptExecutions % BUFF_SIZE].timestamp)
+   if (execLogs[cptExecutions & MASK_SIZE].timestamp)
    {
-      execLogs[cptExecutions % BUFF_SIZE].duration = _logTime - execLogs[cptExecutions % BUFF_SIZE].timestamp;
+      execLogs[cptExecutions & MASK_SIZE].duration = _logTime - execLogs[cptExecutions & MASK_SIZE].timestamp;
 
-      if(execLogs[cptExecutions % BUFF_SIZE].duration > deadline )
+      if(execLogs[cptExecutions & MASK_SIZE].duration > deadline )
       {
-         #if VERBOSE_ASK
-         rt_fprintf(stderr, "[ Warning ] [ %s ] - Executed in %.2f ms.\n",getName(),execLogs[cptExecutions % BUFF_SIZE].duration/1e6);
+         #if VERBOSE_DEBUG
+         rt_fprintf(stderr, "[ Warning ] [ %s ] - Executed in %.2f ms.\n",getName(),execLogs[cptExecutions & MASK_SIZE].duration/1e6);
          #endif
          cptOutOfDeadline++;
       }else{

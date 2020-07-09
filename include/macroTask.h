@@ -7,9 +7,10 @@
 #include "dataLogger.h"
 //#include "taskLauncher.h"
 
-#define  MODE_OVERLOADED          1
-#define  MODE_NOMINAL            -1
-#define  MODE_DISABLE             0
+// 1 bit-set flags, non-null !!
+#define  MODE_OVERLOADED         (0*1|0*2|1*4)
+#define  MODE_NOMINAL            (0*1|1*2)
+#define  MODE_DISABLE            (1*1)
 
 #define  CHANGE_MODE_EVENT_NAME  "modeChangeEvent"
 #define  MESSAGE_TOPIC_NAME      "monitoringTopic"
@@ -110,7 +111,7 @@ class MacroTask : public TaskProcess
       inline int before();
       inline int proceed();
       inline int after();
-      inline int before_besteff();
+      inline uint before_besteff();
       inline int after_besteff();
 
    public :
@@ -128,7 +129,7 @@ class MCAgent : public TaskProcess
    protected :
       RT_TASK msgReceiverTask;
       //bool enable;
-      short runtimeMode;    // NOMINAL or OVERLOADED
+      unsigned int runtimeMode;    // NOMINAL or OVERLOADED
       ulong overruns;
       std::vector<taskChain> allTaskChain;
       std::vector<RT_TASK> bestEffortTasks;
@@ -136,7 +137,7 @@ class MCAgent : public TaskProcess
       void initCommunications();
       void setAllDeadlines(std::vector<end2endDeadlineStruct> _tcDeadlineStructs);
       void setAllTasks(std::vector<rtTaskInfosStruct> _TasksInfos);
-      void setMode(int mode);
+      void setMode(uint mode);
       //int checkTaskChains();
       void displaySystemInfo(std::vector<end2endDeadlineStruct> e2eDD,
                              std::vector<rtTaskInfosStruct> tasksSet);

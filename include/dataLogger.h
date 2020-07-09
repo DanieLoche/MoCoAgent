@@ -6,6 +6,7 @@
 #include <iomanip>
 
 #define BUFF_SIZE    4096
+#define MASK_SIZE    0xfff
 struct timeLog
 {
    RTIME timestamp;
