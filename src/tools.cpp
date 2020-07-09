@@ -59,6 +59,7 @@ void printInquireInfo(RT_TASK* task)
    } else {
       rt_printf("[ %s ] - (PID : %d) - Priority = %d.\n", curtaskinfo.name, curtaskinfo.pid, curtaskinfo.prio);
    }
+   rt_print_flush_buffers();
    #endif
 }
 

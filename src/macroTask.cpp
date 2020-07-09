@@ -385,6 +385,13 @@ void MacroTask::executeRun_besteffort()
    {
       ERROR_MNG(rt_event_bind(&_event, CHANGE_MODE_EVENT_NAME, _mSEC(500)));
    }
+   int amount = prop.rtP.periodicity;
+   for (int i = 0 ; i < amount ; ++i)
+   {
+      proceed();
+      rt_task_wait_period(&dataLogs->overruns);
+
+   }
 
    while (MoCoIsAlive)
    {

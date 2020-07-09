@@ -26,13 +26,16 @@ MCAgent::MCAgent(rtTaskInfosStruct _taskInfo,
                   std::vector<rtTaskInfosStruct> tasksSet) : TaskProcess (_taskInfo)
 {
    MoCoIsAlive = TRUE;
-   displaySystemInfo(e2eDD, tasksSet);
+   //displaySystemInfo(e2eDD, tasksSet);
    runtimeMode = MODE_NOMINAL;
    initCommunications();
 
    setAllDeadlines(e2eDD);
    setAllTasks(tasksSet);
+
    displayChains();
+   rt_print_flush_buffers();
+
    //rt_task_sleep(1);
    ERROR_MNG(rt_task_spawn(&msgReceiverTask, "MonitoringTask", 0, 98, 0, messageReceiver, this));
    #if VERBOSE_INFO
@@ -64,7 +67,7 @@ void MCAgent::setAllDeadlines(std::vector<end2endDeadlineStruct> _tcDeadlineStru
    #endif
    for (auto& tcDeadlineStruct : _tcDeadlineStructs)
    {
-      if (tcDeadlineStruct.taskChainID)
+      if (tcDeadlineStruct.taskChainID) // if ID = 0 : NRT tasks, not a chain.
       {
          taskChain* tc = new taskChain(tcDeadlineStruct, _stdOut);
          allTaskChain.push_back(*tc);
@@ -90,10 +93,10 @@ void MCAgent::setAllTasks(std::vector<rtTaskInfosStruct> _TasksInfos)
       if ( !_taskInfo.fP.isHRT )
       {
          rt_printf("Adding %s to BE list.\n", _taskInfo.fP.name);
-         RT_TASK _t;
-         ERROR_MNG(rt_task_bind(&_t, _taskInfo.fP.name, TM_NONBLOCK));
-         printInquireInfo(&_t);
-         bestEffortTasks.push_back(_t);
+         RT_TASK* _t = new RT_TASK;
+         ERROR_MNG(rt_task_bind(_t, _taskInfo.fP.name, TM_NONBLOCK));
+         //printInquireInfo(&_t);
+         bestEffortTasks.push_back(*_t);
          break;
       }
       else for (auto& _taskChain : allTaskChain)
@@ -229,7 +232,7 @@ void MCAgent::updateTaskInfo(monitoringMsg msg)
                if (_taskChain.checkIfEnded())
                {
                   _taskChain.logger->logExec(_taskChain.currentEndTime);
-                  if (_taskChain.isAtRisk && runtimeMode) setMode(MODE_NOMINAL);
+                  if (_taskChain.isAtRisk && !(runtimeMode & MODE_DISABLE)) setMode(MODE_NOMINAL);
                   _taskChain.resetChain();
                }
             }
@@ -246,43 +249,44 @@ void MCAgent::updateTaskInfo(monitoringMsg msg)
 * Envoi un signal Condition de MODE
 * Parcours toutes les tâches best effort pour Suspend/Resume
 ***********************/
-void MCAgent::setMode(int _newMode)
+void MCAgent::setMode(uint _newMode)
 {
    //cout << "[MONITORING & CONTROL AGENT] Change mode to " << ((mode>0)?"OVERLOADED":"NOMINAL") << ". " << endl;
-   if (_newMode == MODE_DISABLE)  runtimeMode = MODE_DISABLE;
+   if (_newMode & MODE_DISABLE)  runtimeMode = MODE_DISABLE;
    else if (!bestEffortTasks.empty())
    {
-      if (_newMode >= MODE_OVERLOADED && runtimeMode <= MODE_NOMINAL)
+      if ((_newMode & MODE_OVERLOADED) && (runtimeMode & MODE_NOMINAL))
       { // Pause Best Effort Tasks sur front montant changement de mode.
-         rt_event_signal(&_event, MODE_OVERLOADED);
+         rt_event_clear(&_event, MODE_NOMINAL, NULL); // => MODE_OVERLOADED.
          for (auto& bestEffortTask : bestEffortTasks)
          {   // Publier message pour dire à stopper
             if (rt_task_suspend(&bestEffortTask))
             {
                #if VERBOSE_DEBUG
-               cerr << "Failed to stop task : "; // ==1?"OVERLOADED":"NOMINAL"
-               #endif
+               rt_fprintf(stderr,"Failed to stop task : "); // ==1?"OVERLOADED":"NOMINAL"
                printInquireInfo(&bestEffortTask);
+               #endif
             }
          }
          #if VERBOSE_DEBUG
-         cerr << "Stopped BE tasks." << endl; // ==1?"OVERLOADED":"NOMINAL"
+         rt_fprintf(stderr,"[MCA] [%ld] - Stopped BE tasks.", rt_timer_read()); // ==1?"OVERLOADED":"NOMINAL"
          #endif
       }
-      else if (_newMode <= MODE_NOMINAL && runtimeMode >= MODE_OVERLOADED)
+      else if ((_newMode & MODE_NOMINAL) && (runtimeMode & MODE_OVERLOADED))
       { // runtimeMode NOMINAL
-         rt_event_signal(&_event, MODE_NOMINAL);
          for (auto& bestEffortTask : bestEffortTasks)
          {  // relancer Best Effort Tasks;
             rt_task_resume(&bestEffortTask);
          }
+         //rt_event_clear(&_event, MODE_OVERLOADED, NULL);
+         rt_event_signal(&_event, MODE_NOMINAL);
          #if VERBOSE_DEBUG // ==1?"OVERLOADED":"NOMINAL"
-         cerr << "Re-started BE tasks." << endl;
+         rt_fprintf(stderr,"[MCA] [%ld] - Re-started BE tasks.", rt_timer_read());
          #endif
       }
       runtimeMode = _newMode;
-      #if VERBOSE_ASK // ==1?"OVERLOADED":"NOMINAL"
-      cerr << "MoCoAgent Triggered to mode " << ((_newMode>0)?"OVERLOADED":"NOMINAL") << "!" << endl;
+      #if VERBOSE_DEBUG // ==1?"OVERLOADED":"NOMINAL"
+      rt_fprintf(stderr,"=> MoCoAgent Triggered to mode %s !\n",((_newMode&MODE_OVERLOADED)?"OVERLOADED":"NOMINAL"));
       #endif
    }
 }
@@ -345,7 +349,7 @@ void MCAgent::saveData()
 void MCAgent::displaySystemInfo(std::vector<end2endDeadlineStruct> _e2eDD,
                                  std::vector<rtTaskInfosStruct> _tasksSet)
 {
-   #if VERBOSE_INFO
+   #if VERBOSE_ASK
    cout << "- MoCoAgent input database -" << endl;
    cout << "------- Task  Chains -------" << endl;
    for (auto &taskdd : _e2eDD)
@@ -373,7 +377,7 @@ void MCAgent::displaySystemInfo(std::vector<end2endDeadlineStruct> _e2eDD,
 
 void MCAgent::displayChains()
 {
-   #if VERBOSE_ASK
+   #if VERBOSE_INFO
    cout << "Displaying MoCoAgent Database : " << "\n";
    for (auto& chain : allTaskChain)
    { // Print chain params
