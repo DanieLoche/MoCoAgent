@@ -1,0 +1,58 @@
+Experiment made with parameters : 
+ MoCoAgent: 1
+  Duration: 100
+CPU Factor: 80
+Input  file: ./inputFile
+Output files: ./Experimentations/Expe_31-07-18h/VR_1_100_80_RR_Expe.csv & ./Experimentations/Expe_31-07-18h/VR_1_100_80_RR_Chains.csv & ./Experimentations/Expe_31-07-18h/VR_1_100_80_RR_Resume.txt
+
+Running summary for task RT_VR_bitcount_S. (28895, 50, RT_VR_bitcount_S)
+Deadline : 189.6 ms.  Missed | Executions 
+                       121 | 123 times
+Primary Mode execution time - 1.94472 ms. Timeouts : 0
+  MIN   |   AVG   |   MAX
+27.9906 | 807.698 | 5293.85 (ms)
+   Mode Switches - 127
+Context Switches - 593
+Cobalt Sys calls - 507
+
+Running summary for task RT_VR_gsm_L. (28896, 50, RT_VR_gsm_L)
+Deadline : 1788 ms.  Missed | Executions 
+                         2 | 100 times
+Primary Mode execution time - 1.35721 ms. Timeouts : 0
+  MIN   |   AVG   |   MAX
+303.352 | 990.678 | 5293.94 (ms)
+   Mode Switches - 104
+Context Switches - 388
+Cobalt Sys calls - 414
+
+Running summary for task RT_VR_basicmath_L. (28897, 50, RT_VR_basicmath_L)
+Deadline : 2592 ms.  Missed | Executions 
+                         1 | 109 times
+Primary Mode execution time - 2.36266 ms. Timeouts : 0
+  MIN   |   AVG   |   MAX
+433.06 | 912.027 | 5294.72 (ms)
+   Mode Switches - 113
+Context Switches - 734
+Cobalt Sys calls - 451
+
+Running summary for task RT_VR_stringsearch_L. (28898, 50, RT_VR_stringsearch_L)
+Deadline : 153.6 ms.  Missed | Executions 
+                       115 | 118 times
+Primary Mode execution time - 1.90039 ms. Timeouts : 0
+  MIN   |   AVG   |   MAX
+28.7401 | 842.005 | 5293.93 (ms)
+   Mode Switches - 122
+Context Switches - 619
+Cobalt Sys calls - 487
+
+ Monitoring and Control Agent Stats : 
+Primary Mode execution time - 43.8491 ms. Timeouts : 0
+   Mode Switches - 12
+Context Switches - 27287
+Cobalt Sys calls - 25040
+
+Running summary for Chain VoiceRecognition. ( 4 )
+Deadline : 10000 ms. Anticipated Misses |  Missed  |  Chain loops 
+                                     0 |          0 | 0 times
+  MIN   |   AVG   |   MAX
+   1000 | 9.22337e+12 | 0 runtimes (ms)

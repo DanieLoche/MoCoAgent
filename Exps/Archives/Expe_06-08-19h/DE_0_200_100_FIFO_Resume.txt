@@ -1,0 +1,56 @@
+Experiment made with parameters : 
+ MoCoAgent: 0
+  Duration: 200
+CPU Factor: 100
+Input  file: ./inputFile
+Output files: ./Experimentations/Expe_06-08-17h/DE_0_200_100_FIFO_Expe.csv & ./Experimentations/Expe_06-08-17h/DE_0_200_100_FIFO_Chains.csv & ./Experimentations/Expe_06-08-17h/DE_0_200_100_FIFO_Resume.txt
+
+Running summary for task RT_DE_bitcount_S. (22747, 50, RT_DE_bitcount_S)
+Deadline : 250 ms.  Missed | Executions 
+                        43 | 1235 times
+Primary Mode execution time - 4.94434 ms. Timeouts : 0
+  MIN   |   AVG   |   MAX
+25.6863 | 157.989 | 1504.15 (ms)
+   Mode Switches - 1239
+Context Switches - 5347
+Cobalt Sys calls - 1249
+
+Running summary for task RT_DE_CRC32_S. (22748, 50, RT_DE_CRC32_S)
+Deadline : 250 ms.  Missed | Executions 
+                        42 | 1239 times
+Primary Mode execution time - 4.19764 ms. Timeouts : 0
+  MIN   |   AVG   |   MAX
+20.8499 | 157.483 | 1275.1 (ms)
+   Mode Switches - 1243
+Context Switches - 4788
+Cobalt Sys calls - 1253
+
+Running summary for task RT_DE_patricia_L. (22749, 50, RT_DE_patricia_L)
+Deadline : 2000 ms.  Missed | Executions 
+                         0 | 1225 times
+Primary Mode execution time - 7.52556 ms. Timeouts : 0
+  MIN   |   AVG   |   MAX
+100.561 | 159.308 | 1275.12 (ms)
+   Mode Switches - 1229
+Context Switches - 6431
+Cobalt Sys calls - 1239
+
+Running summary for task RT_DE_basicmath_S. (22750, 50, RT_DE_basicmath_S)
+Deadline : 250 ms.  Missed | Executions 
+                        40 | 1238 times
+Primary Mode execution time - 5.69514 ms. Timeouts : 0
+  MIN   |   AVG   |   MAX
+29.0003 | 157.616 | 1274.91 (ms)
+   Mode Switches - 1242
+Context Switches - 5089
+Cobalt Sys calls - 1252
+
+Running summary for task RT_DE_blowfish_S. (22751, 50, RT_DE_blowfish_S)
+Deadline : 250 ms.  Missed | Executions 
+                        46 | 973 times
+Primary Mode execution time - 7.20945 ms. Timeouts : 0
+  MIN   |   AVG   |   MAX
+23.4173 | 201.477 | 1576.21 (ms)
+   Mode Switches - 977
+Context Switches - 6192
+Cobalt Sys calls - 987

@@ -1,0 +1,16 @@
+Experiment made with parameters : 
+ MoCoAgent: 0
+  Duration: 300
+CPU Factor: 100
+Input  file: ./inputFile
+Output files: ./Experimentations/Expe_20-08-17h/PA_L_0_300_100_FIFO_Expe.csv & ./Experimentations/Expe_20-08-17h/PA_L_0_300_100_FIFO_Chains.csv & ./Experimentations/Expe_20-08-17h/PA_L_0_300_100_FIFO_Resume.txt
+
+Running summary for task RT_patricia_L. (21536, 50, RT_patricia_L)
+Deadline : 200 ms.  Missed | Executions 
+                         0 | 1501 times
+Primary Mode execution time - 5.93826 ms. Timeouts : 0
+  MIN   |   AVG   |   MAX
+77.2602 | 78.6063 | 121.699 (ms)
+   Mode Switches - 1505
+Context Switches - 3008
+Cobalt Sys calls - 1517

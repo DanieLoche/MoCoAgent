@@ -1,0 +1,21 @@
+ID  name                WCET   T    prio  aff  prec  task                 arguments
+29 BE_load1_L            5000  10    -10     2     0     do_load              200000
+30 BE_load2_L            5000  10    -10     3     0     do_load              200000
+//29  BE_cjpeg_S          7      30     0     1    0    cjpeg                -dct int -progressive -opt -outfile ./bench/output/o_small_encode.jpeg ./bench/jpg/input_small.ppm
+//31  BE_cjpeg_L          18     60     0     3    0    cjpeg                -dct int -progressive -opt -outfile ./bench/output/o_large_encode.jpeg ./bench/jpg/input_large.ppm
+//13  BE_susan_S_smooth   6      30     0     2    0    susan_bin            ./bench/susan/input_small.pgm ./bench/output/o_susan_small.smoothing.pgm -s
+//14  BE_susan_S_edges    9      30     0     2    0    susan_bin            ./bench/susan/input_small.pgm ./bench/output/o_susan_small.edges.pgm     -e
+//12  BE_susan_S_corners  3      30     0     3    0    susan_bin            ./bench/susan/input_small.pgm ./bench/output/o_susan_small.corners.pgm   -c
+//16  BE_susan_L_edges    12     60     0     3    0    susan_bin            ./bench/susan/input_large.pgm ./bench/output/o_susan_large.edges.pgm     -e
+//17  BE_susan_L_corners  15     60     0     2    0    susan_bin            ./bench/susan/input_large.pgm ./bench/output/o_susan_large.corners.pgm   -c
+//21  BE_adpcmCaudio_S    16     60     0     3    0    adpcm_rawcaudio      < ./bench/adpcm/small.pcm     > ./bench/output/o_small.adpcm
+//19  BE_adpcmDaudio_S    6      15     0     1    0    adpcm_rawdaudio      < ./bench/adpcm/small.adpcm   > ./bench/output/o_small.pcm
+//24  BE_gsmToast1_S      3      60     0     2    0    toast                -fps -c ./bench/gsm/small.au         > ./bench/output/o_small.encode.gsm
+//40  BE_gsmToast2_S      3      60     0     2    0    toast                -fps -c ./bench/gsm/small.au         > ./bench/output/o_small.encode.gsm
+//41  BE_gsmToast3_S      3      60     0     3    0    toast                -fps -c ./bench/gsm/small.au         > ./bench/output/o_small.encode.gsm
+//42  BE_gsmToast4_S      3      60     0     3    0    toast                -fps -c ./bench/gsm/small.au         > ./bench/output/o_small.encode.gsm
+//33  BE_bitcount_L       70     240    0     2    0    bitcnts              1125000 > ./bench/output/o_btcnt_large.txt
+//25  BE_rijndaelD_L      35     120    0     3    0    rijndael             ./bench/rijndael/output_large.enc ./bench/output/output_large.dec d 1234567890abcdeffedcba09876543211234567890abcdeffedcba0987654321
+//23  BE_basicmath1_L     15     60     0     3    0    basicmath_large      > ./bench/output/o_basmth_large.txt
+//27  BE_basicmath2_L     15     60     0     2    0    basicmath_large      > ./bench/output/o_basmth_large.txt
+//32  BE_dijkstra_S       9      30     0     1    0    dijkstra_small       ./bench/dijkstra/input.dat   >   ./bench/output/o_dijk_small.dat

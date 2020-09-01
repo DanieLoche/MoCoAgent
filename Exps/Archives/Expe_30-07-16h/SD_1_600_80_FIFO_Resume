@@ -1,0 +1,50 @@
+
+Running summary for task RT_SDP_bitcount_S. (1681, 50, RT_SDP_bitcount_S)
+Deadline : 189.6 ms.  Missed | Executions 
+                      1528 | 1530 times
+Primary Mode execution time - 19.6699 ms. Timeouts : 0
+  MIN   |   AVG   |   MAX
+42.5198 | 388.197 | 1102.87 (ms)
+   Mode Switches - 1534
+Context Switches - 5292
+Cobalt Sys calls - 6128
+
+Running summary for task RT_SDP_fft_S. (1682, 50, RT_SDP_fft_S)
+Deadline : 275.2 ms.  Missed | Executions 
+                      1525 | 1528 times
+Primary Mode execution time - 22.403 ms. Timeouts : 0
+  MIN   |   AVG   |   MAX
+187.755 | 388.706 | 1037.26 (ms)
+   Mode Switches - 1532
+Context Switches - 5526
+Cobalt Sys calls - 6130
+
+Running summary for task RT_SDP_CRC32_L. (1683, 50, RT_SDP_CRC32_L)
+Deadline : 3551.2 ms.  Missed | Executions 
+                         0 | 1530 times
+Primary Mode execution time - 17.8107 ms. Timeouts : 0
+  MIN   |   AVG   |   MAX
+204.922 | 388.201 | 1032.43 (ms)
+   Mode Switches - 1534
+Context Switches - 5150
+Cobalt Sys calls - 6131
+
+Running summary for task RT_SDP_basicmath_S. (1684, 50, RT_SDP_basicmath_S)
+Deadline : 231.2 ms.  Missed | Executions 
+                      1526 | 1531 times
+Primary Mode execution time - 17.4844 ms. Timeouts : 0
+  MIN   |   AVG   |   MAX
+42.7864 | 387.944 | 1229.96 (ms)
+   Mode Switches - 1535
+Context Switches - 4794
+Cobalt Sys calls - 6138
+
+Running summary for task RT_SDP_qsort_L. (1685, 50, RT_SDP_qsort_L)
+Deadline : 555.2 ms.  Missed | Executions 
+                        37 | 1528 times
+Primary Mode execution time - 22.8401 ms. Timeouts : 0
+  MIN   |   AVG   |   MAX
+116.556 | 388.712 | 1308.66 (ms)
+   Mode Switches - 1532
+Context Switches - 5898
+Cobalt Sys calls - 6130

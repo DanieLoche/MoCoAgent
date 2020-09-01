@@ -1,0 +1,86 @@
+Experiment made with parameters : 
+ MoCoAgent: 0
+  Duration: 20
+CPU Factor: 200
+Input  file: ./inputFile
+Output files: ./Experimentations/Expe_26-08-14h/VR_0_20_200_FIFO_Expe.csv & ./Experimentations/Expe_26-08-14h/VR_0_20_200_FIFO_Chains.csv & ./Experimentations/Expe_26-08-14h/VR_0_20_200_FIFO_Resume.txt
+
+Running summary for task RT_VR_bitcount_S. (16242, 50, RT_VR_bitcount_S)
+Deadline : 30 ms.  Missed | (2) | Executions 
+                         0 |   3 | 267 times
+Primary Mode execution time - 2.05548 ms. Timeouts : 0
+  MIN   |   AVG   |   MAX
+4.44975 | 6.29533 | 19.638 (ms)
+   Mode Switches - 804
+Context Switches - 996
+Cobalt Sys calls - 1615
+
+Running summary for task RT_VR_stringsearch_L. (16243, 50, RT_VR_stringsearch_L)
+Deadline : 30 ms.  Missed | (2) | Executions 
+                         0 |   3 | 268 times
+Primary Mode execution time - 1.96866 ms. Timeouts : 0
+  MIN   |   AVG   |   MAX
+0.562817 | 2.03711 | 14.8139 (ms)
+   Mode Switches - 807
+Context Switches - 976
+Cobalt Sys calls - 1621
+
+Running summary for task RT_VR_gsmToast_S. (16244, 50, RT_VR_gsmToast_S)
+Deadline : 30 ms.  Missed | (2) | Executions 
+                         0 |   3 | 257 times
+Primary Mode execution time - 1.62777 ms. Timeouts : 0
+  MIN   |   AVG   |   MAX
+2.50963 | 4.52773 | 16.8014 (ms)
+   Mode Switches - 774
+Context Switches - 964
+Cobalt Sys calls - 1555
+
+Running summary for task RT_VR_adpcmCaudio_S. (16245, 50, RT_VR_adpcmCaudio_S)
+Deadline : 60 ms.  Missed | (2) | Executions 
+                         0 |   1 | 170 times
+Primary Mode execution time - 1.21081 ms. Timeouts : 0
+  MIN   |   AVG   |   MAX
+11.9932 | 13.9254 | 18.1904 (ms)
+   Mode Switches - 513
+Context Switches - 625
+Cobalt Sys calls - 1033
+
+Running summary for task RT_VR_adpcmCaudio_L. (16246, 50, RT_VR_adpcmCaudio_L)
+Deadline : 960 ms.  Missed | (2) | Executions 
+                         0 |   3 | 25 times
+Primary Mode execution time - 0.203571 ms. Timeouts : 0
+  MIN   |   AVG   |   MAX
+190.609 | 200.191 | 227.831 (ms)
+   Mode Switches - 78
+Context Switches - 104
+Cobalt Sys calls - 163
+
+Running summary for task RT_VR_adpcmDaudio_S. (16247, 50, RT_VR_adpcmDaudio_S)
+Deadline : 30 ms.  Missed | (2) | Executions 
+                        24 |  14 | 249 times
+Primary Mode execution time - 1.69767 ms. Timeouts : 0
+  MIN   |   AVG   |   MAX
+4.43821 | 24.7542 | 233.696 (ms)
+   Mode Switches - 750
+Context Switches - 891
+Cobalt Sys calls - 1507
+
+Running summary for task RT_VR_adpcmDaudio_L. (16248, 50, RT_VR_adpcmDaudio_L)
+Deadline : 480 ms.  Missed | (2) | Executions 
+                         0 |   8 | 48 times
+Primary Mode execution time - 0.446732 ms. Timeouts : 0
+  MIN   |   AVG   |   MAX
+87.6914 | 99.7955 | 338.431 (ms)
+   Mode Switches - 147
+Context Switches - 172
+Cobalt Sys calls - 301
+
+Running summary for task RT_VR_basicmath_L. (16249, 50, RT_VR_basicmath_L)
+Deadline : 960 ms.  Missed | (2) | Executions 
+                         0 |   3 | 25 times
+Primary Mode execution time - 0.275881 ms. Timeouts : 0
+  MIN   |   AVG   |   MAX
+247.378 | 345.96 | 451.133 (ms)
+   Mode Switches - 78
+Context Switches - 104
+Cobalt Sys calls - 163

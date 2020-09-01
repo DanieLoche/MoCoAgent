@@ -1,0 +1,68 @@
+Experiment made with parameters : 
+ MoCoAgent: 1
+  Duration: 200
+CPU Factor: 100
+Input  file: ./inputFile
+Output files: ./Experimentations/Expe_07-08-10h/SD_1_200_100_FIFO_Expe.csv & ./Experimentations/Expe_07-08-10h/SD_1_200_100_FIFO_Chains.csv & ./Experimentations/Expe_07-08-10h/SD_1_200_100_FIFO_Resume.txt
+
+Running summary for task RT_SDP_bitcount_S. (31135, 50, RT_SDP_bitcount_S)
+Deadline : 250 ms.  Missed | Executions 
+                        39 | 826 times
+Primary Mode execution time - 5.68385 ms. Timeouts : 0
+  MIN   |   AVG   |   MAX
+63.5813 | 250.693 | 1397.77 (ms)
+   Mode Switches - 831
+Context Switches - 2838
+Cobalt Sys calls - 3311
+
+Running summary for task RT_SDP_fft_S. (31136, 50, RT_SDP_fft_S)
+Deadline : 250 ms.  Missed | Executions 
+                        51 | 825 times
+Primary Mode execution time - 7.70053 ms. Timeouts : 0
+  MIN   |   AVG   |   MAX
+77.7024 | 251.001 | 1497.33 (ms)
+   Mode Switches - 829
+Context Switches - 2949
+Cobalt Sys calls - 3312
+
+Running summary for task RT_SDP_CRC32_L. (31137, 50, RT_SDP_CRC32_L)
+Deadline : 2000 ms.  Missed | Executions 
+                         0 | 826 times
+Primary Mode execution time - 8.21113 ms. Timeouts : 0
+  MIN   |   AVG   |   MAX
+134.324 | 250.688 | 963.977 (ms)
+   Mode Switches - 830
+Context Switches - 3533
+Cobalt Sys calls - 3309
+
+Running summary for task RT_SDP_basicmath_S. (31138, 50, RT_SDP_basicmath_S)
+Deadline : 250 ms.  Missed | Executions 
+                        40 | 828 times
+Primary Mode execution time - 7.00471 ms. Timeouts : 0
+  MIN   |   AVG   |   MAX
+63.0001 | 250.149 | 1397.77 (ms)
+   Mode Switches - 831
+Context Switches - 3066
+Cobalt Sys calls - 3320
+
+Running summary for task RT_SDP_qsort_L. (31139, 50, RT_SDP_qsort_L)
+Deadline : 500 ms.  Missed | Executions 
+                        17 | 825 times
+Primary Mode execution time - 8.80449 ms. Timeouts : 0
+  MIN   |   AVG   |   MAX
+51.7513 | 251.063 | 1421.5 (ms)
+   Mode Switches - 828
+Context Switches - 3484
+Cobalt Sys calls - 3312
+
+ Monitoring and Control Agent Stats : 
+Primary Mode execution time - 86.3466 ms. Timeouts : 0
+   Mode Switches - 4090
+Context Switches - 71293
+Cobalt Sys calls - 55687
+
+Running summary for Chain SignalDataProcessing. ( 1 )
+Deadline : 10000 ms. Anticipated Misses |  Missed  |  Chain loops 
+                                     0 |          0 | 365 times
+  MIN   |   AVG   |   MAX
+235.932 | 523.591 | 3199.04 runtimes (ms)

@@ -1,0 +1,16 @@
+Experiment made with parameters : 
+ MoCoAgent: 0
+  Duration: 300
+CPU Factor: 100
+Input  file: ./inputFile
+Output files: ./Experimentations/Expe_20-08-11h/ADd_L_0_300_100_FIFO_Expe.csv & ./Experimentations/Expe_20-08-11h/ADd_L_0_300_100_FIFO_Chains.csv & ./Experimentations/Expe_20-08-11h/ADd_L_0_300_100_FIFO_Resume.txt
+
+Running summary for task RT_adpcmDaudio_L. (28431, 50, RT_adpcmDaudio_L)
+Deadline : 250 ms.  Missed | Executions 
+                         0 | 1202 times
+Primary Mode execution time - 5.35907 ms. Timeouts : 0
+  MIN   |   AVG   |   MAX
+0.110425 | 0.228521 | 98.8464 (ms)
+   Mode Switches - 1205
+Context Switches - 2409
+Cobalt Sys calls - 1219

@@ -1,0 +1,16 @@
+Experiment made with parameters : 
+ MoCoAgent: 0
+  Duration: 100
+CPU Factor: 100
+Input  file: ./inputFile
+Output files: ./Experimentations/Expe_22-08-18h/GSt_L_0_100_100_FIFO_Expe.csv & ./Experimentations/Expe_22-08-18h/GSt_L_0_100_100_FIFO_Chains.csv & ./Experimentations/Expe_22-08-18h/GSt_L_0_100_100_FIFO_Resume.txt
+
+Running summary for task RT_gsmToast_L. (8081, 50, RT_gsmToast_L)
+Deadline : 200 ms.  Missed | Executions 
+                         0 | 502 times
+Primary Mode execution time - 1.29436 ms. Timeouts : 0
+  MIN   |   AVG   |   MAX
+120.993 | 123.525 | 127.332 (ms)
+   Mode Switches - 505
+Context Switches - 1008
+Cobalt Sys calls - 515

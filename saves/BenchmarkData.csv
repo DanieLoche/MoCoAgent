@@ -1,0 +1,37 @@
+name              meanET    path                        wcet   affinity     parameter
+basicmath_S       58       ./bench/basicmath_small      289        0         > ./bench/output/output_basicmath_small.txt
+basicmath_L       648      ./bench/basicmath_large      3240       0         > ./bench/output/output_basicmath_small.txt
+bitcount_S        48       ./bench/bitcnts              237        0         75000 > ./bench/output/output_btcnt_small.txt
+bitcount_L        197      ./bench/bitcnts              984        0         1125000 > ./bench/output/output_btcnt_large.txt
+qsort_S           44       ./bench/qsort_small          219        0         ./bench/qsort/input_small.dat >  ./bench/output/output_qsort_small.txt
+qsort_L           139      ./bench/qsort_large          694        0         ./bench/qsort/input_large.dat >  ./bench/output/output_qsort_large.txt
+susan_S_smooth    44       ./bench/susan_bin            220        0         ./bench/susan/input_small.pgm ./bench/output/susan_output_small.smoothing.pgm -s
+susan_S_edges     44       ./bench/susan_bin            220        0         ./bench/susan/input_small.pgm ./bench/output/susan_output_small.edges.pgm -e
+susan_S_corners   44       ./bench/susan_bin            220        0         ./bench/susan/input_small.pgm ./bench/output/susan_output_small.corners.pgm -c
+susan_L_smooth    50       ./bench/susan_bin            250        0         ./bench/susan/input_large.pgm ./bench/output/susan_output_large.smoothing.pgm -s
+susan_L_edges     50       ./bench/susan_bin            250        0         ./bench/susan/input_large.pgm ./bench/output/susan_output_large.edges.pgm -e
+susan_L_corners   45       ./bench/susan_bin            240        0         ./bench/susan/input_large.pgm ./bench/output/susan_output_large.corners.pgm -c
+jpeg_S            50       ./bench/jpeg_small.sh        248        0
+jpeg_L            77       ./bench/jpeg_large.sh        384        0
+typeset_S         79       ./bench/typeset_small.sh     392        0
+typeset_L         804      ./bench/typeset_large.sh     4021       0
+dijkstra_S        53       ./bench/dijkstra_small       267        0         ./bench/dijkstra/input.dat > ./bench/output/dijk_output_small.dat
+dijkstra_L        104      ./bench/dijkstra_large       523        0         ./bench/dijkstra/input.dat > ./bench/output/dijk_output_large.dat
+patricia_S        70       ./bench/patricia_bin         349        0         ./bench/patricia/small.udp > ./bench/output/pat_output_small.txt
+patricia_L        838      ./bench/patricia_bin         4190       0         ./bench/patricia/large.udp > ./bench/output/pat_output_large.txt
+stringsearch_L    38       ./bench/search_large         192        0         >  ./bench/output/output_search_large
+stringsearch_S    38       ./bench/search_small         189        0         >  ./bench/output/output_search_small
+blowfish_S        61       ./bench/blowfish_small.sh    304        0
+blowfish_L        875      ./bench/blowfish_large.sh    4374       0
+sha_S             42       ./bench/sha_bin              209        0         ./bench/sha/input_small.asc > ./bench/output/sha_output_small.txt
+sha_L             82       ./bench/sha_bin              410        0         ./bench/sha/input_large.asc > ./bench/output/sha_output_large.txt
+adpcm_S           79       ./bench/adpcm_small.sh       397        0
+adpcm_L           964      ./bench/adpcm_large.sh       4819       0
+CRC32_S           49       ./bench/crc                  245        0         ./bench/data/small.pcm > ./bench/output/crc_output_small.txt
+CRC32_L           888      ./bench/crc                  4439       0         ./bench/data/large.pcm > ./bench/output/crc_output_large.txt
+fft_S             69       ./bench/fft                  344        0         8 32768 > ./bench/output/fft_output_small.txt
+fft_L             849      ./bench/fft                  4248       0         8 32768 > ./bench/output/fft_output_large.txt
+fft_inv_S         69       ./bench/fft                  344        0         8 32768 -i > ./bench/output/ffti_output_small.inv.txt
+fft_inv_L         850      ./bench/fft                  4248       0         8 32768 -i > ./bench/output/ffti_output_large.inv.txt
+gsm_S             48       ./bench/gsm_small.sh         239        0
+gsm_L             447      ./bench/gsm_large.sh         2235       0

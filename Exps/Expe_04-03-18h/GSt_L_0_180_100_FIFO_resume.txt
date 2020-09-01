@@ -1,0 +1,23 @@
+Experiment made with parameters : 
+ MoCoAgent: 2
+  Duration: 180
+CPU Factor: 100
+Scheduling Policy: FIFO(1)
+Input  file: ./inputFile.in
+Output files: ./Exps/Expe_04-03-18h/GSt_L_0_180_100_FIFO_Expe.csv & ./Exps/Expe_04-03-18h/GSt_L_0_180_100_FIFO_Chains.csv & ./Exps/Expe_04-03-18h/GSt_L_0_180_100_FIFO_Resume.txt
+
+ Monitoring and Control Agent Stats : 
+Primary Mode execution time - 99.1111 ms. Timeouts : 0
+   Mode Switches - 41
+Context Switches - 90043
+Cobalt Sys calls - 90221
+
+Running summary for task RT_gsmToast_L. (9416, 50, RT_gsmToast_L)
+Deadline : 100 ms.  Missed | (2) | Executions 
+                      1231 |   1 | 1231 times
+Primary Mode execution time - 9.71463 ms. Timeouts : 0
+  MIN   |   AVG   |   MAX
+141.96 | 146.204 | 155.892 (ms)
+   Mode Switches - 1290
+Context Switches - 2418
+Cobalt Sys calls - 5142

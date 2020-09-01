@@ -1,0 +1,56 @@
+Experiment made with parameters : 
+ MoCoAgent: 0
+  Duration: 100
+CPU Factor: 80
+Input  file: ./inputFile
+Output files: ./Experimentations/Expe_31-07-17h/DE_0_100_80_FIFO_Expe.csv & ./Experimentations/Expe_31-07-17h/DE_0_100_80_FIFO_Chains.csv & ./Experimentations/Expe_31-07-17h/DE_0_100_80_FIFO_Resume.txt
+
+Running summary for task RT_DE_bitcount_S. (19416, 50, RT_DE_bitcount_S)
+Deadline : 189.6 ms.  Missed | Executions 
+                       603 | 697 times
+Primary Mode execution time - 4.43264 ms. Timeouts : 0
+  MIN   |   AVG   |   MAX
+30.6535 | 217.849 | 1155.24 (ms)
+   Mode Switches - 798
+Context Switches - 3489
+Cobalt Sys calls - 808
+
+Running summary for task RT_DE_CRC32_S. (19417, 50, RT_DE_CRC32_S)
+Deadline : 196 ms.  Missed | Executions 
+                       442 | 695 times
+Primary Mode execution time - 4.55382 ms. Timeouts : 0
+  MIN   |   AVG   |   MAX
+37.0753 | 218.822 | 1155.24 (ms)
+   Mode Switches - 747
+Context Switches - 3850
+Cobalt Sys calls - 757
+
+Running summary for task RT_DE_patricia_L. (19418, 50, RT_DE_patricia_L)
+Deadline : 3352 ms.  Missed | Executions 
+                         0 | 691 times
+Primary Mode execution time - 5.8961 ms. Timeouts : 0
+  MIN   |   AVG   |   MAX
+179.818 | 220.167 | 1194.87 (ms)
+   Mode Switches - 757
+Context Switches - 4261
+Cobalt Sys calls - 767
+
+Running summary for task RT_DE_blowfish_S. (19419, 50, RT_DE_blowfish_S)
+Deadline : 243.2 ms.  Missed | Executions 
+                       345 | 533 times
+Primary Mode execution time - 5.31451 ms. Timeouts : 0
+  MIN   |   AVG   |   MAX
+41.076 | 285.837 | 974.304 (ms)
+   Mode Switches - 792
+Context Switches - 3552
+Cobalt Sys calls - 802
+
+Running summary for task RT_DE_basicmath_S. (19420, 50, RT_DE_basicmath_S)
+Deadline : 231.2 ms.  Missed | Executions 
+                       182 | 695 times
+Primary Mode execution time - 3.70325 ms. Timeouts : 0
+  MIN   |   AVG   |   MAX
+44.5316 | 219.218 | 1155.24 (ms)
+   Mode Switches - 700
+Context Switches - 3125
+Cobalt Sys calls - 710

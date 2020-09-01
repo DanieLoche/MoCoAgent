@@ -1,0 +1,2 @@
+ID  name 		     meanET  wcet    isHRT aff  prec path                       arguments
+1 cjpeg_S 7 15 1 1 0 ./bench/cjpeg -dct int -progressive -opt -outfile ./bench/output/o_small_encode.jpeg ./bench/jpg/input_small.ppm

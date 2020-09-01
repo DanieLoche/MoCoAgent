@@ -1,0 +1,68 @@
+Experiment made with parameters : 
+ MoCoAgent: 1
+  Duration: 20
+CPU Factor: 200
+Input  file: ./inputFile
+Output files: ./Experimentations/Expe_26-08-14h/DE_1_20_200_RR_Expe.csv & ./Experimentations/Expe_26-08-14h/DE_1_20_200_RR_Chains.csv & ./Experimentations/Expe_26-08-14h/DE_1_20_200_RR_Resume.txt
+
+Running summary for task RT_DE_bitcount_S. (3530, 50, RT_DE_bitcount_S)
+Deadline : 30 ms.  Missed | (2) | Executions 
+                         0 |   1 | 621 times
+Primary Mode execution time - 4.09042 ms. Timeouts : 0
+  MIN   |   AVG   |   MAX
+4.40118 | 5.75667 | 11.4129 (ms)
+   Mode Switches - 1867
+Context Switches - 2363
+Cobalt Sys calls - 3743
+
+Running summary for task RT_DE_CRC32_S. (3531, 50, RT_DE_CRC32_S)
+Deadline : 30 ms.  Missed | (2) | Executions 
+                         1 |   2 | 582 times
+Primary Mode execution time - 5.05571 ms. Timeouts : 0
+  MIN   |   AVG   |   MAX
+5.60017 | 7.10412 | 85.9398 (ms)
+   Mode Switches - 1750
+Context Switches - 2321
+Cobalt Sys calls - 3557
+
+Running summary for task RT_DE_patricia_L. (3532, 51, RT_DE_patricia_L)
+Deadline : 480 ms.  Missed | (2) | Executions 
+                         0 |   9 | 43 times
+Primary Mode execution time - 0.381109 ms. Timeouts : 0
+  MIN   |   AVG   |   MAX
+79.9576 | 81.2768 | 84.9953 (ms)
+   Mode Switches - 134
+Context Switches - 180
+Cobalt Sys calls - 278
+
+Running summary for task RT_DE_basicmath_S. (3533, 51, RT_DE_basicmath_S)
+Deadline : 60 ms.  Missed | (2) | Executions 
+                        42 |   1 | 332 times
+Primary Mode execution time - 2.42999 ms. Timeouts : 0
+  MIN   |   AVG   |   MAX
+7.74988 | 19.3132 | 98.3284 (ms)
+   Mode Switches - 1001
+Context Switches - 1299
+Cobalt Sys calls - 2059
+
+Running summary for task RT_DE_blowfishE_S. (3534, 50, RT_DE_blowfishE_S)
+Deadline : 30 ms.  Missed | (2) | Executions 
+                         1 |   2 | 578 times
+Primary Mode execution time - 5.17994 ms. Timeouts : 0
+  MIN   |   AVG   |   MAX
+5.9618 | 10.2295 | 98.3298 (ms)
+   Mode Switches - 1738
+Context Switches - 2484
+Cobalt Sys calls - 3784
+
+ Monitoring and Control Agent Stats : 
+Primary Mode execution time - 12.0144 ms. Timeouts : 0
+   Mode Switches - 16
+Context Switches - 4006
+Cobalt Sys calls - 4098
+
+Running summary for Chain DatabaseEncryption. ( 1 )
+Deadline : 10000 ms. Anticipated Misses |  Missed  |  Chain loops 
+                                     0 |          0 | 42 times
+  MIN   |   AVG   |   MAX
+105.172 | 461.897 | 479.089 runtimes (ms)

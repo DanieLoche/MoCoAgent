@@ -1,0 +1,56 @@
+Experiment made with parameters : 
+ MoCoAgent: 0
+  Duration: 60
+CPU Factor: 80
+Input  file: ./inputFile
+Output files: ./Experimentations/Expe_05-08-11h/DE_0_60_80_FIFO_Expe.csv & ./Experimentations/Expe_05-08-11h/DE_0_60_80_FIFO_Chains.csv & ./Experimentations/Expe_05-08-11h/DE_0_60_80_FIFO_Resume.txt
+
+Running summary for task RT_DE_bitcount_S. (19435, 50, RT_DE_bitcount_S)
+Deadline : 189.6 ms.  Missed | Executions 
+                       310 | 620 times
+Primary Mode execution time - 3.96304 ms. Timeouts : 0
+  MIN   |   AVG   |   MAX
+172.965 | 187.14 | 193.776 (ms)
+   Mode Switches - 625
+Context Switches - 3085
+Cobalt Sys calls - 635
+
+Running summary for task RT_DE_CRC32_S. (19436, 50, RT_DE_CRC32_S)
+Deadline : 196 ms.  Missed | Executions 
+                         0 | 620 times
+Primary Mode execution time - 4.60107 ms. Timeouts : 0
+  MIN   |   AVG   |   MAX
+182.272 | 187.173 | 193.774 (ms)
+   Mode Switches - 623
+Context Switches - 3574
+Cobalt Sys calls - 633
+
+Running summary for task RT_DE_patricia_L. (19437, 50, RT_DE_patricia_L)
+Deadline : 3352 ms.  Missed | Executions 
+                         0 | 620 times
+Primary Mode execution time - 2.78328 ms. Timeouts : 0
+  MIN   |   AVG   |   MAX
+172.968 | 187.173 | 201.35 (ms)
+   Mode Switches - 623
+Context Switches - 2218
+Cobalt Sys calls - 633
+
+Running summary for task RT_DE_basicmath_S. (19438, 50, RT_DE_basicmath_S)
+Deadline : 231.2 ms.  Missed | Executions 
+                         0 | 620 times
+Primary Mode execution time - 3.29341 ms. Timeouts : 0
+  MIN   |   AVG   |   MAX
+182.265 | 187.173 | 193.777 (ms)
+   Mode Switches - 623
+Context Switches - 2714
+Cobalt Sys calls - 633
+
+Running summary for task RT_DE_blowfish_S. (19439, 50, RT_DE_blowfish_S)
+Deadline : 243.2 ms.  Missed | Executions 
+                       308 | 310 times
+Primary Mode execution time - 4.4589 ms. Timeouts : 0
+  MIN   |   AVG   |   MAX
+240.332 | 376.573 | 381.542 (ms)
+   Mode Switches - 624
+Context Switches - 2902
+Cobalt Sys calls - 634

@@ -1,0 +1,23 @@
+Experiment made with parameters : 
+ MoCoAgent: 2
+  Duration: 180
+CPU Factor: 100
+Scheduling Policy: FIFO(1)
+Input  file: ./inputFile.in
+Output files: ./Exps/Expe_04-03-18h/ADc_S_0_180_100_FIFO_Expe.csv & ./Exps/Expe_04-03-18h/ADc_S_0_180_100_FIFO_Chains.csv & ./Exps/Expe_04-03-18h/ADc_S_0_180_100_FIFO_Resume.txt
+
+ Monitoring and Control Agent Stats : 
+Primary Mode execution time - 83.4705 ms. Timeouts : 0
+   Mode Switches - 41
+Context Switches - 90041
+Cobalt Sys calls - 90221
+
+Running summary for task RT_adpcmCaudio_S. (7417, 50, RT_adpcmCaudio_S)
+Deadline : 100 ms.  Missed | (2) | Executions 
+                         0 |  19 | 1802 times
+Primary Mode execution time - 6.62105 ms. Timeouts : 0
+  MIN   |   AVG   |   MAX
+0.00316 | 0.011258 | 12.0838 (ms)
+   Mode Switches - 1861
+Context Switches - 3669
+Cobalt Sys calls - 8857

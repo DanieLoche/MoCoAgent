@@ -1,0 +1,56 @@
+Experiment made with parameters : 
+ MoCoAgent: 0
+  Duration: 20
+CPU Factor: 200
+Input  file: ./inputFile
+Output files: ./Experimentations/Expe_26-08-14h/SD_0_20_200_FIFO_Expe.csv & ./Experimentations/Expe_26-08-14h/SD_0_20_200_FIFO_Chains.csv & ./Experimentations/Expe_26-08-14h/SD_0_20_200_FIFO_Resume.txt
+
+Running summary for task RT_SDP_bitcount_L. (14077, 50, RT_SDP_bitcount_L)
+Deadline : 480 ms.  Missed | (2) | Executions 
+                         0 |   1 | 50 times
+Primary Mode execution time - 0.450307 ms. Timeouts : 0
+  MIN   |   AVG   |   MAX
+62.2733 | 68.3414 | 127.476 (ms)
+   Mode Switches - 153
+Context Switches - 203
+Cobalt Sys calls - 313
+
+Running summary for task RT_SDP_fft_L. (14078, 50, RT_SDP_fft_L)
+Deadline : 240 ms.  Missed | (2) | Executions 
+                         1 |   1 | 94 times
+Primary Mode execution time - 0.799425 ms. Timeouts : 0
+  MIN   |   AVG   |   MAX
+59.7459 | 84.5962 | 308.446 (ms)
+   Mode Switches - 285
+Context Switches - 329
+Cobalt Sys calls - 577
+
+Running summary for task RT_SDP_CRC32_L. (14079, 50, RT_SDP_CRC32_L)
+Deadline : 480 ms.  Missed | (2) | Executions 
+                         0 |   8 | 50 times
+Primary Mode execution time - 0.384259 ms. Timeouts : 0
+  MIN   |   AVG   |   MAX
+107.245 | 145.032 | 354.359 (ms)
+   Mode Switches - 153
+Context Switches - 198
+Cobalt Sys calls - 313
+
+Running summary for task RT_SDP_basicmath_L. (14080, 50, RT_SDP_basicmath_L)
+Deadline : 960 ms.  Missed | (2) | Executions 
+                         0 |   3 | 26 times
+Primary Mode execution time - 0.271703 ms. Timeouts : 0
+  MIN   |   AVG   |   MAX
+242.713 | 336.895 | 359.857 (ms)
+   Mode Switches - 81
+Context Switches - 108
+Cobalt Sys calls - 169
+
+Running summary for task RT_SDP_qsort_L. (14081, 50, RT_SDP_qsort_L)
+Deadline : 240 ms.  Missed | (2) | Executions 
+                         1 |   1 | 73 times
+Primary Mode execution time - 0.546261 ms. Timeouts : 0
+  MIN   |   AVG   |   MAX
+36.6776 | 61.2823 | 282.393 (ms)
+   Mode Switches - 222
+Context Switches - 246
+Cobalt Sys calls - 451

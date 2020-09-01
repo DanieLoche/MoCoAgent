@@ -1,0 +1,16 @@
+Experiment made with parameters : 
+ MoCoAgent: 0
+  Duration: 300
+CPU Factor: 100
+Input  file: ./inputFile
+Output files: ./Experimentations/Expe_20-08-17h/SH_L_0_300_100_FIFO_Expe.csv & ./Experimentations/Expe_20-08-17h/SH_L_0_300_100_FIFO_Chains.csv & ./Experimentations/Expe_20-08-17h/SH_L_0_300_100_FIFO_Resume.txt
+
+Running summary for task RT_sha_L. (6205, 50, RT_sha_L)
+Deadline : 100 ms.  Missed | Executions 
+                         0 | 3001 times
+Primary Mode execution time - 7.86407 ms. Timeouts : 0
+  MIN   |   AVG   |   MAX
+22.1425 | 22.9004 | 23.9924 (ms)
+   Mode Switches - 3005
+Context Switches - 6008
+Cobalt Sys calls - 3017

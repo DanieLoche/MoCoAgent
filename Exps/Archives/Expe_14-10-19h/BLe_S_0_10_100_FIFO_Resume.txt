@@ -1,0 +1,16 @@
+Experiment made with parameters : 
+ MoCoAgent: 0
+  Duration: 10
+CPU Factor: 100
+Input  file: ./inputFile
+Output files: ./Experimentations/Expe_14-10-19h/BLe_S_0_10_100_FIFO_Expe.csv & ./Experimentations/Expe_14-10-19h/BLe_S_0_10_100_FIFO_Chains.csv & ./Experimentations/Expe_14-10-19h/BLe_S_0_10_100_FIFO_Resume.txt
+
+Running summary for task RT_blowfishE_S. (15948, 50, RT_blowfishE_S)
+Deadline : 15 ms.  Missed | (2) | Executions 
+                       312 |   1 | 312 times
+Primary Mode execution time - 0.596622 ms. Timeouts : 0
+  MIN   |   AVG   |   MAX
+37.7551 | 38.3759 | 62.165 (ms)
+   Mode Switches - 316
+Context Switches - 319
+Cobalt Sys calls - 950
