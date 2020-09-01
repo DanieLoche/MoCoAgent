@@ -358,7 +358,7 @@ uint MacroTask::before_besteff()
    ERROR_MNG(rt_event_inquire(&_event, &_eventInfos));
    if ( _eventInfos.value & MODE_NOMINAL)
    {
-      dataLogs->logStart();
+      //dataLogs->logStart();
       return  MODE_NOMINAL;
    } else {
       rt_fprintf(stderr, "[%s] [%ld]- Stopped. \n", prop.fP.name, rt_timer_read());
@@ -370,7 +370,7 @@ uint MacroTask::before_besteff()
 
 int MacroTask::after_besteff()
 {
-   dataLogs->logExec();
+   //dataLogs->logExec();
    #if VERBOSE_OTHER
    //cout << "End Task : " << prop.fP.name << endl;
    #endif
