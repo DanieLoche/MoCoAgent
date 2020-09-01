@@ -55,7 +55,8 @@ namespace
 		strftime(buffer, 32, "%Y-%m-%d %T.", gmtime);
 		char microseconds[7];
 		sprintf(microseconds, "%06llu", timestamp % 1000000);
-		os << '[' << buffer << microseconds << ']';
+		//os << '[' << buffer << microseconds << ']';
+		os << buffer << microseconds << ';';
 	}
 
 	std::thread::id this_thread_id()
@@ -139,11 +140,15 @@ namespace nanolog
 		uint32_t line = *reinterpret_cast < uint32_t * >(b); b += sizeof(uint32_t);
 		LogLevel loglevel = *reinterpret_cast < LogLevel * >(b); b += sizeof(LogLevel);
 
-		format_timestamp(os, timestamp);
+		//format_timestamp(os, timestamp);
+		os << timestamp << ';' ;
+		os //<< to_string(loglevel) << ';'
+		   << threadid << ';'
+		   << +function.m_s << ':' << line << "] ";
 
-		os << '[' << to_string(loglevel) << ']'
-		<< '[' << threadid << ']'
-		<< '[' << file.m_s << ':' << function.m_s << ':' << line << "] ";
+		// os << '[' << to_string(loglevel) << ']'
+		// << '[' << threadid << ']'
+		// << '[' << file.m_s << ':' << function.m_s << ':' << line << "] ";
 
 		stringify(os, b, end);
 

@@ -9,10 +9,7 @@ DataLogger::DataLogger(string expeName){
    cptExecutions = 0;
    execLogs = {{0}};
    overruns = 0;
-   //nanolog::initialize(nanolog::GuaranteedLogger(), ".", "nanolog", 1);
-   //LOG_INFO << "This is a Information Log test !";
-   //LOG_WARN << "This is a WARNING log.";
-   //LOG_CRIT << "This is a CRITical log message.";
+
 }
 
 ChainDataLogger::ChainDataLogger(end2endDeadlineStruct _chainInfos, string expeName) : DataLogger(expeName)
@@ -20,12 +17,20 @@ ChainDataLogger::ChainDataLogger(end2endDeadlineStruct _chainInfos, string expeN
    chainInfos = _chainInfos;
    deadline = _chainInfos.deadline;
    cptAnticipatedMisses = 0;
+
+   //nanolog::initialize(nanolog::GuaranteedLogger(), "./", expeName + "_chains", 1);
+
 }
 
 TaskDataLogger::TaskDataLogger(rtTaskInfosStruct _taskInfos, string expeName) : DataLogger(expeName)
 {
    taskInfos = _taskInfos;
    deadline = _taskInfos.rtP.periodicity;
+
+   // nanolog::initialize(nanolog::GuaranteedLogger(), "./", expeName + "_expe", 1);
+   // LOG_INFO << "This is a Information Log test !";
+   // LOG_WARN << "This is a WARNING log.";
+   // LOG_CRIT << "This is a CRITical log message.";
 }
 
 void DataLogger::logStart(RTIME startTime)
