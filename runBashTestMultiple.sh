@@ -17,7 +17,7 @@ commentaire="//"
 
 Infile="input_chaine.txt"
 duration=100
-load=80
+load=100
 schedPolicy=1
 
 while [ "$1" != "" ]; do
@@ -28,14 +28,22 @@ while [ "$1" != "" ]; do
         -l | --load )        shift
                              load=$1
         ;;
-        -s | --sched )       shift
-                             schedPolicy="-s $1"
-        ;;
-        -FIFO | -RR | -RM | -EDF )
-                             schedPolicy=$1
-        ;;
         -d | --duration )    shift
                              duration=$1
+        ;;
+        -s | --sched )     shift
+                           schedPolicy="-s $1"
+                           if test $1 = 1
+                              then schedName="FIFO"
+                           elif test $1 = 2
+                              then schedName="RR"
+                           elif test $1 = 7
+                              then schedName="RM"
+                           else schedName=$1
+                           fi
+        ;;
+        -FIFO | -RR | -RM | -EDF ) schedName="${1:1}"
+                                   schedPolicy=$1
         ;;
         -h | --help )        echo "usage: runBashTest.sh [[[-f file ] [-d duration] [-l load]] | [-h]]"
                              exit 0
@@ -46,16 +54,14 @@ while [ "$1" != "" ]; do
     shift
 done
 
-$iload=`calc $load/100` || $iload=$load
-expeResume=${duration}_${iload}_${schedPolicy}
+echo "Duration : $duration | Load : $load | Scheduling : $schedPolicy (${schedName}) | Input : $Infile | Output : $dirName"
+expeResume=${duration}s_${load}_${schedName}
 dirName=./Exps/`date +%d-%m-%Hh`_$expeResume
-
-echo "Duration : $duration | Load : $load | Scheduling : $schedPolicy | Input : $Infile | Output : $dirName"
-
+exit 0
 
 if test -f $Infile
 then
-    mkdir $dirName
+    mkdir -p $dirName
     for toExecute in {2..6} # exécuter toutes les chaines
     do
         #echo $toExecute
@@ -72,12 +78,12 @@ then
             numLigne=`expr $numLigne + 1`
         done < $Infile > _inputFile.tmp.in
         #echo "Name is "$name
-        sudo sar -o ${dirName}/IODatas${name}_1_${duration}_${load}_${schedPolicy} -P 0-3 1 $duration > /dev/null 2>&1 &
+        sudo sar -o ${dirName}/IODatas${name}_1_${expeResume} -P 0-3 1 $duration > /dev/null 2>&1 &
         ./MoCoAgent.out -e 1  -d $duration -l $load $schedPolicy -i ./_inputFile.tmp.in -o ${dirName}/${name}_1_${expeResume}
         expe1Out=$?
         rm ./bench/output/*
 
-        sudo sar -o ${dirName}/IODatas${name}_0_${duration}_${load}_${schedPolicy} -P 0-3 1 $duration > /dev/null 2>&1 &
+        sudo sar -o ${dirName}/IODatas${name}_0_${expeResume} -P 0-3 1 $duration > /dev/null 2>&1 &
         ./MoCoAgent.out -e 0 -d $duration -l $load $schedPolicy -i ./_inputFile.tmp.in -o ${dirName}/${name}_0_${expeResume}
         expe0Out=$?
         rm ./bench/output/*

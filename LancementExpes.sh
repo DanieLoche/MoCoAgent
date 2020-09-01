@@ -1,3 +1,5 @@
+# Lance la même experimentation selon les 3 ordonancements Possibles : RM, RR, FIFO;
+
 input=input_chaine.txt
 duration=100
 Duration=0

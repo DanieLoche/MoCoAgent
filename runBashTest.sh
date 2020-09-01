@@ -5,11 +5,11 @@
 
 commentaire="//"
 
-Infile="input_chaine.txt"
-duration=100
 dirName=./Exps
+Infile="input_chaine.txt"
 errorDir="error.log.txt"
-load=80
+duration=100
+load=100
 schedPolicy=1
 MoCoMode=1
 
@@ -21,8 +21,16 @@ while [ "$1" != "" ]; do
       -l | --load )        shift
                            load=$1
       ;;
-      -s | --sched )       shift
-                           schedPolicy=$1
+      -s | --sched )     shift
+                         schedPolicy="-s $1"
+                         if test $1 = 1
+                            then schedName="FIFO"
+                         elif test $1 = 2
+                            then schedName="RR"
+                         elif test $1 = 7
+                            then schedName="RM"
+                         else schedName=$1
+                         fi
       ;;
       -d | --duration )    shift
                            duration=$1
@@ -46,10 +54,11 @@ while [ "$1" != "" ]; do
 done
 
 echo "Duration : $duration | Load : $load | Scheduling : $schedPolicy | Input : $Infile | Output : $dirName"
+expeResume=${duration}s_${load}_${schedName}
+dirName=${dirName}/`date +%d-%m-%Hh`_$expeResume
 
 if test -f $Infile
 then
-   dirName=${dirName}/`date +%d-%m-%Hh`_$duration_$load_$schedPolicy
    mkdir -p $dirName
 
 # Identification de la chaine de tâche critique pour donner un nom aux fichiers d'output.
@@ -68,9 +77,9 @@ then
       fi
    done < $Infile
 
-   expeName=${name}_$MoCoMode_${duration}_${load}_${schedPolicy}
+   expeName=${name}_$MoCoMode_${expeResume}
    sar -o ${dirName}/IODatas_$expeName -P 0-3 1 $duration > /dev/null 2>&1 &
-   ./MoCoAgent.out -e $MoCoMode -d $duration -l $load -s $schedPolicy -i ./$Infile -o ${dirName}/$expeName 2> $errorDir
+   ./MoCoAgent.out -e $MoCoMode -d $duration -l $load $schedPolicy -i ./$Infile -o ${dirName}/$expeName 2> $errorDir
    expe2Out=$?
    rm ./bench/output/*
 

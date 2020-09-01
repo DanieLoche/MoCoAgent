@@ -9,7 +9,7 @@ calc(){ awk "BEGIN { print "$*" }"; }
 
 commentaire="//"
 
-Infile="input_chaine.txt"
+Infile="input_benchmarkTasks.in"
 duration=100
 load=100
 schedPolicy=1
@@ -22,19 +22,27 @@ while [ "$1" != "" ]; do
          -i | -f | --input )     shift
             Infile=$1
             ;;
-         -d | --duration )    	shift
+         -d | --duration )  shift
             duration=$1
             ;;
-         -l | --load )		shift
+         -l | --load )		 shift
          	load=$1
          	;;
-         -s | --sched )		shift
-         	schedPolicy=$1
+         -s | --sched )     shift
+                            schedPolicy="-s $1"
+                            if test $1 = 1
+                               then schedName="FIFO"
+                            elif test $1 = 2
+                               then schedName="RR"
+                            elif test $1 = 7
+                               then schedName="RM"
+                            else schedName=$1
+                            fi
          	;;
-         -h | --help )           echo "usage: runBashTest.sh [[[-i inputfile] [-d duration] [-l load]] | [-h]]"
+         -h | --help )      echo "usage: runBashTest.sh [[[-i inputfile] [-d duration] [-l load]] | [-h]]"
             exit
             ;;
-         * )                     echo "usage: runBashTest.sh [[[-i inputfile] [-d duration] [-l load]] | [-h]]"
+         * )                echo "usage: runBashTest.sh [[[-i inputfile] [-d duration] [-l load]] | [-h]]"
             exit 1
             esac
             shift
@@ -42,9 +50,8 @@ done
 
 
 
-expeResume=${duration}_${load}_${schedPolicy}
+expeResume=${duration}_${load}_${schedName}
 dirName=./Exps/`date +%d-%m-%Hh`_${expeResume}
-
 echo "Duration : $duration | Load : $load | Scheduling : $schedPolicy | Input : $Infile | Output : $dirName"
 
 if test -f $Infile
@@ -69,11 +76,10 @@ then
 #        sudo sar -o ${dirName}/IODatas${name}_1_${duration}_${load}_${schedPolicy} -P 0-3 1 $duration > /dev/null 2>&1 &
 #        ./MoCoAgent.out true  $duration $load _inputFile.tmp.in ${dirName}/${name}_1_${duration}_${load}_${schedPolicy} $schedPolicy
 #        expe1Out=$?
-#        rm ./bench/output/*
 
         #sudo sar -o ${dirName}/IODatas${name}_0_${duration}_${load}_${schedPolicy} -P 0-3 1 $duration > /dev/null 2>&1 &
-        echo "> ./MoCoAgent.out -e 2 -d $duration -l $load -i ./inputFile.in -o ${dirName}/${name}_2_${expeResume}"
-        sudo ./MoCoAgent.out -e 2 -d $duration -l $load -i _inputFile.tmp.in -o ${dirName}/${name}_2_${expeResume}
+        echo "> ./MoCoAgent.out -e 2 -d $duration -l $load ${schedPolicy} -i ./inputFile.in -o ${dirName}/${name}_2_${expeResume}"
+        sudo ./MoCoAgent.out -e 2 -d $duration -l $load ${schedPolicy} -i _inputFile.tmp.in -o ${dirName}/${name}_2_${expeResume}
         expe0Out=$?
         rm -f ./_inputFile.tmp.in
         ./bench/output/eraseOutputs.sh
