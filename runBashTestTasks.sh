@@ -57,7 +57,7 @@ echo "Duration : $duration | Load : $load | Scheduling : $schedPolicy | Input : 
 if test -f $Infile
 then
     mkdir -p $dirName
-    for toExecute in {2..50} # exécuter toutes les chaines
+    for toExecute in {2..51} # exécuter toutes les chaines
     do
         #echo $toExecute
         numLigne=1
