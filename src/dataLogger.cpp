@@ -111,7 +111,7 @@ void TaskDataLogger::saveData(int nameSize, RT_TASK_INFO* cti)
    RTIME min_runtime = execLogs[0].duration;
    RTIME somme = 0;
 
-   for (int i = 1; i < BUFF_SIZE; ++i)
+   for (int i = LOG_VALUES_REMOVAL; i < (BUFF_SIZE - LOG_VALUES_REMOVAL); ++i)
    {
       RTIME _dur = execLogs[i].duration;
       if (execLogs[i].timestamp != 0)
@@ -171,10 +171,10 @@ void ChainDataLogger::saveData(int nameSize, RT_TASK_INFO* cti )
 
    double average_runtime = 0;
    RTIME max_runtime = 0;
-   RTIME min_runtime = execLogs[0].duration;
+   RTIME min_runtime = execLogs[LOG_VALUES_REMOVAL].duration; // offset = LOG_VALUES_REMOVAL
    RTIME sommeTime = 0;
 
-   for (int i = 0; i < BUFF_SIZE-1; i++) // Last element probably not finished !
+   for (int i = LOG_VALUES_REMOVAL; i < (BUFF_SIZE - LOG_VALUES_REMOVAL -1); ++i) // Last element probably not finished !
    {
       const RTIME _dur = execLogs[i].duration;
       if (execLogs[i].timestamp != 0)
@@ -191,7 +191,7 @@ void ChainDataLogger::saveData(int nameSize, RT_TASK_INFO* cti )
       }
    }
    outputFileChainData.close();
-/*
+/* CODE EN CAS D'OVERFLOW SUR LES CALCULS DE DURATION... A priori pas utile.
    RTIME s[16] = {0};
    int div = 0;
    for (int i = 0; i < BUFF_SIZE; ++i)

@@ -6,6 +6,7 @@
 #include <iomanip>
 
 #define BUFF_SIZE    4096
+#define LOG_VALUES_REMOVAL 20    // we ignore the first xx values from the log buffer for output.
 #define MASK_SIZE    0xfff
 struct timeLog
 {

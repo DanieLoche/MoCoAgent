@@ -220,13 +220,13 @@ int TaskLauncher::runTasks(long expeDuration)
          if (currentTaskDescriptor.fP.isHRT == 0) {
             //rt_fprintf(stderr, "[ %s ] - Execution in progress - BE.\n", currentTaskDescriptor.fP.name);
             rt_print_flush_buffers();
-
+            rt_task_sleep(_mSEC(100)); // on attend que le système se stabilise avant de lancer le Control.
             currentProcess->executeRun_besteffort();
          }
          else {
             //rt_fprintf(stderr, "[ %s ] - Execution in progress - CT.\n", currentTaskDescriptor.fP.name);
             rt_print_flush_buffers();
-
+            rt_task_sleep(_mSEC(100)); // on attend que le système se stabilise avant de lancer le Control.
             currentProcess->executeRun();
          }
 ///////////////////////////////////////////////////////////
