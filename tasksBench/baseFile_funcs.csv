@@ -1,8 +1,8 @@
 	name	For C/P only	wcet(uSEC)	period (ms)	isHRT	aff	prec	path	parameters
 	adpcmCaudio_L	adpcmCaudio_L	5520000	100	1	1	0	adpcm_rawcaudio	< ./bench/adpcm/large.pcm > ./bench/output/o_large.adpcm
-	adpcmCaudio_S	adpcmCaudio_S	10000000	100	1	1	0	adpcm_rawcaudio	< ./bench/adpcm/small.pcm > ./bench/output/o_small.adpcm
+	adpcmCaudio_S	adpcmCaudio_S	10000000	200	1	1	0	adpcm_rawcaudio	< ./bench/adpcm/small.pcm > ./bench/output/o_small.adpcm
 	adpcmDaudio_L	adpcmDaudio_L	14300000	100	1	1	0	adpcm_rawdaudio	< ./bench/adpcm/large.adpcm > ./bench/output/o_large.pcm
-	adpcmDaudio_S	adpcmDaudio_S	4050000	100	1	1	0	adpcm_rawdaudio	< ./bench/adpcm/small.adpcm > ./bench/output/o_small.pcm
+	adpcmDaudio_S	adpcmDaudio_S	4050000	200	1	1	0	adpcm_rawdaudio	< ./bench/adpcm/small.adpcm > ./bench/output/o_small.pcm
 	cjpeg_L	cjpeg_L	5970000	100	1	1	0	cjpeg	-dct int -progressive -opt -outfile ./bench/output/o_large_encode.jpeg ./bench/jpg/input_large.ppm
 	cjpeg_S	cjpeg_S	4710000	100	1	1	0	cjpeg	-dct int -progressive -opt -outfile ./bench/output/o_small_encode.jpeg ./bench/jpg/input_small.ppm
 	CRC32_L	CRC32_L	1	100	1	1	0	crc	< ./bench/data/large.pcm > ./bench/output/o_crc_large.txt
@@ -13,9 +13,9 @@
 	djpeg_S	djpeg_S	5190000	100	1	1	0	djpeg	-dct int -ppm -outfile ./bench/output/o_small_decode.ppm ./bench/jpg/input_small.jpg
 	fft_inv_L	fft_inv_L	1650000	100	1	1	0	fft	8 16384 -i > ./bench/output/o_ffti_large.inv.txt
 	fft_L	fft_L	1940000	100	1	1	0	fft	8 8192 > ./bench/output/o_fft_large.txt
-	susan_L_corners	susan_L_corners	100	100	1	1	0	susan_bin	-c < ./bench/susan/input_large.pgm > ./bench/output/o_susan_large.corners.pgm
-	susan_L_edges	susan_L_edges	100	100	1	1	0	susan_bin	-e < ./bench/susan/input_large.pgm > ./bench/output/o_susan_large.edges.pgm
-	susan_L_smooth	susan_L_smooth	100	100	1	1	0	susan_bin	-s < ./bench/susan/input_large.pgm > ./bench/output/o_susan_large.smoothing.pgm
+	susan_L_corners	susan_L_corners	100	200	1	1	0	susan_bin	-c < ./bench/susan/input_large.pgm > ./bench/output/o_susan_large.corners.pgm
+	susan_L_edges	susan_L_edges	100	200	1	1	0	susan_bin	-e < ./bench/susan/input_large.pgm > ./bench/output/o_susan_large.edges.pgm
+	susan_L_smooth	susan_L_smooth	100	200	1	1	0	susan_bin	-s < ./bench/susan/input_large.pgm > ./bench/output/o_susan_large.smoothing.pgm
 	susan_S_corners	susan_S_corners	100	100	1	1	0	susan_bin	-c < ./bench/susan/input_small.pgm > ./bench/output/o_susan_small.corners.pgm
 	susan_S_edges	susan_S_edges	100	100	1	1	0	susan_bin	-e < ./bench/susan/input_small.pgm > ./bench/output/o_susan_small.edges.pgm
 	susan_S_smooth	susan_S_smooth	100	100	1	1	0	susan_bin	-s < ./bench/susan/input_small.pgm > ./bench/output/o_susan_small.smoothing.pgm
@@ -45,7 +45,7 @@
 	rijndaelD_S	rijndaelD_S	7915	100	1	1	0	rijndael	d 1234567890abcdeffedcba09876543211234567890abcdeffedcba0987654321 < ./bench/rijndael/output_small.enc > ./bench/output/output_small.dec
 	rijndaelE_L	rijndaelE_L	75987	100	1	1	0	rijndael	e 1234567890abcdeffedcba09876543211234567890abcdeffedcba0987654321 < ./bench/rijndael/input_large.asc > ./bench/output/output_large.enc
 	rijndaelE_S	rijndaelE_S	14064	100	1	1	0	rijndael	e 1234567890abcdeffedcba09876543211234567890abcdeffedcba0987654321 < ./bench/rijndael/input_small.asc > ./bench/output/output_small.enc
-	sha_L	sha_L	35196	100	1	1	0	sha	< ./bench/sha/input_large.asc > ./bench/output/o_sha_large.txt
+	sha_L	sha_L	35196	200	1	1	0	sha	< ./bench/sha/input_large.asc > ./bench/output/o_sha_large.txt
 	sha_S	sha_S	4215	100	1	1	0	sha	< ./bench/sha/input_small.asc > ./bench/output/o_sha_small.txt
 	stringsearch_L	stringsearch_L	404	100	1	1	0	search_large	> ./bench/output/o_search_large.txt
 	stringsearch_S	stringsearch_S	6412	100	1	1	0	search_small	> ./bench/output/o_search_small.txt
