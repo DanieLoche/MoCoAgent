@@ -95,7 +95,6 @@ class TaskProcess
 
       TaskProcess(rtTaskInfosStruct _taskInfo);
       virtual void executeRun() = 0;
-      virtual void executeRun_besteffort() = 0;
       void saveData(int nameMaxSize);
 };
 
@@ -105,26 +104,39 @@ class MacroTask : public TaskProcess
       int ret;
       TaskDataLogger* dataLogs;
       int (*proceed_function)(int Argc, char *argv[]);
-
-      //void setRTtask(rtPStruct _rtInfos, char*);
       void findFunction(char* _func);
-      inline int before();
-      inline int proceed();
-      inline int after();
-      inline uint before_besteff();
-      inline int after_besteff();
 
    public :
       rtTaskInfosStruct prop;
 
       MacroTask(rtTaskInfosStruct taskInfos, bool MoCoMode, string name);
+      inline virtual uint before() = 0;
+      inline int proceed();
+      inline virtual int after() = 0;
       void saveData(int maxNameSize, RT_TASK_INFO* cti = NULL);
-      void executeRun();
-      void executeRun_besteffort();
-
 };
 
-class MCAgent : public TaskProcess
+class RTMacroTask : public MacroTask
+{
+   public:
+      RTMacroTask(rtTaskInfosStruct taskInfos, bool MoCoMode, string name);
+
+      inline uint before();
+      inline int after();
+      void executeRun();
+};
+
+class BEMacroTask : public MacroTask
+{
+   public:
+      BEMacroTask(rtTaskInfosStruct taskInfos, bool MoCoMode, string name);
+
+      inline uint before();
+      inline int after();
+      void executeRun();
+};
+
+class Agent : public TaskProcess
 {
    protected :
       RT_TASK msgReceiverTask;
@@ -144,14 +156,33 @@ class MCAgent : public TaskProcess
       void displayChains();
 
    public :
-      MCAgent(rtTaskInfosStruct _taskInfo,
+      Agent(rtTaskInfosStruct _taskInfo,
       std::vector<end2endDeadlineStruct> e2eDD,
       std::vector<rtTaskInfosStruct> tasksSet);
       void updateTaskInfo(monitoringMsg msg);
       void saveData();
-      //static void finishProcess(void* _mcAgent /*MCAgent* task*/);
+
       void executeRun();
-      void executeRun_besteffort();
+};
+
+class MonitoringAgent : public Agent
+{
+   public:
+      MonitoringAgent(rtTaskInfosStruct _taskInfo,
+      std::vector<end2endDeadlineStruct> e2eDD,
+      std::vector<rtTaskInfosStruct> tasksSet);
+
+      void executeRun();
+};
+
+class MonitoringControlAgent : public Agent
+{
+   public:
+      MonitoringControlAgent(rtTaskInfosStruct _taskInfo,
+      std::vector<end2endDeadlineStruct> e2eDD,
+      std::vector<rtTaskInfosStruct> tasksSet);
+
+      void executeRun();
 };
 
    int do_load           (int argc, char* argv[]);

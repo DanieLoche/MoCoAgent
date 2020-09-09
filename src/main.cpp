@@ -112,11 +112,9 @@ int main(int argc, char* argv[])
    outputFileResume.close();
    if(tln->runTasks(expeDuration)) {cerr << "Failed to create all tasks" << endl; return -4;}
 
-   if (enableAgent)
-   {
-      sleep(2);
-      tln->runAgent(expeDuration);
-   }
+   sleep(2);
+   tln->runAgent(expeDuration);
+
 
    //sleeping the time that all tasks will be started
    //sleep(2);

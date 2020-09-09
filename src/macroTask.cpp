@@ -227,6 +227,12 @@ MacroTask::MacroTask(rtTaskInfosStruct _taskInfo, bool MoCo, string _name) : Tas
 
 }
 
+RTMacroTask::RTMacroTask(rtTaskInfosStruct _taskInfo, bool MoCo, string _name) : MacroTask(_taskInfo, MoCo, _name)
+{}
+
+BEMacroTask::BEMacroTask(rtTaskInfosStruct _taskInfo, bool MoCo, string _name) : MacroTask(_taskInfo, MoCo, _name)
+{}
+
 void MacroTask::findFunction (char* _func)
 {
    if      (!strcmp(_func, "basicmath_small")) proceed_function = basicmath_small;
@@ -258,7 +264,7 @@ void MacroTask::findFunction (char* _func)
 
 }
 
-int MacroTask::before()
+uint RTMacroTask::before()
 {
    #if VERBOSE_OTHER
    //rt_fprintf(stderr, "[ %s ] - Executing Before.\n", prop.fP.name);
@@ -307,7 +313,7 @@ int MacroTask::proceed()
    return ret;
 }
 
-int MacroTask::after()
+int RTMacroTask::after()
 {
    #if VERBOSE_OTHER
    //rt_fprintf(stderr, "[ %s ] - Executing After.\n", prop.fP.name);
@@ -331,7 +337,7 @@ int MacroTask::after()
    return 0;
 }
 
-void MacroTask::executeRun()
+void RTMacroTask::executeRun()
 {
    if (MoCoIsAlive)
    {
@@ -353,7 +359,7 @@ void MacroTask::executeRun()
 ////////////////////////////////////////////////////////////////////////////////////////
 
 
-uint MacroTask::before_besteff()
+uint BEMacroTask::before()
 {
    ERROR_MNG(rt_event_inquire(&_event, &_eventInfos));
    if ( _eventInfos.value & MODE_NOMINAL)
@@ -368,7 +374,7 @@ uint MacroTask::before_besteff()
 
 }
 
-int MacroTask::after_besteff()
+int BEMacroTask::after()
 {
    //dataLogs->logExec();
    #if VERBOSE_OTHER
@@ -378,7 +384,7 @@ int MacroTask::after_besteff()
 }
 
 
-void MacroTask::executeRun_besteffort()
+void BEMacroTask::executeRun()
 {
    //cout << "Running..." << endl;
    if (MoCoIsAlive)
@@ -395,10 +401,10 @@ void MacroTask::executeRun_besteffort()
 
    while (MoCoIsAlive)
    {
-      if (before_besteff() & MODE_NOMINAL) // Check if execution allowed
+      if (before() & MODE_NOMINAL) // Check if execution allowed
       {
          if (proceed() == 0)  // execute task
-            after_besteff();  // Inform of execution time for the mcAgent
+            after();  // Inform of execution time for the mcAgent
       }
       else {
          rt_event_wait(&_event, MODE_NOMINAL, NULL , EV_PRIO, TM_INFINITE);

@@ -174,6 +174,7 @@ int TaskLauncher::runTasks(long expeDuration)
       #if VERBOSE_INFO
       cout << "Creating Task " << taskInfo.fP.name << "." << endl;
       #endif
+
       pid_t pid = fork();
       if (pid == 0) // proc fils
       {
@@ -181,10 +182,15 @@ int TaskLauncher::runTasks(long expeDuration)
          setvbuf(stderr, NULL, _IOLBF, 4096) ; // _IOLBF
 
          currentTaskDescriptor = taskInfo;
+         MacroTask* currentProcess;
+
          //RT_TASK _t;
          //ERROR_MNG(rt_task_shadow(&_t, "TOTO", 1, 0));
          //sleep(50);
-         MacroTask* currentProcess = new MacroTask(currentTaskDescriptor, enableAgent, outputFileName);
+         if (currentTaskDescriptor.fP.isHRT == 0)
+            currentProcess = new BEMacroTask(currentTaskDescriptor, enableAgent, outputFileName);
+         else
+            currentProcess = new RTMacroTask(currentTaskDescriptor, enableAgent, outputFileName);
 
          #if VERBOSE_DEBUG
          //rt_printf("[ %s ] - Process created (pid = %d).\n", currentTaskDescriptor.fP.name, getpid());
@@ -217,18 +223,12 @@ int TaskLauncher::runTasks(long expeDuration)
          rt_fprintf(stderr, "[ %s ] - Semaphor %s signal received, go !\n", currentTaskDescriptor.fP.name, SEM_NAME);
          #endif
          //rt_task_sleep(_mSEC(10));
-         if (currentTaskDescriptor.fP.isHRT == 0) {
+
             //rt_fprintf(stderr, "[ %s ] - Execution in progress - BE.\n", currentTaskDescriptor.fP.name);
             rt_print_flush_buffers();
-            rt_task_sleep(_mSEC(100)); // on attend que le système se stabilise avant de lancer le Control.
-            currentProcess->executeRun_besteffort();
-         }
-         else {
-            //rt_fprintf(stderr, "[ %s ] - Execution in progress - CT.\n", currentTaskDescriptor.fP.name);
-            rt_print_flush_buffers();
-            rt_task_sleep(_mSEC(100)); // on attend que le système se stabilise avant de lancer le Control.
+            //rt_task_sleep(_mSEC(100)); // on attend que le système se stabilise avant de lancer le Control.
             currentProcess->executeRun();
-         }
+
 ///////////////////////////////////////////////////////////
 /////////////// END OF EXPERIMENT /////////////////////////
          rt_fprintf(stderr, "[ %llu ][ %s ] - Waiting Semaphor...\n", rt_timer_read(), currentProcess->prop.fP.name);
@@ -281,7 +281,14 @@ int TaskLauncher::runAgent(long expeDuration)
    //sleep(2);
    //system("find /run/xenomai") ; // see what the registry is looking like
    cout << std::flush;
-   MCAgent* currentProcess = new MCAgent(MoCoAgentParams, chainSet, tasksSet);
+   Agent* currentProcess;
+   if (enableAgent == 2)
+      currentProcess = new MonitoringControlAgent(MoCoAgentParams, chainSet, tasksSet);
+   else if (enableAgent == 1)
+      currentProcess = new MonitoringAgent(MoCoAgentParams, chainSet, tasksSet);
+   else currentProcess = new Agent(MoCoAgentParams, chainSet, tasksSet);
+
+
    rt_printf("[ %s ] - Process created (pid = %d).\n", currentTaskDescriptor.fP.name, getpid()); //cout << "["<< currentTaskDescriptor.fP.name << "]"<< "Macro task created." << endl;
    //sleep(50);
 
@@ -316,8 +323,8 @@ int TaskLauncher::runAgent(long expeDuration)
 
    rt_sem_broadcast(&_syncSem); // Alarms OK. Start Run !
    rt_task_wait_period(0);
-   if (enableAgent == 2) currentProcess->executeRun_besteffort();
-   else currentProcess->executeRun();
+
+   currentProcess->executeRun();
 
 ///////////////////////////////////////////////////////////
 /////////////// END OF EXPERIMENT /////////////////////////
@@ -369,7 +376,7 @@ int TaskLauncher::runAgent(long expeDuration)
 
 void TaskLauncher::finishMoCoAgent(void* _arg)
 {
-   MCAgent* MoCoAgent_task = (MCAgent*) _arg;
+   Agent* MoCoAgent_task = (Agent*) _arg;
 
    rt_printf("====== End of Experimentation. Saving Data. ======\n");
    //cout << "Checking tasks names :" << endl;

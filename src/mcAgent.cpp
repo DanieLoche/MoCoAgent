@@ -3,7 +3,7 @@
 
 void messageReceiver(void* arg)
 {
-   MCAgent* mocoAgent = (MCAgent*) arg;
+   Agent* mocoAgent = (Agent*) arg;
    monitoringMsg msg;
    while(TRUE)
    {
@@ -21,7 +21,7 @@ void messageReceiver(void* arg)
    }
 }
 
-MCAgent::MCAgent(rtTaskInfosStruct _taskInfo,
+Agent::Agent(rtTaskInfosStruct _taskInfo,
                   std::vector<end2endDeadlineStruct> e2eDD,
                   std::vector<rtTaskInfosStruct> tasksSet) : TaskProcess (_taskInfo)
 {
@@ -43,7 +43,19 @@ MCAgent::MCAgent(rtTaskInfosStruct _taskInfo,
    #endif
 }
 
-void MCAgent::initCommunications()
+MonitoringAgent::MonitoringAgent(rtTaskInfosStruct _taskInfo,
+                  std::vector<end2endDeadlineStruct> e2eDD,
+                  std::vector<rtTaskInfosStruct> tasksSet) :
+                  Agent(_taskInfo, e2eDD, tasksSet)
+{ }
+
+MonitoringControlAgent::MonitoringControlAgent(rtTaskInfosStruct _taskInfo,
+                  std::vector<end2endDeadlineStruct> e2eDD,
+                  std::vector<rtTaskInfosStruct> tasksSet) :
+                  Agent(_taskInfo, e2eDD, tasksSet)
+{ }
+
+void Agent::initCommunications()
 {
    //int ret = 0;
    ERROR_MNG(rt_buffer_create(&_buff, MESSAGE_TOPIC_NAME, 20*sizeof(monitoringMsg), B_FIFO));
@@ -60,7 +72,7 @@ void MCAgent::initCommunications()
 *           liste d' ID de chaines de tâche avec e2e deadline associées
 * @returns : /
 ***********************/
-void MCAgent::setAllDeadlines(std::vector<end2endDeadlineStruct> _tcDeadlineStructs)
+void Agent::setAllDeadlines(std::vector<end2endDeadlineStruct> _tcDeadlineStructs)
 {
    #if VERBOSE_INFO
    rt_printf("[ MoCoAgent ] - setting deadlines.\n");
@@ -82,7 +94,7 @@ void MCAgent::setAllDeadlines(std::vector<end2endDeadlineStruct> _tcDeadlineStru
 *           liste des tâches d'entrée.
 * @returns : /
 ***********************/
-void MCAgent::setAllTasks(std::vector<rtTaskInfosStruct> _TasksInfos)
+void Agent::setAllTasks(std::vector<rtTaskInfosStruct> _TasksInfos)
 {
    #if VERBOSE_INFO
    rt_printf("[ MoCoAgent ] - setting tasks.\n");
@@ -136,8 +148,18 @@ int MCAgent::checkTaskChains()
 }
 */
 
+void Agent::executeRun()
+{
+   while(MoCoIsAlive)
+   {
+      rt_task_sleep(10);
+
+      rt_task_wait_period(NULL);
+   }
+}
+
 //const timespec noWait_time = {0,0};
-void MCAgent::executeRun()
+void MonitoringControlAgent::executeRun()
 {
    //int ret_msg = 0;
    while(MoCoIsAlive)
@@ -181,7 +203,7 @@ void MCAgent::executeRun()
 
 }
 
-void MCAgent::executeRun_besteffort()
+void MonitoringAgent::executeRun()
 {
    setMode(MODE_DISABLE);
    while(MoCoIsAlive)
@@ -201,7 +223,7 @@ void MCAgent::executeRun_besteffort()
 
 // METHODE OPTIMISABLE SUR LE PARCOURS
 // DES TACHE EN TRIANT LES TAKS LISTS.
-void MCAgent::updateTaskInfo(monitoringMsg msg)
+void Agent::updateTaskInfo(monitoringMsg msg)
 {
    //RT_TASK_INFO curtaskinfo;
    //rt_task_inquire((RT_TASK*) msg.task, &curtaskinfo);
@@ -249,7 +271,7 @@ void MCAgent::updateTaskInfo(monitoringMsg msg)
 * Envoi un signal Condition de MODE
 * Parcours toutes les tâches best effort pour Suspend/Resume
 ***********************/
-void MCAgent::setMode(uint _newMode)
+void Agent::setMode(uint _newMode)
 {
    //cout << "[MONITORING & CONTROL AGENT] Change mode to " << ((mode>0)?"OVERLOADED":"NOMINAL") << ". " << endl;
    if (_newMode & MODE_DISABLE)  runtimeMode = MODE_DISABLE;
@@ -291,7 +313,7 @@ void MCAgent::setMode(uint _newMode)
    }
 }
 
-void MCAgent::saveData()
+void Agent::saveData()
 {
    MoCoIsAlive = 0;
    string file = _stdOut;
@@ -346,7 +368,7 @@ void MCAgent::saveData()
 * @params : [ systemRTInfo sInfos ]
 * @returns : cout
 ***********************/
-void MCAgent::displaySystemInfo(std::vector<end2endDeadlineStruct> _e2eDD,
+void Agent::displaySystemInfo(std::vector<end2endDeadlineStruct> _e2eDD,
                                  std::vector<rtTaskInfosStruct> _tasksSet)
 {
    #if VERBOSE_ASK
@@ -375,7 +397,7 @@ void MCAgent::displaySystemInfo(std::vector<end2endDeadlineStruct> _e2eDD,
    #endif
 }
 
-void MCAgent::displayChains()
+void Agent::displayChains()
 {
    #if VERBOSE_INFO
    cout << "Displaying MoCoAgent Database : " << "\n";
