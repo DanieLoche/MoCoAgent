@@ -77,7 +77,7 @@ then
       fi
    done < $Infile
 
-   expeName=${name}_$MoCoMode_${expeResume}
+   expeName=${name}_$MoCoMode #_${expeResume}
    sar -o ${dirName}/IODatas_$expeName -P 0-3 1 $duration > /dev/null 2>&1 &
    ./MoCoAgent.out -e $MoCoMode -d $duration -l $load $schedPolicy -i ./$Infile -o ${dirName}/$expeName 2> $errorDir
    expe2Out=$?
