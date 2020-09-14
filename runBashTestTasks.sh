@@ -22,6 +22,9 @@ while [ "$1" != "" ]; do
          -i | -f | --input )     shift
             Infile=$1
             ;;
+         -o | --output )     shift  ## Output folder suffix
+            ISSTRESSED=$1
+            ;;
          -d | --duration )  shift
             duration=$1
             ;;
@@ -51,7 +54,7 @@ done
 
 
 expeResume=${duration}_${load}_${schedName}
-dirName=./Exps/`date +%d-%m-%Hh`_${expeResume}
+dirName=./Exps/`date +%d-%m-%Hh`_${expeResume}_${ISSTRESSED}
 echo "Duration : $duration | Load : $load | Scheduling : $schedPolicy | Input : $Infile | Output : $dirName"
 
 if test -f $Infile

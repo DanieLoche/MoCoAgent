@@ -23,7 +23,7 @@ while [ "$1" != "" ]; do
     shift
 done
 
-./runBashTestTasks.sh -i $input -s 1 -d $duration -l $load ;
+./runBashTestTasks.sh -i $input -s 1 -d $duration -l $load -o ISOL;
 result=$? ;
-#rm ./bench/output/*
+rm ./bench/output/*
 echo "Result : $result"

@@ -1,4 +1,6 @@
-input=input_benchmarkTasks.in
+#!/usr/bin/env bash
+
+input=input_benchmarkTasksStress.in
 duration=100
 Duration=0
 load=100
@@ -27,9 +29,9 @@ done
 sudo stress-ng --cache 4 &
 sudo stress-ng --io 4 &
 
-./runBashTestTasks.sh -i $input -s 1 -d $duration -l $load ;
+./runBashTestTasks.sh -i $input -s 1 -d $duration -l $load -o STRESS;
 result=$? ;
-#rm ./bench/output/*
+rm ./bench/output/*
 
 
 #Libération des stressors
