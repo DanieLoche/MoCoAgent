@@ -80,8 +80,8 @@ then
         echo "> ./MoCoAgent.out -e 2 -d $duration -l $load ${schedPolicy} -i ./inputFile.in -o ${dirName}/${name}_2" #_${expeResume}"
         sudo ./MoCoAgent.out -e 2 -d $duration -l $load ${schedPolicy} -i _inputFile.tmp.in -o ${dirName}/${name}_2 #_${expeResume}
         expe0Out=$?
-        rm -f ./_inputFile.tmp.in
-        ./bench/output/eraseOutputs.sh
+        sudo rm -f ./_inputFile.tmp.in
+        ## ./bench/output/eraseOutputs.sh
 #        echo "expe1out : $expe1Out"
         echo "expe0out : $expe0Out"
     done

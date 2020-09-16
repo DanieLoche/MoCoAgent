@@ -81,7 +81,7 @@ then
    sar -o ${dirName}/IODatas_$expeName -P 0-3 1 $duration > /dev/null 2>&1 &
    ./MoCoAgent.out -e $MoCoMode -d $duration -l $load $schedPolicy -i ./$Infile -o ${dirName}/$expeName 2> $errorDir
    expe2Out=$?
-   rm ./bench/output/*
+   sudo rm ./bench/output/*
 
    echo "expe${MoCoMode}out : $expe0Out"
 

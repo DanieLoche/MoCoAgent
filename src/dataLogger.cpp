@@ -111,7 +111,7 @@ void TaskDataLogger::saveData(int nameSize, RT_TASK_INFO* cti)
    RTIME min_runtime = execLogs[0].duration;
    RTIME somme = 0;
 
-   for (int i = LOG_VALUES_REMOVAL; i < (BUFF_SIZE - LOG_VALUES_REMOVAL); ++i)
+   for (int i = LOG_VALUES_REMOVAL; i < (BUFF_SIZE - ((cptExecutions <= BUFF_SIZE)?LOG_VALUES_REMOVAL:0) ); ++i)
    {
       RTIME _dur = execLogs[i].duration;
       if (execLogs[i].timestamp != 0)
@@ -134,7 +134,7 @@ void TaskDataLogger::saveData(int nameSize, RT_TASK_INFO* cti)
    outputFileTasksData.close();
 
    if (cptExecutions <= BUFF_SIZE && cptExecutions > 0)
-      average_runtime = somme / cptExecutions;
+      average_runtime = somme / (cptExecutions - LOG_VALUES_REMOVAL);
    else average_runtime = somme / BUFF_SIZE;
 
       int ret = 0;
@@ -174,7 +174,7 @@ void ChainDataLogger::saveData(int nameSize, RT_TASK_INFO* cti )
    RTIME min_runtime = execLogs[LOG_VALUES_REMOVAL].duration; // offset = LOG_VALUES_REMOVAL
    RTIME sommeTime = 0;
 
-   for (int i = LOG_VALUES_REMOVAL; i < (BUFF_SIZE - LOG_VALUES_REMOVAL -1); ++i) // Last element probably not finished !
+   for (int i = LOG_VALUES_REMOVAL; i < (BUFF_SIZE - ((cptExecutions <= BUFF_SIZE)?LOG_VALUES_REMOVAL:0) -1); ++i) // Last element probably not finished !
    {
       const RTIME _dur = execLogs[i].duration;
       if (execLogs[i].timestamp != 0)
@@ -224,8 +224,8 @@ void ChainDataLogger::saveData(int nameSize, RT_TASK_INFO* cti )
    }
 */
 
-   if (cptExecutions > 0 && cptExecutions <= BUFF_SIZE)
-      average_runtime = sommeTime / cptExecutions;
+   if (cptExecutions <= BUFF_SIZE && cptExecutions > 0)
+      average_runtime = sommeTime / (cptExecutions - LOG_VALUES_REMOVAL);
    else average_runtime = sommeTime / BUFF_SIZE; // on a pas enregistré plus de BUFF_SIZE valeurs;
 
    std::ofstream outputFileResume;

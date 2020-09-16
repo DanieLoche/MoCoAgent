@@ -81,12 +81,12 @@ then
         sudo sar -o ${dirName}/IODatas${name}_1 -P 0-3 1 $duration > /dev/null 2>&1 &
         ./MoCoAgent.out -e 1  -d $duration -l $load $schedPolicy -i ./_inputFile.tmp.in -o ${dirName}/${name}_1 #_${expeResume}
         expe1Out=$?
-        rm ./bench/output/*
+        sudo rm -f ./bench/output/*
 
         sudo sar -o ${dirName}/IODatas${name}_0 -P 0-3 1 $duration > /dev/null 2>&1 &
         ./MoCoAgent.out -e 0 -d $duration -l $load $schedPolicy -i ./_inputFile.tmp.in -o ${dirName}/${name}_0 #_${expeResume}
         expe0Out=$?
-        rm ./bench/output/*
+        sudo rm -f ./bench/output/*
         rm -f ./_inputFile.tmp.in
         echo "expe1out : $expe1Out"
         echo "expe0out : $expe0Out"
