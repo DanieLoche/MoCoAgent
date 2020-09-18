@@ -78,7 +78,7 @@ then
 
         #sudo sar -o ${dirName}/IODatas${name}_0_${duration}_${load}_${schedPolicy} -P 0-3 1 $duration > /dev/null 2>&1 &
         echo "> ./MoCoAgent.out -e 2 -d $duration -l $load ${schedPolicy} -i ./inputFile.in -o ${dirName}/${name}_2" #_${expeResume}"
-        sudo ./MoCoAgent.out -e 2 -d $duration -l $load ${schedPolicy} -i _inputFile.tmp.in -o ${dirName}/${name}_2 #_${expeResume}
+        sudo ./MoCoAgent.out -e 0 -d $duration -l $load ${schedPolicy} -i _inputFile.tmp.in -o ${dirName}/${name}_2 #_${expeResume}
         expe0Out=$?
         sudo rm -f ./_inputFile.tmp.in
         ## ./bench/output/eraseOutputs.sh

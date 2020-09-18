@@ -1,6 +1,4 @@
 name             chaineID   Path                        deadline
-typeset_L        5       ./tasksBench/typeset_L.in         5000      TS_L
-typeset_S        5       ./tasksBench/typeset_S.in         5000      TS_S
 do_load          20      ./tasksBench/load_L.in            100       Ld_L
 no_load          20      ./tasksBench/load_S.in            100       Ln_S
 bitcount_L       1       ./tasksBench/bitcount_L.in        5000      BC_L
@@ -11,8 +9,8 @@ blowfishE_L      9       ./tasksBench/blowfishE_L.in       5000      BLe_L
 blowfishE_S      9       ./tasksBench/blowfishE_S.in       5000      BLe_S
 basicmath_S      1       ./tasksBench/basicmath_S.in       5000      BM_S
 basicmath_L      1       ./tasksBench/basicmath_L.in       5000      BM_L
-dijkstra_L       6       ./tasksBench/dijkstra_L.in        5000      DJK_L
-dijkstra_S       6       ./tasksBench/dijkstra_S.in        5000      DJK_S
+//dijkstra_L       6       ./tasksBench/dijkstra_L.in        5000      DJK_L
+//dijkstra_S       6       ./tasksBench/dijkstra_S.in        5000      DJK_S
 fft_inv_L        13      ./tasksBench/fft_inv_L.in         5000      FFi_L
 fft_inv_S        13      ./tasksBench/fft_inv_S.in         5000      FFi_S
 fft_L            13      ./tasksBench/fft_L.in             5000      FF_L
@@ -47,5 +45,5 @@ susan_L_edges    3       ./tasksBench/susan_L_edges.in     5000      SUe_L
 susan_S_edges    3       ./tasksBench/susan_S_edges.in     5000      SUe_S
 susan_L_smooth   3       ./tasksBench/susan_L_smooth.in    5000      SUs_L
 susan_S_smooth   3       ./tasksBench/susan_S_smooth.in    5000      SUs_S
-CRC32_L          12      ./tasksBench/CRC32_L.in           5000      CR_L
-CRC32_S          12      ./tasksBench/CRC32_S.in           5000      CR_S
+//CRC32_L          12      ./tasksBench/CRC32_L.in           5000      CR_L
+//CRC32_S          12      ./tasksBench/CRC32_S.in           5000      CR_S

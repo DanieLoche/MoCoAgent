@@ -11,7 +11,7 @@ errorDir="error.log.txt"
 duration=100
 load=100
 schedPolicy=1
-MoCoMode=1
+MoCoMode=1  # 0 : disable | 1 = Monitoring | 2 = Monitoring & Control
 
 while [ "$1" != "" ]; do
    case $1 in

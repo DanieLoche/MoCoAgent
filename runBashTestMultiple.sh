@@ -79,7 +79,7 @@ then
         done < $Infile > _inputFile.tmp.in
         #echo "Name is "$name
         sudo sar -o ${dirName}/IODatas${name}_1 -P 0-3 1 $duration > /dev/null 2>&1 &
-        ./MoCoAgent.out -e 1  -d $duration -l $load $schedPolicy -i ./_inputFile.tmp.in -o ${dirName}/${name}_1 #_${expeResume}
+        ./MoCoAgent.out -e 2  -d $duration -l $load $schedPolicy -i ./_inputFile.tmp.in -o ${dirName}/${name}_1 #_${expeResume}
         expe1Out=$?
         sudo rm -f ./bench/output/*
 
