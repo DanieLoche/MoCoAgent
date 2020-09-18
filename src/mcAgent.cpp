@@ -25,19 +25,16 @@ Agent::Agent(rtTaskInfosStruct _taskInfo,
                   std::vector<end2endDeadlineStruct> e2eDD,
                   std::vector<rtTaskInfosStruct> tasksSet) : TaskProcess (_taskInfo)
 {
-   MoCoIsAlive = TRUE;
+   MoCoIsAlive = FALSE;
+
    //displaySystemInfo(e2eDD, tasksSet);
    runtimeMode = MODE_NOMINAL;
-   initCommunications();
 
    setAllDeadlines(e2eDD);
    setAllTasks(tasksSet);
 
    displayChains();
-   rt_print_flush_buffers();
 
-   //rt_task_sleep(1);
-   ERROR_MNG(rt_task_spawn(&msgReceiverTask, "MonitoringTask", 0, 98, 0, messageReceiver, this));
    #if VERBOSE_INFO
    rt_printf("[ MoCoAgent ] - READY.\n");
    #endif
@@ -47,23 +44,32 @@ MonitoringAgent::MonitoringAgent(rtTaskInfosStruct _taskInfo,
                   std::vector<end2endDeadlineStruct> e2eDD,
                   std::vector<rtTaskInfosStruct> tasksSet) :
                   Agent(_taskInfo, e2eDD, tasksSet)
-{ }
+{
+   MoCoIsAlive = TRUE;
+   initCommunications();
+
+   ERROR_MNG(rt_task_spawn(&msgReceiverTask, "MonitoringTask", 0, 98, 0, messageReceiver, this));
+
+   rt_print_flush_buffers();
+}
 
 MonitoringControlAgent::MonitoringControlAgent(rtTaskInfosStruct _taskInfo,
                   std::vector<end2endDeadlineStruct> e2eDD,
                   std::vector<rtTaskInfosStruct> tasksSet) :
                   Agent(_taskInfo, e2eDD, tasksSet)
-{ }
+{
+   MoCoIsAlive = TRUE;
+   initCommunications();
+
+   ERROR_MNG(rt_task_spawn(&msgReceiverTask, "MonitoringTask", 0, 98, 0, messageReceiver, this));
+
+   rt_print_flush_buffers();
+}
 
 void Agent::initCommunications()
 {
-   //int ret = 0;
    ERROR_MNG(rt_buffer_create(&_buff, MESSAGE_TOPIC_NAME, 20*sizeof(monitoringMsg), B_FIFO));
-   //string mutexName = (string) MESSAGE_TOPIC_NAME + "_mtx";
-   //ERROR_MNG(rt_mutex_create(&_bufMtx, mutexName.c_str()));
-   //rt_printf("Buffer %s creation : %s (%d).\n", MESSAGE_TOPIC_NAME, getErrorName(ret), ret);
    ERROR_MNG(rt_event_create(&_event, CHANGE_MODE_EVENT_NAME, 0, EV_PRIO));
-   //rt_printf("Event %s creation : %s (%d).\n",CHANGE_MODE_EVENT_NAME, getErrorName(ret), ret);
 }
 
 /***********************
@@ -150,11 +156,30 @@ int MCAgent::checkTaskChains()
 
 void Agent::executeRun()
 {
-   while(MoCoIsAlive)
+   while(!EndOfExpe)
    {
-      rt_task_sleep(10);
+      rt_task_sleep(_mSEC(1));
 
-      rt_task_wait_period(NULL);
+      rt_task_wait_period(&overruns);
+   }
+}
+
+
+void MonitoringAgent::executeRun()
+{
+   setMode(MODE_DISABLE);
+   while(!EndOfExpe)
+   {
+      for (auto& _taskChain : allTaskChain)
+      {
+         // Execute part //
+         if ( _taskChain.checkTaskE2E() && !_taskChain.isAtRisk)
+         {
+            _taskChain.isAtRisk = TRUE;
+            _taskChain.logger->cptAnticipatedMisses++;
+         }
+      }
+      rt_task_wait_period(&overruns);
    }
 }
 
@@ -162,7 +187,7 @@ void Agent::executeRun()
 void MonitoringControlAgent::executeRun()
 {
    //int ret_msg = 0;
-   while(MoCoIsAlive)
+   while(!EndOfExpe)
    {
       /*
       ret_msg = rt_buffer_read(&_buff, &msg, sizeof(monitoringMsg), TM_NONBLOCK);
@@ -181,16 +206,16 @@ void MonitoringControlAgent::executeRun()
          break;
          case sizeof(monitoringMsg) :
          */
-            for (auto& _taskChain : allTaskChain)
-            {
-               // Execute part //
-               if ( _taskChain.checkTaskE2E() && !_taskChain.isAtRisk)
-               {
-                  _taskChain.isAtRisk = TRUE;
-                  _taskChain.logger->cptAnticipatedMisses++;
-                  setMode(MODE_OVERLOADED);
-               }
-            }
+      for (auto& _taskChain : allTaskChain)
+      {
+         // Execute part //
+         if ( _taskChain.checkTaskE2E() && !_taskChain.isAtRisk)
+         {
+            _taskChain.isAtRisk = TRUE;
+            _taskChain.logger->cptAnticipatedMisses++;
+            setMode(MODE_OVERLOADED);
+         }
+      }
       /*      break;
             //CASES(-ETIMEDOUT, -EINTR, -EINVAL, -EIDRM, -EPERM)
             default :
@@ -201,24 +226,6 @@ void MonitoringControlAgent::executeRun()
       rt_task_wait_period(&overruns);
    }
 
-}
-
-void MonitoringAgent::executeRun()
-{
-   setMode(MODE_DISABLE);
-   while(MoCoIsAlive)
-   {
-      for (auto& _taskChain : allTaskChain)
-      {
-         // Execute part //
-         if ( _taskChain.checkTaskE2E() && !_taskChain.isAtRisk)
-         {
-            _taskChain.isAtRisk = TRUE;
-            _taskChain.logger->cptAnticipatedMisses++;
-         }
-      }
-      rt_task_wait_period(&overruns);
-   }
 }
 
 // METHODE OPTIMISABLE SUR LE PARCOURS
@@ -243,6 +250,7 @@ void Agent::updateTaskInfo(monitoringMsg msg)
                _taskChain.logger->logStart(msg.time);
                _task.setState(TRUE);
             }
+
             #if WITH_BOOL
             if (msg.isExecuted && _taskChain.checkPrecedency(_task.precedencyID))
             #else
@@ -315,7 +323,7 @@ void Agent::setMode(uint _newMode)
 
 void Agent::saveData()
 {
-   MoCoIsAlive = 0;
+   EndOfExpe = TRUE;
    string file = _stdOut;
 
    //rt_task_delete(&msgReceiverTask);
@@ -334,32 +342,34 @@ void Agent::saveData()
    }
 */
    int nameMaxSize = 8;
-   if (!allTaskChain.empty())
+   if (MoCoIsAlive)
    {
-      for (auto taskInfo = allTaskChain.begin(); taskInfo != allTaskChain.end(); ++taskInfo)
+      if (!allTaskChain.empty())
       {
-         int sizeName = strlen(taskInfo->name);
-         if (sizeName > nameMaxSize) nameMaxSize = sizeName;
+         for (auto taskInfo = allTaskChain.begin(); taskInfo != allTaskChain.end(); ++taskInfo)
+         {
+            int sizeName = strlen(taskInfo->name);
+            if (sizeName > nameMaxSize) nameMaxSize = sizeName;
+         }
+
+         std::ofstream outputFileChainData;
+         outputFileChainData.open (file + CHAIN_FILE);    // TO APPEND :  //,ios_base::app);
+
+         outputFileChainData << std::setw(15)           << "timestamp" << " ; "
+                             << std::setw(nameMaxSize) << "Chain"     << " ; "
+                             << std::setw(2)            << "ID"        << " ; "
+                             << std::setw(10)           << "deadline"  << " ; "
+                             << std::setw(10)           << "duration"  << endl;
+
+         outputFileChainData.close();
+
+         for (auto _taskChain : allTaskChain)
+         {
+               _taskChain.logger->saveData(nameMaxSize);
+         }
       }
-
-      std::ofstream outputFileChainData;
-      outputFileChainData.open (file + CHAIN_FILE);    // TO APPEND :  //,ios_base::app);
-
-      outputFileChainData << std::setw(15)           << "timestamp" << " ; "
-                          << std::setw(nameMaxSize) << "Chain"     << " ; "
-                          << std::setw(2)            << "ID"        << " ; "
-                          << std::setw(10)           << "deadline"  << " ; "
-                          << std::setw(10)           << "duration"  << endl;
-
-      outputFileChainData.close();
-
-      for (auto _taskChain : allTaskChain)
-      {
-            _taskChain.logger->saveData(nameMaxSize);
-      }
+      else cerr << "WOAW !! Chain set is empty !!" << endl;
    }
-   else cerr << "WOAW !! Chain set is empty !!" << endl;
-
 }
 
 /***********************

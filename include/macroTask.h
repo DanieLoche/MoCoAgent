@@ -89,6 +89,7 @@ class TaskProcess
 
    public:
       static bool MoCoIsAlive;
+      static bool EndOfExpe;
       //RT_MUTEX _bufMtx;
       RT_TASK _task;
       RT_BUFFER _buff;
@@ -157,8 +158,8 @@ class Agent : public TaskProcess
 
    public :
       Agent(rtTaskInfosStruct _taskInfo,
-      std::vector<end2endDeadlineStruct> e2eDD,
-      std::vector<rtTaskInfosStruct> tasksSet);
+            std::vector<end2endDeadlineStruct> e2eDD,
+            std::vector<rtTaskInfosStruct> tasksSet);
       void updateTaskInfo(monitoringMsg msg);
       void saveData();
 
@@ -169,8 +170,8 @@ class MonitoringAgent : public Agent
 {
    public:
       MonitoringAgent(rtTaskInfosStruct _taskInfo,
-      std::vector<end2endDeadlineStruct> e2eDD,
-      std::vector<rtTaskInfosStruct> tasksSet);
+                     std::vector<end2endDeadlineStruct> e2eDD,
+                     std::vector<rtTaskInfosStruct> tasksSet);
 
       void executeRun();
 };
@@ -179,8 +180,8 @@ class MonitoringControlAgent : public Agent
 {
    public:
       MonitoringControlAgent(rtTaskInfosStruct _taskInfo,
-      std::vector<end2endDeadlineStruct> e2eDD,
-      std::vector<rtTaskInfosStruct> tasksSet);
+                              std::vector<end2endDeadlineStruct> e2eDD,
+                              std::vector<rtTaskInfosStruct> tasksSet);
 
       void executeRun();
 };

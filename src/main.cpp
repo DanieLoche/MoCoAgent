@@ -7,7 +7,7 @@
 //MCAgent* mca;
 
 string inputFile = "input_chaine.txt", outputFile = "default";
-int enableAgent = 1; // 0 = Disable | 1 = Enable | 2 = Enable for monitoring only
+int enableAgent = 1; // 0 = Disable | 1 = Enable Monitoring only | 2 = Enable for Control too
 int expeDuration = 60;
 int schedMode = SCHED_FIFO, cpuFactor = 100;
 
@@ -55,7 +55,7 @@ int main(int argc, char* argv[])
       }
 
       else if (arg == "-e" || arg == "--enable")
-      {// ENABLE MoCoAgent - parse true/false as bool
+      {// ENABLE MoCoAgent - parse true/false as int
          TRY_CONV("MoCoAgent mode", argv, enableAgent);
       }
 

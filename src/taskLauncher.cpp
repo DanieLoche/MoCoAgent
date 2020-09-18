@@ -266,7 +266,7 @@ int TaskLauncher::runAgent(long expeDuration)
    rtTaskInfosStruct MoCoAgentParams = {
       0,          // Affinity
       98,         // Priority
-      SCHED_RR, // Scheduling POLICY
+      SCHED_FIFO, // Scheduling POLICY
       _mSEC(MCA_PERIOD), // periodicity
       99,         // id
       99,0,0,     // isHRT/task chain ID,precedency & WCET.
@@ -401,7 +401,7 @@ void TaskLauncher::finishTask(void* _MacroTask)
 {
    MacroTask* currentProcess = (MacroTask*) _MacroTask;
 
-   currentProcess->MoCoIsAlive = 0;
+   currentProcess->EndOfExpe = TRUE;
    return;
    rt_fprintf(stderr, "[ %llu ][ %s ] - Waiting Semaphor...\n", rt_timer_read(), currentProcess->prop.fP.name);
    rt_print_flush_buffers();

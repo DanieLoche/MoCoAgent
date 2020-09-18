@@ -2,7 +2,8 @@
 //#include <utmpx.h>    // Pour fonction getcpu()
 
 
-bool TaskProcess::MoCoIsAlive = FALSE;
+bool TaskProcess::MoCoIsAlive = TRUE;
+bool TaskProcess::EndOfExpe = FALSE;
 
 TaskProcess::TaskProcess(rtTaskInfosStruct _taskInfo)
 {
@@ -264,6 +265,38 @@ void MacroTask::findFunction (char* _func)
 
 }
 
+int MacroTask::proceed()
+{
+   #if VERBOSE_OTHER
+   //rt_fprintf(stderr, "[ %s ] - Executing Proceed.\n", prop.fP.name);
+   #endif
+
+   int ret = proceed_function(_argv.size()-1, &_argv[0]);  // -1 : no need for last element "NULL".
+   if (ret != 0)
+   {
+      rt_fprintf(stderr, "[ %s ] - Proceed error. (%d) function was : ", prop.fP.name, ret);
+      for (auto arg : _argv)
+      {
+         string toPrint;
+         if (arg==NULL)toPrint = "null";
+         else toPrint = arg;
+         rt_fprintf(stderr, " %s", toPrint.c_str());
+      }
+      rt_fprintf(stderr, "(%d elements)\n", _argv.size()-1);
+   }
+   return ret;
+}
+
+void MacroTask::saveData(int maxNameSize, RT_TASK_INFO* cti)
+{
+   dataLogs->saveData(maxNameSize, cti);
+   EndOfExpe = TRUE;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////// RT MacroTask /////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+
 uint RTMacroTask::before()
 {
    #if VERBOSE_OTHER
@@ -291,28 +324,6 @@ uint RTMacroTask::before()
    return 0;
 }
 
-int MacroTask::proceed()
-{
-   #if VERBOSE_OTHER
-   //rt_fprintf(stderr, "[ %s ] - Executing Proceed.\n", prop.fP.name);
-   #endif
-
-   int ret = proceed_function(_argv.size()-1, &_argv[0]);  // -1 : no need for last element "NULL".
-   if (ret != 0)
-   {
-      rt_fprintf(stderr, "[ %s ] - Proceed error. (%d) function was : ", prop.fP.name, ret);
-      for (auto arg : _argv)
-      {
-         string toPrint;
-         if (arg==NULL)toPrint = "null";
-         else toPrint = arg;
-         rt_fprintf(stderr, " %s", toPrint.c_str());
-      }
-      rt_fprintf(stderr, "(%d elements)\n", _argv.size()-1);
-   }
-   return ret;
-}
-
 int RTMacroTask::after()
 {
    #if VERBOSE_OTHER
@@ -323,16 +334,19 @@ int RTMacroTask::after()
    msg.isExecuted = 1;
    #endif
 
-   ret = rt_buffer_write(&_buff , &msg , sizeof(monitoringMsg) , _mSEC(1));
-   if(MoCoIsAlive && (ret != sizeof(monitoringMsg)))
+   if (MoCoIsAlive)
    {
-      //MoCoIsAlive = 0;
-      RT_BUFFER_INFO infos;
-      ERROR_MNG(rt_buffer_inquire(&_buff, &infos));
-      fprintf(stderr, "[ %s ] - ERROR %s (%d) - failed to write AFTER monitoring message to buffer %s. (MoCo mode : %d)\n",
-                     prop.fP.name, getErrorName(ret), ret, MESSAGE_TOPIC_NAME, MoCoIsAlive);
-      fprintf(stderr, "Memory Available on buffer : %lu / %lu. %d waiting too.\n", infos.availmem, infos.totalmem, infos.owaiters);
-      rt_print_flush_buffers();
+      ret = rt_buffer_write(&_buff , &msg , sizeof(monitoringMsg) , _mSEC(1));
+      if(ret != sizeof(monitoringMsg))
+      {
+         //MoCoIsAlive = 0;
+         RT_BUFFER_INFO infos;
+         ERROR_MNG(rt_buffer_inquire(&_buff, &infos));
+         fprintf(stderr, "[ %s ] - ERROR %s (%d) - failed to write AFTER monitoring message to buffer %s. (MoCo mode : %d)\n",
+                        prop.fP.name, getErrorName(ret), ret, MESSAGE_TOPIC_NAME, MoCoIsAlive);
+         fprintf(stderr, "Memory Available on buffer : %lu / %lu. %d waiting too.\n", infos.availmem, infos.totalmem, infos.owaiters);
+         rt_print_flush_buffers();
+      }
    }
    return 0;
 }
@@ -346,7 +360,7 @@ void RTMacroTask::executeRun()
       //ERROR_MNG(rt_mutex_bind(&_bufMtx, mutexName.c_str(), _mSEC(500)));
    }
    //rt_fprintf(stderr, "Running...\n");
-   while (MoCoIsAlive)
+   while (!EndOfExpe)
    {
       //cout << "Task" << prop.name << " working." << endl;
       if (before() == 0) // Check if execution allowed
@@ -356,33 +370,39 @@ void RTMacroTask::executeRun()
    }
 }
 
-////////////////////////////////////////////////////////////////////////////////////////
-
+////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////// BEMacroTask //////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 
 uint BEMacroTask::before()
 {
-   ERROR_MNG(rt_event_inquire(&_event, &_eventInfos));
-   if ( _eventInfos.value & MODE_NOMINAL)
+   if (MoCoIsAlive & 2)
    {
-      //dataLogs->logStart();
-      return  MODE_NOMINAL;
-   } else {
-      rt_fprintf(stderr, "[%s] [%ld]- Stopped. \n", prop.fP.name, rt_timer_read());
-      return 0;
+      ERROR_MNG(rt_event_inquire(&_event, &_eventInfos));
+      if ( _eventInfos.value & MODE_NOMINAL)
+      {
+         dataLogs->logStart();
+         return  MODE_NOMINAL;
+      } else {
+         rt_fprintf(stderr, "[%s] [%ld]- Stopped. \n", prop.fP.name, rt_timer_read());
+         return 0;
+      }
+   } else
+   {
+      dataLogs->logStart();
+      return MODE_NOMINAL;
    }
-
 
 }
 
 int BEMacroTask::after()
 {
-   //dataLogs->logExec();
+   dataLogs->logExec();
    #if VERBOSE_OTHER
    //cout << "End Task : " << prop.fP.name << endl;
    #endif
    return 0;
 }
-
 
 void BEMacroTask::executeRun()
 {
@@ -391,20 +411,21 @@ void BEMacroTask::executeRun()
    {
       ERROR_MNG(rt_event_bind(&_event, CHANGE_MODE_EVENT_NAME, _mSEC(500)));
    }
-   int amount = prop.rtP.periodicity;
-   for (int i = 0 ; i < amount ; ++i)
-   {
-      proceed();
-      rt_task_wait_period(&dataLogs->overruns);
-
-   }
-
-   while (MoCoIsAlive)
-   {
-      if (before() & MODE_NOMINAL) // Check if execution allowed
+   /*
+      int amount = prop.rtP.periodicity;
+      for (int i = 0 ; i < amount ; ++i)
       {
-         if (proceed() == 0)  // execute task
-            after();  // Inform of execution time for the mcAgent
+         proceed();
+         rt_task_wait_period(&dataLogs->overruns);
+
+      }
+   */
+   while (!EndOfExpe)
+   {
+      if (before() & MODE_NOMINAL)  // Check if execution allowed
+      {
+         if (proceed() == 0)        // execute task
+            after();                // Log  execution.
       }
       else {
          rt_event_wait(&_event, MODE_NOMINAL, NULL , EV_PRIO, TM_INFINITE);
@@ -415,13 +436,9 @@ void BEMacroTask::executeRun()
 
 }
 
-void MacroTask::saveData(int maxNameSize, RT_TASK_INFO* cti)
-{
-   dataLogs->saveData(maxNameSize, cti);
-   MoCoIsAlive = 0;
-}
-
-
+////////////////////////////////////////////////////////////////////////////////
+////////////////////// Xenomai Specific tasks //////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 
 int do_load (int argc, char* argv[])
 {
