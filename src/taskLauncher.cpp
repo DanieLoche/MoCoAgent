@@ -55,6 +55,7 @@ int TaskLauncher::readChainsList(string input_file)
        #endif
    }
 
+   chainSet.shrink_to_fit();
    if (!chainSet.empty())
    {
       printChainSetInfos ( );
@@ -91,12 +92,12 @@ int TaskLauncher::readTasksList(int cpuPercent)
          if (str.substr(0,2) != "//")
          {
             float tmp_wcet = 0;
-            int tmp_period = 0;
+            int tmp_period = 0, tmp_HRT = 0;
             char name[28];
             if (!(iss >> taskInfo->fP.id >> name
                       >> tmp_wcet     // WCET -> for task chain // placeholder.
                       >> tmp_period   // meanET -> period
-                      >> taskInfo->fP.isHRT
+                      >> tmp_HRT
                       >> taskInfo->rtP.affinity
                       >> taskInfo->fP.prec
                       >> taskInfo->fP.func ) )
@@ -110,7 +111,7 @@ int TaskLauncher::readTasksList(int cpuPercent)
             taskInfo->fP.args = reduce(taskInfo->fP.args);
 
             taskInfo->fP.wcet = _uSEC(tmp_wcet);              // conversion us to RTIME (ns)
-            taskInfo->rtP.priority = abs(taskInfo->fP.isHRT);
+            taskInfo->rtP.priority = abs(tmp_HRT);
             taskInfo->fP.isHRT = std::max(0,sign(taskInfo->fP.isHRT)); //0 for BE, 1 for HRT
             // Traitement de la périodicité de la tâche
             taskInfo->rtP.periodicity = cpuFactor * _mSEC(tmp_period); //taskInfo->periodicity = taskInfo->periodicity * 1.0e6 * cpuFactor;
@@ -157,6 +158,7 @@ int TaskLauncher::readTasksList(int cpuPercent)
       if (sizeName > nameMaxSize) nameMaxSize = sizeName;
    }
 
+   tasksSet.shrink_to_fit();
    printTaskSetInfos();
 
    return 0;
@@ -350,6 +352,8 @@ int TaskLauncher::runAgent(long expeDuration)
       RT_TASK* _t;
       ERROR_MNG(rt_task_bind(_t, taskInfo.fP.name, _mSEC(500)));
       rtTasks.push_back(new RT_TASK(*_t));
+
+      rtTasks.shrink_to_fit();
    }*/
 
    RTIME time = rt_timer_read();

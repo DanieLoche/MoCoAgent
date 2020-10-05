@@ -81,8 +81,8 @@ void printTaskInfo(rtTaskInfosStruct* task)
 
 void print_affinity(pid_t _pid)
 {
-   long nproc = get_nprocs();
    #if VERBOSE_ASK
+   long nproc = get_nprocs();
    int pid = _pid;
    if (!_pid)
    {

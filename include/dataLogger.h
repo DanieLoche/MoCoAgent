@@ -8,20 +8,22 @@
 #define BUFF_SIZE    4096
 #define LOG_VALUES_REMOVAL 20    // we ignore the first xx values from the log buffer for output.
 #define MASK_SIZE    0xfff
+
+//=========================//
+//=== Task Data Logger ===//
 struct timeLog
 {
    RTIME timestamp;
-   RTIME duration;
+   unsigned long duration;
 };
 
 class DataLogger
 {
    protected :
-      std::array<timeLog, BUFF_SIZE> execLogs;
-      int cptOutOfDeadline;
+      uint cptOutOfDeadline;
       uint cptExecutions;
-      int logPointer;
-      RTIME deadline;
+      //int logPointer;
+      unsigned long deadline;
       string outputFileName;
 
       virtual char* getName() =0;
@@ -30,35 +32,52 @@ class DataLogger
       unsigned long overruns;
       DataLogger(string expeName );
 
-      void logStart(RTIME );
-      RTIME logStart();
-      void logExec(RTIME );
-      RTIME logExec();
       virtual void saveData(int nameSize, RT_TASK_INFO* cti) = 0;
 };
 
 class TaskDataLogger : public DataLogger
 {
    protected:
+      std::array<timeLog, BUFF_SIZE> execLogs;
       rtTaskInfosStruct taskInfos;
       inline char* getName();
 
    public :
       TaskDataLogger(rtTaskInfosStruct, string expeName);
+
+      void logStart(RTIME );
+      RTIME logStart();
+      void logExec(RTIME );
+      RTIME logExec();
       void saveData(int nameSize, RT_TASK_INFO* cti = NULL);
 
+};
+
+//=========================//
+//=== Chain Data Logger ===//
+struct chainLog
+{
+   RTIME timestamp;
+   unsigned long duration;
+   unsigned long* rWCETs;
 };
 
 class ChainDataLogger : public DataLogger
 {
    protected:
+      std::array<chainLog, BUFF_SIZE> execLogs;
       end2endDeadlineStruct chainInfos;
       inline char* getName();
+      int chainSize;
+      int cptWCET;
 
    public :
       int cptAnticipatedMisses;
 
       ChainDataLogger(end2endDeadlineStruct, string expeName);
+      void logChain(timeLog _execLog);
+      void logWCET(unsigned long time);
+      void setLogArray(int size);
       void saveData(int nameSize, RT_TASK_INFO* cti = NULL);
 
 };

@@ -5,6 +5,7 @@
 bool TaskProcess::MoCoIsAlive = TRUE;
 bool TaskProcess::EndOfExpe = FALSE;
 
+
 TaskProcess::TaskProcess(rtTaskInfosStruct _taskInfo)
 {
    printTaskInfo(&_taskInfo);
@@ -157,6 +158,7 @@ void TaskProcess::parseParameters(string _arguments)
    }
    _argv.push_back(0);
 
+   _argv.shrink_to_fit();
    //token.copy(argv[i], token.size()); // arguments list must end with a null.
    #if VERBOSE_OTHER
    rt_printf("        Arguments : ");

@@ -102,8 +102,8 @@ struct rtPStruct // Real-time Parameters
 
 struct funcPStruct   // Functional parameters
 {
-   int id;
-   int isHRT;     // task chain ID or best effort if null
+   uint id;
+   uint isHRT;     // task chain ID or best effort if null
    int prec;
    RTIME wcet;   //
    char name[32]; //
@@ -133,7 +133,7 @@ struct sortDescendingPeriod {
 struct end2endDeadlineStruct
 {
   char name[32];
-  int taskChainID;
+  uint taskChainID;
   string Path;
   RTIME deadline;
 };
@@ -142,7 +142,7 @@ struct end2endDeadlineStruct
 struct monitoringMsg
 {
    //RT_TASK* task;
-   int ID;
+   uint ID;
    RTIME time;   // Run-time - task start received
    RTIME endTime; // task duration
    #if WITH_BOOL

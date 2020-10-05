@@ -25,26 +25,43 @@ const RTIME Wmax     =     _mSEC(MCA_PERIOD);    // next slice max time
 #define XENO_INIT(_name) do_xeno_init(_name)
 int do_xeno_init(char* name);
 
+struct ExecTimes
+{
+   RTIME start;
+   RTIME end;
+};
+
 class taskMonitoringStruct
 {
    private :
       #if USE_MUTEX
       RT_MUTEX mtx_taskStatus;
       #endif
-      bool isExecuted; // Run-time - computed
-
+      //bool isExecuted; // Run-time - computed  // will be USELESS //
+      uint maxPendingChains;
    public :
-      int precedencyID;
+      uint precedencyID;
+
+      // A AJOUTER POUR GERER PLUSIEURS OCCURENCES //
+      uint oldestElement, newestElement;
+      ExecTimes* execLogs; // tableau =new timelog[n]
+      taskMonitoringStruct* precedentTask;
+      ChainDataLogger* logger;
+      bool addEntry(ExecTimes times);
+      bool emptyPrecedency( RTIME limitTime, RTIME endOfChain); // récursif
+      ///////////////////////////////////////////////
+
       RT_TASK xenoTask;
-      int id;
+      uint id;
       //RTIME endTime;     // Run-time - received
-      RTIME deadline;    // Static
+      RTIME deadline;    // Static = period
       RTIME rwcet;       // Static
       //bool operator <(const taskMonitoringStruct& tms) const {return (id < tms.id);}
 
       taskMonitoringStruct(rtTaskInfosStruct rtTaskInfos);
+      void setChainInfos(int bufsize, taskMonitoringStruct* prec);
       void setState(bool state);
-      bool getState();
+      ExecTimes getState();
 };
 
 class taskChain
@@ -52,21 +69,28 @@ class taskChain
    public :
       ChainDataLogger* logger;
       char name[32];
-      int chainID;                // static
+      uint chainID;                // static
       RTIME end2endDeadline; // static
       RTIME startTime;       // Runtime - deduced
       RTIME currentEndTime;  // Runtime - deduced
       RTIME remWCET;         // Runtime - computed
       bool isAtRisk;         // Runtime - deduced
+
+      // A AJOUTER POUR GERER PLUSIEURS OCCURENCES //
+      taskMonitoringStruct* lastTask;
+      void setPrecedencies();
+      void updateStartTime();
+      bool unloadChain(RTIME endOfChain);  // renvoi la date de début de chaine;
+      ///////////////////////////////////////////////
       std::vector<taskMonitoringStruct> taskList;
 
       taskChain(end2endDeadlineStruct _tcDeadline, string outfile);
 
-      bool checkPrecedency(int taskID);
-      bool checkTaskE2E();
-      bool checkIfEnded();
+      //bool checkPrecedency(uint taskID); // devient useless
+      bool checkTaskE2E();    // a modifier
+      //bool checkIfEnded();    // a modifier // devient USELESS
       void displayTasks();
-      void resetChain();
+      //void resetChain();      // a modifier => void unloadChain()
    private:
       RTIME getExecutionTime();
       RTIME getRemWCET();
@@ -148,7 +172,7 @@ class Agent : public TaskProcess
       std::vector<RT_TASK> bestEffortTasks;
 
       void initCommunications();
-      void setAllDeadlines(std::vector<end2endDeadlineStruct> _tcDeadlineStructs);
+      void setAllChains(std::vector<end2endDeadlineStruct> _tcDeadlineStructs);
       void setAllTasks(std::vector<rtTaskInfosStruct> _TasksInfos);
       void setMode(uint mode);
       //int checkTaskChains();
@@ -174,9 +198,11 @@ class MonitoringAgent : public Agent
                      std::vector<rtTaskInfosStruct> tasksSet);
 
       void executeRun();
+      void saveData();
+
 };
 
-class MonitoringControlAgent : public Agent
+class MonitoringControlAgent : public MonitoringAgent
 {
    public:
       MonitoringControlAgent(rtTaskInfosStruct _taskInfo,

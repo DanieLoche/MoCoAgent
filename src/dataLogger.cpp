@@ -7,7 +7,6 @@ DataLogger::DataLogger(string expeName){
    outputFileName = expeName;
    cptOutOfDeadline = 0;
    cptExecutions = 0;
-   execLogs = {{0}};
    overruns = 0;
 
 }
@@ -17,6 +16,8 @@ ChainDataLogger::ChainDataLogger(end2endDeadlineStruct _chainInfos, string expeN
    chainInfos = _chainInfos;
    deadline = _chainInfos.deadline;
    cptAnticipatedMisses = 0;
+   cptWCET = 0;
+
 
    //nanolog::initialize(nanolog::GuaranteedLogger(), "./", expeName + "_chains", 1);
 
@@ -26,6 +27,7 @@ TaskDataLogger::TaskDataLogger(rtTaskInfosStruct _taskInfos, string expeName) : 
 {
    taskInfos = _taskInfos;
    deadline = _taskInfos.rtP.periodicity;
+   execLogs = {{0}};
 
    // nanolog::initialize(nanolog::GuaranteedLogger(), "./", expeName + "_expe", 1);
    // LOG_INFO << "This is a Information Log test !";
@@ -33,18 +35,18 @@ TaskDataLogger::TaskDataLogger(rtTaskInfosStruct _taskInfos, string expeName) : 
    // LOG_CRIT << "This is a CRITical log message.";
 }
 
-void DataLogger::logStart(RTIME startTime)
+void TaskDataLogger::logStart(RTIME startTime)
 {
    execLogs[cptExecutions & MASK_SIZE].timestamp = startTime;
 }
 
 
-RTIME DataLogger::logStart()
+RTIME TaskDataLogger::logStart()
 {
    return (execLogs[cptExecutions & MASK_SIZE].timestamp = rt_timer_read());
 }
 
-void DataLogger::logExec(RTIME endTime)
+void TaskDataLogger::logExec(RTIME endTime)
 {
    if (execLogs[cptExecutions & MASK_SIZE].timestamp)
    {
@@ -72,7 +74,7 @@ void DataLogger::logExec(RTIME endTime)
 
 }
 
-RTIME DataLogger::logExec( )
+RTIME TaskDataLogger::logExec( )
 {
    RTIME _logTime = rt_timer_read();
    if (execLogs[cptExecutions & MASK_SIZE].timestamp)
@@ -91,13 +93,55 @@ RTIME DataLogger::logExec( )
          #endif
       }
       cptExecutions++;
-      if (cptExecutions == 4096)
+      if (cptExecutions == BUFF_SIZE)
       {
          rt_fprintf(stderr, "[ WARNING ][ %s ] - Measured more Logs than allowed buffer size.\n", getName());
       }
    }
    else  rt_fprintf(stderr, "[ WARNING ][ %s ] - Exec #%ld not logged as timestamp was not set yet.\n", getName());
    return _logTime;
+}
+
+void ChainDataLogger::logChain(timeLog _execLog)
+{
+   // _execLog.duration est un end timestamp en fait,
+   // il faut faire la soustraction pour avoir la duree
+   execLogs[cptExecutions & MASK_SIZE].timestamp = _execLog.timestamp;
+   execLogs[cptExecutions & MASK_SIZE].duration = _execLog.duration;
+
+      if(execLogs[cptExecutions & MASK_SIZE].duration > deadline )
+      {
+         #if VERBOSE_DEBUG
+         rt_fprintf(stderr, "[ Warning ] [ %s ] - Executed in %.2f ms.\n",getName(),execLogs[cptExecutions & MASK_SIZE].duration/1e6);
+         #endif
+         cptOutOfDeadline++;
+      }else{
+         #if VERBOSE_ASK
+         //fprintf(stderr, "[ \033[1;32mPERFECT\033[0m ] Task : \033[1;32m%s\033[0m - \033[1;36m%.2f ms\033[0m\n",getName(),execLogs[cptExecutions].duration/1e6);
+         #endif
+      }
+      cptExecutions++;
+      if (cptExecutions == BUFF_SIZE)
+      {
+         rt_fprintf(stderr, "[ WARNING ][ %s ] - Measured more Logs than allowed buffer size.\n", getName());
+      }
+}
+
+void ChainDataLogger::setLogArray(int size)
+{
+   chainSize = size;
+   for (auto& logElement : execLogs)
+   {
+      logElement.rWCETs = new unsigned long[chainSize];
+   }
+}
+
+void ChainDataLogger::logWCET(unsigned long wcet)
+{
+   execLogs[cptExecutions & MASK_SIZE].rWCETs[cptWCET] = wcet;
+   cptWCET++;
+   if (cptWCET == chainSize) cptWCET = 0;
+
 }
 
 void TaskDataLogger::saveData(int nameSize, RT_TASK_INFO* cti)
@@ -169,7 +213,7 @@ void ChainDataLogger::saveData(int nameSize, RT_TASK_INFO* cti )
    std::ofstream outputFileChainData;
    outputFileChainData.open (outputFileName + CHAIN_FILE, std::ios::app);    // TO APPEND :  //,ios_base::app);
 
-   double average_runtime = 0;
+   float average_runtime = 0;
    RTIME max_runtime = 0;
    RTIME min_runtime = execLogs[LOG_VALUES_REMOVAL].duration; // offset = LOG_VALUES_REMOVAL
    RTIME sommeTime = 0;
@@ -247,6 +291,7 @@ void ChainDataLogger::saveData(int nameSize, RT_TASK_INFO* cti )
 
    outputFileResume.close();
 }
+
 
 char* ChainDataLogger::getName()
 {
