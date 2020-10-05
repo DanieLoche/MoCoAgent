@@ -26,10 +26,10 @@ while [ "$1" != "" ]; do
 done
 
 #creation des stressors de caches et I/O
-#sudo stress-ng --cache 4 &
-#sudo stress-ng --io 4 &
+sudo stress-ng --cache 4 &
+sudo stress-ng --io 4 &
 
-sudo /usr/xenomai/bin/dohell -s 192.168.0.1 -m /tmp 10800 &
+#sudo /usr/xenomai/bin/dohell -s 192.168.0.1 -m /tmp 10800 &
 
 
 
@@ -39,6 +39,6 @@ rm ./bench/output/*
 
 
 #Libération des stressors
-#sudo killall stress-ng
-sudo killall dohell
+sudo killall stress-ng
+#killall dohell
 echo "Result : $result"
