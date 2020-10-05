@@ -1,7 +1,6 @@
 #include <iomanip>
 
 #include "taskLauncher.h"
-#include "NanoLog.h"
 #include "tools.h"
 
 //MCAgent* mca;
