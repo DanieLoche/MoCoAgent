@@ -70,6 +70,8 @@ while [ "$1" != "" ]; do
     shift
 done
 
+cpt=1
+
 if test $DO == "func"
 then
 	for n in ${names[*]}
@@ -82,7 +84,7 @@ then
 		    echo "ID  name 	wcet  period isHRT aff  prec func                       arguments" > ./${n}.in
 		    numLigne=`expr $numLigne + 1`
 		elif test $n == $firstWord ; then
-		        echo $numLigne $firstWord $restLine		>> ./${n}.in
+		        echo $cpt $firstWord $restLine		>> ./${n}.in
 		        numLigne=`expr $numLigne + 1`
 		elif test $n == $garbage -a $firstWord == "//" ; then
 			restLine=`echo ${restLine//\"/}`
@@ -91,6 +93,7 @@ then
 		fi
 	    done < ${n}.tmp
 	    rm ./${n}.tmp
+        cpt=`expr $cpt + 1`
 	done
 
 
