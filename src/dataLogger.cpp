@@ -18,9 +18,7 @@ ChainDataLogger::ChainDataLogger(end2endDeadlineStruct _chainInfos, string expeN
    cptAnticipatedMisses = 0;
    cptWCET = 0;
 
-
    //nanolog::initialize(nanolog::GuaranteedLogger(), "./", expeName + "_chains", 1);
-
 }
 
 TaskDataLogger::TaskDataLogger(rtTaskInfosStruct _taskInfos, string expeName) : DataLogger(expeName)

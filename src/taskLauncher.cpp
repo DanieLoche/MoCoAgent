@@ -112,7 +112,7 @@ int TaskLauncher::readTasksList(int cpuPercent)
 
             taskInfo->fP.wcet = _uSEC(tmp_wcet);              // conversion us to RTIME (ns)
             taskInfo->rtP.priority = abs(tmp_HRT);
-            taskInfo->fP.isHRT = std::max(0,sign(taskInfo->fP.isHRT)); //0 for BE, 1 for HRT
+            taskInfo->fP.isHRT = std::max(0,sign(tmp_HRT)); //0 for BE, 1 for HRT
             // Traitement de la périodicité de la tâche
             taskInfo->rtP.periodicity = cpuFactor * _mSEC(tmp_period); //taskInfo->periodicity = taskInfo->periodicity * 1.0e6 * cpuFactor;
             //printTaskInfo(&taskInfo); // Résumé
@@ -285,11 +285,13 @@ int TaskLauncher::runAgent(long expeDuration)
    cout << std::flush;
    Agent* currentProcess;
    if (enableAgent == 2)
-      currentProcess = new MonitoringControlAgent(MoCoAgentParams, chainSet, tasksSet);
+      { currentProcess = new MonitoringControlAgent(MoCoAgentParams, chainSet, tasksSet);
+         cout << "Agent with Monitoring & Control." << endl; }
    else if (enableAgent == 1)
-      currentProcess = new MonitoringAgent(MoCoAgentParams, chainSet, tasksSet);
-   else currentProcess = new Agent(MoCoAgentParams, chainSet, tasksSet);
-
+      { currentProcess = new MonitoringAgent(MoCoAgentParams, chainSet, tasksSet);
+         cout << "Agent with Monitoring." << endl; }
+   else { currentProcess = new Agent(MoCoAgentParams, chainSet, tasksSet);
+         cout << "Agent useless." << endl; }
 
    rt_printf("[ %s ] - Process created (pid = %d).\n", currentTaskDescriptor.fP.name, getpid()); //cout << "["<< currentTaskDescriptor.fP.name << "]"<< "Macro task created." << endl;
    //sleep(50);

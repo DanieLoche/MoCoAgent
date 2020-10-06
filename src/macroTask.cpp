@@ -21,7 +21,7 @@ void TaskProcess::setRTtask(rtPStruct _rtInfos, char* _name)
 {
    //system("find /proc/xenomai");
    XENO_INIT(_name);
-
+   cout << "[" << _name << "] - XENO INIT PASSED." << endl;
    int ret = 0;
    ERROR_MNG(rt_task_shadow(&_task, _name, _rtInfos.priority, 0));
    //ret = rt_task_shadow(&_task, _name, _rtInfos.priority, 0);

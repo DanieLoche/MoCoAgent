@@ -19,7 +19,7 @@
 #define  USE_MUTEX               0
 
 #define   MCA_PERIOD             2 // ms
-const RTIME t_RT     =     000*1.0e6;  // time to trigger the Control Agent
+const RTIME t_RT     =     _mSEC(1);  // time to trigger the Control Agent
 const RTIME Wmax     =     _mSEC(MCA_PERIOD);    // next slice max time
 
 #define XENO_INIT(_name) do_xeno_init(_name)
@@ -37,43 +37,47 @@ class taskMonitoringStruct
       #if USE_MUTEX
       RT_MUTEX mtx_taskStatus;
       #endif
+      RT_TASK xenoTask;
+
       //bool isExecuted; // Run-time - computed  // will be USELESS //
       uint maxPendingChains;
+      uint oldestElement, newestElement;
+      taskMonitoringStruct* precedentTask;
+
+      ExecTimes* execLogs; // tableau =new timelog[n]
+
    public :
+      uint id;
       uint precedencyID;
 
-      // A AJOUTER POUR GERER PLUSIEURS OCCURENCES //
-      uint oldestElement, newestElement;
-      ExecTimes* execLogs; // tableau =new timelog[n]
-      taskMonitoringStruct* precedentTask;
       ChainDataLogger* logger;
-      bool addEntry(ExecTimes times);
-      bool emptyPrecedency( RTIME limitTime, RTIME endOfChain); // récursif
-      ///////////////////////////////////////////////
 
-      RT_TASK xenoTask;
-      uint id;
-      //RTIME endTime;     // Run-time - received
       RTIME deadline;    // Static = period
       RTIME rwcet;       // Static
       //bool operator <(const taskMonitoringStruct& tms) const {return (id < tms.id);}
 
       taskMonitoringStruct(rtTaskInfosStruct rtTaskInfos);
       void setChainInfos(int bufsize, taskMonitoringStruct* prec);
-      void setState(bool state);
+      bool addEntry(ExecTimes times);
+      bool emptyPrecedency( RTIME limitTime, RTIME endOfChain); // récursif
       ExecTimes getState();
+      void displayInfos();
 };
 
 class taskChain
 {
+   private:
+      RTIME end2endDeadline; // static
+
+      RTIME getExecutionTime();
+      RTIME getRemWCET();
+
    public :
       ChainDataLogger* logger;
       char name[32];
       uint chainID;                // static
-      RTIME end2endDeadline; // static
       RTIME startTime;       // Runtime - deduced
-      RTIME currentEndTime;  // Runtime - deduced
-      RTIME remWCET;         // Runtime - computed
+      //RTIME remWCET;         // Runtime - computed
       bool isAtRisk;         // Runtime - deduced
 
       // A AJOUTER POUR GERER PLUSIEURS OCCURENCES //
@@ -91,9 +95,6 @@ class taskChain
       //bool checkIfEnded();    // a modifier // devient USELESS
       void displayTasks();
       //void resetChain();      // a modifier => void unloadChain()
-   private:
-      RTIME getExecutionTime();
-      RTIME getRemWCET();
 };
 
 class TaskProcess
