@@ -208,6 +208,7 @@ int TaskLauncher::runTasks(long expeDuration)
          //rt_printf("[ %s ] - Semaphor %s joined.\n", currentTaskDescriptor.fP.name, SEM_NAME);
          #endif
 
+         currentProcess->setCommunications();
          rt_alarm_start(&_endAlarm, _SEC(expeDuration), TM_INFINITE);
          #if VERBOSE_DEBUG
          //rt_printf("[ %s ] - Alarm %s set.\n", currentTaskDescriptor.fP.name, ALARM_NAME);
@@ -333,6 +334,8 @@ int TaskLauncher::runAgent(long expeDuration)
 ///////////////////////////////////////////////////////////
 /////////////// END OF EXPERIMENT /////////////////////////
 
+   rt_printf("====== End of Experimentation. Saving Data. ======\n");
+
    RT_TASK_INFO cti;
    if (!rt_task_inquire(NULL, &cti))
    {
@@ -357,7 +360,19 @@ int TaskLauncher::runAgent(long expeDuration)
 
       rtTasks.shrink_to_fit();
    }*/
+   currentProcess->saveData();
 
+   std::ofstream myFile;
+   myFile.open (outputFileName + TASKS_FILE);    // TO APPEND :  //,ios_base::app);
+   myFile << std::setw(15) << "timestamp" << " ; "
+   << std::setw(nameMaxSize) << "name"     << " ; "
+   << std::setw(2)  << "ID"       << " ; "
+   << std::setw(3)  << "HRT"      << " ; "
+   << std::setw(4) << "Prio"      << " ; "
+   << std::setw(10) << "deadline" << " ; "
+   << std::setw(4)  << "aff."     << " ; "
+   << std::setw(10) << "duration" << "\n";
+   myFile.close();
    RTIME time = rt_timer_read();
    rt_sem_v(&_syncSem);
    rt_fprintf(stderr, "[ %llu ] [ MoCoAgent ]- Giving Semaphor...\n", time);
@@ -383,48 +398,14 @@ int TaskLauncher::runAgent(long expeDuration)
 void TaskLauncher::finishMoCoAgent(void* _arg)
 {
    Agent* MoCoAgent_task = (Agent*) _arg;
-
-   rt_printf("====== End of Experimentation. Saving Data. ======\n");
-   //cout << "Checking tasks names :" << endl;
-   MoCoAgent_task->saveData();
-
-   std::ofstream myFile;
-   myFile.open (outputFileName + TASKS_FILE);    // TO APPEND :  //,ios_base::app);
-   myFile << std::setw(15) << "timestamp" << " ; "
-         << std::setw(nameMaxSize) << "name"     << " ; "
-         << std::setw(2)  << "ID"       << " ; "
-         << std::setw(3)  << "HRT"      << " ; "
-         << std::setw(4) << "Prio"      << " ; "
-         << std::setw(10) << "deadline" << " ; "
-         << std::setw(4)  << "aff."     << " ; "
-         << std::setw(10) << "duration" << "\n";
-   myFile.close();
-
+   MoCoAgent_task->EndOfExpe = TRUE;
    //ERROR_MNG(rt_task_sleep(_mSEC(500)));
 }
 
 void TaskLauncher::finishTask(void* _MacroTask)
 {
    MacroTask* currentProcess = (MacroTask*) _MacroTask;
-
    currentProcess->EndOfExpe = TRUE;
-   return;
-   rt_fprintf(stderr, "[ %llu ][ %s ] - Waiting Semaphor...\n", rt_timer_read(), currentProcess->prop.fP.name);
-   rt_print_flush_buffers();
-
-   rt_sem_p(&_syncSem, TM_INFINITE);
-   rt_fprintf(stderr, "[ %llu ][ %s ] - Got a Semaphor...\n", rt_timer_read(), currentProcess->prop.fP.name);
-
-   currentProcess->saveData(nameMaxSize);
-
-   RTIME time = rt_timer_read();
-   rt_sem_v(&_syncSem);
-   rt_fprintf(stderr, "[ %llu ][ %s ] - Semaphor released.\n", time, currentProcess->prop.fP.name);
-
-   rt_fprintf(stderr, "[ %llu ][ %s ] - Finished.\n", time, currentProcess->prop.fP.name);
-   rt_print_flush_buffers();
-   //ERROR_MNG(rt_task_sleep(_SEC(1)));
-   //exit(EXIT_SUCCESS);
 }
 
 

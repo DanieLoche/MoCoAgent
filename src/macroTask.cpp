@@ -21,7 +21,7 @@ void TaskProcess::setRTtask(rtPStruct _rtInfos, char* _name)
 {
    //system("find /proc/xenomai");
    XENO_INIT(_name);
-   cout << "[" << _name << "] - XENO INIT PASSED." << endl;
+   //cout << "[" << _name << "] - XENO INIT PASSED." << endl;
    int ret = 0;
    ERROR_MNG(rt_task_shadow(&_task, _name, _rtInfos.priority, 0));
    //ret = rt_task_shadow(&_task, _name, _rtInfos.priority, 0);
@@ -228,13 +228,33 @@ MacroTask::MacroTask(rtTaskInfosStruct _taskInfo, bool MoCo, string _name) : Tas
    msg.isExecuted = 1;
    #endif
 
+
 }
 
 RTMacroTask::RTMacroTask(rtTaskInfosStruct _taskInfo, bool MoCo, string _name) : MacroTask(_taskInfo, MoCo, _name)
 {}
 
+void RTMacroTask::setCommunications()
+{
+   if (MoCoIsAlive)
+   {
+      ERROR_MNG(rt_buffer_bind(&_buff, MESSAGE_TOPIC_NAME, TM_INFINITE)); // _mSEC(500)
+      //string mutexName = (string) MESSAGE_TOPIC_NAME + "_mtx";
+      //ERROR_MNG(rt_mutex_bind(&_bufMtx, mutexName.c_str(), _mSEC(500)));
+   }
+}
+
 BEMacroTask::BEMacroTask(rtTaskInfosStruct _taskInfo, bool MoCo, string _name) : MacroTask(_taskInfo, MoCo, _name)
 {}
+
+void BEMacroTask::setCommunications()
+{
+   //cout << "Running..." << endl;
+   if (MoCoIsAlive)
+   {
+      ERROR_MNG(rt_event_bind(&_event, CHANGE_MODE_EVENT_NAME, TM_INFINITE)); //_mSEC(500)
+   }
+}
 
 void MacroTask::findFunction (char* _func)
 {
@@ -299,6 +319,19 @@ void MacroTask::saveData(int maxNameSize, RT_TASK_INFO* cti)
 ///////////////////////////////// RT MacroTask /////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
+void RTMacroTask::executeRun()
+{
+   //rt_fprintf(stderr, "Running...\n");
+   while (!EndOfExpe)
+   {
+      //cout << "Task" << prop.name << " working." << endl;
+      if (before() == 0) // Check if execution allowed
+      if (proceed() == 0)  // execute task
+      after();  // Inform of execution time for the mcAgent
+      rt_task_wait_period(&dataLogs->overruns);
+   }
+}
+
 uint RTMacroTask::before()
 {
    #if VERBOSE_OTHER
@@ -353,28 +386,35 @@ int RTMacroTask::after()
    return 0;
 }
 
-void RTMacroTask::executeRun()
-{
-   if (MoCoIsAlive)
-   {
-      ERROR_MNG(rt_buffer_bind(&_buff, MESSAGE_TOPIC_NAME, _mSEC(500)));
-      //string mutexName = (string) MESSAGE_TOPIC_NAME + "_mtx";
-      //ERROR_MNG(rt_mutex_bind(&_bufMtx, mutexName.c_str(), _mSEC(500)));
-   }
-   //rt_fprintf(stderr, "Running...\n");
-   while (!EndOfExpe)
-   {
-      //cout << "Task" << prop.name << " working." << endl;
-      if (before() == 0) // Check if execution allowed
-         if (proceed() == 0)  // execute task
-            after();  // Inform of execution time for the mcAgent
-      rt_task_wait_period(&dataLogs->overruns);
-   }
-}
-
 ////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////// BEMacroTask //////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
+void BEMacroTask::executeRun()
+{
+   /*
+   int amount = prop.rtP.periodicity;
+   for (int i = 0 ; i < amount ; ++i)
+   {
+      proceed();
+      rt_task_wait_period(&dataLogs->overruns);
+
+   }
+   */
+   while (!EndOfExpe)
+   {
+      if (before() & MODE_NOMINAL)  // Check if execution allowed
+      {
+         if (proceed() == 0)        // execute task
+         after();                // Log  execution.
+      }
+      else {
+         rt_event_wait(&_event, MODE_NOMINAL, NULL , EV_PRIO, TM_INFINITE);
+         rt_fprintf(stderr, "[%s] [%ld]- Started back. \n", prop.fP.name, rt_timer_read());
+      }
+      rt_task_wait_period(&dataLogs->overruns);
+   }
+
+}
 
 uint BEMacroTask::before()
 {
@@ -406,37 +446,6 @@ int BEMacroTask::after()
    return 0;
 }
 
-void BEMacroTask::executeRun()
-{
-   //cout << "Running..." << endl;
-   if (MoCoIsAlive)
-   {
-      ERROR_MNG(rt_event_bind(&_event, CHANGE_MODE_EVENT_NAME, _mSEC(500)));
-   }
-   /*
-      int amount = prop.rtP.periodicity;
-      for (int i = 0 ; i < amount ; ++i)
-      {
-         proceed();
-         rt_task_wait_period(&dataLogs->overruns);
-
-      }
-   */
-   while (!EndOfExpe)
-   {
-      if (before() & MODE_NOMINAL)  // Check if execution allowed
-      {
-         if (proceed() == 0)        // execute task
-            after();                // Log  execution.
-      }
-      else {
-         rt_event_wait(&_event, MODE_NOMINAL, NULL , EV_PRIO, TM_INFINITE);
-         rt_fprintf(stderr, "[%s] [%ld]- Started back. \n", prop.fP.name, rt_timer_read());
-      }
-      rt_task_wait_period(&dataLogs->overruns);
-   }
-
-}
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////// Xenomai Specific tasks //////////////////////////////////

@@ -64,7 +64,7 @@ do {                                                                   \
    int err = fct;                                                      \
    if ( err != 0)                                                      \
    {                                                                   \
-      const char* errName = strerror(err);                             \
+      const char* errName = getErrorName(err);                             \
       rt_fprintf(stderr, "[ ERROR ] %s-%s error %s (%d)\n", __FUNCTION__, #fct, errName, err); \
       rt_print_flush_buffers();                                        \
       rt_task_sleep(_mSEC(10));                                        \

@@ -136,6 +136,7 @@ class MacroTask : public TaskProcess
       rtTaskInfosStruct prop;
 
       MacroTask(rtTaskInfosStruct taskInfos, bool MoCoMode, string name);
+      virtual void setCommunications() = 0;
       inline virtual uint before() = 0;
       inline int proceed();
       inline virtual int after() = 0;
@@ -147,9 +148,10 @@ class RTMacroTask : public MacroTask
    public:
       RTMacroTask(rtTaskInfosStruct taskInfos, bool MoCoMode, string name);
 
+      void setCommunications();
+      void executeRun();
       inline uint before();
       inline int after();
-      void executeRun();
 };
 
 class BEMacroTask : public MacroTask
@@ -157,9 +159,10 @@ class BEMacroTask : public MacroTask
    public:
       BEMacroTask(rtTaskInfosStruct taskInfos, bool MoCoMode, string name);
 
+      void setCommunications();
+      void executeRun();
       inline uint before();
       inline int after();
-      void executeRun();
 };
 
 class Agent : public TaskProcess

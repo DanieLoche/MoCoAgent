@@ -73,7 +73,7 @@ void Agent::initCommunications()
 void Agent::setAllChains(std::vector<end2endDeadlineStruct> _tcDeadlineStructs)
 {
    #if VERBOSE_INFO
-   rt_printf("[ MoCoAgent ] - setting deadlines.\n");
+   printf("[ MoCoAgent ] - setting deadlines.\n");
    #endif
    for (auto& tcDeadlineStruct : _tcDeadlineStructs)
    {
@@ -96,21 +96,20 @@ void Agent::setAllChains(std::vector<end2endDeadlineStruct> _tcDeadlineStructs)
 void Agent::setAllTasks(std::vector<rtTaskInfosStruct> _TasksInfos)
 {
    #if VERBOSE_INFO
-   rt_printf("[ MoCoAgent ] - setting tasks.\n");
+   printf("[ MoCoAgent ] - setting tasks.\n");
    #endif
 ///////// JE NE SAIS GERER QU'AVEC UNE UNIQUE CHAINE DE TACHES !!
-   std::vector<taskMonitoringStruct> tmpTaskChain;
    for (auto& _taskInfo : _TasksInfos)
    {
-      rt_printf(" Adding task %s (%d).\n", _taskInfo.fP.name, _taskInfo.fP.isHRT);
+      printf(" Adding task %s (%d).\n", _taskInfo.fP.name, _taskInfo.fP.isHRT);
       if ( !_taskInfo.fP.isHRT )
       {
-         rt_printf("Adding %s to BE list.\n", _taskInfo.fP.name);
+         printf("Adding %s to BE list.\n", _taskInfo.fP.name);
          RT_TASK* _t = new RT_TASK;
          ERROR_MNG(rt_task_bind(_t, _taskInfo.fP.name, TM_NONBLOCK));
          //printInquireInfo(&_t);
          bestEffortTasks.push_back(*_t);
-         break;
+         //break;
       }
       else
       {
@@ -118,18 +117,22 @@ void Agent::setAllTasks(std::vector<rtTaskInfosStruct> _TasksInfos)
          {
             if ( _taskInfo.fP.isHRT == chain.chainID)
             {
-               rt_printf("Adding %s to HRT chain %d.\n", _taskInfo.fP.name, chain.chainID);
-               taskMonitoringStruct* tms = new taskMonitoringStruct(_taskInfo);
-               tmpTaskChain.push_back(*tms);
+               printf("Adding %s to HRT chain %d.\n", _taskInfo.fP.name, chain.chainID);
+               //taskMonitoringStruct* tms = new taskMonitoringStruct(_taskInfo);
+               //tmpTaskChain.push_back(*new taskMonitoringStruct(_taskInfo));
+               chain.taskList.push_back(*new taskMonitoringStruct(_taskInfo));
                break;
             }
          }
       }
    }
 
+   std::vector<taskMonitoringStruct> tmpTaskChain;
+   printf("Tasks allocated, sorting tasks in chain lists.\n");
    // classement des taches par ordre de precedence.
    for (auto& chain : allTaskChain)
    {
+      tmpTaskChain = chain.taskList;
       chain.setPrecedencies();
 
       uint precedent = 0;
@@ -151,6 +154,7 @@ void Agent::setAllTasks(std::vector<rtTaskInfosStruct> _TasksInfos)
       }
 
       chain.taskList.shrink_to_fit();
+      printf("Setting fixed data log array sizes.\n");
       chain.logger->setLogArray(chain.taskList.size() - 1);
    }
    // On vide le vecteur temporaire.
@@ -318,8 +322,7 @@ void Agent::setMode(uint _newMode)
 
 void Agent::saveData()
 {
-   EndOfExpe = TRUE;
-   string file = _stdOut;
+   string file = _stdOut; // conversion to string
 
    //rt_task_delete(&msgReceiverTask);
    /*RT_TASK_INFO cti;
@@ -355,6 +358,8 @@ void Agent::saveData()
                              << std::setw(2)            << "ID"        << " ; "
                              << std::setw(10)           << "deadline"  << " ; "
                              << std::setw(10)           << "duration"  << endl;
+
+         
 
          outputFileChainData.close();
 
