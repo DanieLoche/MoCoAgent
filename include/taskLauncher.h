@@ -6,13 +6,14 @@
 #include "dataLogger.h"
 //#include "sched.h"
 
-#define ALARM_NAME   "endOfExpe_Alarm"
-#define SEM_NAME     "Start_Sem"
+#define ALARM_NAME    "endOfExpe_Alarm"
+#define SEM_TASK_NAME "Task_Sync_Sem"
+#define SEM_MC_NAME   "MOCO_Sync_Sem"
 
 class TaskLauncher
 {
    private :
-      static RT_SEM _syncSem;
+      RT_SEM _sync_MC_Sem, _sync_Task_Sem;
       static string outputFileName;
       static int nameMaxSize;
       static std::vector<end2endDeadlineStruct> chainSet;

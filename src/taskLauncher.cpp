@@ -6,7 +6,6 @@ int TaskLauncher::nameMaxSize = 0;
 std::vector<rtTaskInfosStruct> TaskLauncher::tasksSet = std::vector<rtTaskInfosStruct>();
 std::vector<end2endDeadlineStruct> TaskLauncher::chainSet = std::vector<end2endDeadlineStruct>();
 
-RT_SEM TaskLauncher::_syncSem = {0};
 
 TaskLauncher::TaskLauncher(int _agentMode, string _outputFileName, int _schedMode)
 {
@@ -85,7 +84,7 @@ int TaskLauncher::readTasksList(int cpuPercent)
          rtTaskInfosStruct* taskInfo = new rtTaskInfosStruct;
          std::istringstream iss(str);
          string token;
-         char ext[32] = "RT_";
+         char ext[32] = "";
          #if VERBOSE_ASK
          cout << "Managing line : " << str;
          #endif
@@ -180,8 +179,8 @@ int TaskLauncher::runTasks(long expeDuration)
       pid_t pid = fork();
       if (pid == 0) // proc fils
       {
-         setvbuf(stdout, NULL, _IOLBF, 4096) ; // _IONBF
-         setvbuf(stderr, NULL, _IOLBF, 4096) ; // _IOLBF
+         //setvbuf(stdout, NULL, _IOLBF, 4096) ; // _IONBF
+         //setvbuf(stderr, NULL, _IOLBF, 4096) ; // _IOLBF
 
          currentTaskDescriptor = taskInfo;
          MacroTask* currentProcess;
@@ -195,35 +194,34 @@ int TaskLauncher::runTasks(long expeDuration)
             currentProcess = new RTMacroTask(currentTaskDescriptor, enableAgent, outputFileName);
 
          #if VERBOSE_DEBUG
-         //rt_printf("[ %s ] - Process created (pid = %d).\n", currentTaskDescriptor.fP.name, getpid());
+         rt_fprintf(stderr, "[ %llu ][ %s ] - Process created (pid = %d).\n", rt_timer_read(), currentTaskDescriptor.fP.name, getpid());
          #endif
 
          ERROR_MNG(rt_alarm_create(&_endAlarm, ALARM_NAME, TaskLauncher::finishTask, (void*) currentProcess)); //ms to ns
          #if VERBOSE_DEBUG
-         //rt_printf("[ %s ] - Alarm %s created.\n", currentTaskDescriptor.fP.name, ALARM_NAME);
-         #endif
-
-         ERROR_MNG(rt_sem_bind(&_syncSem, SEM_NAME, TM_INFINITE)); // Wait Semaphor created.
-         #if VERBOSE_DEBUG
-         //rt_printf("[ %s ] - Semaphor %s joined.\n", currentTaskDescriptor.fP.name, SEM_NAME);
+         rt_fprintf(stderr, "[ %llu ][ %s ] - Alarm %s created.\n", rt_timer_read(), currentTaskDescriptor.fP.name, ALARM_NAME);
          #endif
 
          currentProcess->setCommunications();
+         ERROR_MNG(rt_sem_bind(&_sync_MC_Sem, SEM_MC_NAME, TM_INFINITE)); // Wait Semaphor created.
+         ERROR_MNG(rt_sem_bind(&_sync_Task_Sem, SEM_TASK_NAME, TM_INFINITE)); // Wait Semaphor created.
+         #if VERBOSE_DEBUG
+         rt_fprintf(stderr, "[ %llu ][ %s ] - Semaphors %s & %s joined.\n", rt_timer_read(), currentTaskDescriptor.fP.name, SEM_MC_NAME, SEM_TASK_NAME);
+         #endif
+
          rt_alarm_start(&_endAlarm, _SEC(expeDuration), TM_INFINITE);
          #if VERBOSE_DEBUG
-         //rt_printf("[ %s ] - Alarm %s set.\n", currentTaskDescriptor.fP.name, ALARM_NAME);
+         rt_fprintf(stderr, "[ %llu ][ %s ] - Alarm %s set.\n", rt_timer_read(), currentTaskDescriptor.fP.name, ALARM_NAME);
          #endif
 
-         ERROR_MNG(rt_sem_v(&_syncSem)); // Signal that this task is ready.
+         ERROR_MNG(rt_sem_v(&_sync_Task_Sem)); // Signal that this task is ready.
          #if VERBOSE_DEBUG
-         //rt_printf("[ %s ] - Semaphor %s released !\n", currentTaskDescriptor.fP.name, SEM_NAME);
+         rt_fprintf(stderr, "[ %llu ][ %s ] - Semaphor %s released !\n", rt_timer_read(), currentTaskDescriptor.fP.name, SEM_TASK_NAME);
          #endif
 
-         rt_task_sleep(_mSEC(10));
-         //rt_task_wait_period(0);
-         ERROR_MNG(rt_sem_p(&_syncSem, TM_INFINITE)); // Wait broadcast to run.
+         ERROR_MNG(rt_sem_p(&_sync_MC_Sem, TM_INFINITE)); // Wait broadcast to run.
          #if VERBOSE_DEBUG
-         rt_fprintf(stderr, "[ %s ] - Semaphor %s signal received, go !\n", currentTaskDescriptor.fP.name, SEM_NAME);
+         rt_fprintf(stderr, "[ %llu ][ %s ] - Semaphor %s signal received, go !\n", rt_timer_read(), currentTaskDescriptor.fP.name, SEM_MC_NAME);
          #endif
          //rt_task_sleep(_mSEC(10));
 
@@ -232,20 +230,22 @@ int TaskLauncher::runTasks(long expeDuration)
             //rt_task_sleep(_mSEC(100)); // on attend que le système se stabilise avant de lancer le Control.
             currentProcess->executeRun();
 
+            rt_task_sleep(_mSEC(1));
+
 ///////////////////////////////////////////////////////////
 /////////////// END OF EXPERIMENT /////////////////////////
          rt_fprintf(stderr, "[ %llu ][ %s ] - Waiting Semaphor...\n", rt_timer_read(), currentProcess->prop.fP.name);
          rt_print_flush_buffers();
 
-         rt_sem_p(&_syncSem, TM_INFINITE);
-         rt_fprintf(stderr, "[ %llu ][ %s ] - Got a Semaphor...\n", rt_timer_read(), currentProcess->prop.fP.name);
+         rt_sem_p(&_sync_Task_Sem, TM_INFINITE);
+         rt_fprintf(stderr, "[ %llu ][ %s ] - Got MoCoAgent Semaphor...\n", rt_timer_read(), currentProcess->prop.fP.name);
 
          RT_TASK_INFO cti;
          rt_task_inquire(&currentProcess->_task, &cti);
          currentProcess->saveData(nameMaxSize, &cti);
 
          RTIME time = rt_timer_read();
-         rt_sem_v(&_syncSem);
+         rt_sem_v(&_sync_Task_Sem);
          rt_fprintf(stderr, "[ %llu ][ %s ] - Semaphor released.\n", time, currentProcess->prop.fP.name);
 
          rt_fprintf(stderr, "[ %llu ][ %s ] - Finished.\n", time, currentProcess->prop.fP.name);
@@ -254,7 +254,7 @@ int TaskLauncher::runTasks(long expeDuration)
       }
       else // pid = forked task pid_t
       {
-         sleep(0.5);
+         sleep(0.2);
       }
    }
    return 0;
@@ -286,47 +286,47 @@ int TaskLauncher::runAgent(long expeDuration)
    cout << std::flush;
    Agent* currentProcess;
    if (enableAgent == 2)
-      { currentProcess = new MonitoringControlAgent(MoCoAgentParams, chainSet, tasksSet);
-         cout << "Agent with Monitoring & Control." << endl; }
+      currentProcess = new MonitoringControlAgent(MoCoAgentParams, chainSet, tasksSet);
    else if (enableAgent == 1)
-      { currentProcess = new MonitoringAgent(MoCoAgentParams, chainSet, tasksSet);
-         cout << "Agent with Monitoring." << endl; }
-   else { currentProcess = new Agent(MoCoAgentParams, chainSet, tasksSet);
-         cout << "Agent useless." << endl; }
+      currentProcess = new MonitoringAgent(MoCoAgentParams, chainSet, tasksSet);
+   else currentProcess = new Agent(MoCoAgentParams, chainSet, tasksSet);
 
-   rt_printf("[ %s ] - Process created (pid = %d).\n", currentTaskDescriptor.fP.name, getpid()); //cout << "["<< currentTaskDescriptor.fP.name << "]"<< "Macro task created." << endl;
+
+   rt_fprintf(stderr, "[ %llu ][ %s ] - Process created (pid = %d).\n", rt_timer_read(), currentTaskDescriptor.fP.name, getpid()); //cout << "["<< currentTaskDescriptor.fP.name << "]"<< "Macro task created." << endl;
    //sleep(50);
 
    ERROR_MNG(rt_alarm_create(&_endAlarm, ALARM_NAME, TaskLauncher::finishMoCoAgent, (void*)currentProcess)); //ms to ns
    #if VERBOSE_DEBUG
-   rt_printf("[ %s ] - Alarm %s created.\n", currentTaskDescriptor.fP.name, ALARM_NAME); //cout << "["<< currentTaskDescriptor.fP.name << "]"<< "Alarm created." << endl;
+   rt_fprintf(stderr, "[ %llu ][ %s ] - Alarm %s created.\n", rt_timer_read(), currentTaskDescriptor.fP.name, ALARM_NAME); //cout << "["<< currentTaskDescriptor.fP.name << "]"<< "Alarm created." << endl;
    #endif
 
-   ERROR_MNG(rt_sem_create(&_syncSem, SEM_NAME, 0, S_FIFO)); // sync. #1: ready for alarms.
+   ERROR_MNG(rt_sem_create(&_sync_MC_Sem, SEM_MC_NAME, 0, S_FIFO)); // sync. #1: ready for alarms.
+   ERROR_MNG(rt_sem_create(&_sync_Task_Sem, SEM_TASK_NAME, 0, S_FIFO)); // sync. #1: ready for alarms.
    #if VERBOSE_DEBUG
-   rt_printf("[ %s ] - Semaphor %s created.\n", currentTaskDescriptor.fP.name, SEM_NAME); //cout << "["<< currentTaskDescriptor.fP.name << "]"<< "Semaphor Created." << endl;
+   rt_fprintf(stderr, "[ %llu ][ %s ] - Semaphors %s and %s created.\n", rt_timer_read(), currentTaskDescriptor.fP.name, SEM_MC_NAME, SEM_TASK_NAME); //cout << "["<< currentTaskDescriptor.fP.name << "]"<< "Semaphor Created." << endl;
    #endif
 
    //rt_task_wait_period(0);
    rt_alarm_start(&_endAlarm, _SEC(expeDuration), TM_INFINITE);
    #if VERBOSE_DEBUG
-   rt_printf("[ %s ] - Alarm %s set.\n", currentTaskDescriptor.fP.name, ALARM_NAME); //cout << "["<< currentTaskDescriptor.fP.name << "]"<< "Alarm set." << endl;
+   rt_fprintf(stderr, "[ %llu ][ %s ] - Alarm %s set.\n", rt_timer_read(), currentTaskDescriptor.fP.name, ALARM_NAME); //cout << "["<< currentTaskDescriptor.fP.name << "]"<< "Alarm set." << endl;
    #endif
 
    for (auto taskInfo = tasksSet.begin(); taskInfo != tasksSet.end(); ++taskInfo)
    { // waiting every alarm is set.
-      rt_sem_p(&_syncSem, TM_INFINITE); // => wait for a semaphor release from every task.
+      rt_sem_p(&_sync_Task_Sem, TM_INFINITE); // => wait for a semaphor release from every task.
       #if VERBOSE_DEBUG
-      rt_printf("[ %s ] - Semaphor %s catched !\n", currentTaskDescriptor.fP.name, SEM_NAME); //cout << "["<< currentTaskDescriptor.fP.name << "]"<< "Semaphor catched !" << endl;
+      rt_fprintf(stderr, "[ %llu ][ %s ] - Semaphor %s catched !\n", rt_timer_read(), currentTaskDescriptor.fP.name, SEM_TASK_NAME); //cout << "["<< currentTaskDescriptor.fP.name << "]"<< "Semaphor catched !" << endl;
       #endif
 
    }
-   rt_task_sleep(_mSEC(20));
+   //rt_task_sleep(_mSEC(20));
    #if VERBOSE_INFO
-   rt_printf("[ MoCoAgent ] - GO !\n");
+   rt_fprintf(stderr, "[ %llu ][ MoCoAgent ] - GO !\n", rt_timer_read());
    #endif
+   rt_print_flush_buffers();
 
-   rt_sem_broadcast(&_syncSem); // Alarms OK. Start Run !
+   rt_sem_broadcast(&_sync_MC_Sem); // Alarms OK. Start Run !
    rt_task_wait_period(0);
 
    currentProcess->executeRun();
@@ -335,6 +335,7 @@ int TaskLauncher::runAgent(long expeDuration)
 /////////////// END OF EXPERIMENT /////////////////////////
 
    rt_printf("====== End of Experimentation. Saving Data. ======\n");
+   rt_print_flush_buffers();
 
    RT_TASK_INFO cti;
    if (!rt_task_inquire(NULL, &cti))
@@ -350,6 +351,9 @@ int TaskLauncher::runAgent(long expeDuration)
                     << endl;
       outputFileResume.close();
    }
+
+   rt_fprintf(stderr, "[ %llu ] - SAVING AGENT DATA.\n", rt_timer_read());
+   rt_print_flush_buffers();
 
    /*std::vector<RT_TASK*> rtTasks;
    for (auto& taskInfo : tasksSet)
@@ -373,8 +377,9 @@ int TaskLauncher::runAgent(long expeDuration)
    << std::setw(4)  << "aff."     << " ; "
    << std::setw(10) << "duration" << "\n";
    myFile.close();
+
    RTIME time = rt_timer_read();
-   rt_sem_v(&_syncSem);
+   rt_sem_v(&_sync_Task_Sem);
    rt_fprintf(stderr, "[ %llu ] [ MoCoAgent ]- Giving Semaphor...\n", time);
    rt_print_flush_buffers();
 
@@ -387,7 +392,7 @@ int TaskLauncher::runAgent(long expeDuration)
    rt_print_flush_buffers();*/
 
    rt_task_sleep(_SEC(1));
-   rt_sem_p(&_syncSem, TM_INFINITE);
+   rt_sem_p(&_sync_Task_Sem, TM_INFINITE);
 
    rt_printf(" ======= END OF EXPERIMENTATION ======\n");
    rt_print_flush_buffers();
