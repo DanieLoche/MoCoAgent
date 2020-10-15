@@ -138,18 +138,6 @@ struct end2endDeadlineStruct
   RTIME deadline;
 };
 
-#define WITH_BOOL   0
-struct monitoringMsg
-{
-   //RT_TASK* task;
-   uint ID;
-   RTIME time;   // Run-time - task start received
-   RTIME endTime; // task duration
-   #if WITH_BOOL
-   bool isExecuted;    // Run-time - computed
-   #endif
-};
-
 template <typename T> int sign(T val) {
       return (T(0) < val) - (val < T(0));
 }
