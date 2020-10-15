@@ -153,7 +153,7 @@ void TaskDataLogger::saveData(int nameSize, RT_TASK_INFO* cti)
    RTIME min_runtime = execLogs[0].duration;
    RTIME somme = 0;
 
-   for (int i = LOG_VALUES_REMOVAL; i < (BUFF_SIZE - ((cptExecutions <= BUFF_SIZE)?LOG_VALUES_REMOVAL:0) ); ++i)
+   for (int i = LOG_VALUES_REMOVAL; i < (BUFF_SIZE - LOG_VALUES_REMOVAL ); ++i)
    {
       RTIME _dur = execLogs[i].duration;
       if (execLogs[i].timestamp != 0)
@@ -207,7 +207,8 @@ void TaskDataLogger::saveData(int nameSize, RT_TASK_INFO* cti)
 
 void ChainDataLogger::saveData(int nameSize, RT_TASK_INFO* cti )
 {
-   cerr << "Saving Chain " << getName() << " data." << endl;
+   cerr << "Saving Chain " << getName() << " data. (" << LOG_VALUES_REMOVAL << ")" << endl;
+
    std::ofstream outputFileChainData;
    outputFileChainData.open (outputFileName + CHAIN_FILE, std::ios::app);    // TO APPEND :  //,ios_base::app);
 
@@ -215,8 +216,7 @@ void ChainDataLogger::saveData(int nameSize, RT_TASK_INFO* cti )
    RTIME max_runtime = 0;
    RTIME min_runtime = execLogs[LOG_VALUES_REMOVAL].duration; // offset = LOG_VALUES_REMOVAL
    RTIME sommeTime = 0;
-
-   for (int i = LOG_VALUES_REMOVAL; i < (BUFF_SIZE - ((cptExecutions <= BUFF_SIZE)?LOG_VALUES_REMOVAL:0) -1); ++i) // Last element probably not finished !
+   for (int i = LOG_VALUES_REMOVAL; i < (BUFF_SIZE - LOG_VALUES_REMOVAL); ++i) // Last element probably not finished !
    {
       const RTIME _dur = execLogs[i].duration;
       if (execLogs[i].timestamp != 0)
