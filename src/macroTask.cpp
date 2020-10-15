@@ -327,7 +327,8 @@ void RTMacroTask::executeRun()
       //cout << "Task" << prop.name << " working." << endl;
       if (before() == 0) // Check if execution allowed
       if (proceed() == 0)  // execute task
-      after();  // Inform of execution time for the mcAgent
+         after();  // Inform of execution time for the
+
       rt_task_wait_period(&dataLogs->overruns);
    }
 }
@@ -337,7 +338,9 @@ uint RTMacroTask::before()
    #if VERBOSE_OTHER
    //rt_fprintf(stderr, "[ %s ] - Executing Before.\n", prop.fP.name);
    #endif
+
    msg.time = dataLogs->logStart();
+
    #if WITH_BOOL
    msg.isExecuted = 0;
    #endif
@@ -364,6 +367,7 @@ int RTMacroTask::after()
    #if VERBOSE_OTHER
    //rt_fprintf(stderr, "[ %s ] - Executing After.\n", prop.fP.name);
    #endif
+
    msg.endTime = dataLogs->logExec();
    #if WITH_BOOL
    msg.isExecuted = 1;
@@ -371,15 +375,15 @@ int RTMacroTask::after()
 
    if (MoCoIsAlive)
    {
-      ret = rt_buffer_write(&_buff , &msg , sizeof(monitoringMsg) , _mSEC(1));
+      ret = rt_buffer_write(&_buff , &msg , sizeof(monitoringMsg) , _mSEC(5));
       if(ret != sizeof(monitoringMsg))
       {
          //MoCoIsAlive = 0;
          RT_BUFFER_INFO infos;
          ERROR_MNG(rt_buffer_inquire(&_buff, &infos));
-         fprintf(stderr, "[ %s ] - ERROR %s (%d) - failed to write AFTER monitoring message to buffer %s. (MoCo mode : %d)\n",
-                        prop.fP.name, getErrorName(ret), ret, MESSAGE_TOPIC_NAME, MoCoIsAlive);
-         fprintf(stderr, "Memory Available on buffer : %lu / %lu. %d waiting too.\n", infos.availmem, infos.totalmem, infos.owaiters);
+         rt_fprintf(stderr, "[%llu][ %s ] - ERROR %s (%d) - failed to write AFTER monitoring message to buffer %s. (MoCo mode : %d)\n",
+                        rt_timer_read(), prop.fP.name, getErrorName(ret), ret, MESSAGE_TOPIC_NAME, MoCoIsAlive);
+         rt_fprintf(stderr, "Memory Available on buffer : %lu / %lu. %d waiting too.\n", infos.availmem, infos.totalmem, infos.owaiters);
          rt_print_flush_buffers();
       }
    }

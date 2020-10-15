@@ -1,23 +1,26 @@
 #include "macroTask.h"
 
 
-void messageReceiver(void* arg)
+void MonitoringAgent::messageReceiver(void* arg)
 {
-   Agent* mocoAgent = (Agent*) arg;
+   MonitoringAgent* mocoAgent = (MonitoringAgent*) arg;
    monitoringMsg msg;
+   ERROR_MNG(rt_task_set_periodic(NULL, TM_NOW, TM_INFINITE)); // disable periodicity;
+
+   RTIME _time;
    while(TRUE)
    {
-      //  cout<<"buffer read"<<endl;
       //rt_mutex_acquire(&mocoAgent->_bufMtx, TM_INFINITE);
-      int ret = rt_buffer_read(&(mocoAgent->_buff), &msg, sizeof(monitoringMsg), TM_INFINITE);
+      int ret = rt_buffer_read(&(mocoAgent->_buff), &msg, sizeof(monitoringMsg), TM_NONBLOCK);
       if (ret == sizeof(monitoringMsg))
+      {
          mocoAgent->updateTaskInfo(msg);
+         rt_printf("%llu ; Message Receiver ; %llu\n", rt_timer_read(), _time);
+      }
       //rt_mutex_release(&mocoAgent->_bufMtx);
-      //cout<<"done buffer read"<<endl;
-      rt_task_yield();
-      // rt_task_wait_period(&mocoAgent->overruns);
-      // rt_task_yield();
-
+      //rt_task_sleep()_mSEC(1);
+      //rt_task_yield();
+      //rt_task_wait_period(0);
    }
 }
 
@@ -48,8 +51,12 @@ MonitoringAgent::MonitoringAgent(rtTaskInfosStruct _taskInfo,
    MoCoIsAlive = TRUE;
    initCommunications();
 
-   ERROR_MNG(rt_task_spawn(&msgReceiverTask, "MonitoringTask", 0, 98, 0, messageReceiver, this));
+   ERROR_MNG(rt_task_spawn(&msgReceiverTask, "MonitoringTask", 0, 0 /*prio*/, 0, MonitoringAgent::messageReceiver, this));
 
+
+   #if VERBOSE_INFO
+   rt_printf("[ Monitoring ] - READY.\n");
+   #endif
    rt_print_flush_buffers();
 }
 
@@ -62,6 +69,7 @@ void Agent::initCommunications()
 {
    ERROR_MNG(rt_buffer_create(&_buff, MESSAGE_TOPIC_NAME, 20*sizeof(monitoringMsg), B_FIFO));
    ERROR_MNG(rt_event_create(&_event, CHANGE_MODE_EVENT_NAME, 0, EV_PRIO));
+   rt_printf("Buffer and Event flag created.\n"); rt_print_flush_buffers();
 }
 
 /***********************
@@ -117,34 +125,33 @@ void Agent::setAllTasks(std::vector<rtTaskInfosStruct> _TasksInfos)
          {
             if ( _taskInfo.fP.isHRT == chain.chainID)
             {
-               printf("Adding %s to HRT chain %d.\n", _taskInfo.fP.name, chain.chainID);
+               rt_printf("Adding %s to HRT chain %d.\n", _taskInfo.fP.name, chain.chainID);
                //taskMonitoringStruct* tms = new taskMonitoringStruct(_taskInfo);
                //tmpTaskChain.push_back(*new taskMonitoringStruct(_taskInfo));
-               chain.taskList.push_back(*new taskMonitoringStruct(_taskInfo));
+               chain.taskList.push_back(*new taskMonitoringStruct(_taskInfo, chain.logger));
                break;
             }
          }
       }
    }
 
+
    std::vector<taskMonitoringStruct> tmpTaskChain;
-   printf("Tasks allocated, sorting tasks in chain lists.\n");
    // classement des taches par ordre de precedence.
    for (auto& chain : allTaskChain)
    {
-      tmpTaskChain = chain.taskList;
-      chain.setPrecedencies();
-
+      // tmpTaskChain = chain.taskList;
+      //chain.taskList.clear();
       uint precedent = 0;
-      bool stop;
+      bool stop = FALSE;
       while (!stop)
       {
          stop = TRUE;
-         for (auto& task : tmpTaskChain)
+         for (auto&& task : chain.taskList)
          {
             if (task.precedencyID == precedent)
             {
-               chain.taskList.push_back(task);
+               tmpTaskChain.push_back(task);
                precedent = task.id;
                stop = FALSE;
                break;
@@ -152,16 +159,17 @@ void Agent::setAllTasks(std::vector<rtTaskInfosStruct> _TasksInfos)
          }
 
       }
-
+      chain.taskList = tmpTaskChain;
       chain.taskList.shrink_to_fit();
-      printf("Setting fixed data log array sizes.\n");
+
+      chain.lastTask = &(chain.taskList.back());
       chain.logger->setLogArray(chain.taskList.size() - 1);
+      chain.setPrecedencies();
+
+      tmpTaskChain.clear();
    }
-   // On vide le vecteur temporaire.
-   std::vector<taskMonitoringStruct>().swap(tmpTaskChain);
 
    bestEffortTasks.shrink_to_fit();
-
 }
 
 
@@ -176,8 +184,11 @@ void Agent::executeRun()
 
 void MonitoringAgent::executeRun()
 {
+   RTIME _time;
    while(!EndOfExpe)
    {
+      _time = rt_timer_read();
+
       for (auto& chain : allTaskChain)
       {
          // Execute part //
@@ -187,18 +198,21 @@ void MonitoringAgent::executeRun()
             chain.logger->cptAnticipatedMisses++;
          }
       }
+      rt_printf("%llu ; Monitoring Agent ; %llu\n", rt_timer_read(), _time);
+
       rt_task_wait_period(&overruns);
    }
+
+   rt_task_delete(&msgReceiverTask);
 }
 
 //const timespec noWait_time = {0,0};
 void MonitoringControlAgent::executeRun()
 {
    //int ret_msg = 0;
+   RTIME _time;
    while(!EndOfExpe)
    {
-      rt_fprintf(stderr,"[MCAgent] - %llu", rt_timer_read());
-
       /*
       ret_msg = rt_buffer_read(&_buff, &msg, sizeof(monitoringMsg), TM_NONBLOCK);
       switch(ret_msg)
@@ -216,6 +230,7 @@ void MonitoringControlAgent::executeRun()
          break;
          case sizeof(monitoringMsg) :
          */
+         _time = rt_timer_read();
       for (auto& chain : allTaskChain)
       {
          // Execute part //
@@ -232,11 +247,12 @@ void MonitoringControlAgent::executeRun()
                rt_fprintf(stderr, "[ MOCOAGENT ] Error on receiving message, code %s [%d].\n", getErrorName(ret_msg), ret_msg);
             break;
       } */
-      rt_fprintf(stderr," ; %llu \n", rt_timer_read());
+      rt_fprintf(stdout,"[MCAgent] ; %llu ; %llu\n", rt_timer_read(), _time);
 
       rt_task_wait_period(&overruns);
    }
 
+   rt_task_delete(&msgReceiverTask);
 }
 
 // METHODE OPTIMISABLE SUR LE PARCOURS
@@ -249,7 +265,7 @@ void Agent::updateTaskInfo(monitoringMsg msg)
    // printInquireInfo((RT_TASK*) msg.task);
    for (auto& chain : allTaskChain)
    {
-      for (auto& _task : chain.taskList)
+      for (auto&& _task : chain.taskList)
       {
          //cout << "Logged chain end at : " << _taskChain->currentEndTime/1.0e6 << endl;
          //cout << "Logged chain start at : " << msg.time/1.0e6 << endl;
@@ -265,11 +281,12 @@ void Agent::updateTaskInfo(monitoringMsg msg)
                if ( chain.unloadChain( msg.endTime) )
                { // si tache complete executee.
                   chain.isAtRisk = FALSE;
-                  chain.logger->logChain({chain.startTime, chain.startTime-msg.endTime});
+                  //cout << "LOGGING CHAIN FROM " << chain.startTime << " TO " << msg.endTime << endl;
+                  chain.logger->logChain({chain.startTime, msg.endTime-chain.startTime});
                   chain.updateStartTime();
+                  //sleep(1);
                }
             }
-
             return;
          }
       }
@@ -354,18 +371,25 @@ void Agent::saveData()
          outputFileChainData.open (file + CHAIN_FILE);    // TO APPEND :  //,ios_base::app);
 
          outputFileChainData << std::setw(15)           << "timestamp" << " ; "
-                             << std::setw(nameMaxSize) << "Chain"     << " ; "
-                             << std::setw(2)            << "ID"        << " ; "
-                             << std::setw(10)           << "deadline"  << " ; "
-                             << std::setw(10)           << "duration"  << endl;
+         << std::setw(nameMaxSize) << "name"     << " ; "
+         << std::setw(2)            << "ID"        << " ; "
+         << std::setw(10)           << "deadline"  << " ; "
+         << std::setw(10)           << "duration"  ;
 
-         
 
-         outputFileChainData.close();
 
-         for (auto _taskChain : allTaskChain)
+         for (auto& _taskChain : allTaskChain)
          {
-               _taskChain.logger->saveData(nameMaxSize);
+            for (uint j = 0; j < _taskChain.taskList.size() -1; j++)
+            {
+               outputFileChainData << " ; " << " rWCETs_t" << j;
+            }
+            outputFileChainData << endl;
+
+            outputFileChainData.close();
+            rt_fprintf(stdout, "[ %llu ] - SAVING CHAIN %s DATA.\n", rt_timer_read(), _taskChain.name);
+            rt_print_flush_buffers();
+            _taskChain.logger->saveData(nameMaxSize);
          }
       }
       else cerr << "WOAW !! Chain set is empty !!" << endl;
@@ -432,18 +456,23 @@ taskChain::taskChain(end2endDeadlineStruct _e2eInfos, string outfile)
 
 void taskChain::setPrecedencies()
 {
-   uint macroPeriod = 0;
+   unsigned long macroPeriod = 0;
    uint bufsize = 0;
 
-   for (auto& task : taskList)
+   for (auto&& task : taskList)
    {
       macroPeriod += task.deadline;
    }
 
-   for (auto& task_i : taskList)
+   for (auto&& task_i : taskList)
    {
-      bufsize = 1 + macroPeriod / task_i.deadline;
-      for (auto& task_k : taskList)
+      bufsize = 20; //* macroPeriod / task_i.deadline;
+      if (task_i.precedencyID == 0)
+      {
+         task_i.setChainInfos(bufsize, NULL);
+
+      }
+      else for (auto&& task_k : taskList)
       {
          if (task_i.precedencyID == task_k.id)
             task_i.setChainInfos(bufsize, &task_k);
@@ -475,7 +504,9 @@ bool taskChain::checkTaskE2E()
    if (startTime != 0)
    {
       RTIME execTime = getExecutionTime();
+      //rt_printf("Exec Time = %lu.\n", execTime); rt_print_flush_buffers();
       RTIME remTime = getRemWCET();
+      //rt_printf("Remaining Time = %lu.\n", remTime); rt_print_flush_buffers();
       miss = ( execTime + Wmax + t_RT + remTime > end2endDeadline ); // TOUT EN ns !!
       //cout << "Exec Time : " << execTime/1e6 << " | Rem Time : " << remTime/1e6 << " | Deadline : " << end2endDeadline/1e6 << endl;
    }
@@ -504,7 +535,11 @@ void taskChain::resetChain()
 
 void taskChain::updateStartTime()
 {
-   startTime = taskList.front().getState().start;
+   startTime = taskList.begin()->getState().start;
+   for (unsigned i = 1; i < taskList.size(); i++)
+   {
+      taskList.at(i).emptyUntil(startTime);
+   }
 }
 
 RTIME taskChain::getExecutionTime()
@@ -554,7 +589,7 @@ void taskChain::displayTasks()
 * @params : vector<rtTaskInfosStruct> rtTasks
 * @returns : [ vector<taskMonitoringStruct> taskList ]
 ***********************/
-taskMonitoringStruct::taskMonitoringStruct(rtTaskInfosStruct _taskInfos)
+taskMonitoringStruct::taskMonitoringStruct(rtTaskInfosStruct _taskInfos, ChainDataLogger* dataLogger)
 {
    ERROR_MNG(rt_task_bind(&xenoTask, _taskInfos.fP.name, TM_NONBLOCK));
    deadline = _taskInfos.rtP.periodicity;
@@ -566,6 +601,7 @@ taskMonitoringStruct::taskMonitoringStruct(rtTaskInfosStruct _taskInfos)
    oldestElement = 0;
    newestElement = 0;
    precedentTask = NULL;
+   logger = dataLogger;
 
 /* useless
    setState(FALSE);
@@ -584,7 +620,6 @@ void taskMonitoringStruct::setChainInfos(int bufsize, taskMonitoringStruct* prec
    execLogs = new ExecTimes[bufsize]; // amount to define.
    maxPendingChains = bufsize;
    precedentTask = prec;
-
 }
 
 /* addEntry(ExecTimes times)
@@ -597,16 +632,29 @@ bool taskMonitoringStruct::addEntry(ExecTimes times)
 {
    bool updateFollowedChain = FALSE;
    if (!precedencyID && newestElement == oldestElement ) updateFollowedChain = TRUE;
-   execLogs[newestElement++] = times;
+   execLogs[newestElement] = times;
+   newestElement++;
    newestElement = (newestElement == maxPendingChains ? 0 : newestElement); // comme un modulo
 
+   /*
+   uint i = oldestElement;
+   cout << "Task #" << id << " : ";
+   while (i != newestElement)
+   {
+      cout << "[" << execLogs[i].start-execLogs[oldestElement].start << "/" << execLogs[i].end-execLogs[oldestElement].start << "] | ";
+      i++;
+      i = (i == maxPendingChains ? 0 : i); // comme un modulo
+   }
+   cout << oldestElement << "/" << newestElement << endl;
+   cout.flush();
+   */
    return updateFollowedChain;
 }
 
-// ENTREE : start de la tâche suivante de chaine
-// SORTIE : start time valide (le + ancien) de la première tache de chaine
-bool taskMonitoringStruct::emptyPrecedency( RTIME limitTime, RTIME endOfChain)
+ExecTimes taskMonitoringStruct::emptyUntil(RTIME limitTime)
 {
+   //cout << "Emptying precedency of " << id << " => limitTime=" << limitTime << " ; " << oldestElement << "/" << newestElement << " ; ";
+
    ExecTimes _time = {0,0};
    // while there is still elements in the array AND
    // the time values are valid if there's a time value limit.
@@ -615,12 +663,21 @@ bool taskMonitoringStruct::emptyPrecedency( RTIME limitTime, RTIME endOfChain)
            ( (execLogs[oldestElement].end < limitTime) || !limitTime) )
    {
       _time = execLogs[oldestElement]; // save last removed element times
-
       oldestElement++; // remove element
       oldestElement = (oldestElement == maxPendingChains ? 0 : oldestElement); // comme un modulo
    }
 
-   if (_time.start == 0) return FALSE; // no tasks available, stop recursion
+   //cout << "->" << oldestElement << "/" << newestElement << endl;
+   return _time;
+}
+
+// ENTREE : start de la tâche suivante de chaine
+// SORTIE : start time valide (le + ancien) de la première tache de chaine
+bool taskMonitoringStruct::emptyPrecedency( RTIME limitTime, RTIME endOfChain)
+{
+   ExecTimes _time = emptyUntil(limitTime);
+
+   if (_time.start == 0) return FALSE; // no tasks removed from buffer, stop recursion
 
    bool result = TRUE;
 
@@ -629,8 +686,14 @@ bool taskMonitoringStruct::emptyPrecedency( RTIME limitTime, RTIME endOfChain)
 
    if (result && limitTime) // uniquement si on est pas sur la toute dernière tâche
    {
+      //cout << "Logging WCET from #" << id << " to end. D=" << endOfChain - _time.end << endl;
       // log du WCET d'etat de chaine quand on en est à CETTE tache qui est terminee.
+      // Pour t2 :  [t1] -> [t2]( -> [t3] -> [t4])
+      //                       ´|`__> WCET de fin de t2 à fin de t4.
+      //rt_printf("LOG @%d for #%d", logger, id);
       logger->logWCET(endOfChain - _time.end);
+
+
    }
 
    return  result;
@@ -655,7 +718,8 @@ void taskMonitoringStruct::displayInfos()
    RT_TASK_INFO xenoInfos;
    rt_task_inquire(&xenoTask, &xenoInfos);
    cout << "  |- Task    : "  << xenoInfos.name     << "\n"
-        << "   ‾‾|- ID      : " << id               << "\n"
+        << "   ‾|- ID      : " << id               << "\n"
+        << "     |- Prec. ID: " << precedencyID  << "\n"
         << "     |- Deadline: " << deadline /1.0e6  << "\n"
         << "     |- WCET    : " << rwcet /1.0e6     << "\n"
         << "     |- Priority: " << xenoInfos.prio      //   << "\n"

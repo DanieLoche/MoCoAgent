@@ -68,9 +68,10 @@ class taskMonitoringStruct
       RTIME rwcet;       // Static
       //bool operator <(const taskMonitoringStruct& tms) const {return (id < tms.id);}
 
-      taskMonitoringStruct(rtTaskInfosStruct rtTaskInfos);
+      taskMonitoringStruct(rtTaskInfosStruct rtTaskInfos, ChainDataLogger* logger);
       void setChainInfos(int bufsize, taskMonitoringStruct* prec);
       bool addEntry(ExecTimes times);
+      ExecTimes emptyUntil(RTIME limitTime);
       bool emptyPrecedency( RTIME limitTime, RTIME endOfChain); // récursif
       ExecTimes getState();
       void displayInfos();
@@ -200,9 +201,9 @@ class Agent : public TaskProcess
       Agent(rtTaskInfosStruct _taskInfo,
             std::vector<end2endDeadlineStruct> e2eDD,
             std::vector<rtTaskInfosStruct> tasksSet);
+
       void updateTaskInfo(monitoringMsg msg);
       void saveData();
-
       void executeRun();
 };
 
@@ -214,6 +215,7 @@ class MonitoringAgent : public Agent
                      std::vector<rtTaskInfosStruct> tasksSet);
 
       void executeRun();
+      static void messageReceiver(void* _arg /* Agent* */);
       void saveData();
 
 };

@@ -123,11 +123,14 @@ void ChainDataLogger::logChain(timeLog _execLog)
       {
          rt_fprintf(stderr, "[ WARNING ][ %s ] - Measured more Logs than allowed buffer size.\n", getName());
       }
+
+      //cptWCET = 0;
 }
 
 void ChainDataLogger::setLogArray(int size)
 {
    chainSize = size;
+   //cout << "ARRAY SIZE IS " << size << endl;
    for (auto& logElement : execLogs)
    {
       logElement.rWCETs = new unsigned long[chainSize];
@@ -136,10 +139,11 @@ void ChainDataLogger::setLogArray(int size)
 
 void ChainDataLogger::logWCET(unsigned long wcet)
 {
+   //rt_printf("LOGGING %lu AT %d TO LOCATION #%d\n", wcet, cptExecutions, cptWCET);
+   //rt_print_flush_buffers();
    execLogs[cptExecutions & MASK_SIZE].rWCETs[cptWCET] = wcet;
    cptWCET++;
-   if (cptWCET == chainSize) cptWCET = 0;
-
+   if (cptWCET >= chainSize) cptWCET = 0;
 }
 
 void TaskDataLogger::saveData(int nameSize, RT_TASK_INFO* cti)
@@ -225,7 +229,13 @@ void ChainDataLogger::saveData(int nameSize, RT_TASK_INFO* cti )
          << std::setw(nameSize) << getName()        << " ; "
          << std::setw(2)       << chainInfos.taskChainID  << " ; "
          << std::setw(10)      << chainInfos.deadline    << " ; "
-         << std::setw(10)      << _dur        << "\n";
+         << std::setw(10)      << _dur      ; // << " ; ";
+
+         for (int j = 0; j < chainSize; j++)
+         {
+            outputFileChainData << " ; " << execLogs[i].rWCETs[j];
+         }
+         outputFileChainData << endl;
 
          sommeTime += _dur;
          if (_dur < min_runtime) min_runtime = _dur;
