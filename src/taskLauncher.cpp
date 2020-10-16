@@ -270,7 +270,7 @@ int TaskLauncher::runAgent(long expeDuration)
       0,          // Affinity
       98,         // Priority
       SCHED_FIFO, // Scheduling POLICY
-      _mSEC(MCA_PERIOD), // periodicity
+      MCA_PERIOD, // periodicity
       99,         // id
       99,0,0,     // isHRT/task chain ID,precedency & WCET.
       "MoCoAgent", // char[32] name

@@ -14,8 +14,9 @@ void MonitoringAgent::messageReceiver(void* arg)
       int ret = rt_buffer_read(&(mocoAgent->_buff), &msg, sizeof(monitoringMsg), TM_NONBLOCK);
       if (ret == sizeof(monitoringMsg))
       {
+         _time = rt_timer_read();
          mocoAgent->updateTaskInfo(msg);
-         rt_printf("%llu ; Message Receiver ; %llu\n", rt_timer_read(), _time);
+         rt_fprintf(stderr,"%llu ; Message Receiver ; %llu\n", _time, rt_timer_read());
       }
       //rt_mutex_release(&mocoAgent->_bufMtx);
       //rt_task_sleep()_mSEC(1);
@@ -198,12 +199,12 @@ void MonitoringAgent::executeRun()
             chain.logger->cptAnticipatedMisses++;
          }
       }
-      rt_printf("%llu ; Monitoring Agent ; %llu\n", rt_timer_read(), _time);
+      rt_fprintf(stderr, "%llu ; Monitoring Agent ; %llu\n", _time, rt_timer_read());
 
       rt_task_wait_period(&overruns);
    }
 
-   rt_task_delete(&msgReceiverTask);
+   //rt_task_delete(&msgReceiverTask);
 }
 
 //const timespec noWait_time = {0,0};
