@@ -20,7 +20,7 @@ void MonitoringAgent::messageReceiver(void* arg)
       }
       //rt_mutex_release(&mocoAgent->_bufMtx);
       //rt_task_sleep()_mSEC(1);
-      //rt_task_yield();
+      rt_task_yield();
       //rt_task_wait_period(0);
    }
 }
@@ -52,8 +52,7 @@ MonitoringAgent::MonitoringAgent(rtTaskInfosStruct _taskInfo,
    MoCoIsAlive = TRUE;
    initCommunications();
 
-   ERROR_MNG(rt_task_spawn(&msgReceiverTask, "MonitoringTask", 0, 0 /*prio*/, 0, MonitoringAgent::messageReceiver, this));
-
+   ERROR_MNG(rt_task_spawn(&msgReceiverTask, "MonitoringTask", 0, 99 /*prio*/, 0, MonitoringAgent::messageReceiver, this));
 
    #if VERBOSE_INFO
    rt_printf("[ Monitoring ] - READY.\n");
