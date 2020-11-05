@@ -57,7 +57,6 @@ int TaskLauncher::readChainsList(string input_file)
    chainSet.shrink_to_fit();
    if (!chainSet.empty())
    {
-      printChainSetInfos ( );
       return 0;
    } else return -1;
 }
@@ -115,7 +114,6 @@ int TaskLauncher::readTasksList(int cpuPercent)
             taskInfo->fP.isHRT = std::max(0,sign(tmp_HRT)); //0 for BE, 1 for HRT
             // Traitement de la périodicité de la tâche
             taskInfo->rtP.periodicity = cpuFactor * _mSEC(tmp_period); //taskInfo->periodicity = taskInfo->periodicity * 1.0e6 * cpuFactor;
-            //printTaskInfo(&taskInfo); // Résumé
             //askInfo->rtP.schedPolicy = schedPolicy;
             taskInfo->rtP.schedPolicy = (taskInfo->rtP.priority ? schedPolicy : SCHED_OTHER);
 
@@ -239,7 +237,7 @@ int TaskLauncher::runTasks(long expeDuration)
          rt_print_flush_buffers();
 
          rt_sem_p(&_sync_Task_Sem, TM_INFINITE);
-         rt_fprintf(stderr, "[ %llu ][ %s ] - Got MoCoAgent Semaphor...\n", rt_timer_read(), currentProcess->prop.fP.name);
+         rt_fprintf(stderr, "[ %llu ][ %s ] - Got Semaphor...\n", rt_timer_read(), currentProcess->prop.fP.name);
 
          RT_TASK_INFO cti;
          rt_task_inquire(&currentProcess->_task, &cti);
@@ -432,42 +430,68 @@ void TaskLauncher::finishTask(void* _MacroTask)
    currentProcess->EndOfExpe = TRUE;
 }
 
+void TaskLauncher::printChainSetInfos ( ) // std::vector<rtTaskInfosStruct> _myTasksInfos)
+{
+   std::ofstream outputFileStr;
+   string outputFile = outputFileName + RESUME_FILE;
+   outputFileStr.open (outputFile, std::ios::app);
+   outputFileStr << "Resume of Chain set information : " << chainSet.size() << " elements." << endl;
+   outputFileStr << std::setw(18) << "NAME"    << " ; "
+                  << std::setw(2) << "ID"     << " ; "
+                  << std::setw(8) << "DEADLINE"   << " ; "
+                  << "PATH"
+                  << endl;
+
+   if (!chainSet.empty())
+   for (auto &chainInfo : chainSet)
+   {
+      outputFileStr << std::setw(nameMaxSize) << chainInfo.name    << " ; "
+                     << std::setw(2) << chainInfo.taskChainID     << " ; "
+                     << std::setw(8) << chainInfo.deadline   << " ; "
+                     << chainInfo.Path
+                     << endl;
+   }
+   else cerr << "[ERROR] - No Task Chain to display !" << endl;
+
+   outputFileStr.close();
+}
 
 void TaskLauncher::printTaskSetInfos ( ) // std::vector<rtTaskInfosStruct> _myTasksInfos)
 {
-   #if VERBOSE_INFO
    cout << "Resume of tasks set information : " << endl;
+      std::ofstream outputFileStr;
+      string outputFile = outputFileName + RESUME_FILE;
+      outputFileStr.open (outputFile, std::ios::app);
+      outputFileStr << std::setw(2) << "ID"     << " ; "
+                    << std::setw(4) << "PREC"     << " ; "
+                    << std::setw(nameMaxSize) << "NAME"    << " ; "
+                    << std::setw(18) << "FUNC."   << " ; "
+                    << std::setw(5) << "isHRT"    << " ; "
+                    << std::setw(4) << "PRIO"    << " ; "
+                    << std::setw(6) << "PERIOD"   << " ; "
+                    << std::setw(6) << "rWCET"   << " ; "
+                    << std::setw(4) << "CORE"    << " ; "
+                    << "ARGUMENTS"
+                    << endl;
    if (!tasksSet.empty())
-      for (auto &taskInfo : tasksSet)
+   {
+      for (auto &t : tasksSet)
       {
-         cout << "Name: " << taskInfo.fP.name
-         << "  | path: " << taskInfo.fP.func
-         << "  | is RT ? " << taskInfo.fP.isHRT
-         << "  | Period: " << taskInfo.rtP.periodicity/1.0e6
-         << "  | Deadline: " << taskInfo.fP.wcet/1.0e6
-         << "  | affinity: " << taskInfo.rtP.affinity
-         << "  | priority: " << taskInfo.rtP.priority
-         << "  | ID: "<< taskInfo.fP.id << endl;
-
+         outputFileStr << std::setw(2)  << t.fP.id     << " ; "
+                       << std::setw(4) << t.fP.prec     << " ; "
+                       << std::setw(nameMaxSize) << t.fP.name   << " ; "
+                       << std::setw(18) << t.fP.func   << " ; "
+                       << std::setw(5)  << t.fP.isHRT   << " ; "
+                       << std::setw(4)  << t.rtP.priority    << " ; "
+                       << std::setw(6)  << t.rtP.periodicity/1.0e6   << " ; "
+                       << std::setw(6)  << t.fP.wcet/1.0e6   << " ; "
+                       << std::setw(4)  << t.rtP.affinity    << " ; "
+                       << t.fP.args
+                       << endl;
       }
+      outputFileStr.close();
+   }
    else cerr << "[ERROR] - No Tasks to display !" << endl;
-   #endif
-}
-
-void TaskLauncher::printChainSetInfos ( ) // std::vector<rtTaskInfosStruct> _myTasksInfos)
-{
-   #if VERBOSE_INFO
-   cout << "Resume of Chain set information : " << chainSet.size() << " elements." << endl;
-   if (!chainSet.empty())
-      for (auto &chainInfo : chainSet)
-      {
-         cout << "Name: " << chainInfo.name
-         << "  | ID: "<< chainInfo.taskChainID
-         << "  | path: " << chainInfo.Path
-         << "  | Deadline: " << chainInfo.deadline << endl;
-      }
-   else cerr << "[ERROR] - No Task Chain to display !" << endl;
-   #endif
 }
 
 

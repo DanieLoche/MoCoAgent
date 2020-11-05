@@ -107,8 +107,12 @@ int main(int argc, char* argv[])
       << "Output files: " << outputFile << "_Expe.csv & "
       << outputFile       << "_Chains.csv"  << " & "
       << outputFile       << "_Resume.txt"    << endl;
-
    outputFileResume.close();
+
+   tln->printChainSetInfos();
+   tln->printTaskSetInfos();
+
+
    if(tln->runTasks(expeDuration)) {cerr << "Failed to create all tasks" << endl; return -4;}
 
    sleep(2);

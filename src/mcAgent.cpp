@@ -14,9 +14,9 @@ void MonitoringAgent::messageReceiver(void* arg)
       int ret = rt_buffer_read(&(mocoAgent->_buff), &msg, sizeof(monitoringMsg), TM_NONBLOCK);
       if (ret == sizeof(monitoringMsg))
       {
-         _time = rt_timer_read();
+         /////////_time = rt_timer_read();
          mocoAgent->updateTaskInfo(msg);
-         rt_fprintf(stderr,"%llu ; Message Receiver ; %llu\n", _time, rt_timer_read());
+         /////////rt_fprintf(stderr,"%llu ; Message Receiver ; %llu\n", _time, rt_timer_read());
       }
       //rt_mutex_release(&mocoAgent->_bufMtx);
       //rt_task_sleep()_mSEC(1);
@@ -188,18 +188,22 @@ void MonitoringAgent::executeRun()
    RTIME _time;
    while(!EndOfExpe)
    {
+      #if VERBOSE_LOGS
       _time = rt_timer_read();
-
+      #endif
       for (auto& chain : allTaskChain)
       {
          // Execute part //
          if ( chain.checkTaskE2E() && !chain.isAtRisk)
          {
+            #if VERBOSE_LOGS
+            rt_fprintf(stderr, "%llu ; Monitoring Agent ; %llu\n", _time, rt_timer_read());
+            #endif
             chain.isAtRisk = TRUE;
             chain.logger->cptAnticipatedMisses++;
          }
       }
-      rt_fprintf(stderr, "%llu ; Monitoring Agent ; %llu\n", _time, rt_timer_read());
+      /////////////rt_fprintf(stderr, "%llu ; Monitoring Agent ; %llu\n", _time, rt_timer_read());
 
       rt_task_wait_period(&overruns);
    }
@@ -231,7 +235,7 @@ void MonitoringControlAgent::executeRun()
          break;
          case sizeof(monitoringMsg) :
          */
-         _time = rt_timer_read();
+   /////////////_time = rt_timer_read();
       for (auto& chain : allTaskChain)
       {
          // Execute part //
@@ -248,7 +252,8 @@ void MonitoringControlAgent::executeRun()
                rt_fprintf(stderr, "[ MOCOAGENT ] Error on receiving message, code %s [%d].\n", getErrorName(ret_msg), ret_msg);
             break;
       } */
-      rt_fprintf(stdout,"[MCAgent] ; %llu ; %llu\n", rt_timer_read(), _time);
+
+      /////////////rt_fprintf(stdout,"[MCAgent] ; %llu ; %llu\n", rt_timer_read(), _time);
 
       rt_task_wait_period(&overruns);
    }
