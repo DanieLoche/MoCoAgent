@@ -1,6 +1,4 @@
 name             chaineID   Path                        deadline
-typeset_L        5       ./tasksBench/typeset_L.in         5000      TS_L
-typeset_S        5       ./tasksBench/typeset_S.in         5000      TS_S
 do_load          20      ./tasksBench/load_L.in            100       Ld_L
 no_load          20      ./tasksBench/load_S.in            100       Ln_S
 bitcount_L       1       ./tasksBench/bitcount_L.in        5000      BC_L
