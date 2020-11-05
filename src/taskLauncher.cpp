@@ -96,7 +96,7 @@ int TaskLauncher::readTasksList(int cpuPercent)
             if (!(iss >> taskInfo->fP.id >> name
                       >> tmp_wcet     // WCET -> for task chain // placeholder.
                       >> tmp_period   // meanET -> period
-                      >> tmp_HRT
+                      >> tmp_HRT    // -/+ => BE/HRT tasks. 0 => BE task with sched_other.
                       >> taskInfo->rtP.affinity
                       >> taskInfo->fP.prec
                       >> taskInfo->fP.func ) )
@@ -110,12 +110,14 @@ int TaskLauncher::readTasksList(int cpuPercent)
             taskInfo->fP.args = reduce(taskInfo->fP.args);
 
             taskInfo->fP.wcet = _uSEC(tmp_wcet);              // conversion us to RTIME (ns)
-            taskInfo->rtP.priority = abs(tmp_HRT);
+            //taskInfo->rtP.priority = abs(tmp_HRT);
+            taskInfo->rtP.priority = (schedPolicy ? abs(tmp_HRT) : 0);
             taskInfo->fP.isHRT = std::max(0,sign(tmp_HRT)); //0 for BE, 1 for HRT
             // Traitement de la périodicité de la tâche
             taskInfo->rtP.periodicity = cpuFactor * _mSEC(tmp_period); //taskInfo->periodicity = taskInfo->periodicity * 1.0e6 * cpuFactor;
             //printTaskInfo(&taskInfo); // Résumé
-            taskInfo->rtP.schedPolicy = schedPolicy;
+            //askInfo->rtP.schedPolicy = schedPolicy;
+            taskInfo->rtP.schedPolicy = (taskInfo->rtP.priority ? schedPolicy : SCHED_OTHER);
 
             tasksSet.push_back(*taskInfo);
          }
@@ -185,9 +187,6 @@ int TaskLauncher::runTasks(long expeDuration)
          currentTaskDescriptor = taskInfo;
          MacroTask* currentProcess;
 
-         //RT_TASK _t;
-         //ERROR_MNG(rt_task_shadow(&_t, "TOTO", 1, 0));
-         //sleep(50);
          if (currentTaskDescriptor.fP.isHRT == 0)
             currentProcess = new BEMacroTask(currentTaskDescriptor, enableAgent, outputFileName);
          else

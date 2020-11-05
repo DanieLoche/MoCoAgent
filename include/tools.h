@@ -28,7 +28,7 @@ using std::endl;
 using std::cin;
 using std::cerr;
 
-#define RESUME_FILE "_resume.txt"
+#define RESUME_FILE  "_resume.txt"
 #define CHAIN_FILE   "_chains.csv"
 #define TASKS_FILE   "_expe.csv"
 
@@ -45,15 +45,13 @@ using std::cerr;
 #define     SCHED_EDF       6 // Not Implemented
 #define     SCHED_RM        7 // Rate-Monotonic
 
-#define   RR_SLICE_TIME     _mSEC(5)  // clock ticks (=ns)
-#define   SPINTIME          1e7   // spin time in ns
-#define   EXECTIME          2e8   // execution time in ns
+#define   RR_SLICE_TIME     _mSEC(2)  // clock ticks (=ns)
 
-
-#define   VERBOSE_INFO      1 // Cout d'informations, démarrage, etc...
-#define   VERBOSE_DEBUG     1 // Cout de débug...
-#define   VERBOSE_OTHER     1 // Cout autre...
-#define   VERBOSE_ASK       1 // cout explicitement demandés dans le code
+#define   VERBOSE_INFO     1 // Cout d'informations, démarrage, etc...
+#define   VERBOSE_LOGS     0
+#define   VERBOSE_DEBUG    0 // Cout de débug...
+#define   VERBOSE_OTHER    0 // Cout autre...
+#define   VERBOSE_ASK      0 // cout explicitement demandés dans le code
 
 #define _SEC(_time)    ((_time)*1000 * 1000 * 1000)
 #define _mSEC(_time)   ((_time)*1000 * 1000)
@@ -88,6 +86,14 @@ do {                                                                   \
    case _fn5 :
 
 //#define TO_STRING(str) convertToString(str)
+
+struct end2endDeadlineStruct
+{
+   char name[32];
+   uint taskChainID;
+   string Path;
+   RTIME deadline;
+};
 
 struct rtPStruct // Real-time Parameters
 {
@@ -130,14 +136,6 @@ struct sortDescendingPeriod {
    }
 };
 
-struct end2endDeadlineStruct
-{
-  char name[32];
-  uint taskChainID;
-  string Path;
-  RTIME deadline;
-};
-
 template <typename T> int sign(T val) {
       return (T(0) < val) - (val < T(0));
 }
@@ -155,19 +153,6 @@ std::string reduce(const std::string& str,
                    const std::string& whitespace = " \t");
 
 //string convertToString(const char* a){ std::string s = a; return s; }
-
-/*
-struct logData
-{
-  struct timeLog
-  {
-    RTIME timestamp;
-    RTIME duration;
-  } timeLogs[8000];
-  int cptOutOfDeadline;
-  int cptExecutions;
-};
-*/
 
 /* To create a task :
  * Arguments : &task,

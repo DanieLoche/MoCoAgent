@@ -144,6 +144,9 @@ const char* getSchedPolicyName(int schedPol)
       case SCHED_RM        :
          return "Rate-Monotonic\0";
       break;
+      case SCHED_OTHER     :
+         return "Other\0";
+      break;
       default : return "Undefined Policy\0";
       break;
    }

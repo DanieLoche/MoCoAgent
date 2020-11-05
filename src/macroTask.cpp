@@ -22,14 +22,11 @@ void TaskProcess::setRTtask(rtPStruct _rtInfos, char* _name)
    //system("find /proc/xenomai");
    XENO_INIT(_name);
    //cout << "[" << _name << "] - XENO INIT PASSED." << endl;
-   int ret = 0;
    ERROR_MNG(rt_task_shadow(&_task, _name, _rtInfos.priority, 0));
-   //ret = rt_task_shadow(&_task, _name, _rtInfos.priority, 0);
-
+   rt_printf("[ %s ] - shadowed.\n", _name); //cout << "["<< _name << "]"<< " shadowed." << endl;
    rt_print_flush_buffers();
-   rt_printf("[ %s ] - shadowed : %d (%s).\n", _name, ret, getErrorName(ret)); //cout << "["<< _name << "]"<< " shadowed." << endl;
 
-   if (_rtInfos.priority != 0 || _rtInfos.schedPolicy == SCHED_OTHER)
+   if (_rtInfos.priority != 0 && _rtInfos.schedPolicy != SCHED_OTHER)
    { // if priority = 0, SCHED_OTHER !!
       RT_TASK_INFO curtaskinfo;
       rt_task_inquire(0, &curtaskinfo);
@@ -290,7 +287,7 @@ void MacroTask::findFunction (char* _func)
 int MacroTask::proceed()
 {
    #if VERBOSE_OTHER
-   //rt_fprintf(stderr, "[ %s ] - Executing Proceed.\n", prop.fP.name);
+   //rt_fprintf(stderr, "[%llu][ %s ] - Executing Proceed.\n", rt_timer_read(), prop.fP.name);
    #endif
 
    int ret = proceed_function(_argv.size()-1, &_argv[0]);  // -1 : no need for last element "NULL".
@@ -475,7 +472,7 @@ int do_xeno_init(char* _name)
       //"--enable-registry"
       //"--registry-root=/usr/xenomai",
       "--shared-registry",
-      "--session=test",
+      "--session=Expe",
       //"--dump-config",
       NULL
    };

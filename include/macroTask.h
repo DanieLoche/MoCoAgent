@@ -17,6 +17,7 @@
 #define  LOG_MUTEX_NAME          "logToFileMutex"
 
 #define  USE_MUTEX               0
+#define  WITH_BOOL               0
 
 #define   MCA_PERIOD       _mSEC(5) // ms
 const RTIME t_RT     =     _uSEC(500);  // time to trigger the Control Agent
@@ -31,7 +32,6 @@ struct ExecTimes
    RTIME end;
 };
 
-#define WITH_BOOL   0
 struct monitoringMsg
 {
    //RT_TASK* task;

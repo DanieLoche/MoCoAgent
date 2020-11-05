@@ -36,6 +36,9 @@ fi
 ./runBashTest.sh -i $input -s 1 -d $duration -l $load;
 FIFO=$? ;
 
+./runBashTest.sh -i $input -s 0 -d $duration -l $load;
+OTHER=$? ;
+
 ./runBashTest.sh -i $input -s 2 -d $duration -l $load;
 RR=$? ;
 
@@ -43,5 +46,6 @@ RR=$? ;
 RM=$? ;
 
 echo "Result FIFO : $FIFO"
+echo "Result OTHER : $OTHER"
 echo "Result RR : $RR"
 echo "Result RM : $RM"

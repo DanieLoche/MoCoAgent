@@ -65,7 +65,7 @@ int main(int argc, char* argv[])
       else if (arg == "-FIFO")   schedMode = SCHED_FIFO;
       else if  (arg == "-RM")    schedMode = SCHED_RM;
       else if  (arg == "-RR")    schedMode = SCHED_RR;
-      else if  (arg == "-EDF")   schedMode = SCHED_EDF; // NOT MANAGED !!
+      else if  (arg == "-OTHER") schedMode = SCHED_OTHER;
 
     }
 
