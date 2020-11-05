@@ -92,13 +92,13 @@ int main(int argc, char* argv[])
    cout << "\n------------------------------" << endl;
    cout << " Generating Task Set ..." << endl;
    #endif
-   if(tln->readChainsList(inputFile)) {cerr << "Failed to read task chains or no chain found." << endl; return -1;}
+   if(tln->readChainsList(inputFile)) {cerr << "Failed to read task chains or no chain found." << endl; exit(-1);}
    if(tln->readTasksList(cpuFactor)) {cerr << "Failed to read tasks list or no tasks found." << endl; return -2;}
 
    std::ofstream outputFileResume;
    string outputFileName = outputFile + RESUME_FILE;
    outputFileResume.open (outputFileName);    // TO APPEND :  //,ios_base::app);
-   outputFileResume << "Experiment made at " << /*ctime(&(time_t)time(0)) << */" with parameters : \n"
+   outputFileResume << "Experiment made" /* at " << ctime(&(time_t)time(0)) << */" with parameters : \n"
       << " MoCoAgent: " << enableAgent  << "\n"
       << "  Duration: " << expeDuration << "\n"
       << "CPU Factor: " << cpuFactor    << "\n"

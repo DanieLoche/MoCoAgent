@@ -337,11 +337,12 @@ int TaskLauncher::runAgent(long expeDuration)
    rt_printf("====== End of Experimentation. Saving Data. ======\n");
    rt_print_flush_buffers();
 
+   std::ofstream outputFileResume;
+   outputFileResume.open (outputFileName + RESUME_FILE, std::ios::app);    // TO APPEND :  //,ios_base::app);
+
    RT_TASK_INFO cti;
    if (!rt_task_inquire(NULL, &cti))
    {
-      std::ofstream outputFileResume;
-      outputFileResume.open (outputFileName + RESUME_FILE, std::ios::app);    // TO APPEND :  //,ios_base::app);
       outputFileResume << "\n Monitoring and Control Agent Stats : \n"
                     << "Primary Mode execution time - " << cti.stat.xtime/1.0e6 << " ms."
                     << " Timeouts : " << cti.stat.timeout << "\n"
@@ -349,8 +350,8 @@ int TaskLauncher::runAgent(long expeDuration)
                     << "Context Switches - " << cti.stat.csw << "\n"
                     << "Cobalt Sys calls - " << cti.stat.xsc
                     << endl;
-      outputFileResume.close();
    }
+   outputFileResume.close();
 
    rt_fprintf(stderr, "[ %llu ] - SAVING AGENT DATA.\n", rt_timer_read());
    rt_print_flush_buffers();
@@ -366,16 +367,32 @@ int TaskLauncher::runAgent(long expeDuration)
    }*/
    currentProcess->saveData();
 
+   outputFileResume.open (outputFileName + RESUME_FILE, std::ios::app);    // TO APPEND :  //,ios_base::app);
+   outputFileResume << endl << std::setw(nameMaxSize) << "NAME"       << " ; "
+                  << std::setw(6) << "DEADLN"   << " ; "
+                  << std::setw(4) << "MISS"     << " ; "
+                  << std::setw(4) << "OVER"   << " ; "
+                  << std::setw(6) << "EXECS"      << " ; "
+                  << std::setw(7) << "MIN"        << " ; "
+                  << std::setw(7) << "AVG"        << " ; "
+                  << std::setw(7) << "MAX"        << " ; "
+                  << std::setw(7) << "in PRIM" << " ; "
+                  << std::setw(7) << "MODE SW"    << " ; "
+                  << std::setw(7) << "CONT SW"  << " ; "
+                  << std::setw(7) << "SYSCALL"  << " ; "
+                  << std::setw(7) << "TIMEOUT"   << endl;
+   outputFileResume.close();
+
    std::ofstream myFile;
    myFile.open (outputFileName + TASKS_FILE);    // TO APPEND :  //,ios_base::app);
    myFile << std::setw(15) << "timestamp" << " ; "
-   << std::setw(nameMaxSize) << "name"     << " ; "
-   << std::setw(2)  << "ID"       << " ; "
-   << std::setw(3)  << "HRT"      << " ; "
-   << std::setw(4) << "Prio"      << " ; "
-   << std::setw(10) << "deadline" << " ; "
-   << std::setw(4)  << "aff."     << " ; "
-   << std::setw(10) << "duration" << "\n";
+         << std::setw(nameMaxSize) << "name"     << " ; "
+         << std::setw(2)  << "ID"       << " ; "
+         << std::setw(3)  << "HRT"      << " ; "
+         << std::setw(4) << "Prio"      << " ; "
+         << std::setw(10) << "deadline" << " ; "
+         << std::setw(4)  << "aff."     << " ; "
+         << std::setw(10) << "duration" << "\n";
    myFile.close();
 
    RTIME time = rt_timer_read();

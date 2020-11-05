@@ -372,10 +372,10 @@ void Agent::saveData()
          outputFileChainData.open (file + CHAIN_FILE);    // TO APPEND :  //,ios_base::app);
 
          outputFileChainData << std::setw(15)           << "timestamp" << " ; "
-         << std::setw(nameMaxSize) << "name"     << " ; "
-         << std::setw(2)            << "ID"        << " ; "
-         << std::setw(10)           << "deadline"  << " ; "
-         << std::setw(10)           << "duration"  ;
+                              << std::setw(nameMaxSize) << "name"      << " ; "
+                              << std::setw(2)           << "ID"        << " ; "
+                              << std::setw(10)          << "deadline"  << " ; "
+                              << std::setw(10)          << "duration"  ;
 
 
 

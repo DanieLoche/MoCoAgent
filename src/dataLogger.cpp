@@ -191,20 +191,23 @@ void TaskDataLogger::saveData(int nameSize, RT_TASK_INFO* cti)
          std::ofstream outputFileResume;
          outputFileResume.open (outputFileName + RESUME_FILE, std::ios::app);    // TO APPEND :  //,ios_base::app);
 
-         outputFileResume
-            << "\nRunning summary for task "
-            << getName() << ". (" << cti->pid << ", " << cti->prio << ", " << cti->name << ") Deadline : " << deadline / 1.0e6     << " ms.\n"
-            << "Missed"     << " | "                 << "(2) | " << "Executions " << "\n"
-            << std::setw(6) <<  cptOutOfDeadline << " | " << std::setw(3) << overruns << " | " << cptExecutions << " task times" << "\n"
-            << "Primary Mode execution time - " << cti->stat.xtime/1.0e6 << " ms. Timeouts : " << cti->stat.timeout << "\n"
-            <<         "  MIN  "   << " | " <<        "  AVG  "        << " | " <<      "  MAX"        << "\n"
-            << min_runtime / 1.0e6 << " | " << average_runtime / 1.0e6 << " | " << max_runtime / 1.0e6 << " (ms) [task profile]" << "\n"
-            << "   Mode Switches - " << cti->stat.msw << "\n"
-            << "Context Switches - " << cti->stat.csw << "\n"
-            << "Cobalt Sys calls - " << cti->stat.xsc
-         << endl;
+         outputFileResume << std::setw(nameSize) << getName()                 << " ; "
+                        << std::setw(6)  << (deadline/1.0e6)          << " ; "
+                        << std::setw(4)  <<  cptOutOfDeadline           << " ; "
+                        << std::setw(4)  << overruns                    << " ; "
+                        << std::setw(6)  << cptExecutions               << " ; "
+                        << std::setw(7)  << (min_runtime/1.0e6)       << " ; "
+                        << std::setw(7)  << (average_runtime/1.0e6)   << " ; "
+                        << std::setw(7)  << (max_runtime/1.0e6)       << " ; "
+                        << std::setw(7)  << (cti->stat.xtime/1.0e6)   << " ; "
+                        << std::setw(7)  << cti->stat.msw               << " ; "
+                        << std::setw(7)  << cti->stat.csw               << " ; "
+                        << std::setw(7)  << cti->stat.xsc               << " ; "
+                        << std::setw(7)  << cti->stat.timeout
+                        << endl;
 
          outputFileResume.close();
+
       } else rt_fprintf(stderr, "[ ERROR ] - Error inquiring task %s : %s (%d).\n", getName(), getErrorName(ret), ret);
 
 }
@@ -225,11 +228,12 @@ void ChainDataLogger::saveData(int nameSize, RT_TASK_INFO* cti )
       const RTIME _dur = execLogs[i].duration;
       if (execLogs[i].timestamp != 0)
       {
-         outputFileChainData << std::setw(15)      << execLogs[i].timestamp << " ; "
-         << std::setw(nameSize) << getName()        << " ; "
-         << std::setw(2)       << chainInfos.taskChainID  << " ; "
-         << std::setw(10)      << chainInfos.deadline    << " ; "
-         << std::setw(10)      << _dur      ; // << " ; ";
+         outputFileChainData
+               << std::setw(15)      << execLogs[i].timestamp << " ; "
+               << std::setw(nameSize) << getName()        << " ; "
+               << std::setw(2)       << chainInfos.taskChainID  << " ; "
+               << std::setw(10)      << chainInfos.deadline    << " ; "
+               << std::setw(10)      << _dur      ; // << " ; ";
 
          for (int j = 0; j < chainSize; j++)
          {
