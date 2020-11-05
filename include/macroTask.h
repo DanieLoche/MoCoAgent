@@ -73,7 +73,7 @@ class taskMonitoringStruct
       bool addEntry(ExecTimes times);
       ExecTimes emptyUntil(RTIME limitTime);
       bool emptyPrecedency( RTIME limitTime, RTIME endOfChain); // récursif
-      ExecTimes getState();
+      ExecTimes getState(RTIME limit = 0);
       void displayInfos();
 };
 

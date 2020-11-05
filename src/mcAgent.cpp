@@ -700,18 +700,29 @@ bool taskMonitoringStruct::emptyPrecedency( RTIME limitTime, RTIME endOfChain)
    return  result;
 }
 
-ExecTimes taskMonitoringStruct::getState()
+ExecTimes taskMonitoringStruct::getState(RTIME limitTime)
 {
    // si aucun élément dans le tableau
    if (oldestElement == newestElement) return {0,0};
 
    #if USE_MUTEX
       rt_mutex_acquire(&mtx_taskStatus, TM_INFINITE);
-      return execLogs[oldestElement];
-      rt_mutex_release(&mtx_taskStatus);
-   #else
-      return execLogs[oldestElement];
    #endif
+
+   uint i = oldestElement;
+   while ( ( i != newestElement ) &&
+           (execLogs[i].start < limitTime) )
+   {
+      i++; // remove element
+      i = (i == maxPendingChains ? 0 : i); // comme un modulo
+   }
+      return execLogs[i];
+
+   #if USE_MUTEX
+   rt_mutex_release(&mtx_taskStatus);
+   #endif
+
+
 }
 
 void taskMonitoringStruct::displayInfos()
