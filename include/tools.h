@@ -103,6 +103,7 @@ struct rtPStruct // Real-time Parameters
    int priority;      //
    int schedPolicy;   //
    RTIME periodicity; // in clock ticks, inputed as ms !
+   uint offsetTime;
 
 };
 
@@ -110,7 +111,7 @@ struct funcPStruct   // Functional parameters
 {
    uint id;
    uint isHRT;     // task chain ID or best effort if null
-   int prec;
+   uint prec;
    RTIME wcet;   //
    char name[32]; //
    char func[128];

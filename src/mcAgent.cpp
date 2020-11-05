@@ -713,7 +713,7 @@ ExecTimes taskMonitoringStruct::getState(RTIME limitTime)
    while ( ( i != newestElement ) &&
            (execLogs[i].start < limitTime) )
    {
-      i++; // remove element
+      i++; // next element
       i = (i == maxPendingChains ? 0 : i); // comme un modulo
    }
       return execLogs[i];

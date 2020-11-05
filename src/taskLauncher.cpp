@@ -132,6 +132,16 @@ int TaskLauncher::readTasksList(int cpuPercent)
          return -1;
       }
 
+      unsigned int offset = 0;
+      for (auto taskInfo = tasksSet.begin(); taskInfo != tasksSet.end(); ++taskInfo)
+      {
+         taskInfo->rtP.offsetTime = offset;
+         offset += 100;
+
+         int sizeName = strlen(taskInfo->fP.name);
+         if (sizeName > nameMaxSize) nameMaxSize = sizeName;
+      }
+
       if (schedPolicy == SCHED_RM)
       { // Changer les niveaux de priorité si on schedule en RM.
          #if VERBOSE_INFO
@@ -153,14 +163,7 @@ int TaskLauncher::readTasksList(int cpuPercent)
 
    }
 
-   for (auto taskInfo = tasksSet.begin(); taskInfo != tasksSet.end(); ++taskInfo)
-   {
-      int sizeName = strlen(taskInfo->fP.name);
-      if (sizeName > nameMaxSize) nameMaxSize = sizeName;
-   }
-
    tasksSet.shrink_to_fit();
-   printTaskSetInfos();
 
    return 0;
 }
@@ -222,14 +225,13 @@ int TaskLauncher::runTasks(long expeDuration)
          #if VERBOSE_DEBUG
          rt_fprintf(stderr, "[ %llu ][ %s ] - Semaphor %s signal received, go !\n", rt_timer_read(), currentTaskDescriptor.fP.name, SEM_MC_NAME);
          #endif
-         //rt_task_sleep(_mSEC(10));
 
             //rt_fprintf(stderr, "[ %s ] - Execution in progress - BE.\n", currentTaskDescriptor.fP.name);
             rt_print_flush_buffers();
-            //rt_task_sleep(_mSEC(100)); // on attend que le système se stabilise avant de lancer le Control.
+            rt_task_sleep(_uSEC(currentProcess->prop.rtP.offsetTime)); // Délai pour forcer l'ordre de lancement à T0.
             currentProcess->executeRun();
 
-            rt_task_sleep(_mSEC(1));
+            //rt_task_sleep(_mSEC(1));
 
 ///////////////////////////////////////////////////////////
 /////////////// END OF EXPERIMENT /////////////////////////
@@ -247,8 +249,10 @@ int TaskLauncher::runTasks(long expeDuration)
          rt_sem_v(&_sync_Task_Sem);
          rt_fprintf(stderr, "[ %llu ][ %s ] - Semaphor released.\n", time, currentProcess->prop.fP.name);
 
+         //rt_task_sleep(_SEC(1));
          rt_fprintf(stderr, "[ %llu ][ %s ] - Finished.\n", time, currentProcess->prop.fP.name);
          rt_print_flush_buffers();
+
          exit(EXIT_SUCCESS);
       }
       else // pid = forked task pid_t
@@ -269,7 +273,7 @@ int TaskLauncher::runAgent(long expeDuration)
       0,          // Affinity
       98,         // Priority
       SCHED_FIFO, // Scheduling POLICY
-      MCA_PERIOD, // periodicity
+      MCA_PERIOD, 0, // periodicity // offsetTime
       99,         // id
       99,0,0,     // isHRT/task chain ID,precedency & WCET.
       "MoCoAgent", // char[32] name
@@ -292,7 +296,6 @@ int TaskLauncher::runAgent(long expeDuration)
 
 
    rt_fprintf(stderr, "[ %llu ][ %s ] - Process created (pid = %d).\n", rt_timer_read(), currentTaskDescriptor.fP.name, getpid()); //cout << "["<< currentTaskDescriptor.fP.name << "]"<< "Macro task created." << endl;
-   //sleep(50);
 
    ERROR_MNG(rt_alarm_create(&_endAlarm, ALARM_NAME, TaskLauncher::finishMoCoAgent, (void*)currentProcess)); //ms to ns
    #if VERBOSE_DEBUG
@@ -305,7 +308,7 @@ int TaskLauncher::runAgent(long expeDuration)
    rt_fprintf(stderr, "[ %llu ][ %s ] - Semaphors %s and %s created.\n", rt_timer_read(), currentTaskDescriptor.fP.name, SEM_MC_NAME, SEM_TASK_NAME); //cout << "["<< currentTaskDescriptor.fP.name << "]"<< "Semaphor Created." << endl;
    #endif
 
-   //rt_task_wait_period(0);
+   rt_task_wait_period(NULL);
    rt_alarm_start(&_endAlarm, _SEC(expeDuration), TM_INFINITE);
    #if VERBOSE_DEBUG
    rt_fprintf(stderr, "[ %llu ][ %s ] - Alarm %s set.\n", rt_timer_read(), currentTaskDescriptor.fP.name, ALARM_NAME); //cout << "["<< currentTaskDescriptor.fP.name << "]"<< "Alarm set." << endl;
@@ -317,8 +320,8 @@ int TaskLauncher::runAgent(long expeDuration)
       #if VERBOSE_DEBUG
       rt_fprintf(stderr, "[ %llu ][ %s ] - Semaphor %s catched !\n", rt_timer_read(), currentTaskDescriptor.fP.name, SEM_TASK_NAME); //cout << "["<< currentTaskDescriptor.fP.name << "]"<< "Semaphor catched !" << endl;
       #endif
-
    }
+
    //rt_task_sleep(_mSEC(20));
    #if VERBOSE_INFO
    rt_fprintf(stderr, "[ %llu ][ MoCoAgent ] - GO !\n", rt_timer_read());
