@@ -233,6 +233,7 @@ int TaskLauncher::runTasks(long expeDuration)
 
 ///////////////////////////////////////////////////////////
 /////////////// END OF EXPERIMENT /////////////////////////
+         //rt_alarm_delete(&_endAlarm);
          rt_fprintf(stderr, "[ %llu ][ %s ] - Waiting Semaphor...\n", rt_timer_read(), currentProcess->prop.fP.name);
          rt_print_flush_buffers();
 
@@ -240,7 +241,7 @@ int TaskLauncher::runTasks(long expeDuration)
          rt_fprintf(stderr, "[ %llu ][ %s ] - Got Semaphor...\n", rt_timer_read(), currentProcess->prop.fP.name);
 
          RT_TASK_INFO cti;
-         rt_task_inquire(&currentProcess->_task, &cti);
+         rt_task_inquire(NULL, &cti); // self inquire
          currentProcess->saveData(nameMaxSize, &cti);
 
          RTIME time = rt_timer_read();
@@ -294,6 +295,14 @@ int TaskLauncher::runAgent(long expeDuration)
 
 
    rt_fprintf(stderr, "[ %llu ][ %s ] - Process created (pid = %d).\n", rt_timer_read(), currentTaskDescriptor.fP.name, getpid()); //cout << "["<< currentTaskDescriptor.fP.name << "]"<< "Macro task created." << endl;
+   std::vector<RT_TASK> rtTasks;
+   for (auto& taskInfo : tasksSet)
+   {
+      RT_TASK* _t = new RT_TASK();
+      ERROR_MNG(rt_task_bind(_t, taskInfo.fP.name, TM_INFINITE));
+      rtTasks.push_back(*_t);
+      rtTasks.shrink_to_fit();
+   }
 
    ERROR_MNG(rt_alarm_create(&_endAlarm, ALARM_NAME, TaskLauncher::finishMoCoAgent, (void*)currentProcess)); //ms to ns
    #if VERBOSE_DEBUG
@@ -327,13 +336,16 @@ int TaskLauncher::runAgent(long expeDuration)
    rt_print_flush_buffers();
 
    rt_sem_broadcast(&_sync_MC_Sem); // Alarms OK. Start Run !
-   rt_task_wait_period(0);
+
+   //rt_task_wait_period(0);
 
    currentProcess->executeRun();
 
 ///////////////////////////////////////////////////////////
 /////////////// END OF EXPERIMENT /////////////////////////
+   //rt_sem_broadcast(&_sync_Task_Sem); //  Clear semaphor count;
 
+   //rt_alarm_delete(&_endAlarm);
    rt_printf("====== End of Experimentation. Saving Data. ======\n");
    rt_print_flush_buffers();
 
@@ -356,15 +368,6 @@ int TaskLauncher::runAgent(long expeDuration)
    rt_fprintf(stderr, "[ %llu ] - SAVING AGENT DATA.\n", rt_timer_read());
    rt_print_flush_buffers();
 
-   /*std::vector<RT_TASK*> rtTasks;
-   for (auto& taskInfo : tasksSet)
-   {
-      RT_TASK* _t;
-      ERROR_MNG(rt_task_bind(_t, taskInfo.fP.name, _mSEC(500)));
-      rtTasks.push_back(new RT_TASK(*_t));
-
-      rtTasks.shrink_to_fit();
-   }*/
    currentProcess->saveData();
 
    outputFileResume.open (outputFileName + RESUME_FILE, std::ios::app);    // TO APPEND :  //,ios_base::app);
@@ -400,15 +403,13 @@ int TaskLauncher::runAgent(long expeDuration)
    rt_fprintf(stderr, "[ %llu ] [ MoCoAgent ]- Giving Semaphor...\n", time);
    rt_print_flush_buffers();
 
-   /*if (!rtTasks.empty())
    for (auto _task : rtTasks)
    {
-      ERROR_MNG(rt_task_join(_task));
+      rt_task_sleep(_mSEC(100));
+      //while (!rt_task_join(&_task)) { rt_printf("YOLO.\n"); rt_print_flush_buffers(); rt_task_wait_period(NULL); }
       //rt_task_sleep(_mSEC(5));
-   } else rt_printf("ERROR ! No task set to cheeeck..!\n");
-   rt_print_flush_buffers();*/
+   }
 
-   rt_task_sleep(_SEC(1));
    rt_sem_p(&_sync_Task_Sem, TM_INFINITE);
 
    rt_printf(" ======= END OF EXPERIMENTATION ======\n");
