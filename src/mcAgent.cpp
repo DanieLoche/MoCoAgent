@@ -228,7 +228,7 @@ void MonitoringControlAgent::executeRun()
    #endif
    while(!EndOfExpe)
    {
-      /*
+      /* ALL MO Co Code IN 1 function
       ret_msg = rt_buffer_read(&_buff, &msg, sizeof(monitoringMsg), TM_NONBLOCK);
       switch(ret_msg)
       {
@@ -244,7 +244,12 @@ void MonitoringControlAgent::executeRun()
             }
          break;
          case sizeof(monitoringMsg) :
-         */
+         break;
+         //CASES(-ETIMEDOUT, -EINTR, -EINVAL, -EIDRM, -EPERM)
+         default :
+         rt_fprintf(stderr, "[ MOCOAGENT ] Error on receiving message, code %s [%d].\n", getErrorName(ret_msg), ret_msg);
+         break;
+      } */
       #if VERBOSE_LOGS
       _time = rt_timer_read();
       #endif
@@ -258,12 +263,6 @@ void MonitoringControlAgent::executeRun()
             setMode(MODE_OVERLOADED);
          }
       }
-      /*      break;
-            //CASES(-ETIMEDOUT, -EINTR, -EINVAL, -EIDRM, -EPERM)
-            default :
-               rt_fprintf(stderr, "[ MOCOAGENT ] Error on receiving message, code %s [%d].\n", getErrorName(ret_msg), ret_msg);
-            break;
-      } */
 
       #if VERBOSE_LOGS
       rt_fprintf(stdout,"[MCAgent] ; %llu ; %llu\n", rt_timer_read(), _time);

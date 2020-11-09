@@ -128,7 +128,6 @@ class TaskProcess
    public:
       static bool MoCoIsAlive;
       static bool EndOfExpe;
-      //RT_MUTEX _bufMtx;
       RT_TASK _task;
       RT_BUFFER _buff;
 
