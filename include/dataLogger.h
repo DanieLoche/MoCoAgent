@@ -6,7 +6,7 @@
 #include <iomanip>
 
 #define BUFF_SIZE    4096
-#define LOG_VALUES_REMOVAL ((cptExecutions <= BUFF_SIZE && cptExecutions >= 30)?10:0)    // we ignore the first xx values from the log buffer for output.
+#define LOG_VALUES_REMOVAL ((cptExecutions <= BUFF_SIZE && cptExecutions >= 30)?2:0)    // we ignore the first xx values from the log buffer for output.
 #define MASK_SIZE    0xfff
 
 //=========================//

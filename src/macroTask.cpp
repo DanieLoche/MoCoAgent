@@ -24,7 +24,6 @@ void TaskProcess::setRTtask(rtPStruct _rtInfos, char* _name, RTIME initPeriodic)
    //cout << "[" << _name << "] - XENO INIT PASSED." << endl;
    ERROR_MNG(rt_task_shadow(&_task, _name, _rtInfos.priority, 0));
    rt_printf("[ %s ] - shadowed.\n", _name); //cout << "["<< _name << "]"<< " shadowed." << endl;
-   rt_print_flush_buffers();
 
    if (_rtInfos.priority != 0 && _rtInfos.schedPolicy != SCHED_OTHER)
    { // if priority = 0, SCHED_OTHER !!

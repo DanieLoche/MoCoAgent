@@ -64,8 +64,8 @@ int TaskLauncher::readChainsList(string input_file)
 int TaskLauncher::readTasksList(int cpuPercent)
 {
    float cpuFactor = cpuPercent/100.0;
-   #if VERBOSE_ASK
    cout << "====== READING TASKS FILE ======"<< endl;
+   #if VERBOSE_ASK
    cout << "CPU use factor = " << cpuFactor <<  endl;
    #endif
    for(int i=0; i < (int) chainSet.size(); ++i )
@@ -223,9 +223,9 @@ int TaskLauncher::runTasks(long expeDuration)
          ERROR_MNG(rt_sem_p(&_sync_MC_Sem, TM_INFINITE)); // Wait broadcast to run.
          #if VERBOSE_DEBUG
          rt_fprintf(stderr, "[ %llu ][ %s ] - Semaphor %s signal received, go !\n", rt_timer_read(), currentTaskDescriptor.fP.name, SEM_MC_NAME);
+         rt_print_flush_buffers();
          #endif
 
-            rt_print_flush_buffers();
             //rt_fprintf(stderr, "[ %llu ][ %s ] - Scheduled first.\n", rt_timer_read(), currentTaskDescriptor.fP.name);
             rt_task_wait_period(NULL);
             rt_task_sleep(currentProcess->prop.rtP.offsetTime); // Délai pour forcer l'ordre de lancement à T0.
@@ -462,10 +462,10 @@ void TaskLauncher::printChainSetInfos ( ) // std::vector<rtTaskInfosStruct> _myT
 
 void TaskLauncher::printTaskSetInfos ( ) // std::vector<rtTaskInfosStruct> _myTasksInfos)
 {
-   cout << "Resume of tasks set information : " << endl;
       std::ofstream outputFileStr;
       string outputFile = outputFileName + RESUME_FILE;
       outputFileStr.open (outputFile, std::ios::app);
+      outputFileStr << "Resume of tasks set information : " << endl;
       outputFileStr << std::setw(2) << "ID"     << " ; "
                     << std::setw(4) << "PREC"     << " ; "
                     << std::setw(nameMaxSize) << "NAME"    << " ; "

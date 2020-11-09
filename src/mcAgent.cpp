@@ -7,16 +7,22 @@ void MonitoringAgent::messageReceiver(void* arg)
    monitoringMsg msg;
    ERROR_MNG(rt_task_set_periodic(NULL, TM_NOW, TM_INFINITE)); // disable periodicity;
 
+   #if VERBOSE_LOGS
    RTIME _time;
+   #endif
    while(TRUE)
    {
       //rt_mutex_acquire(&mocoAgent->_bufMtx, TM_INFINITE);
       int ret = rt_buffer_read(&(mocoAgent->_buff), &msg, sizeof(monitoringMsg), TM_NONBLOCK);
       if (ret == sizeof(monitoringMsg))
       {
-         /////////_time = rt_timer_read();
+         #if VERBOSE_LOGS
+         _time = rt_timer_read();
+         #endif
          mocoAgent->updateTaskInfo(msg);
-         /////////rt_fprintf(stderr,"%llu ; Message Receiver ; %llu\n", _time, rt_timer_read());
+         #if VERBOSE_LOGS
+         rt_fprintf(stderr,"%llu ; Message Receiver ; %llu\n", _time, rt_timer_read());
+         #endif
       }
       //rt_mutex_release(&mocoAgent->_bufMtx);
       //rt_task_sleep()_mSEC(1);
@@ -184,7 +190,9 @@ void Agent::executeRun()
 
 void MonitoringAgent::executeRun()
 {
+   #if VERBOSE_LOGS
    RTIME _time;
+   #endif
    while(!EndOfExpe)
    {
       #if VERBOSE_LOGS
@@ -202,8 +210,9 @@ void MonitoringAgent::executeRun()
             chain.logger->cptAnticipatedMisses++;
          }
       }
-      /////////////rt_fprintf(stderr, "%llu ; Monitoring Agent ; %llu\n", _time, rt_timer_read());
-
+      #if VERBOSE_LOGS
+      rt_fprintf(stderr, "%llu ; Monitoring Agent ; %llu\n", _time, rt_timer_read());
+      #endif
       rt_task_wait_period(&overruns);
    }
 
@@ -214,7 +223,9 @@ void MonitoringAgent::executeRun()
 void MonitoringControlAgent::executeRun()
 {
    //int ret_msg = 0;
+   #if VERBOSE_LOGS
    RTIME _time;
+   #endif
    while(!EndOfExpe)
    {
       /*
@@ -234,7 +245,9 @@ void MonitoringControlAgent::executeRun()
          break;
          case sizeof(monitoringMsg) :
          */
-   /////////////_time = rt_timer_read();
+      #if VERBOSE_LOGS
+      _time = rt_timer_read();
+      #endif
       for (auto& chain : allTaskChain)
       {
          // Execute part //
@@ -252,7 +265,9 @@ void MonitoringControlAgent::executeRun()
             break;
       } */
 
-      /////////////rt_fprintf(stdout,"[MCAgent] ; %llu ; %llu\n", rt_timer_read(), _time);
+      #if VERBOSE_LOGS
+      rt_fprintf(stdout,"[MCAgent] ; %llu ; %llu\n", rt_timer_read(), _time);
+      #endif
 
       rt_task_wait_period(&overruns);
    }
