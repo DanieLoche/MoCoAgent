@@ -130,11 +130,12 @@ int TaskLauncher::readTasksList(int cpuPercent)
          return -1;
       }
 
-      unsigned int offset = 0;
+      uint coreOffset[4] = {OFFSET_STEP, OFFSET_STEP, OFFSET_STEP, OFFSET_STEP};
       for (auto taskInfo = tasksSet.begin(); taskInfo != tasksSet.end(); ++taskInfo)
       {
-         taskInfo->rtP.offsetTime = offset;
-         offset += 100;
+         taskInfo->rtP.offsetTime = coreOffset[taskInfo->rtP.affinity];
+         //cout << taskInfo->fP.name << " : offset = " << taskInfo->rtP.offsetTime << endl;
+         coreOffset[taskInfo->rtP.affinity] += OFFSET_STEP;
 
          int sizeName = strlen(taskInfo->fP.name);
          if (sizeName > nameMaxSize) nameMaxSize = sizeName;
@@ -178,7 +179,7 @@ int TaskLauncher::runTasks(long expeDuration)
       #if VERBOSE_INFO
       cout << "Creating Task " << taskInfo.fP.name << "." << endl;
       #endif
-
+      RTIME initPeriodTime = rt_timer_read();
       pid_t pid = fork();
       if (pid == 0) // proc fils
       {
@@ -189,9 +190,9 @@ int TaskLauncher::runTasks(long expeDuration)
          MacroTask* currentProcess;
 
          if (currentTaskDescriptor.fP.isHRT == 0)
-            currentProcess = new BEMacroTask(currentTaskDescriptor, enableAgent, outputFileName);
+            currentProcess = new BEMacroTask(currentTaskDescriptor, initPeriodTime, enableAgent, outputFileName);
          else
-            currentProcess = new RTMacroTask(currentTaskDescriptor, enableAgent, outputFileName);
+            currentProcess = new RTMacroTask(currentTaskDescriptor, initPeriodTime, enableAgent, outputFileName);
 
          #if VERBOSE_DEBUG
          rt_fprintf(stderr, "[ %llu ][ %s ] - Process created (pid = %d).\n", rt_timer_read(), currentTaskDescriptor.fP.name, getpid());
@@ -224,9 +225,11 @@ int TaskLauncher::runTasks(long expeDuration)
          rt_fprintf(stderr, "[ %llu ][ %s ] - Semaphor %s signal received, go !\n", rt_timer_read(), currentTaskDescriptor.fP.name, SEM_MC_NAME);
          #endif
 
-            //rt_fprintf(stderr, "[ %s ] - Execution in progress - BE.\n", currentTaskDescriptor.fP.name);
             rt_print_flush_buffers();
-            rt_task_sleep(_uSEC(currentProcess->prop.rtP.offsetTime)); // Délai pour forcer l'ordre de lancement à T0.
+            //rt_fprintf(stderr, "[ %llu ][ %s ] - Scheduled first.\n", rt_timer_read(), currentTaskDescriptor.fP.name);
+            rt_task_wait_period(NULL);
+            rt_task_sleep(currentProcess->prop.rtP.offsetTime); // Délai pour forcer l'ordre de lancement à T0.
+            //rt_fprintf(stderr, "[ %llu ][ %s ] - Started for Real.\n", rt_timer_read(), currentTaskDescriptor.fP.name);
             currentProcess->executeRun();
 
             //rt_task_sleep(_mSEC(1));

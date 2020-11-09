@@ -121,7 +121,7 @@ class TaskProcess
       std::vector<char*> _argv;
 
       void setAffinity (int _aff, int mode);
-      void setRTtask(rtPStruct, char*);
+      void setRTtask(rtPStruct, char*, RTIME);
       void parseParameters(string _arguments);
       void setIO( );
 
@@ -132,7 +132,7 @@ class TaskProcess
       RT_TASK _task;
       RT_BUFFER _buff;
 
-      TaskProcess(rtTaskInfosStruct _taskInfo);
+      TaskProcess(rtTaskInfosStruct _taskInfo, RTIME initPeriodic = TM_NOW);
       virtual void executeRun() = 0;
       void saveData(int nameMaxSize);
 };
@@ -148,7 +148,7 @@ class MacroTask : public TaskProcess
    public :
       rtTaskInfosStruct prop;
 
-      MacroTask(rtTaskInfosStruct taskInfos, bool MoCoMode, string name);
+      MacroTask(rtTaskInfosStruct taskInfos, RTIME initPeriodic, bool MoCoMode, string name);
       virtual void setCommunications() = 0;
       inline virtual uint before() = 0;
       inline int proceed();
@@ -159,7 +159,7 @@ class MacroTask : public TaskProcess
 class RTMacroTask : public MacroTask
 {
    public:
-      RTMacroTask(rtTaskInfosStruct taskInfos, bool MoCoMode, string name);
+      RTMacroTask(rtTaskInfosStruct taskInfos, RTIME initPeriodic, bool MoCoMode, string name);
 
       void setCommunications();
       void executeRun();
@@ -170,7 +170,7 @@ class RTMacroTask : public MacroTask
 class BEMacroTask : public MacroTask
 {
    public:
-      BEMacroTask(rtTaskInfosStruct taskInfos, bool MoCoMode, string name);
+      BEMacroTask(rtTaskInfosStruct taskInfos, RTIME initPeriodic, bool MoCoMode, string name);
 
       void setCommunications();
       void executeRun();

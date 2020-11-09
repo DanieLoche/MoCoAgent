@@ -10,6 +10,7 @@
 #define SEM_TASK_NAME "Task_Sync_Sem"
 #define SEM_MC_NAME   "MOCO_Sync_Sem"
 
+#define OFFSET_STEP    _uSEC(100)
 class TaskLauncher
 {
    private :

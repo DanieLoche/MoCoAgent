@@ -6,18 +6,18 @@ bool TaskProcess::MoCoIsAlive = TRUE;
 bool TaskProcess::EndOfExpe = FALSE;
 
 
-TaskProcess::TaskProcess(rtTaskInfosStruct _taskInfo)
+TaskProcess::TaskProcess(rtTaskInfosStruct _taskInfo, RTIME initPeriodic)
 {
    printTaskInfo(&_taskInfo);
 
    cout << "[ "<< _taskInfo.fP.name << " ] - "<< "Setting Real-time parameters..." << endl;
-   setRTtask(_taskInfo.rtP, _taskInfo.fP.name);
+   setRTtask(_taskInfo.rtP, _taskInfo.fP.name, initPeriodic);
 
    printInquireInfo(&_task);
    parseParameters(_taskInfo.fP.args);
 }
 
-void TaskProcess::setRTtask(rtPStruct _rtInfos, char* _name)
+void TaskProcess::setRTtask(rtPStruct _rtInfos, char* _name, RTIME initPeriodic)
 {
    //system("find /proc/xenomai");
    XENO_INIT(_name);
@@ -50,8 +50,8 @@ void TaskProcess::setRTtask(rtPStruct _rtInfos, char* _name)
    setAffinity(_rtInfos.affinity, 0);
 
    //Periodicity
-   ERROR_MNG(rt_task_set_periodic(&_task, TM_NOW, _rtInfos.periodicity));
-   rt_printf("[ %s ] - Task Period %d updated.\n", _name, _rtInfos.periodicity); //cout << "["<< _name << "]"<< "Managing Scheduling policy " << getSchedPolicyName(_rtInfos.schedPolicy) << endl;
+   ERROR_MNG(rt_task_set_periodic(&_task, initPeriodic+_rtInfos.offsetTime, _rtInfos.periodicity));
+   rt_printf("[ %s ] - Task Period %d updated, base at %llu.\n", _name, _rtInfos.periodicity, initPeriodic+_rtInfos.offsetTime); //cout << "["<< _name << "]"<< "Managing Scheduling policy " << getSchedPolicyName(_rtInfos.schedPolicy) << endl;
    rt_print_flush_buffers();
 
    /* Gestion EDF Scheduling
@@ -210,7 +210,7 @@ void TaskProcess::setIO()
 // ================================================== //
 // ======= MACRO TASK - Task Wrapper Component ====== //
 
-MacroTask::MacroTask(rtTaskInfosStruct _taskInfo, bool MoCo, string _name) : TaskProcess(_taskInfo)
+MacroTask::MacroTask(rtTaskInfosStruct _taskInfo, RTIME initPeriodic, bool MoCo, string _name) : TaskProcess(_taskInfo, initPeriodic)
 {
    MoCoIsAlive = MoCo;
    prop = _taskInfo;
@@ -228,7 +228,7 @@ MacroTask::MacroTask(rtTaskInfosStruct _taskInfo, bool MoCo, string _name) : Tas
 
 }
 
-RTMacroTask::RTMacroTask(rtTaskInfosStruct _taskInfo, bool MoCo, string _name) : MacroTask(_taskInfo, MoCo, _name)
+RTMacroTask::RTMacroTask(rtTaskInfosStruct _taskInfo, RTIME initPeriodic, bool MoCo, string _name) : MacroTask(_taskInfo, initPeriodic, MoCo, _name)
 {}
 
 void RTMacroTask::setCommunications()
@@ -241,7 +241,7 @@ void RTMacroTask::setCommunications()
    }
 }
 
-BEMacroTask::BEMacroTask(rtTaskInfosStruct _taskInfo, bool MoCo, string _name) : MacroTask(_taskInfo, MoCo, _name)
+BEMacroTask::BEMacroTask(rtTaskInfosStruct _taskInfo, RTIME initPeriodic, bool MoCo, string _name) : MacroTask(_taskInfo, initPeriodic, MoCo, _name)
 {}
 
 void BEMacroTask::setCommunications()
