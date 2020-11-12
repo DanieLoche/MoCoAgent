@@ -50,8 +50,8 @@ int TaskLauncher::readChainsList(string input_file)
       }
       #if VERBOSE_ASK
       else cout << " ==> line ignored.";
-       cout << endl;
-       #endif
+      cout << endl;
+      #endif
    }
 
    chainSet.shrink_to_fit();
@@ -170,7 +170,7 @@ int TaskLauncher::readTasksList(int cpuPercent)
 int TaskLauncher::runTasks(long expeDuration)
 {
    #if VERBOSE_INFO
-   cout << endl << "====== LAUNCHING TASKS ======" << endl;
+   cout << "====== LAUNCHING TASKS ======" << endl;
    #endif
    //for (auto taskInfo = taskSetInfos.rtTIs.begin(); taskInfo != taskSetInfos.rtTIs.end(); ++taskInfo)
 
@@ -334,7 +334,7 @@ int TaskLauncher::runAgent(long expeDuration)
 
    //rt_task_sleep(_mSEC(20));
    #if VERBOSE_INFO
-   rt_fprintf(stderr, "[ %llu ][ MoCoAgent ] - GO !\n", rt_timer_read());
+   rt_fprintf(stdout, "[ %llu ][ MoCoAgent ] - GO !\n", rt_timer_read());
    #endif
    rt_print_flush_buffers();
 
@@ -368,7 +368,7 @@ int TaskLauncher::runAgent(long expeDuration)
    }
    outputFileResume.close();
 
-   rt_fprintf(stderr, "[ %llu ] - SAVING AGENT DATA.\n", rt_timer_read());
+   rt_fprintf(stdout, "[ %llu ] - SAVING AGENT DATA.\n", rt_timer_read());
    rt_print_flush_buffers();
 
    currentProcess->saveData();
@@ -403,7 +403,7 @@ int TaskLauncher::runAgent(long expeDuration)
 
    RTIME time = rt_timer_read();
    rt_sem_v(&_sync_Task_Sem);
-   rt_fprintf(stderr, "[ %llu ] [ MoCoAgent ]- Giving Semaphor...\n", time);
+   rt_fprintf(stdout, "[ %llu ] [ MoCoAgent ]- Giving Semaphor...\n", time);
    rt_print_flush_buffers();
 
    for (auto _task : rtTasks)

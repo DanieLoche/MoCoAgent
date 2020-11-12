@@ -206,8 +206,9 @@ void TaskProcess::setIO()
 
 }
 
-// ================================================== //
-// ======= MACRO TASK - Task Wrapper Component ====== //
+////////////////////////////////////////////////////////////////////////////////
+////////////// ======= MACRO TASK - Task Wrapper Component ====== //////////////
+////////////////////////////////////////////////////////////////////////////////
 
 MacroTask::MacroTask(rtTaskInfosStruct _taskInfo, RTIME initPeriodic, bool MoCo, string _name) : TaskProcess(_taskInfo, initPeriodic)
 {
@@ -225,31 +226,6 @@ MacroTask::MacroTask(rtTaskInfosStruct _taskInfo, RTIME initPeriodic, bool MoCo,
    #endif
 
 
-}
-
-RTMacroTask::RTMacroTask(rtTaskInfosStruct _taskInfo, RTIME initPeriodic, bool MoCo, string _name) : MacroTask(_taskInfo, initPeriodic, MoCo, _name)
-{}
-
-void RTMacroTask::setCommunications()
-{
-   if (MoCoIsAlive)
-   {
-      ERROR_MNG(rt_buffer_bind(&_buff, MESSAGE_TOPIC_NAME, TM_INFINITE)); // _mSEC(500)
-      //string mutexName = (string) MESSAGE_TOPIC_NAME + "_mtx";
-      //ERROR_MNG(rt_mutex_bind(&_bufMtx, mutexName.c_str(), _mSEC(500)));
-   }
-}
-
-BEMacroTask::BEMacroTask(rtTaskInfosStruct _taskInfo, RTIME initPeriodic, bool MoCo, string _name) : MacroTask(_taskInfo, initPeriodic, MoCo, _name)
-{}
-
-void BEMacroTask::setCommunications()
-{
-   //cout << "Running..." << endl;
-   if (MoCoIsAlive)
-   {
-      ERROR_MNG(rt_event_bind(&_event, CHANGE_MODE_EVENT_NAME, TM_INFINITE)); //_mSEC(500)
-   }
 }
 
 void MacroTask::findFunction (char* _func)
@@ -314,6 +290,18 @@ void MacroTask::saveData(int maxNameSize, RT_TASK_INFO* cti)
 ////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////// RT MacroTask /////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
+RTMacroTask::RTMacroTask(rtTaskInfosStruct _taskInfo, RTIME initPeriodic, bool MoCo, string _name) : MacroTask(_taskInfo, initPeriodic, MoCo, _name)
+{}
+
+void RTMacroTask::setCommunications()
+{
+   if (MoCoIsAlive)
+   {
+      ERROR_MNG(rt_buffer_bind(&_buff, MESSAGE_TOPIC_NAME, TM_INFINITE)); // _mSEC(500)
+      //string mutexName = (string) MESSAGE_TOPIC_NAME + "_mtx";
+      //ERROR_MNG(rt_mutex_bind(&_bufMtx, mutexName.c_str(), _mSEC(500)));
+   }
+}
 
 void RTMacroTask::executeRun()
 {
@@ -389,6 +377,18 @@ int RTMacroTask::after()
 ////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////// BEMacroTask //////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
+BEMacroTask::BEMacroTask(rtTaskInfosStruct _taskInfo, RTIME initPeriodic, bool MoCo, string _name) : MacroTask(_taskInfo, initPeriodic, MoCo, _name)
+{}
+
+void BEMacroTask::setCommunications()
+{
+   //cout << "Running..." << endl;
+   if (MoCoIsAlive)
+   {
+      ERROR_MNG(rt_event_bind(&_event, CHANGE_MODE_EVENT_NAME, TM_INFINITE)); //_mSEC(500)
+   }
+}
+
 void BEMacroTask::executeRun()
 {
    /*

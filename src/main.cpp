@@ -73,6 +73,7 @@ int main(int argc, char* argv[])
     {
       outputFile = "RES_" + std::to_string(expeDuration) + "_" + std::to_string(enableAgent) + "_" + getSchedPolicyName(schedMode) + "_" + std::to_string(cpuFactor);
     }
+    cout << "\n\n================= START OF EXPERIMENT =================\n";
     cout << "Experiment made with parameters : \n"
       << " MoCoAgent mode: " << enableAgent  << "\n"
       << "  Duration: " << expeDuration << "\n"
@@ -89,11 +90,10 @@ int main(int argc, char* argv[])
    TaskLauncher* tln = new TaskLauncher(enableAgent, outputFile, schedMode);
 
    #if VERBOSE_INFO
-   cout << "\n------------------------------" << endl;
    cout << " Generating Task Set ..." << endl;
    #endif
    if(tln->readChainsList(inputFile)) {cerr << "Failed to read task chains or no chain found." << endl; exit(-1);}
-   if(tln->readTasksList(cpuFactor)) {cerr << "Failed to read tasks list or no tasks found." << endl; return -2;}
+   if(tln->readTasksList(cpuFactor)) {cerr << "Failed to read tasks list or no tasks found." << endl; exit(-2);}
 
    std::ofstream outputFileResume;
    string outputFileName = outputFile + RESUME_FILE;
@@ -113,9 +113,9 @@ int main(int argc, char* argv[])
    tln->printTaskSetInfos();
 
 
-   if(tln->runTasks(expeDuration)) {cerr << "Failed to create all tasks" << endl; return -4;}
+   if(tln->runTasks(expeDuration)) {cerr << "Failed to create all tasks" << endl; exit(-4);}
 
-   sleep(2);
+   sleep(0.2);
    tln->runAgent(expeDuration);
 
 

@@ -1,36 +1,5 @@
 #include "macroTask.h"
 
-
-void MonitoringAgent::messageReceiver(void* arg)
-{
-   MonitoringAgent* mocoAgent = (MonitoringAgent*) arg;
-   monitoringMsg msg;
-   ERROR_MNG(rt_task_set_periodic(NULL, TM_NOW, TM_INFINITE)); // disable periodicity;
-
-   #if VERBOSE_LOGS
-   RTIME _time;
-   #endif
-   while(TRUE)
-   {
-      //rt_mutex_acquire(&mocoAgent->_bufMtx, TM_INFINITE);
-      int ret = rt_buffer_read(&(mocoAgent->_buff), &msg, sizeof(monitoringMsg), TM_NONBLOCK);
-      if (ret == sizeof(monitoringMsg))
-      {
-         #if VERBOSE_LOGS
-         _time = rt_timer_read();
-         #endif
-         mocoAgent->updateTaskInfo(msg);
-         #if VERBOSE_LOGS
-         rt_fprintf(stderr,"%llu ; Message Receiver ; %llu\n", _time, rt_timer_read());
-         #endif
-      }
-      //rt_mutex_release(&mocoAgent->_bufMtx);
-      //rt_task_sleep()_mSEC(1);
-      rt_task_yield();
-      //rt_task_wait_period(0);
-   }
-}
-
 Agent::Agent(rtTaskInfosStruct _taskInfo,
                   std::vector<end2endDeadlineStruct> e2eDD,
                   std::vector<rtTaskInfosStruct> tasksSet) : TaskProcess (_taskInfo)
@@ -219,7 +188,6 @@ void MonitoringAgent::executeRun()
    //rt_task_delete(&msgReceiverTask);
 }
 
-//const timespec noWait_time = {0,0};
 void MonitoringControlAgent::executeRun()
 {
    //int ret_msg = 0;
@@ -274,8 +242,36 @@ void MonitoringControlAgent::executeRun()
    rt_task_delete(&msgReceiverTask);
 }
 
-// METHODE OPTIMISABLE SUR LE PARCOURS
-// DES TACHE EN TRIANT LES TAKS LISTS.
+void MonitoringAgent::messageReceiver(void* arg)
+{
+   MonitoringAgent* mocoAgent = (MonitoringAgent*) arg;
+   monitoringMsg msg;
+   ERROR_MNG(rt_task_set_periodic(NULL, TM_NOW, TM_INFINITE)); // disable periodicity;
+
+   #if VERBOSE_LOGS
+   RTIME _time;
+   #endif
+   while(TRUE)
+   {
+      //rt_mutex_acquire(&mocoAgent->_bufMtx, TM_INFINITE);
+      int ret = rt_buffer_read(&(mocoAgent->_buff), &msg, sizeof(monitoringMsg), TM_NONBLOCK);
+      if (ret == sizeof(monitoringMsg))
+      {
+         #if VERBOSE_LOGS
+         _time = rt_timer_read();
+         #endif
+         mocoAgent->updateTaskInfo(msg);
+         #if VERBOSE_LOGS
+         rt_fprintf(stderr,"%llu ; Message Receiver ; %llu\n", _time, rt_timer_read());
+         #endif
+      }
+      //rt_mutex_release(&mocoAgent->_bufMtx);
+      //rt_task_sleep()_mSEC(1);
+      rt_task_yield();
+      //rt_task_wait_period(0);
+   }
+}
+
 void Agent::updateTaskInfo(monitoringMsg msg)
 {
    //RT_TASK_INFO curtaskinfo;
@@ -537,20 +533,6 @@ bool taskChain::unloadChain(RTIME endOfChain)
 {
    return lastTask->emptyPrecedency( 0, endOfChain);
 }
-
-/* void taskChain::resetChain() Useless => remplacé par unloadChain
-void taskChain::resetChain()
-{
-   for (auto& task : taskList)
-   {
-      task.setState(FALSE);
-      //task.endTime = 0;
-   }
-   if (isAtRisk) isAtRisk = FALSE;
-   startTime = 0;
-   currentEndTime = rt_timer_read();
-}
-*/
 
 void taskChain::updateStartTime()
 {

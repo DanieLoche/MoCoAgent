@@ -93,21 +93,15 @@ class taskChain
       //RTIME remWCET;         // Runtime - computed
       bool isAtRisk;         // Runtime - deduced
 
-      // A AJOUTER POUR GERER PLUSIEURS OCCURENCES //
       taskMonitoringStruct* lastTask;
-      void setPrecedencies();
-      void updateStartTime();
-      bool unloadChain(RTIME endOfChain);  // renvoi la date de début de chaine;
-      ///////////////////////////////////////////////
       std::vector<taskMonitoringStruct> taskList;
 
       taskChain(end2endDeadlineStruct _tcDeadline, string outfile);
-
-      //bool checkPrecedency(uint taskID); // devient useless
+      void setPrecedencies();
       bool checkTaskE2E();    // a modifier
-      //bool checkIfEnded();    // a modifier // devient USELESS
+      bool unloadChain(RTIME endOfChain);  // renvoi la date de début de chaine;
+      void updateStartTime();
       void displayTasks();
-      //void resetChain();      // a modifier => void unloadChain()
 };
 
 class TaskProcess
@@ -142,6 +136,7 @@ class MacroTask : public TaskProcess
       int ret;
       TaskDataLogger* dataLogs;
       int (*proceed_function)(int Argc, char *argv[]);
+
       void findFunction(char* _func);
 
    public :
@@ -202,8 +197,8 @@ class Agent : public TaskProcess
             std::vector<rtTaskInfosStruct> tasksSet);
 
       void updateTaskInfo(monitoringMsg msg);
-      void saveData();
       void executeRun();
+      void saveData();
 };
 
 class MonitoringAgent : public Agent
