@@ -13,47 +13,51 @@ Infile="input_benchmarkTasks.in"
 duration=100
 load=100
 schedPolicy=1
+ISSTRESSED=""
 # 1 = fifo
 #2 = RR
 #7 = RM
 
 while [ "$1" != "" ]; do
-    case $1 in
-         -i | -f | --input )     shift
-            Infile=$1
-            ;;
-         -o | --output )     shift  ## Output folder suffix
-            ISSTRESSED=$1
-            ;;
-         -d | --duration )  shift
-            duration=$1
-            ;;
-         -l | --load )		 shift
-         	load=$1
-         	;;
-         -s | --sched )     shift
-                            schedPolicy="-s $1"
-                            if test $1 = 1
-                               then schedName="FIFO"
-                            elif test $1 = 2
-                               then schedName="RR"
-                            elif test $1 = 7
-                               then schedName="RM"
-                            else schedName=$1
-                            fi
-         	;;
-         -h | --help )      echo "usage: runBashTest.sh [[[-i inputfile] [-d duration] [-l load]] | [-h]]"
-            exit
-            ;;
-         * )                echo "usage: runBashTest.sh [[[-i inputfile] [-d duration] [-l load]] | [-h]]"
-            exit 1
-            esac
-            shift
+   case $1 in
+      -d | --duration ) shift
+                        duration=$1
+      ;;
+      -l | --load )		shift
+      	               load=$1
+      ;;
+      -s | --sched )    shift
+                        schedPolicy="-s $1"
+                        if test $1 = 1
+                           then schedName="FIFO"
+                        elif test $1 = 2
+                           then schedName="RR"
+                        elif test $1 = 7
+                           then schedName="RM"
+                        else schedName=$1
+                        fi
+      ;;
+      -i | --input )    shift
+                        Infile=$1
+      ;;
+      -o | --output )   shift  ## Output folder suffix
+                        ISSTRESSED=$1
+      ;;
+      -o2 | --error )   shift
+                        errorDir="2> $1" # not used
+      ;;
+      -h | --help )     echo "usage: runBashTest.sh [[[-i inputfile] [-d duration] [-l load]] | [-h]]"
+         exit
+      ;;
+      * )               echo "usage: runBashTest.sh [[[-i inputfile] [-d duration] [-l load]] | [-h]]"
+         exit 1
+   esac
+   shift
 done
 
 
 
-expeResume=${duration}_${load}_${schedName}
+expeResume=${duration}_${load} #_${schedName}
 dirName=./Exps/`date +%d-%m-%Hh`_${expeResume}_${ISSTRESSED}
 echo "Duration : $duration | Load : $load | Scheduling : $schedPolicy | Input : $Infile | Output : $dirName"
 
@@ -77,8 +81,8 @@ then
         done < $Infile > _inputFile.tmp.in
 
         #sudo sar -o ${dirName}/IODatas${name}_0_${duration}_${load}_${schedPolicy} -P 0-3 1 $duration > /dev/null 2>&1 &
-        echo "> ./MoCoAgent.out -e 2 -d $duration -l $load ${schedPolicy} -i ./inputFile.in -o ${dirName}/${name}_2" #_${expeResume}"
-        sudo ./MoCoAgent.out -e 0 -d $duration -l $load ${schedPolicy} -i _inputFile.tmp.in -o ${dirName}/${name}_2 #_${expeResume}
+        echo "> ./MoCoAgent.out -e 0 -d $duration -l $load ${schedPolicy} -i ./inputFile.in -o ${dirName}/${name}" #_${expeResume}"
+        sudo ./MoCoAgent.out -e 0 -d $duration -l $load ${schedPolicy} -i _inputFile.tmp.in -o ${dirName}/${name}
         expe0Out=$?
         sudo rm -f ./_inputFile.tmp.in
         ## ./bench/output/eraseOutputs.sh

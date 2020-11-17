@@ -4,9 +4,9 @@ function resumeFolder {
     FOLDER=$1
     VERBOSE=$2
     
-    sudo chown danlo $FOLDER
+    sudo chown danlo:danlo $FOLDER
     cd $FOLDER 
-    sudo chown danlo *
+    sudo chown danlo:danlo *
     
     output=${FOLDER%%+(/)}"_RESUMES.csv"
     
