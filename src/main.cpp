@@ -115,7 +115,7 @@ int main(int argc, char* argv[])
 
    if(tln->runTasks(expeDuration)) {cerr << "Failed to create all tasks" << endl; exit(-4);}
 
-   sleep(0.2);
+   sleep(1);
    tln->runAgent(expeDuration);
 
 
