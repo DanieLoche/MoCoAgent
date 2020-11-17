@@ -7,7 +7,6 @@ import pandas
 fully=[]
 fullx=[]
 fullz=[]
-testa=-1
 sns.set_theme(style="whitegrid")
 for nom in sys.argv[1:]:
     if(str(nom)!='/'):
@@ -32,8 +31,8 @@ for nom in sys.argv[1:]:
                             etiquetteValeur=i
                 i=i+1            
             flagStress="Isolé"
-            testa=testa*-1
-            if(testa<0):
+            ListeNom=str(nom).split("+")
+            if(len(ListeNom)>1):
                 flagStress="Stressé"
             for ligne in lignes[1:]:
                 numero=str(ligne).split(";")
@@ -41,24 +40,9 @@ for nom in sys.argv[1:]:
                 fullx.append(str(numero[etiquetteNom])) 
                 fullz.append(flagStress)                   
             f.close
-datafinal = {'':fullx,'Time (ms)':fully,'Legende':fullz}
+datafinal = {'Graphe':fullx,'Execution time (ms)':fully,'Legende':fullz}
 dl = pandas.DataFrame(datafinal)
-
-check="Stressé"
-checkIsole="Isolé"
-StressPresent = fullz.count(check)
-IsolePresent = fullz.count(checkIsole)
-
-#ax = sns.violinplot(x=dl["Graphe"],y=dl["Valeur (1e6)"],hue=dl["Legende"],split=True,cut=0,scale="count",inner="quartile")
-#plt.show()
-
-if StressPresent > 0 and IsolePresent > 0:
-    ax = sns.violinplot(x=dl[""],y=dl["Time (ms)"],hue=dl["Legende"],split=True,cut=0,scale="count",inner="quartile")
-
-if StressPresent == 0 and IsolePresent > 0:
-    ax = sns.violinplot(x=dl[""],y=dl["Time (ms)"],cut=0)   
-    
-#fig.text(0.5, 0.04, 'Remaining Response Times', ha='center', va='center')
+ax = sns.violinplot(x=dl["Graphe"],y=dl["Execution time (ms)"],hue=dl["Legende"],split=True,cut=0,scale="count",inner="quartile")
 plt.show()
 #python3 AffichageViolon.py FF_L_2_expe.csv FF_L_2_expe+S.csv FFi_S_2_expe.csv FFi_S_2_expe+S.csv FF_S_2_expe.csv FF_S_2_expe+S.csv
 #gestion du split si il nexiste pas 
