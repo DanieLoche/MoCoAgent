@@ -19,8 +19,8 @@
 #define  USE_MUTEX               0
 #define  WITH_BOOL               0
 
-#define   MCA_PERIOD       _mSEC(5) // ms
-const RTIME t_RT     =     _uSEC(500);  // time to trigger the Control Agent
+#define   MCA_PERIOD       _mSEC(1) // ms
+const RTIME t_RT     =     _uSEC(100);  // time to trigger the Control Agent
 const RTIME Wmax     =     MCA_PERIOD;    // next slice max time
 
 #define XENO_INIT(_name) do_xeno_init(_name)

@@ -636,6 +636,11 @@ bool taskMonitoringStruct::addEntry(ExecTimes times)
    execLogs[newestElement] = times;
    newestElement++;
    newestElement = (newestElement == maxPendingChains ? 0 : newestElement); // comme un modulo
+   if (newestElement == oldestElement)
+   {
+      rt_fprintf(stderr, "[ %llu ][ %d ] - Too much logs ! Discarding.", rt_timer_read(), id);
+      newestElement = (newestElement ? (newestElement - 1) : (maxPendingChains-1));
+   }
 
    /*
    uint i = oldestElement;
