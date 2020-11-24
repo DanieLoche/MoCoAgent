@@ -25,5 +25,6 @@ done
 
 ./runBashTestTasks.sh -i $input -s 1 -d $duration -l $load -o ISOL;
 result=$? ;
-rm ./bench/output/*
+sudo rm -f ./bench/output/*
+
 echo "Result : $result"

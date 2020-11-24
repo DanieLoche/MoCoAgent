@@ -59,6 +59,9 @@ if StressPresent == 0 and IsolePresent > 0:
     ax = sns.violinplot(x=dl[""],y=dl["Time (ms)"],cut=0)   
     
 #fig.text(0.5, 0.04, 'Remaining Response Times', ha='center', va='center')
+figName=str(sys.argv[1]).split("/")
+fig=plt.gcf();
+fig.canvas.set_window_title(figName[0]);
 plt.show()
 #python3 AffichageViolon.py FF_L_2_expe.csv FF_L_2_expe+S.csv FFi_S_2_expe.csv FFi_S_2_expe+S.csv FF_S_2_expe.csv FF_S_2_expe+S.csv
 #gestion du split si il nexiste pas 

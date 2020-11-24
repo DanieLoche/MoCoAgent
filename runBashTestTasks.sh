@@ -64,7 +64,9 @@ echo "Duration : $duration | Load : $load | Scheduling : $schedPolicy | Input : 
 if test -f $Infile
 then
     mkdir -p $dirName
-    for toExecute in {2..51} # exécuter toutes les chaines
+    cntLines=`wc -l $Infile | awk '{print $1 }'`
+    cntLines=`expr $cntLines - 1` 
+    for toExecute in $(seq 2 $cntLines) # exécuter toutes les chaines
     do
         #echo $toExecute
         numLigne=1

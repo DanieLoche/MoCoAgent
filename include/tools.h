@@ -29,7 +29,7 @@ using std::cin;
 using std::cerr;
 
 #define RESUME_FILE  "_resume.txt"
-#define CHAIN_FILE   "_chains.csv"
+#define CHAIN_FILE   "_chain.csv"
 #define TASKS_FILE   "_expe.csv"
 
 #define   TRUE    1

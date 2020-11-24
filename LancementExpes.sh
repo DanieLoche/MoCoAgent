@@ -33,17 +33,13 @@ then
 	duration=`expr $Duration / 3`
 fi
 
-./runBashTest.sh -i $input -s 1 -d $duration -l $load;
-FIFO=$? ;
+./runBashTest.sh -i $input -s 1 -d $duration -l $load; FIFO=$? ;
 
-./runBashTest.sh -i $input -s 0 -d $duration -l $load;
-OTHER=$? ;
+./runBashTest.sh -i $input -s 0 -d $duration -l $load; OTHER=$? ;
 
-./runBashTest.sh -i $input -s 2 -d $duration -l $load;
-RR=$? ;
+./runBashTest.sh -i $input -s 2 -d $duration -l $load; RR=$? ;
 
-./runBashTest.sh -i $input -s 7 -d $duration -l $load;
-RM=$? ;
+#./runBashTest.sh -i $input -s 7 -d $duration -l $load; RM=$? ;
 
 echo "Result FIFO : $FIFO"
 echo "Result OTHER : $OTHER"

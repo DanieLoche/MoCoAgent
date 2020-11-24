@@ -81,6 +81,7 @@ then
    done < $Infile
 
    expeName=${name}_$MoCoMode_${schedName}
+   sudo ~/killXenomai.sh 
    ## sar -o ${dirName}/IODatas_$expeName -P 0-3 1 $duration > /dev/null 2>&1 &
    sudo ./MoCoAgent.out -e $MoCoMode -d $duration -l $load ${schedPolicy} -i ./$Infile -o ${dirName}/$expeName $errorDir
    expe2Out=$?

@@ -26,7 +26,6 @@ while [ "$1" != "" ]; do
 done
 
 #creation des stressors de caches et I/O
-#sudo stress-ng --cache 4 --io 4 &
 sudo stress-ng --ionice-class rt --ionice-level 0 --cache 4 --fault 4 --io 4 --matrix 2 &
 #sudo /usr/xenomai/bin/dohell -s 192.168.0.1 -m /tmp 10800 &
 
