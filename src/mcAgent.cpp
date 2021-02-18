@@ -179,6 +179,7 @@ void MonitoringAgent::executeRun()
             chain.logger->cptAnticipatedMisses++;
          }
       }
+
       #if VERBOSE_LOGS
       rt_fprintf(stderr, "%llu ; Monitoring Agent ; %llu\n", _time, rt_timer_read());
       #endif
@@ -235,7 +236,6 @@ void MonitoringControlAgent::executeRun()
       #if VERBOSE_LOGS
       rt_fprintf(stdout,"[MCAgent] ; %llu ; %llu\n", rt_timer_read(), _time);
       #endif
-
       rt_task_wait_period(&overruns);
    }
 
@@ -295,10 +295,14 @@ void Agent::updateTaskInfo(monitoringMsg msg)
             { // si toute dernière tache de la chaine.
                if ( chain.unloadChain( msg.endTime) )
                { // si tache complete executee.
-                  chain.isAtRisk = FALSE;
                   //cout << "LOGGING CHAIN FROM " << chain.startTime << " TO " << msg.endTime << endl;
                   chain.logger->logChain({chain.startTime, msg.endTime-chain.startTime});
                   chain.updateStartTime();
+                  if (chain.isAtRisk && !EndOfExpe)
+                  {
+                     chain.isAtRisk = FALSE;
+                     setMode(MODE_NOMINAL);
+                  }
                   //sleep(1);
                }
             }
@@ -317,7 +321,7 @@ void Agent::updateTaskInfo(monitoringMsg msg)
 ***********************/
 void Agent::setMode(uint _newMode)
 {
-   //cout << "[MONITORING & CONTROL AGENT] Change mode to " << ((mode>0)?"OVERLOADED":"NOMINAL") << ". " << endl;
+   cout << "[MONITORING & CONTROL AGENT] Change mode to " << ((_newMode&MODE_OVERLOADED)?"OVERLOADED":"NOMINAL") << ". " << endl;
    if (!bestEffortTasks.empty())
    {
 

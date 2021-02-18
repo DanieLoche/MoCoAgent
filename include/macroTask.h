@@ -185,7 +185,6 @@ class Agent : public TaskProcess
       void initCommunications();
       void setAllChains(std::vector<end2endDeadlineStruct> _tcDeadlineStructs);
       void setAllTasks(std::vector<rtTaskInfosStruct> _TasksInfos);
-      void setMode(uint mode);
       //int checkTaskChains();
       void displaySystemInfo(std::vector<end2endDeadlineStruct> e2eDD,
                              std::vector<rtTaskInfosStruct> tasksSet);
@@ -198,6 +197,7 @@ class Agent : public TaskProcess
 
       void updateTaskInfo(monitoringMsg msg);
       void executeRun();
+      void setMode(uint mode);
       void saveData();
 };
 

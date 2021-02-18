@@ -240,6 +240,7 @@ int TaskLauncher::runTasks(long expeDuration)
          rt_fprintf(stderr, "[ %llu ][ %s ] - Waiting Semaphor...\n", rt_timer_read(), currentProcess->prop.fP.name);
          rt_print_flush_buffers();
 
+         rt_task_sleep(_mSEC(500));
          rt_sem_p(&_sync_Task_Sem, TM_INFINITE);
          rt_fprintf(stderr, "[ %llu ][ %s ] - Got Semaphor...\n", rt_timer_read(), currentProcess->prop.fP.name);
 
@@ -350,6 +351,7 @@ int TaskLauncher::runAgent(long expeDuration)
 
    //rt_alarm_delete(&_endAlarm);
    rt_printf("====== End of Experimentation. Saving Data. ======\n");
+
    rt_print_flush_buffers();
 
    std::ofstream outputFileResume;
@@ -401,6 +403,7 @@ int TaskLauncher::runAgent(long expeDuration)
          << std::setw(10) << "duration" << "\n";
    myFile.close();
 
+   ((Agent*)currentProcess)->setMode(MODE_NOMINAL);
    RTIME time = rt_timer_read();
    rt_sem_v(&_sync_Task_Sem);
    rt_fprintf(stdout, "[ %llu ] [ MoCoAgent ]- Giving Semaphor...\n", time);
