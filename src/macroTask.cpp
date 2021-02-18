@@ -408,7 +408,7 @@ void BEMacroTask::executeRun()
          after();                // Log  execution.
       }
       else {
-         rt_event_wait(&_event, MODE_NOMINAL, NULL , EV_PRIO, TM_INFINITE);
+         //rt_event_wait(&_event, MODE_NOMINAL, NULL , EV_PRIO, TM_INFINITE);
          rt_fprintf(stderr, "[%s] [%ld]- Started back. \n", prop.fP.name, rt_timer_read());
       }
       rt_task_wait_period(&dataLogs->overruns);
@@ -420,8 +420,8 @@ uint BEMacroTask::before()
 {
    if (MoCoIsAlive & 2)
    {
-      ERROR_MNG(rt_event_inquire(&_event, &_eventInfos));
-      if ( _eventInfos.value & MODE_NOMINAL)
+      //ERROR_MNG(rt_event_inquire(&_event, &_eventInfos));
+      if (TRUE || _eventInfos.value & MODE_NOMINAL)
       {
          dataLogs->logStart();
          return  MODE_NOMINAL;

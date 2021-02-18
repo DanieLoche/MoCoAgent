@@ -327,7 +327,8 @@ void Agent::setMode(uint _newMode)
 
       if ((_newMode & MODE_OVERLOADED) && (runtimeMode & MODE_NOMINAL))
       { // Pause Best Effort Tasks if Nominal => OVERLOADED.
-         rt_event_clear(&_event, MODE_NOMINAL, NULL); // => MODE_OVERLOADED.
+          rt_fprintf(stderr,"[MCA] [%ld] - Stopping BE tasks.", rt_timer_read());
+         //rt_event_clear(&_event, MODE_NOMINAL, NULL); // => MODE_OVERLOADED.
          for (auto& bestEffortTask : bestEffortTasks)
          {   // Publier message pour dire à stopper
             ERROR_MNG(rt_task_suspend(&bestEffortTask));
@@ -344,7 +345,7 @@ void Agent::setMode(uint _newMode)
             rt_task_resume(&bestEffortTask);
          }
          //rt_event_clear(&_event, MODE_OVERLOADED, NULL);
-         rt_event_signal(&_event, MODE_NOMINAL);
+         //rt_event_signal(&_event, MODE_NOMINAL);
          #if VERBOSE_DEBUG // ==1?"OVERLOADED":"NOMINAL"
          rt_fprintf(stderr,"[MCA] [%ld] - Re-started BE tasks.", rt_timer_read());
          #endif
