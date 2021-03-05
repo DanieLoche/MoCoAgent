@@ -272,7 +272,46 @@ void MonitoringAgent::messageReceiver(void* arg)
    }
 }
 
-void Agent::updateTaskInfo(monitoringMsg msg)
+void MonitoringAgent::updateTaskInfo(monitoringMsg msg)
+{
+   //RT_TASK_INFO curtaskinfo;
+   //rt_task_inquire((RT_TASK*) msg.task, &curtaskinfo);
+   //cout << "Update from task : " << " ("<< msg.ID << ") - " << msg.isExecuted << " T=" << msg.time/1e6 << endl;
+   // printInquireInfo((RT_TASK*) msg.task);
+   for (auto& chain : allTaskChain)
+   {
+      for (auto&& _task : chain.taskList)
+      {
+         //cout << "Logged chain end at : " << _taskChain->currentEndTime/1.0e6 << endl;
+         //cout << "Logged chain start at : " << msg.time/1.0e6 << endl;
+         if( msg.ID == _task.id )
+         {
+            if (_task.addEntry({msg.time, msg.endTime}) )
+            { // si toute première tache de la chaine.
+               chain.updateStartTime();
+            }
+
+            if (msg.ID == chain.lastTask->id)
+            { // si toute dernière tache de la chaine.
+               if ( chain.unloadChain( msg.endTime) )
+               { // si tache complete executee.
+                  //cout << "LOGGING CHAIN FROM " << chain.startTime << " TO " << msg.endTime << endl;
+                  chain.logger->logChain({chain.startTime, msg.endTime-chain.startTime});
+                  chain.updateStartTime();
+                  if (chain.isAtRisk)
+                  {
+                     chain.isAtRisk = FALSE;
+                  }
+                  //sleep(1);
+               }
+            }
+            return;
+         }
+      }
+   }
+}
+
+void MonitoringAgent::updateTaskInfo(monitoringMsg msg)
 {
    //RT_TASK_INFO curtaskinfo;
    //rt_task_inquire((RT_TASK*) msg.task, &curtaskinfo);
@@ -311,7 +350,6 @@ void Agent::updateTaskInfo(monitoringMsg msg)
       }
    }
 }
-
 /***********************
 * Passage du système en mode :
 * MODE_NOMINAL : Toutes les tâches passent.

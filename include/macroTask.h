@@ -195,7 +195,6 @@ class Agent : public TaskProcess
             std::vector<end2endDeadlineStruct> e2eDD,
             std::vector<rtTaskInfosStruct> tasksSet);
 
-      void updateTaskInfo(monitoringMsg msg);
       void executeRun();
       void setMode(uint mode);
       void saveData();
@@ -209,6 +208,7 @@ class MonitoringAgent : public Agent
                      std::vector<rtTaskInfosStruct> tasksSet);
 
       void executeRun();
+      void updateTaskInfo(monitoringMsg msg);
       static void messageReceiver(void* _arg /* Agent* */);
       void saveData();
 
