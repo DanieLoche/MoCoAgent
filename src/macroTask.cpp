@@ -2,32 +2,30 @@
 //#include <utmpx.h>    // Pour fonction getcpu()
 
 
-bool TaskProcess::MoCoIsAlive = FALSE;
+bool TaskProcess::MoCoIsAlive = TRUE;
+bool TaskProcess::EndOfExpe = FALSE;
 
-TaskProcess::TaskProcess(rtTaskInfosStruct _taskInfo)
+
+TaskProcess::TaskProcess(rtTaskInfosStruct _taskInfo, RTIME initPeriodic)
 {
    printTaskInfo(&_taskInfo);
 
    cout << "[ "<< _taskInfo.fP.name << " ] - "<< "Setting Real-time parameters..." << endl;
-   setRTtask(_taskInfo.rtP, _taskInfo.fP.name);
+   setRTtask(_taskInfo.rtP, _taskInfo.fP.name, initPeriodic);
 
    printInquireInfo(&_task);
    parseParameters(_taskInfo.fP.args);
 }
 
-void TaskProcess::setRTtask(rtPStruct _rtInfos, char* _name)
+void TaskProcess::setRTtask(rtPStruct _rtInfos, char* _name, RTIME initPeriodic)
 {
    //system("find /proc/xenomai");
    XENO_INIT(_name);
-
-   int ret = 0;
+   //cout << "[" << _name << "] - XENO INIT PASSED." << endl;
    ERROR_MNG(rt_task_shadow(&_task, _name, _rtInfos.priority, 0));
-   //ret = rt_task_shadow(&_task, _name, _rtInfos.priority, 0);
+   rt_printf("[ %s ] - shadowed.\n", _name); //cout << "["<< _name << "]"<< " shadowed." << endl;
 
-   rt_print_flush_buffers();
-   rt_printf("[ %s ] - shadowed : %d (%s).\n", _name, ret, getErrorName(ret)); //cout << "["<< _name << "]"<< " shadowed." << endl;
-
-   if (_rtInfos.priority != 0 || _rtInfos.schedPolicy == SCHED_OTHER)
+   if (_rtInfos.priority != 0 && _rtInfos.schedPolicy != SCHED_OTHER)
    { // if priority = 0, SCHED_OTHER !!
       RT_TASK_INFO curtaskinfo;
       rt_task_inquire(0, &curtaskinfo);
@@ -51,8 +49,8 @@ void TaskProcess::setRTtask(rtPStruct _rtInfos, char* _name)
    setAffinity(_rtInfos.affinity, 0);
 
    //Periodicity
-   ERROR_MNG(rt_task_set_periodic(&_task, TM_NOW, _rtInfos.periodicity));
-   rt_printf("[ %s ] - Task Period %d updated.\n", _name, _rtInfos.periodicity); //cout << "["<< _name << "]"<< "Managing Scheduling policy " << getSchedPolicyName(_rtInfos.schedPolicy) << endl;
+   ERROR_MNG(rt_task_set_periodic(&_task, initPeriodic+_rtInfos.offsetTime, _rtInfos.periodicity));
+   rt_printf("[ %s ] - Task Period %d updated, base at %llu.\n", _name, _rtInfos.periodicity, initPeriodic+_rtInfos.offsetTime); //cout << "["<< _name << "]"<< "Managing Scheduling policy " << getSchedPolicyName(_rtInfos.schedPolicy) << endl;
    rt_print_flush_buffers();
 
    /* Gestion EDF Scheduling
@@ -156,6 +154,7 @@ void TaskProcess::parseParameters(string _arguments)
    }
    _argv.push_back(0);
 
+   _argv.shrink_to_fit();
    //token.copy(argv[i], token.size()); // arguments list must end with a null.
    #if VERBOSE_OTHER
    rt_printf("        Arguments : ");
@@ -207,10 +206,11 @@ void TaskProcess::setIO()
 
 }
 
-// ================================================== //
-// ======= MACRO TASK - Task Wrapper Component ====== //
+////////////////////////////////////////////////////////////////////////////////
+////////////// ======= MACRO TASK - Task Wrapper Component ====== //////////////
+////////////////////////////////////////////////////////////////////////////////
 
-MacroTask::MacroTask(rtTaskInfosStruct _taskInfo, bool MoCo, string _name) : TaskProcess(_taskInfo)
+MacroTask::MacroTask(rtTaskInfosStruct _taskInfo, RTIME initPeriodic, bool MoCo, string _name) : TaskProcess(_taskInfo, initPeriodic)
 {
    MoCoIsAlive = MoCo;
    prop = _taskInfo;
@@ -224,6 +224,7 @@ MacroTask::MacroTask(rtTaskInfosStruct _taskInfo, bool MoCo, string _name) : Tas
    #if WITH_BOOL
    msg.isExecuted = 1;
    #endif
+
 
 }
 
@@ -258,12 +259,72 @@ void MacroTask::findFunction (char* _func)
 
 }
 
-int MacroTask::before()
+int MacroTask::proceed()
+{
+   #if VERBOSE_OTHER
+   //rt_fprintf(stderr, "[%llu][ %s ] - Executing Proceed.\n", rt_timer_read(), prop.fP.name);
+   #endif
+
+   int ret = proceed_function(_argv.size()-1, &_argv[0]);  // -1 : no need for last element "NULL".
+   if (ret != 0)
+   {
+      rt_fprintf(stderr, "[ %s ] - Proceed error. (%d) function was : ", prop.fP.name, ret);
+      for (auto arg : _argv)
+      {
+         string toPrint;
+         if (arg==NULL)toPrint = "null";
+         else toPrint = arg;
+         rt_fprintf(stderr, " %s", toPrint.c_str());
+      }
+      rt_fprintf(stderr, "(%d elements)\n", _argv.size()-1);
+   }
+   return ret;
+}
+
+void MacroTask::saveData(int maxNameSize, RT_TASK_INFO* cti)
+{
+   dataLogs->saveData(maxNameSize, cti);
+   EndOfExpe = TRUE;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////// RT MacroTask /////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+RTMacroTask::RTMacroTask(rtTaskInfosStruct _taskInfo, RTIME initPeriodic, bool MoCo, string _name) : MacroTask(_taskInfo, initPeriodic, MoCo, _name)
+{}
+
+void RTMacroTask::setCommunications()
+{
+   if (MoCoIsAlive)
+   {
+      ERROR_MNG(rt_buffer_bind(&_buff, MESSAGE_TOPIC_NAME, TM_INFINITE)); // _mSEC(500)
+      //string mutexName = (string) MESSAGE_TOPIC_NAME + "_mtx";
+      //ERROR_MNG(rt_mutex_bind(&_bufMtx, mutexName.c_str(), _mSEC(500)));
+   }
+}
+
+void RTMacroTask::executeRun()
+{
+   //rt_fprintf(stderr, "Running...\n");
+   while (!EndOfExpe)
+   {
+      //cout << "Task" << prop.name << " working." << endl;
+      if (before() == 0) // Check if execution allowed
+      if (proceed() == 0)  // execute task
+         after();  // Inform of execution time for the
+
+      rt_task_wait_period(&dataLogs->overruns);
+   }
+}
+
+uint RTMacroTask::before()
 {
    #if VERBOSE_OTHER
    //rt_fprintf(stderr, "[ %s ] - Executing Before.\n", prop.fP.name);
    #endif
+
    msg.time = dataLogs->logStart();
+
    #if WITH_BOOL
    msg.isExecuted = 0;
    #endif
@@ -285,106 +346,52 @@ int MacroTask::before()
    return 0;
 }
 
-int MacroTask::proceed()
-{
-   #if VERBOSE_OTHER
-   //rt_fprintf(stderr, "[ %s ] - Executing Proceed.\n", prop.fP.name);
-   #endif
-
-   int ret = proceed_function(_argv.size()-1, &_argv[0]);  // -1 : no need for last element "NULL".
-   if (ret != 0)
-   {
-      rt_fprintf(stderr, "[ %s ] - Proceed error. (%d) function was : ", prop.fP.name, ret);
-      for (auto arg : _argv)
-      {
-         string toPrint;
-         if (arg==NULL)toPrint = "null";
-         else toPrint = arg;
-         rt_fprintf(stderr, " %s", toPrint.c_str());
-      }
-      rt_fprintf(stderr, "(%d elements)\n", _argv.size()-1);
-   }
-   return ret;
-}
-
-int MacroTask::after()
+int RTMacroTask::after()
 {
    #if VERBOSE_OTHER
    //rt_fprintf(stderr, "[ %s ] - Executing After.\n", prop.fP.name);
    #endif
+
    msg.endTime = dataLogs->logExec();
    #if WITH_BOOL
    msg.isExecuted = 1;
    #endif
 
-   ret = rt_buffer_write(&_buff , &msg , sizeof(monitoringMsg) , _mSEC(1));
-   if(MoCoIsAlive && (ret != sizeof(monitoringMsg)))
-   {
-      //MoCoIsAlive = 0;
-      RT_BUFFER_INFO infos;
-      ERROR_MNG(rt_buffer_inquire(&_buff, &infos));
-      fprintf(stderr, "[ %s ] - ERROR %s (%d) - failed to write AFTER monitoring message to buffer %s. (MoCo mode : %d)\n",
-                     prop.fP.name, getErrorName(ret), ret, MESSAGE_TOPIC_NAME, MoCoIsAlive);
-      fprintf(stderr, "Memory Available on buffer : %lu / %lu. %d waiting too.\n", infos.availmem, infos.totalmem, infos.owaiters);
-      rt_print_flush_buffers();
-   }
-   return 0;
-}
-
-void MacroTask::executeRun()
-{
    if (MoCoIsAlive)
    {
-      ERROR_MNG(rt_buffer_bind(&_buff, MESSAGE_TOPIC_NAME, _mSEC(500)));
-      //string mutexName = (string) MESSAGE_TOPIC_NAME + "_mtx";
-      //ERROR_MNG(rt_mutex_bind(&_bufMtx, mutexName.c_str(), _mSEC(500)));
+      ret = rt_buffer_write(&_buff , &msg , sizeof(monitoringMsg) , _mSEC(5));
+      if(ret != sizeof(monitoringMsg))
+      {
+         //MoCoIsAlive = 0;
+         RT_BUFFER_INFO infos;
+         ERROR_MNG(rt_buffer_inquire(&_buff, &infos));
+         rt_fprintf(stderr, "[%llu][ %s ] - ERROR %s (%d) - failed to write AFTER monitoring message to buffer %s. (MoCo mode : %d)\n",
+                        rt_timer_read(), prop.fP.name, getErrorName(ret), ret, MESSAGE_TOPIC_NAME, MoCoIsAlive);
+         rt_fprintf(stderr, "Memory Available on buffer : %lu / %lu. %d waiting too.\n", infos.availmem, infos.totalmem, infos.owaiters);
+         rt_print_flush_buffers();
+      }
    }
-   //rt_fprintf(stderr, "Running...\n");
-   while (MoCoIsAlive)
-   {
-      //cout << "Task" << prop.name << " working." << endl;
-      if (before() == 0) // Check if execution allowed
-         if (proceed() == 0)  // execute task
-            after();  // Inform of execution time for the mcAgent
-      rt_task_wait_period(&dataLogs->overruns);
-   }
-}
-
-////////////////////////////////////////////////////////////////////////////////////////
-
-
-uint MacroTask::before_besteff()
-{
-   ERROR_MNG(rt_event_inquire(&_event, &_eventInfos));
-   if ( _eventInfos.value & MODE_NOMINAL)
-   {
-      //dataLogs->logStart();
-      return  MODE_NOMINAL;
-   } else {
-      rt_fprintf(stderr, "[%s] [%ld]- Stopped. \n", prop.fP.name, rt_timer_read());
-      return 0;
-   }
-
-
-}
-
-int MacroTask::after_besteff()
-{
-   //dataLogs->logExec();
-   #if VERBOSE_OTHER
-   //cout << "End Task : " << prop.fP.name << endl;
-   #endif
    return 0;
 }
 
+////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////// BEMacroTask //////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+BEMacroTask::BEMacroTask(rtTaskInfosStruct _taskInfo, RTIME initPeriodic, bool MoCo, string _name) : MacroTask(_taskInfo, initPeriodic, MoCo, _name)
+{}
 
-void MacroTask::executeRun_besteffort()
+void BEMacroTask::setCommunications()
 {
    //cout << "Running..." << endl;
    if (MoCoIsAlive)
    {
-      ERROR_MNG(rt_event_bind(&_event, CHANGE_MODE_EVENT_NAME, _mSEC(500)));
+      ERROR_MNG(rt_event_bind(&_event, CHANGE_MODE_EVENT_NAME, TM_INFINITE)); //_mSEC(500)
    }
+}
+
+void BEMacroTask::executeRun()
+{
+   /*
    int amount = prop.rtP.periodicity;
    for (int i = 0 ; i < amount ; ++i)
    {
@@ -392,16 +399,16 @@ void MacroTask::executeRun_besteffort()
       rt_task_wait_period(&dataLogs->overruns);
 
    }
-
-   while (MoCoIsAlive)
+   */
+   while (!EndOfExpe)
    {
-      if (before_besteff() & MODE_NOMINAL) // Check if execution allowed
+      if (before() & MODE_NOMINAL)  // Check if execution allowed
       {
-         if (proceed() == 0)  // execute task
-            after_besteff();  // Inform of execution time for the mcAgent
+         if (proceed() == 0)        // execute task
+         after();                // Log  execution.
       }
       else {
-         rt_event_wait(&_event, MODE_NOMINAL, NULL , EV_PRIO, TM_INFINITE);
+         //rt_event_wait(&_event, MODE_NOMINAL, NULL , EV_PRIO, TM_INFINITE);
          rt_fprintf(stderr, "[%s] [%ld]- Started back. \n", prop.fP.name, rt_timer_read());
       }
       rt_task_wait_period(&dataLogs->overruns);
@@ -409,13 +416,40 @@ void MacroTask::executeRun_besteffort()
 
 }
 
-void MacroTask::saveData(int maxNameSize, RT_TASK_INFO* cti)
+uint BEMacroTask::before()
 {
-   dataLogs->saveData(maxNameSize, cti);
-   MoCoIsAlive = 0;
+   if (MoCoIsAlive & 2)
+   {
+      //ERROR_MNG(rt_event_inquire(&_event, &_eventInfos));
+      if (TRUE || _eventInfos.value & MODE_NOMINAL)
+      {
+         dataLogs->logStart();
+         return  MODE_NOMINAL;
+      } else {
+         rt_fprintf(stderr, "[%s] [%ld]- Stopped. \n", prop.fP.name, rt_timer_read());
+         return 0;
+      }
+   } else
+   {
+      dataLogs->logStart();
+      return MODE_NOMINAL;
+   }
+
+}
+
+int BEMacroTask::after()
+{
+   dataLogs->logExec();
+   #if VERBOSE_OTHER
+   //cout << "End Task : " << prop.fP.name << endl;
+   #endif
+   return 0;
 }
 
 
+////////////////////////////////////////////////////////////////////////////////
+////////////////////// Xenomai Specific tasks //////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 
 int do_load (int argc, char* argv[])
 {
@@ -437,7 +471,7 @@ int do_xeno_init(char* _name)
       //"--enable-registry"
       //"--registry-root=/usr/xenomai",
       "--shared-registry",
-      "--session=test",
+      "--session=Expe",
       //"--dump-config",
       NULL
    };

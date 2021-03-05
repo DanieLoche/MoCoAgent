@@ -81,8 +81,8 @@ void printTaskInfo(rtTaskInfosStruct* task)
 
 void print_affinity(pid_t _pid)
 {
-   long nproc = get_nprocs();
    #if VERBOSE_ASK
+   long nproc = get_nprocs();
    int pid = _pid;
    if (!_pid)
    {
@@ -143,6 +143,9 @@ const char* getSchedPolicyName(int schedPol)
       break;
       case SCHED_RM        :
          return "Rate-Monotonic\0";
+      break;
+      case SCHED_OTHER     :
+         return "Other\0";
       break;
       default : return "Undefined Policy\0";
       break;

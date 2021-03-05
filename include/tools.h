@@ -28,8 +28,8 @@ using std::endl;
 using std::cin;
 using std::cerr;
 
-#define RESUME_FILE "_resume.txt"
-#define CHAIN_FILE   "_chains.csv"
+#define RESUME_FILE  "_resume.txt"
+#define CHAIN_FILE   "_chain.csv"
 #define TASKS_FILE   "_expe.csv"
 
 #define   TRUE    1
@@ -45,15 +45,13 @@ using std::cerr;
 #define     SCHED_EDF       6 // Not Implemented
 #define     SCHED_RM        7 // Rate-Monotonic
 
-#define   RR_SLICE_TIME     _mSEC(5)  // clock ticks (=ns)
-#define   SPINTIME          1e7   // spin time in ns
-#define   EXECTIME          2e8   // execution time in ns
+#define   RR_SLICE_TIME     _mSEC(2)  // clock ticks (=ns)
 
-
-#define   VERBOSE_INFO      1 // Cout d'informations, démarrage, etc...
-#define   VERBOSE_DEBUG     0 // Cout de débug...
-#define   VERBOSE_OTHER     0 // Cout autre...
-#define   VERBOSE_ASK       0 // cout explicitement demandés dans le code
+#define   VERBOSE_INFO     1 // Cout d'informations, démarrage, etc...
+#define   VERBOSE_LOGS     0
+#define   VERBOSE_DEBUG    0 // Cout de débug...
+#define   VERBOSE_OTHER    0 // Cout autre...
+#define   VERBOSE_ASK      0 // cout explicitement demandés dans le code
 
 #define _SEC(_time)    ((_time)*1000 * 1000 * 1000)
 #define _mSEC(_time)   ((_time)*1000 * 1000)
@@ -64,7 +62,7 @@ do {                                                                   \
    int err = fct;                                                      \
    if ( err != 0)                                                      \
    {                                                                   \
-      const char* errName = strerror(err);                             \
+      const char* errName = getErrorName(err);                             \
       rt_fprintf(stderr, "[ ERROR ] %s-%s error %s (%d)\n", __FUNCTION__, #fct, errName, err); \
       rt_print_flush_buffers();                                        \
       rt_task_sleep(_mSEC(10));                                        \
@@ -89,6 +87,14 @@ do {                                                                   \
 
 //#define TO_STRING(str) convertToString(str)
 
+struct end2endDeadlineStruct
+{
+   char name[32];
+   uint taskChainID;
+   string Path;
+   RTIME deadline;
+};
+
 struct rtPStruct // Real-time Parameters
 {
    //RT_TASK* _t;  //
@@ -97,14 +103,15 @@ struct rtPStruct // Real-time Parameters
    int priority;      //
    int schedPolicy;   //
    RTIME periodicity; // in clock ticks, inputed as ms !
+   uint offsetTime;
 
 };
 
 struct funcPStruct   // Functional parameters
 {
-   int id;
-   int isHRT;     // task chain ID or best effort if null
-   int prec;
+   uint id;
+   uint isHRT;     // task chain ID or best effort if null
+   uint prec;
    RTIME wcet;   //
    char name[32]; //
    char func[128];
@@ -130,26 +137,6 @@ struct sortDescendingPeriod {
    }
 };
 
-struct end2endDeadlineStruct
-{
-  char name[32];
-  int taskChainID;
-  string Path;
-  RTIME deadline;
-};
-
-#define WITH_BOOL   0
-struct monitoringMsg
-{
-   //RT_TASK* task;
-   int ID;
-   RTIME time;   // Run-time - task start received
-   RTIME endTime; // task duration
-   #if WITH_BOOL
-   bool isExecuted;    // Run-time - computed
-   #endif
-};
-
 template <typename T> int sign(T val) {
       return (T(0) < val) - (val < T(0));
 }
@@ -167,19 +154,6 @@ std::string reduce(const std::string& str,
                    const std::string& whitespace = " \t");
 
 //string convertToString(const char* a){ std::string s = a; return s; }
-
-/*
-struct logData
-{
-  struct timeLog
-  {
-    RTIME timestamp;
-    RTIME duration;
-  } timeLogs[8000];
-  int cptOutOfDeadline;
-  int cptExecutions;
-};
-*/
 
 /* To create a task :
  * Arguments : &task,

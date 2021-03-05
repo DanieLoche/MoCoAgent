@@ -11,51 +11,54 @@ errorDir="error.log.txt"
 duration=100
 load=100
 schedPolicy=1
-MoCoMode=1
+MoCoMode=1  # 0 : disable | 1 = Monitoring | 2 = Monitoring & Control
 
 while [ "$1" != "" ]; do
    case $1 in
-      -m | --mode )        shift
-                           MoCoMode=$1
+      -m | --mode )     shift
+                        MoCoMode=$1
       ;;
-      -l | --load )        shift
-                           load=$1
+      -d | --duration ) shift
+      duration=$1
       ;;
-      -s | --sched )     shift
-                         schedPolicy="-s $1"
-                         if test $1 = 1
+      -l | --load )     shift
+                        load=$1
+      ;;
+      -s | --sched )    shift
+                        schedPolicy="-s $1"
+                        if test $1 = 1
                             then schedName="FIFO"
-                         elif test $1 = 2
+                        elif test $1 = 0
+                            then schedName="OTHER"
+                            schedPolicy="-OTHER"
+                        elif test $1 = 2
                             then schedName="RR"
-                         elif test $1 = 7
+                        elif test $1 = 7
                             then schedName="RM"
-                         else schedName=$1
-                         fi
+                        else schedName=$1
+                        fi
       ;;
-      -d | --duration )    shift
-                           duration=$1
+      -i | --input )    shift
+                        Infile=$1
       ;;
-      -i | -f | --input )  shift
-                           Infile=$1
+      -o | --output )   shift
+                        ISSTRESSED=_$1
       ;;
-      -o | --output )      shift
-                           dirName=$1
+      -o2 | --error )   shift
+                        errorDir="2> $1"
       ;;
-      -o2 | --error )      shift
-                           errorDir=$1
+      -h | --help )     echo "usage: runBashTest.sh [[-m mode] [-d duration] [-l load] [-s sched] [-i inputfile] [-o outputfile] [-o2 logFile]| [-h]]"
+                        exit
       ;;
-      -h | --help )        echo "usage: runBashTest.sh [[-m mode] [-d duration] [-l load] [-s sched] [-i inputfile] [-o outputfile] [-o2 logFile]| [-h]]"
-                           exit
-      ;;
-      * )                  echo "usage: runBashTest.sh [[-m mode] [-d duration] [-l load] [-s sched] [-i inputfile] [-o outputfile] [-o2 logFile]| [-h]]"
-                           exit 1
+      * )               echo "usage: runBashTest.sh [[-m mode] [-d duration] [-l load] [-s sched] [-i inputfile] [-o outputfile] [-o2 logFile]| [-h]]"
+                        exit 1
    esac
    shift
 done
 
+expeResume=${duration}s_${load}  #_${schedName}
+dirName=./Exps/`date +%d-%m-%Hh`_${expeResume}${ISSTRESSED}
 echo "Duration : $duration | Load : $load | Scheduling : $schedPolicy | Input : $Infile | Output : $dirName"
-expeResume=${duration}s_${load}_${schedName}
-dirName=${dirName}/`date +%d-%m-%Hh`_$expeResume
 
 if test -f $Infile
 then
@@ -65,7 +68,7 @@ then
    numLigne=1
    while read -r line
    do
-      if test $numLigne -ne 1
+      if test $numLigne -ne 1 -a `echo $line | cut -c -2` != "//"
       then
           HRT=`echo $line | awk '{print $2}'`      # On cherche la chaine ID #I (HRT)
           if test $HRT -eq 1
@@ -77,11 +80,12 @@ then
       fi
    done < $Infile
 
-   expeName=${name}_$MoCoMode_${expeResume}
-   sar -o ${dirName}/IODatas_$expeName -P 0-3 1 $duration > /dev/null 2>&1 &
-   ./MoCoAgent.out -e $MoCoMode -d $duration -l $load $schedPolicy -i ./$Infile -o ${dirName}/$expeName 2> $errorDir
+   expeName=${name}_$MoCoMode_${schedName}
+   sudo ~/killXenomai.sh 
+   ## sar -o ${dirName}/IODatas_$expeName -P 0-3 1 $duration > /dev/null 2>&1 &
+   sudo ./MoCoAgent.out -e $MoCoMode -d $duration -l $load ${schedPolicy} -i ./$Infile -o ${dirName}/$expeName $errorDir
    expe2Out=$?
-   rm ./bench/output/*
+   sudo rm ./bench/output/*
 
    echo "expe${MoCoMode}out : $expe0Out"
 

@@ -17,13 +17,31 @@
 #define  LOG_MUTEX_NAME          "logToFileMutex"
 
 #define  USE_MUTEX               0
+#define  WITH_BOOL               0
 
-#define   MCA_PERIOD             2 // ms
-const RTIME t_RT     =     000*1.0e6;  // time to trigger the Control Agent
-const RTIME Wmax     =     _mSEC(MCA_PERIOD);    // next slice max time
+#define   MCA_PERIOD       _mSEC(1) // ms
+const RTIME t_RT     =     _uSEC(100);  // time to trigger the Control Agent
+const RTIME Wmax     =     MCA_PERIOD;    // next slice max time
 
 #define XENO_INIT(_name) do_xeno_init(_name)
 int do_xeno_init(char* name);
+
+struct ExecTimes
+{
+   RTIME start;
+   RTIME end;
+};
+
+struct monitoringMsg
+{
+   //RT_TASK* task;
+   uint ID;
+   RTIME time;   // Run-time - task start received
+   RTIME endTime; // task duration
+   #if WITH_BOOL
+   bool isExecuted;    // Run-time - computed
+   #endif
+};
 
 class taskMonitoringStruct
 {
@@ -31,45 +49,59 @@ class taskMonitoringStruct
       #if USE_MUTEX
       RT_MUTEX mtx_taskStatus;
       #endif
-      bool isExecuted; // Run-time - computed
+      RT_TASK xenoTask;
+
+      //bool isExecuted; // Run-time - computed  // will be USELESS //
+      uint maxPendingChains;
+      uint oldestElement, newestElement;
+      taskMonitoringStruct* precedentTask;
+
+      ExecTimes* execLogs; // tableau =new timelog[n]
 
    public :
-      int precedencyID;
-      RT_TASK xenoTask;
-      int id;
-      //RTIME endTime;     // Run-time - received
-      RTIME deadline;    // Static
+      uint id;
+      uint precedencyID;
+
+      ChainDataLogger* logger;
+
+      RTIME deadline;    // Static = period
       RTIME rwcet;       // Static
       //bool operator <(const taskMonitoringStruct& tms) const {return (id < tms.id);}
 
-      taskMonitoringStruct(rtTaskInfosStruct rtTaskInfos);
-      void setState(bool state);
-      bool getState();
+      taskMonitoringStruct(rtTaskInfosStruct rtTaskInfos, ChainDataLogger* logger);
+      void setChainInfos(int bufsize, taskMonitoringStruct* prec);
+      bool addEntry(ExecTimes times);
+      ExecTimes emptyUntil(RTIME limitTime);
+      bool emptyPrecedency( RTIME limitTime, RTIME endOfChain); // récursif
+      ExecTimes getState(RTIME limit = 0);
+      void displayInfos();
 };
 
 class taskChain
 {
+   private:
+      RTIME end2endDeadline; // static
+
+      RTIME getExecutionTime();
+      RTIME getRemWCET();
+
    public :
       ChainDataLogger* logger;
       char name[32];
-      int chainID;                // static
-      RTIME end2endDeadline; // static
+      uint chainID;                // static
       RTIME startTime;       // Runtime - deduced
-      RTIME currentEndTime;  // Runtime - deduced
-      RTIME remWCET;         // Runtime - computed
+      //RTIME remWCET;         // Runtime - computed
       bool isAtRisk;         // Runtime - deduced
+
+      taskMonitoringStruct* lastTask;
       std::vector<taskMonitoringStruct> taskList;
 
       taskChain(end2endDeadlineStruct _tcDeadline, string outfile);
-
-      bool checkPrecedency(int taskID);
-      bool checkTaskE2E();
-      bool checkIfEnded();
+      void setPrecedencies();
+      bool checkTaskE2E();    // a modifier
+      bool unloadChain(RTIME endOfChain);  // renvoi la date de début de chaine;
+      void updateStartTime();
       void displayTasks();
-      void resetChain();
-   private:
-      RTIME getExecutionTime();
-      RTIME getRemWCET();
 };
 
 class TaskProcess
@@ -83,19 +115,18 @@ class TaskProcess
       std::vector<char*> _argv;
 
       void setAffinity (int _aff, int mode);
-      void setRTtask(rtPStruct, char*);
+      void setRTtask(rtPStruct, char*, RTIME);
       void parseParameters(string _arguments);
       void setIO( );
 
    public:
       static bool MoCoIsAlive;
-      //RT_MUTEX _bufMtx;
+      static bool EndOfExpe;
       RT_TASK _task;
       RT_BUFFER _buff;
 
-      TaskProcess(rtTaskInfosStruct _taskInfo);
+      TaskProcess(rtTaskInfosStruct _taskInfo, RTIME initPeriodic = TM_NOW);
       virtual void executeRun() = 0;
-      virtual void executeRun_besteffort() = 0;
       void saveData(int nameMaxSize);
 };
 
@@ -106,25 +137,42 @@ class MacroTask : public TaskProcess
       TaskDataLogger* dataLogs;
       int (*proceed_function)(int Argc, char *argv[]);
 
-      //void setRTtask(rtPStruct _rtInfos, char*);
       void findFunction(char* _func);
-      inline int before();
-      inline int proceed();
-      inline int after();
-      inline uint before_besteff();
-      inline int after_besteff();
 
    public :
       rtTaskInfosStruct prop;
 
-      MacroTask(rtTaskInfosStruct taskInfos, bool MoCoMode, string name);
+      MacroTask(rtTaskInfosStruct taskInfos, RTIME initPeriodic, bool MoCoMode, string name);
+      virtual void setCommunications() = 0;
+      inline virtual uint before() = 0;
+      inline int proceed();
+      inline virtual int after() = 0;
       void saveData(int maxNameSize, RT_TASK_INFO* cti = NULL);
-      void executeRun();
-      void executeRun_besteffort();
-
 };
 
-class MCAgent : public TaskProcess
+class RTMacroTask : public MacroTask
+{
+   public:
+      RTMacroTask(rtTaskInfosStruct taskInfos, RTIME initPeriodic, bool MoCoMode, string name);
+
+      void setCommunications();
+      void executeRun();
+      inline uint before();
+      inline int after();
+};
+
+class BEMacroTask : public MacroTask
+{
+   public:
+      BEMacroTask(rtTaskInfosStruct taskInfos, RTIME initPeriodic, bool MoCoMode, string name);
+
+      void setCommunications();
+      void executeRun();
+      inline uint before();
+      inline int after();
+};
+
+class Agent : public TaskProcess
 {
    protected :
       RT_TASK msgReceiverTask;
@@ -135,23 +183,45 @@ class MCAgent : public TaskProcess
       std::vector<RT_TASK> bestEffortTasks;
 
       void initCommunications();
-      void setAllDeadlines(std::vector<end2endDeadlineStruct> _tcDeadlineStructs);
+      void setAllChains(std::vector<end2endDeadlineStruct> _tcDeadlineStructs);
       void setAllTasks(std::vector<rtTaskInfosStruct> _TasksInfos);
-      void setMode(uint mode);
       //int checkTaskChains();
       void displaySystemInfo(std::vector<end2endDeadlineStruct> e2eDD,
                              std::vector<rtTaskInfosStruct> tasksSet);
       void displayChains();
 
    public :
-      MCAgent(rtTaskInfosStruct _taskInfo,
-      std::vector<end2endDeadlineStruct> e2eDD,
-      std::vector<rtTaskInfosStruct> tasksSet);
-      void updateTaskInfo(monitoringMsg msg);
-      void saveData();
-      //static void finishProcess(void* _mcAgent /*MCAgent* task*/);
+      Agent(rtTaskInfosStruct _taskInfo,
+            std::vector<end2endDeadlineStruct> e2eDD,
+            std::vector<rtTaskInfosStruct> tasksSet);
+
       void executeRun();
-      void executeRun_besteffort();
+      void setMode(uint mode);
+      void saveData();
+};
+
+class MonitoringAgent : public Agent
+{
+   public:
+      MonitoringAgent(rtTaskInfosStruct _taskInfo,
+                     std::vector<end2endDeadlineStruct> e2eDD,
+                     std::vector<rtTaskInfosStruct> tasksSet);
+
+      void executeRun();
+      void updateTaskInfo(monitoringMsg msg);
+      static void messageReceiver(void* _arg /* Agent* */);
+      void saveData();
+
+};
+
+class MonitoringControlAgent : public MonitoringAgent
+{
+   public:
+      MonitoringControlAgent(rtTaskInfosStruct _taskInfo,
+                              std::vector<end2endDeadlineStruct> e2eDD,
+                              std::vector<rtTaskInfosStruct> tasksSet);
+
+      void executeRun();
 };
 
    int do_load           (int argc, char* argv[]);

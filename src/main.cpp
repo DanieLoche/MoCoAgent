@@ -1,13 +1,12 @@
 #include <iomanip>
 
 #include "taskLauncher.h"
-#include "NanoLog.h"
 #include "tools.h"
 
 //MCAgent* mca;
 
 string inputFile = "input_chaine.txt", outputFile = "default";
-int enableAgent = 1; // 0 = Disable | 1 = Enable | 2 = Enable for monitoring only
+int enableAgent = 1; // 0 = Disable | 1 = Enable Monitoring only | 2 = Enable for Control too
 int expeDuration = 60;
 int schedMode = SCHED_FIFO, cpuFactor = 100;
 
@@ -55,7 +54,7 @@ int main(int argc, char* argv[])
       }
 
       else if (arg == "-e" || arg == "--enable")
-      {// ENABLE MoCoAgent - parse true/false as bool
+      {// ENABLE MoCoAgent - parse true/false as int
          TRY_CONV("MoCoAgent mode", argv, enableAgent);
       }
 
@@ -66,7 +65,7 @@ int main(int argc, char* argv[])
       else if (arg == "-FIFO")   schedMode = SCHED_FIFO;
       else if  (arg == "-RM")    schedMode = SCHED_RM;
       else if  (arg == "-RR")    schedMode = SCHED_RR;
-      else if  (arg == "-EDF")   schedMode = SCHED_EDF; // NOT MANAGED !!
+      else if  (arg == "-OTHER") schedMode = SCHED_OTHER;
 
     }
 
@@ -74,6 +73,7 @@ int main(int argc, char* argv[])
     {
       outputFile = "RES_" + std::to_string(expeDuration) + "_" + std::to_string(enableAgent) + "_" + getSchedPolicyName(schedMode) + "_" + std::to_string(cpuFactor);
     }
+    cout << "\n\n================= START OF EXPERIMENT =================\n";
     cout << "Experiment made with parameters : \n"
       << " MoCoAgent mode: " << enableAgent  << "\n"
       << "  Duration: " << expeDuration << "\n"
@@ -90,16 +90,15 @@ int main(int argc, char* argv[])
    TaskLauncher* tln = new TaskLauncher(enableAgent, outputFile, schedMode);
 
    #if VERBOSE_INFO
-   cout << "\n------------------------------" << endl;
    cout << " Generating Task Set ..." << endl;
    #endif
-   if(tln->readChainsList(inputFile)) {cerr << "Failed to read task chains or no chain found." << endl; return -1;}
-   if(tln->readTasksList(cpuFactor)) {cerr << "Failed to read tasks list or no tasks found." << endl; return -2;}
+   if(tln->readChainsList(inputFile)) {cerr << "Failed to read task chains or no chain found." << endl; exit(-1);}
+   if(tln->readTasksList(cpuFactor)) {cerr << "Failed to read tasks list or no tasks found." << endl; exit(-2);}
 
    std::ofstream outputFileResume;
    string outputFileName = outputFile + RESUME_FILE;
    outputFileResume.open (outputFileName);    // TO APPEND :  //,ios_base::app);
-   outputFileResume << "Experiment made at " << /*ctime(&(time_t)time(0)) << */" with parameters : \n"
+   outputFileResume << "Experiment made" /* at " << ctime(&(time_t)time(0)) << */" with parameters : \n"
       << " MoCoAgent: " << enableAgent  << "\n"
       << "  Duration: " << expeDuration << "\n"
       << "CPU Factor: " << cpuFactor    << "\n"
@@ -108,15 +107,17 @@ int main(int argc, char* argv[])
       << "Output files: " << outputFile << "_Expe.csv & "
       << outputFile       << "_Chains.csv"  << " & "
       << outputFile       << "_Resume.txt"    << endl;
-
    outputFileResume.close();
-   if(tln->runTasks(expeDuration)) {cerr << "Failed to create all tasks" << endl; return -4;}
 
-   if (enableAgent)
-   {
-      sleep(2);
-      tln->runAgent(expeDuration);
-   }
+   tln->printChainSetInfos();
+   tln->printTaskSetInfos();
+
+
+   if(tln->runTasks(expeDuration)) {cerr << "Failed to create all tasks" << endl; exit(-4);}
+
+   sleep(1);
+   tln->runAgent(expeDuration);
+
 
    //sleeping the time that all tasks will be started
    //sleep(2);

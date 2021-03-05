@@ -33,13 +33,22 @@ then
 	duration=`expr $Duration / 3`
 fi
 
-./runBashTest.sh -i $input -s 1 -d $duration -l $load; FIFO=$? ;
+sudo stress-ng --ionice-class rt --ionice-level 0 --cache 4 --fault 4 --io 4 --matrix 2 &
+#sudo /usr/xenomai/bin/dohell -s 192.168.0.1 -m /tmp 10800 &
 
-./runBashTest.sh -i $input -s 0 -d $duration -l $load; OTHER=$? ;
+sleep 1
 
-./runBashTest.sh -i $input -s 2 -d $duration -l $load; RR=$? ;
+./runBashTest.sh -i $input -s 1 -d $duration -l $load -o STRESS; FIFO=$? ;
 
-#./runBashTest.sh -i $input -s 7 -d $duration -l $load; RM=$? ;
+./runBashTest.sh -i $input -s 0 -d $duration -l $load -o STRESS; OTHER=$? ;
+
+./runBashTest.sh -i $input -s 2 -d $duration -l $load -o STRESS; RR=$? ;
+
+#./runBashTest.sh -i $input -s 7 -d $duration -l $load -o STRESS; RM=$? ;
+
+sleep 1
+sudo killall stress-ng
+#sudo killall dohell
 
 echo "Result FIFO : $FIFO"
 echo "Result OTHER : $OTHER"
