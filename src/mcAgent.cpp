@@ -21,13 +21,16 @@ Agent::Agent(rtTaskInfosStruct _taskInfo,
 
 MonitoringAgent::MonitoringAgent(rtTaskInfosStruct _taskInfo,
                   std::vector<end2endDeadlineStruct> e2eDD,
-                  std::vector<rtTaskInfosStruct> tasksSet) :
+                  std::vector<rtTaskInfosStruct> tasksSet, bool _control) :
                   Agent(_taskInfo, e2eDD, tasksSet)
 {
    MoCoIsAlive = TRUE;
    initCommunications();
 
-   ERROR_MNG(rt_task_spawn(&msgReceiverTask, "MonitoringTask", 0, 99 /*prio*/, 0, MonitoringAgent::messageReceiver, this));
+   if (_control) ERROR_MNG(rt_task_spawn(&msgReceiverTask, "MonitoringTask", 0, 99 /*prio*/, 0,
+                                          MonitoringControlAgent::messageReceiver, this ));
+   else  ERROR_MNG(rt_task_spawn(&msgReceiverTask, "MonitoringTask", 0, 99 /*prio*/, 0,
+                                 MonitoringAgent::messageReceiver, {this} ));
 
    #if VERBOSE_INFO
    rt_printf("[ Monitoring ] - READY.\n");
@@ -38,12 +41,13 @@ MonitoringAgent::MonitoringAgent(rtTaskInfosStruct _taskInfo,
 MonitoringControlAgent::MonitoringControlAgent(rtTaskInfosStruct _taskInfo,
                   std::vector<end2endDeadlineStruct> e2eDD,
                   std::vector<rtTaskInfosStruct> tasksSet) :
-                  MonitoringAgent(_taskInfo, e2eDD, tasksSet) {}
+                  MonitoringAgent(_taskInfo, e2eDD, tasksSet, TRUE) {}
 
 void Agent::initCommunications()
 {
    ERROR_MNG(rt_buffer_create(&_buff, MESSAGE_TOPIC_NAME, 20*sizeof(monitoringMsg), B_FIFO));
    ERROR_MNG(rt_event_create(&_event, CHANGE_MODE_EVENT_NAME, 0, EV_PRIO));
+   ERROR_MNG(rt_mutex_create(&mtx_ChangeMode, "MUTEX_MODE_CHANGE"));
    rt_printf("Buffer and Event flag created.\n"); rt_print_flush_buffers();
 }
 
@@ -88,10 +92,10 @@ void Agent::setAllTasks(std::vector<rtTaskInfosStruct> _TasksInfos)
       if ( !_taskInfo.fP.isHRT )
       {
          printf("Adding %s to BE list.\n", _taskInfo.fP.name);
-         RT_TASK* _t = new RT_TASK;
-         ERROR_MNG(rt_task_bind(_t, _taskInfo.fP.name, TM_NONBLOCK));
+
+         bestEffortTasks.push_back(*new RT_TASK);
+         ERROR_MNG(rt_task_bind(&bestEffortTasks.back(), _taskInfo.fP.name, TM_NONBLOCK));
          //printInquireInfo(&_t);
-         bestEffortTasks.push_back(*_t);
          //break;
       }
       else
@@ -239,12 +243,44 @@ void MonitoringControlAgent::executeRun()
       rt_task_wait_period(&overruns);
    }
 
-   rt_task_delete(&msgReceiverTask);
+   //rt_task_delete(&msgReceiverTask);
 }
 
 void MonitoringAgent::messageReceiver(void* arg)
 {
    MonitoringAgent* mocoAgent = (MonitoringAgent*) arg;
+
+   monitoringMsg msg;
+   ERROR_MNG(rt_task_set_periodic(NULL, TM_NOW, TM_INFINITE)); // disable periodicity;
+
+   #if VERBOSE_LOGS
+   RTIME _time;
+   #endif
+   while(TRUE)
+   {
+      //rt_mutex_acquire(&mocoAgent->_bufMtx, TM_INFINITE);
+      int ret = rt_buffer_read(&(mocoAgent->_buff), &msg, sizeof(monitoringMsg), TM_NONBLOCK);
+      if (ret == sizeof(monitoringMsg))
+      {
+         #if VERBOSE_LOGS
+         _time = rt_timer_read();
+         #endif
+         mocoAgent->updateTaskInfo(msg);
+         #if VERBOSE_LOGS
+         rt_fprintf(stderr,"%llu ; Message Receiver ; %llu\n", _time, rt_timer_read());
+         #endif
+      }
+      //rt_mutex_release(&mocoAgent->_bufMtx);
+      //rt_task_sleep()_mSEC(1);
+      rt_task_yield();
+      //rt_task_wait_period(0);
+   }
+}
+
+void MonitoringControlAgent::messageReceiver(void* arg)
+{
+   MonitoringControlAgent* mocoAgent = (MonitoringControlAgent*) arg;
+
    monitoringMsg msg;
    ERROR_MNG(rt_task_set_periodic(NULL, TM_NOW, TM_INFINITE)); // disable periodicity;
 
@@ -298,10 +334,13 @@ void MonitoringAgent::updateTaskInfo(monitoringMsg msg)
                   //cout << "LOGGING CHAIN FROM " << chain.startTime << " TO " << msg.endTime << endl;
                   chain.logger->logChain({chain.startTime, msg.endTime-chain.startTime});
                   chain.updateStartTime();
+                  rt_mutex_acquire(&mtx_ChangeMode, TM_INFINITE);
                   if (chain.isAtRisk)
                   {
                      chain.isAtRisk = FALSE;
                   }
+                  rt_mutex_release(&mtx_ChangeMode);
+
                   //sleep(1);
                }
             }
@@ -311,7 +350,7 @@ void MonitoringAgent::updateTaskInfo(monitoringMsg msg)
    }
 }
 
-void MonitoringAgent::updateTaskInfo(monitoringMsg msg)
+void MonitoringControlAgent::updateTaskInfo(monitoringMsg msg)
 {
    //RT_TASK_INFO curtaskinfo;
    //rt_task_inquire((RT_TASK*) msg.task, &curtaskinfo);
@@ -337,11 +376,13 @@ void MonitoringAgent::updateTaskInfo(monitoringMsg msg)
                   //cout << "LOGGING CHAIN FROM " << chain.startTime << " TO " << msg.endTime << endl;
                   chain.logger->logChain({chain.startTime, msg.endTime-chain.startTime});
                   chain.updateStartTime();
-                  if (chain.isAtRisk && !EndOfExpe)
+                  rt_mutex_acquire(&mtx_ChangeMode, TM_INFINITE);
+                  if (chain.isAtRisk )//&& !EndOfExpe)
                   {
                      chain.isAtRisk = FALSE;
                      setMode(MODE_NOMINAL);
                   }
+                  rt_mutex_release(&mtx_ChangeMode);
                   //sleep(1);
                }
             }
@@ -359,16 +400,18 @@ void MonitoringAgent::updateTaskInfo(monitoringMsg msg)
 ***********************/
 void Agent::setMode(uint _newMode)
 {
-   cout << "[MONITORING & CONTROL AGENT] Change mode to " << ((_newMode&MODE_OVERLOADED)?"OVERLOADED":"NOMINAL") << ". " << endl;
+   cout << "[MONITORING & CONTROL AGENT] Change mode to " << ((_newMode&MODE_OVERLOADED)?"OVERLOADED":"NOMINAL");
    if (!bestEffortTasks.empty())
    {
-
-      if ((_newMode & MODE_OVERLOADED) && (runtimeMode & MODE_NOMINAL))
+      cout << ". ";
+      if ((_newMode == MODE_OVERLOADED) )// && (runtimeMode == MODE_NOMINAL))
       { // Pause Best Effort Tasks if Nominal => OVERLOADED.
-          rt_fprintf(stderr,"[MCA] [%ld] - Stopping BE tasks.", rt_timer_read());
+          //rt_fprintf(stderr,"[MCA] [%ld] - Stopping BE tasks.", rt_timer_read());
+          cout << "=> OVER.";
          //rt_event_clear(&_event, MODE_NOMINAL, NULL); // => MODE_OVERLOADED.
          for (auto& bestEffortTask : bestEffortTasks)
          {   // Publier message pour dire à stopper
+            cout << "S";
             ERROR_MNG(rt_task_suspend(&bestEffortTask));
          }
          #if VERBOSE_DEBUG
@@ -376,11 +419,12 @@ void Agent::setMode(uint _newMode)
          #endif
       }
 
-      else if ((_newMode & MODE_NOMINAL) && (runtimeMode & MODE_OVERLOADED))
+      else if ((_newMode == MODE_NOMINAL) ) // && (runtimeMode == MODE_OVERLOADED))
       { // resume Best Effort if Overloaded => NOMINAL
+         cout << "=> BACK.";
          for (auto& bestEffortTask : bestEffortTasks)
          {
-            rt_task_resume(&bestEffortTask);
+            ERROR_MNG(rt_task_resume(&bestEffortTask));
          }
          //rt_event_clear(&_event, MODE_OVERLOADED, NULL);
          //rt_event_signal(&_event, MODE_NOMINAL);
@@ -390,8 +434,9 @@ void Agent::setMode(uint _newMode)
       }
       runtimeMode = _newMode;
       #if VERBOSE_DEBUG // ==1?"OVERLOADED":"NOMINAL"
-      rt_fprintf(stderr,"=> MoCoAgent Triggered to mode %s !\n",((_newMode&MODE_OVERLOADED)?"OVERLOADED":"NOMINAL"));
+      rt_fprintf(stderr,"=> MoCoAgent Triggered to mode %s !\n",((_newMode==MODE_OVERLOADED)?"OVERLOADED":"NOMINAL"));
       #endif
+      cout  << endl;
    }
 }
 
@@ -509,6 +554,8 @@ taskChain::taskChain(end2endDeadlineStruct _e2eInfos, string outfile)
    chainID = _e2eInfos.taskChainID;
    end2endDeadline = _e2eInfos.deadline;
    logger = new ChainDataLogger(_e2eInfos, outfile);
+
+   isAtRisk = FALSE;
    startTime = 0;
 }
 

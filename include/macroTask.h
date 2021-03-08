@@ -170,14 +170,17 @@ class BEMacroTask : public MacroTask
       void executeRun();
       inline uint before();
       inline int after();
+
 };
 
 class Agent : public TaskProcess
 {
    protected :
       RT_TASK msgReceiverTask;
+      RT_MUTEX mtx_ChangeMode;
+
       //bool enable;
-      unsigned int runtimeMode;    // NOMINAL or OVERLOADED
+      uint runtimeMode;    // NOMINAL or OVERLOADED
       ulong overruns;
       std::vector<taskChain> allTaskChain;
       std::vector<RT_TASK> bestEffortTasks;
@@ -205,7 +208,8 @@ class MonitoringAgent : public Agent
    public:
       MonitoringAgent(rtTaskInfosStruct _taskInfo,
                      std::vector<end2endDeadlineStruct> e2eDD,
-                     std::vector<rtTaskInfosStruct> tasksSet);
+                     std::vector<rtTaskInfosStruct> tasksSet,
+                     bool _control = FALSE);
 
       void executeRun();
       void updateTaskInfo(monitoringMsg msg);
@@ -222,6 +226,10 @@ class MonitoringControlAgent : public MonitoringAgent
                               std::vector<rtTaskInfosStruct> tasksSet);
 
       void executeRun();
+      void updateTaskInfo(monitoringMsg msg);
+      static void messageReceiver(void* _arg /* Agent* */);
+
+
 };
 
    int do_load           (int argc, char* argv[]);
