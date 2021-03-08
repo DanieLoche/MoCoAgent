@@ -163,6 +163,9 @@ class RTMacroTask : public MacroTask
 
 class BEMacroTask : public MacroTask
 {
+   protected:
+      void setRTtask(rtPStruct, char*, RTIME);
+
    public:
       BEMacroTask(rtTaskInfosStruct taskInfos, RTIME initPeriodic, bool MoCoMode, string name);
 

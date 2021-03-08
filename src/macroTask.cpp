@@ -77,6 +77,66 @@ void TaskProcess::setRTtask(rtPStruct _rtInfos, char* _name, RTIME initPeriodic)
 
 }
 
+void BEMacroTask::setRTtask(rtPStruct _rtInfos, char* _name, RTIME initPeriodic)
+{
+   //system("find /proc/xenomai");
+   XENO_INIT(_name);
+   //cout << "[" << _name << "] - XENO INIT PASSED." << endl;
+   ERROR_MNG(rt_task_shadow(&_task, _name, _rtInfos.priority, 0));
+   rt_printf("[ %s ] - shadowed.\n", _name); //cout << "["<< _name << "]"<< " shadowed." << endl;
+
+   if (_rtInfos.priority != 0 && _rtInfos.schedPolicy != SCHED_OTHER)
+   { // if priority = 0, SCHED_OTHER !!
+      RT_TASK_INFO curtaskinfo;
+      rt_task_inquire(0, &curtaskinfo);
+      struct sched_param_ex param;
+      param.sched_priority = _rtInfos.priority;
+
+      if (_rtInfos.schedPolicy == SCHED_RM) _rtInfos.schedPolicy = SCHED_FIFO;
+      ERROR_MNG(sched_setscheduler_ex(curtaskinfo.pid, _rtInfos.schedPolicy, &param));
+      rt_printf("[ %s ] - Scheduling policy %s (%d) updated.\n", _name, getSchedPolicyName(_rtInfos.schedPolicy), _rtInfos.schedPolicy); //cout << "["<< _name << "]"<< "Managing Scheduling policy " << getSchedPolicyName(_rtInfos.schedPolicy) << endl;
+
+      if (_rtInfos.schedPolicy == SCHED_RR)
+      {
+         ERROR_MNG(rt_task_slice(&_task, RR_SLICE_TIME));
+         rt_printf("[ %s ] - Round-Robin slice %d ns updated.\n", _name, RR_SLICE_TIME); //cout << "["<< _name << "]"<< "Managing Scheduling policy " << getSchedPolicyName(_rtInfos.schedPolicy) << endl;
+      }
+   }
+
+   ERROR_MNG(rt_task_set_priority(&_task, _rtInfos.priority));
+   rt_printf("[ %s ] - Task Priority %llu updated.\n", _name, _rtInfos.priority); //cout << "["<< _name << "]"<< "Managing Scheduling policy " << getSchedPolicyName(_rtInfos.schedPolicy) << endl;
+
+   //setAffinity(_rtInfos.affinity, 0);
+
+   //Periodicity
+   ERROR_MNG(rt_task_set_periodic(&_task, initPeriodic+_rtInfos.offsetTime, _rtInfos.periodicity));
+   rt_printf("[ %s ] - Task Period %d updated, base at %llu.\n", _name, _rtInfos.periodicity, initPeriodic+_rtInfos.offsetTime); //cout << "["<< _name << "]"<< "Managing Scheduling policy " << getSchedPolicyName(_rtInfos.schedPolicy) << endl;
+   rt_print_flush_buffers();
+
+   /* Gestion EDF Scheduling
+   RT_TASK_INFO curtaskinfo;
+   rt_task_inquire(taskInfo->task, &curtaskinfo);
+
+   struct sched_attr para;
+   para.sched_policy = SCHED_POLICY;
+   para.sched_flags= 0;
+   //para.sched_runtime = taskInfo.periodicity;;
+   //para.sched_deadline = taskInfo.periodicity;
+   para.sched_period = taskInfo->periodicity;
+   para.sched_priority = taskInfo->priority;
+   para.size=sizeof(sched_attr);
+   rt_task_inquire(taskInfo->task, &curtaskinfo);
+   if( sched_setattr(curtaskinfo.pid, &para, 0) != 0)
+   {
+   fprintf(stderr,"error setting scheduler ... are you root? : %d \n", errno);
+   exit(errno);
+}
+*/
+
+//ERROR_MNG( rt_task_suspend(NULL) );
+
+}
+
 void TaskProcess::setAffinity (int _aff, int mode)
 { // mode 0 : replace | mode 1 : add | mode -1 : remove
    cpu_set_t mask;
