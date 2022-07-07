@@ -1,14 +1,19 @@
+#!/usr/bin/env bash
 # Lance la même experimentation selon les 3 ordonancements Possibles : RM, RR, FIFO;
 
 input=input_chaine.txt
 duration=100
 Duration=0
 load=100
+Mode=1 
 
 while [ "$1" != "" ]; do
     case $1 in
         -i | -f | --input )     shift
                                 input=$1
+                                ;;
+        -m | --mode )     shift
+                                Mode=$1
                                 ;;
         -d | --duration )    	shift
 				                duration=$1
@@ -33,11 +38,11 @@ then
 	duration=`expr $Duration / 3`
 fi
 
-./runBashTest.sh -i $input -s 1 -d $duration -l $load; FIFO=$? ;
+#./runBashTest.sh -i $input -s 1 -d $duration -l $load; FIFO=$? ;
 
-./runBashTest.sh -i $input -s 0 -d $duration -l $load; OTHER=$? ;
+./runBashTest.sh -i $input -m $Mode -s 0 -d $duration -l $load; OTHER=$? ;
 
-./runBashTest.sh -i $input -s 2 -d $duration -l $load; RR=$? ;
+#./runBashTest.sh -i $input -s 2 -d $duration -l $load; RR=$? ;
 
 #./runBashTest.sh -i $input -s 7 -d $duration -l $load; RM=$? ;
 

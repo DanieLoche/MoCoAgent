@@ -1,14 +1,19 @@
+#!/usr/bin/env bash
 # Lance la même experimentation selon les 3 ordonancements Possibles : RM, RR, FIFO;
 
 input=input_chaine.txt
 duration=100
 Duration=0
 load=100
+Mode=1
 
 while [ "$1" != "" ]; do
     case $1 in
         -i | -f | --input )     shift
                                 input=$1
+                                ;;
+        -m | --mode )     shift
+                                Mode=$1
                                 ;;
         -d | --duration )    	shift
 				                duration=$1
@@ -34,15 +39,16 @@ then
 fi
 
 sudo stress-ng --ionice-class rt --ionice-level 0 --cache 4 --fault 4 --io 4 --matrix 2 &
+#sudo stress-ng --taskset 2-3 --ionice-class rt --ionice-level 0 --cache 4 --fault 4 --io 4 --matrix 2 &
 #sudo /usr/xenomai/bin/dohell -s 192.168.0.1 -m /tmp 10800 &
 
 sleep 1
 
-./runBashTest.sh -i $input -s 1 -d $duration -l $load -o STRESS; FIFO=$? ;
+#./runBashTest.sh -i $input -s 1 -d $duration -l $load -o STRESS; FIFO=$? ;
 
-./runBashTest.sh -i $input -s 0 -d $duration -l $load -o STRESS; OTHER=$? ;
+./runBashTest.sh -i $input -m $Mode -s 0 -d $duration -l $load -o STRESS; OTHER=$? ;
 
-./runBashTest.sh -i $input -s 2 -d $duration -l $load -o STRESS; RR=$? ;
+#./runBashTest.sh -i $input -m $Mode -s 2 -d $duration -l $load -o STRESS; RR=$? ;
 
 #./runBashTest.sh -i $input -s 7 -d $duration -l $load -o STRESS; RM=$? ;
 
