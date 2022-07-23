@@ -1,28 +1,48 @@
+#ifndef TASKLAUNCHER_H
+#define TASKLAUNCHER_H
+
 #include "tools.h"
+#include "macroTask.h"
+#include "dataLogger.h"
+//#include "sched.h"
 
+#define ALARM_NAME    "endOfExpe_Alarm"
+#define SEM_TASK_NAME "Task_Sync_Sem"
+#define SEM_MC_NAME   "MOCO_Sync_Sem"
 
-
+#define OFFSET_STEP    _uSEC(100)
 class TaskLauncher
 {
+   private :
+      RT_SEM _sync_MC_Sem, _sync_Task_Sem;
+      static string outputFileName;
+      static int nameMaxSize;
+      static std::vector<end2endDeadlineStruct> chainSet;
+      static std::vector<rtTaskInfosStruct> tasksSet;
+      rtTaskInfosStruct currentTaskDescriptor;
+      int enableAgent;
+      int schedPolicy;
 
-  private :
-  int number_task_created ;
-  public :
-    std::vector<rtTaskInfosStruct> tasksInfosList;
+      //TaskProcess* currentProcess;
+      RT_ALARM _endAlarm;
 
-    TaskLauncher();
-    TaskLauncher(string input_file);
+   public :
+      //bool triggerSave;
+      TaskLauncher(int agentMode, string outputFileName, int schedPolicy);
+      ~TaskLauncher(){};
 
-    void runTasks( );
-    std::vector<rtTaskInfosStruct> readTasksList(string);
-
-    void printTasksInfos (/* std::vector<rtTaskInfosStruct> _myTasksInfos*/);
-    void print_affinity(pid_t _pid);
+      int readChainsList(string);
+      int readTasksList (int cpuPercent);
+      int runTasks(long expeDuration);
+      int runAgent(long expeDuration);
+      static void finishMoCoAgent(void* _arg /*MCAgent* task*/);
+      static void finishTask(void* _arg /*MCAgent* task*/);
+      //void stopTasks(bool);
+      //void saveData(string);
+      void printTaskSetInfos (/* std::vector<rtTaskInfosStruct> _myTasksInfos*/);
+      void printChainSetInfos (/* std::vector<rtTaskInfosStruct> _myTasksInfos*/);
 
 };
 
-extern void RunmcAgentMain(void *arg);
-extern void TaskMain(void* arg);
-extern void print_affinity(pid_t _pid);
-extern void printTaskInfo(rtTaskInfosStruct* task);
-extern void set_affinity (RT_TASK* task, int _aff);
+
+#endif

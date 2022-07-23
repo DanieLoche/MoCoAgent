@@ -1,0 +1,8 @@
+ID  name       meanET  wcet   isHRT   aff    prec      path                       arguments
+//1   SDP_bitcount_L   70   240   1   1   0   bitcnts   1125000   >   ./bench/output/o_btcnt_large.txt
+1   SDP_fft1_S         6100   25   1   1   0   fft   8   8192   >   ./bench/output/o_fft_small1.txt
+//2   SDP_fft2_S         6100   25   1   1   1   fft   8   8192   >   ./bench/output/o_fft_small2.txt
+//3   SDP_fft3_S         6100   25   1   1   2   fft   8   8192   >   ./bench/output/o_fft_small3.txt
+//3   SDP_CRC32_L      112   240   1   1   2   crc   ./bench/data/large.pcm   >   ./bench/output/o_crc_large.txt
+//4   SDP_basicmath_L  250   480   1   1   3   basicmath_large   >   ./bench/output/o_basmth_large.txt
+//5   SDP_qsort_L      45   120   1   1   4   qsort_large   ./bench/qsort/input_large.dat   >   ./bench/output/o_qsort_large.txt

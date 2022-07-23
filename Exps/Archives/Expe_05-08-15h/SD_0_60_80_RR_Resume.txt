@@ -1,0 +1,56 @@
+Experiment made with parameters : 
+ MoCoAgent: 0
+  Duration: 60
+CPU Factor: 80
+Input  file: ./inputFile
+Output files: ./Experimentations/Expe_05-08-15h/SD_0_60_80_RR_Expe.csv & ./Experimentations/Expe_05-08-15h/SD_0_60_80_RR_Chains.csv & ./Experimentations/Expe_05-08-15h/SD_0_60_80_RR_Resume.txt
+
+Running summary for task RT_SDP_bitcount_S. (13069, 50, RT_SDP_bitcount_S)
+Deadline : 189.6 ms.  Missed | Executions 
+                       250 | 256 times
+Primary Mode execution time - 1.1032 ms. Timeouts : 0
+  MIN   |   AVG   |   MAX
+23.2148 | 230.247 | 411.948 (ms)
+   Mode Switches - 260
+Context Switches - 811
+Cobalt Sys calls - 270
+
+Running summary for task RT_SDP_fft_S. (13070, 50, RT_SDP_fft_S)
+Deadline : 275.2 ms.  Missed | Executions 
+                         5 | 254 times
+Primary Mode execution time - 1.76812 ms. Timeouts : 0
+  MIN   |   AVG   |   MAX
+182.261 | 232.129 | 411.631 (ms)
+   Mode Switches - 258
+Context Switches - 903
+Cobalt Sys calls - 268
+
+Running summary for task RT_SDP_CRC32_L. (13071, 50, RT_SDP_CRC32_L)
+Deadline : 3551.2 ms.  Missed | Executions 
+                         0 | 256 times
+Primary Mode execution time - 1.6769 ms. Timeouts : 0
+  MIN   |   AVG   |   MAX
+163.586 | 230.246 | 298.944 (ms)
+   Mode Switches - 260
+Context Switches - 1098
+Cobalt Sys calls - 270
+
+Running summary for task RT_SDP_basicmath_S. (13072, 50, RT_SDP_basicmath_S)
+Deadline : 231.2 ms.  Missed | Executions 
+                       124 | 256 times
+Primary Mode execution time - 0.786895 ms. Timeouts : 0
+  MIN   |   AVG   |   MAX
+55.423 | 230.013 | 411.618 (ms)
+   Mode Switches - 260
+Context Switches - 798
+Cobalt Sys calls - 270
+
+Running summary for task RT_SDP_qsort_L. (13073, 50, RT_SDP_qsort_L)
+Deadline : 555.2 ms.  Missed | Executions 
+                         0 | 254 times
+Primary Mode execution time - 1.83594 ms. Timeouts : 0
+  MIN   |   AVG   |   MAX
+107.954 | 231.853 | 361.427 (ms)
+   Mode Switches - 258
+Context Switches - 987
+Cobalt Sys calls - 268

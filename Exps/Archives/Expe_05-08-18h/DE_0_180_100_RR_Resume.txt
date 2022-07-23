@@ -1,0 +1,56 @@
+Experiment made with parameters : 
+ MoCoAgent: 0
+  Duration: 180
+CPU Factor: 100
+Input  file: ./inputFile
+Output files: ./Experimentations/Expe_05-08-18h/DE_0_180_100_RR_Expe.csv & ./Experimentations/Expe_05-08-18h/DE_0_180_100_RR_Chains.csv & ./Experimentations/Expe_05-08-18h/DE_0_180_100_RR_Resume.txt
+
+Running summary for task RT_DE_bitcount_S. (16433, 50, RT_DE_bitcount_S)
+Deadline : 250 ms.  Missed | Executions 
+                        46 | 1668 times
+Primary Mode execution time - 7.58631 ms. Timeouts : 0
+  MIN   |   AVG   |   MAX
+24.274 | 155.983 | 1042.45 (ms)
+   Mode Switches - 1882
+Context Switches - 8561
+Cobalt Sys calls - 1892
+
+Running summary for task RT_DE_CRC32_S. (16434, 50, RT_DE_CRC32_S)
+Deadline : 250 ms.  Missed | Executions 
+                        45 | 1667 times
+Primary Mode execution time - 8.35711 ms. Timeouts : 0
+  MIN   |   AVG   |   MAX
+25.1575 | 155.488 | 1042.41 (ms)
+   Mode Switches - 1979
+Context Switches - 9647
+Cobalt Sys calls - 1989
+
+Running summary for task RT_DE_patricia_L. (16435, 50, RT_DE_patricia_L)
+Deadline : 2000 ms.  Missed | Executions 
+                         0 | 1670 times
+Primary Mode execution time - 9.74777 ms. Timeouts : 0
+  MIN   |   AVG   |   MAX
+95.3598 | 156.276 | 1082.49 (ms)
+   Mode Switches - 2069
+Context Switches - 9656
+Cobalt Sys calls - 2079
+
+Running summary for task RT_DE_basicmath_S. (16436, 50, RT_DE_basicmath_S)
+Deadline : 250 ms.  Missed | Executions 
+                        45 | 1681 times
+Primary Mode execution time - 7.79294 ms. Timeouts : 0
+  MIN   |   AVG   |   MAX
+23.5484 | 155.357 | 1042.43 (ms)
+   Mode Switches - 1708
+Context Switches - 8964
+Cobalt Sys calls - 1718
+
+Running summary for task RT_DE_blowfish_S. (16437, 50, RT_DE_blowfish_S)
+Deadline : 250 ms.  Missed | Executions 
+                        37 | 1432 times
+Primary Mode execution time - 8.47186 ms. Timeouts : 0
+  MIN   |   AVG   |   MAX
+23.1184 | 183.006 | 1410.04 (ms)
+   Mode Switches - 1912
+Context Switches - 8186
+Cobalt Sys calls - 1922

@@ -1,0 +1,56 @@
+Experiment made with parameters : 
+ MoCoAgent: 0
+  Duration: 60
+CPU Factor: 80
+Input  file: ./inputFile
+Output files: ./Experimentations/Expe_05-08-15h/DE_0_60_80_RM_Expe.csv & ./Experimentations/Expe_05-08-15h/DE_0_60_80_RM_Chains.csv & ./Experimentations/Expe_05-08-15h/DE_0_60_80_RM_Resume.txt
+
+Running summary for task RT_DE_bitcount_S. (887, 10, RT_DE_bitcount_S)
+Deadline : 189.6 ms.  Missed | Executions 
+                        83 | 349 times
+Primary Mode execution time - 1.5362 ms. Timeouts : 0
+  MIN   |   AVG   |   MAX
+10.1476 | 847.431 | 74216.3 (ms)
+   Mode Switches - 352
+Context Switches - 1120
+Cobalt Sys calls - 362
+
+Running summary for task RT_DE_CRC32_S. (888, 11, RT_DE_CRC32_S)
+Deadline : 196 ms.  Missed | Executions 
+                        82 | 373 times
+Primary Mode execution time - 1.82791 ms. Timeouts : 0
+  MIN   |   AVG   |   MAX
+8.62614 | 792.599 | 12839 (ms)
+   Mode Switches - 382
+Context Switches - 861
+Cobalt Sys calls - 392
+
+Running summary for task RT_DE_basicmath_S. (890, 12, RT_DE_basicmath_S)
+Deadline : 231.2 ms.  Missed | Executions 
+                       240 | 554 times
+Primary Mode execution time - 2.75713 ms. Timeouts : 0
+  MIN   |   AVG   |   MAX
+11.1347 | 532.339 | 1437.5 (ms)
+   Mode Switches - 561
+Context Switches - 1676
+Cobalt Sys calls - 571
+
+Running summary for task RT_DE_blowfish_S. (894, 13, RT_DE_blowfish_S)
+Deadline : 243.2 ms.  Missed | Executions 
+                       621 | 987 times
+Primary Mode execution time - 4.55809 ms. Timeouts : 0
+  MIN   |   AVG   |   MAX
+15.4646 | 296.997 | 730.87 (ms)
+   Mode Switches - 1005
+Context Switches - 3175
+Cobalt Sys calls - 1015
+
+Running summary for task RT_DE_patricia_L. (895, 14, RT_DE_patricia_L)
+Deadline : 3352 ms.  Missed | Executions 
+                         0 | 2807 times
+Primary Mode execution time - 19.5975 ms. Timeouts : 0
+  MIN   |   AVG   |   MAX
+81.8215 | 101.12 | 887.459 (ms)
+   Mode Switches - 3623
+Context Switches - 9141
+Cobalt Sys calls - 3633

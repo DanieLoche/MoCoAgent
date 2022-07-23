@@ -1,0 +1,6 @@
+Experiment made with parameters : 
+ MoCoAgent: 0
+  Duration: 600
+CPU Factor: 80
+Input  file: ./inputFile
+Output files: ./Experimentations/Expe_16-05-16h/Chain2VR_0_600_80_FIFO.csv & ./Experimentations/Expe_16-05-16h/Chain2VR_0_600_80_FIFO_MoCoLogs.csv & ./Experimentations/Expe_16-05-16h/Chain2VR_0_600_80_FIFO_Resume.cvs

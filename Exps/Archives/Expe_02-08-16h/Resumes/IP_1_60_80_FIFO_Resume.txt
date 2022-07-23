@@ -1,0 +1,78 @@
+Experiment made with parameters : 
+ MoCoAgent: 1
+  Duration: 60
+CPU Factor: 80
+Input  file: ./inputFile
+Output files: ./Experimentations/Expe_02-08-16h/IP_1_60_80_FIFO_Expe.csv & ./Experimentations/Expe_02-08-16h/IP_1_60_80_FIFO_Chains.csv & ./Experimentations/Expe_02-08-16h/IP_1_60_80_FIFO_Resume.txt
+
+Running summary for task RT_IP_susan_L_smooth. (2591, 50, RT_IP_susan_L_smooth)
+Deadline : 200 ms.  Missed | Executions 
+                       269 | 269 times
+Primary Mode execution time - 3.49837 ms. Timeouts : 0
+  MIN   |   AVG   |   MAX
+217.542 | 218.641 | 224.938 (ms)
+   Mode Switches - 273
+Context Switches - 1313
+Cobalt Sys calls - 1091
+
+Running summary for task RT_IP_susan_L_edges. (2592, 50, RT_IP_susan_L_edges)
+Deadline : 200 ms.  Missed | Executions 
+                       269 | 269 times
+Primary Mode execution time - 2.57714 ms. Timeouts : 0
+  MIN   |   AVG   |   MAX
+208.879 | 218.638 | 239.464 (ms)
+   Mode Switches - 273
+Context Switches - 591
+Cobalt Sys calls - 1091
+
+Running summary for task RT_IP_susan_L_corners. (2593, 50, RT_IP_susan_L_corners)
+Deadline : 192 ms.  Missed | Executions 
+                       269 | 269 times
+Primary Mode execution time - 2.0053 ms. Timeouts : 0
+  MIN   |   AVG   |   MAX
+217.545 | 218.64 | 226.574 (ms)
+   Mode Switches - 273
+Context Switches - 770
+Cobalt Sys calls - 1090
+
+Running summary for task RT_IP_bitcount_L. (2594, 50, RT_IP_bitcount_L)
+Deadline : 787.2 ms.  Missed | Executions 
+                         0 | 269 times
+Primary Mode execution time - 5.62448 ms. Timeouts : 0
+  MIN   |   AVG   |   MAX
+214.521 | 218.635 | 224.519 (ms)
+   Mode Switches - 273
+Context Switches - 1694
+Cobalt Sys calls - 1091
+
+Running summary for task RT_IP_basicmath_S. (2595, 50, RT_IP_basicmath_S)
+Deadline : 231.2 ms.  Missed | Executions 
+                         1 | 270 times
+Primary Mode execution time - 4.0086 ms. Timeouts : 0
+  MIN   |   AVG   |   MAX
+45.437 | 217.936 | 391.288 (ms)
+   Mode Switches - 274
+Context Switches - 549
+Cobalt Sys calls - 1094
+
+Running summary for task RT_IP_dijkstra_S. (2596, 50, RT_IP_dijkstra_S)
+Deadline : 213.6 ms.  Missed | Executions 
+                       269 | 269 times
+Primary Mode execution time - 2.5907 ms. Timeouts : 0
+  MIN   |   AVG   |   MAX
+217.547 | 218.641 | 226.439 (ms)
+   Mode Switches - 273
+Context Switches - 1041
+Cobalt Sys calls - 1091
+
+ Monitoring and Control Agent Stats : 
+Primary Mode execution time - 51.633 ms. Timeouts : 0
+   Mode Switches - 19
+Context Switches - 22606
+Cobalt Sys calls - 15055
+
+Running summary for Chain ImageProcessing. ( 1 )
+Deadline : 10000 ms. Anticipated Misses |  Missed  |  Chain loops 
+                                     0 |          0 | 70 times
+  MIN   |   AVG   |   MAX
+663.114 | 842.087 | 893.781 runtimes (ms)

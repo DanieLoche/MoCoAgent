@@ -1,0 +1,2 @@
+ID  name 		     meanET  wcet    isHRT aff  prec path                       arguments
+1 CRC32_S 6.5 15 1 1 0 ./bench/crc ./bench/data/small.pcm > ./bench/output/o_crc_small.txt

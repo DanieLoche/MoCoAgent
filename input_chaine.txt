@@ -1,2 +1,7 @@
-name            chaineID      nombredetache    Path           deadline
-chaine1             1               2         ./input.txt       1000
+name                     chaineID    Path                              deadline
+ComputeTraj              1          ./chain_ComputeTraj.in             90    CT
+//DatabaseEncryption       1          ./chain_DatabaseEncryption.in      10000    DE
+//SignalDataProcessing     1          ./chain_SignalDataProcess.in       10000    SD
+//VoiceRecognition         1          ./chain_VoiceRecognition.in        10000    VR
+//ImageProcessing          1          ./chain_ImageProcessing.in         10000    IP
+NonCritical             0           ./bestEffort_tasks.in              10000     BE

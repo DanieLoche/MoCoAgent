@@ -1,0 +1,76 @@
+Experiment made with parameters : 
+ MoCoAgent: 0
+  Duration: 180
+CPU Factor: 100
+Input  file: ./inputFile
+Output files: ./Experimentations/Expe_05-08-17h/CT_0_180_100_FIFO_Expe.csv & ./Experimentations/Expe_05-08-17h/CT_0_180_100_FIFO_Chains.csv & ./Experimentations/Expe_05-08-17h/CT_0_180_100_FIFO_Resume.txt
+
+Running summary for task RT_CT_bitcount_S. (27019, 50, RT_CT_bitcount_S)
+Deadline : 250 ms.  Missed | Executions 
+                       225 | 236 times
+Primary Mode execution time - 1.1815 ms. Timeouts : 0
+  MIN   |   AVG   |   MAX
+26.8181 | 757.104 | 4739.02 (ms)
+   Mode Switches - 240
+Context Switches - 1322
+Cobalt Sys calls - 250
+
+Running summary for task RT_CT_CRC32_S. (27020, 50, RT_CT_CRC32_S)
+Deadline : 250 ms.  Missed | Executions 
+                       226 | 233 times
+Primary Mode execution time - 1.159 ms. Timeouts : 0
+  MIN   |   AVG   |   MAX
+61.9672 | 768.181 | 4738.98 (ms)
+   Mode Switches - 237
+Context Switches - 1442
+Cobalt Sys calls - 247
+
+Running summary for task RT_CT_dijkstra_L. (27021, 50, RT_CT_dijkstra_L)
+Deadline : 500 ms.  Missed | Executions 
+                        84 | 235 times
+Primary Mode execution time - 1.14616 ms. Timeouts : 0
+  MIN   |   AVG   |   MAX
+61.9698 | 761.609 | 4614.63 (ms)
+   Mode Switches - 239
+Context Switches - 1329
+Cobalt Sys calls - 249
+
+Running summary for task RT_CT_blowfish_S. (27022, 50, RT_CT_blowfish_S)
+Deadline : 250 ms.  Missed | Executions 
+                       179 | 223 times
+Primary Mode execution time - 1.1457 ms. Timeouts : 0
+  MIN   |   AVG   |   MAX
+31.8836 | 801.004 | 4614.67 (ms)
+   Mode Switches - 227
+Context Switches - 917
+Cobalt Sys calls - 237
+
+Running summary for task RT_CT_basicmath_L. (27023, 50, RT_CT_basicmath_L)
+Deadline : 3000 ms.  Missed | Executions 
+                         5 | 222 times
+Primary Mode execution time - 2.12351 ms. Timeouts : 0
+  MIN   |   AVG   |   MAX
+268.662 | 806.441 | 4739.01 (ms)
+   Mode Switches - 226
+Context Switches - 1962
+Cobalt Sys calls - 236
+
+Running summary for task RT_CT_fft_S. (27024, 50, RT_CT_fft_S)
+Deadline : 500 ms.  Missed | Executions 
+                        83 | 235 times
+Primary Mode execution time - 1.1925 ms. Timeouts : 0
+  MIN   |   AVG   |   MAX
+104.464 | 761.539 | 4660.62 (ms)
+   Mode Switches - 239
+Context Switches - 1276
+Cobalt Sys calls - 249
+
+Running summary for task RT_CT_fft_inv_S. (27025, 50, RT_CT_fft_inv_S)
+Deadline : 500 ms.  Missed | Executions 
+                        83 | 233 times
+Primary Mode execution time - 1.26622 ms. Timeouts : 0
+  MIN   |   AVG   |   MAX
+100.045 | 768.11 | 4738.99 (ms)
+   Mode Switches - 237
+Context Switches - 1419
+Cobalt Sys calls - 247

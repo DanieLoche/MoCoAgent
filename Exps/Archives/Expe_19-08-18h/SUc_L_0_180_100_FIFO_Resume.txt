@@ -1,0 +1,16 @@
+Experiment made with parameters : 
+ MoCoAgent: 0
+  Duration: 180
+CPU Factor: 100
+Input  file: ./inputFile
+Output files: ./Experimentations/Expe_19-08-18h/SUc_L_0_180_100_FIFO_Expe.csv & ./Experimentations/Expe_19-08-18h/SUc_L_0_180_100_FIFO_Chains.csv & ./Experimentations/Expe_19-08-18h/SUc_L_0_180_100_FIFO_Resume.txt
+
+Running summary for task RT_susan_L_corners. (15917, 50, RT_susan_L_corners)
+Deadline : 1000 ms.  Missed | Executions 
+                         0 | 181 times
+Primary Mode execution time - 0.626338 ms. Timeouts : 0
+  MIN   |   AVG   |   MAX
+3.1203 | 3.36969 | 16.5048 (ms)
+   Mode Switches - 185
+Context Switches - 368
+Cobalt Sys calls - 195

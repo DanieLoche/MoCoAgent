@@ -1,0 +1,6 @@
+Experiment made with parameters : 
+ MoCoAgent: 0
+  Duration: 100
+CPU Factor: 100
+Input  file: ./inputFile
+Output files: ./Experimentations/Expe_22-08-18h/STR_L_0_100_100_FIFO_Expe.csv & ./Experimentations/Expe_22-08-18h/STR_L_0_100_100_FIFO_Chains.csv & ./Experimentations/Expe_22-08-18h/STR_L_0_100_100_FIFO_Resume.txt
