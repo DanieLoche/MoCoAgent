@@ -1,7 +1,14 @@
-ID  name          WCET    T   prio  aff  prec  task            arguments
-1 CT_bitcount_S   78500    20  10      1   0    bitcnts         75000 > ./bench/output/o_btcnt_small.txt
-2 CT_fft_inv_S    75050    20  10      1   1    fft             8 4096 -i > ./bench/output/o_ffti_small.inv.txt
-3 CT_basicmath_S  72040    20  10      1   2    basicmath_small > ./bench/output/o_basmth_small.txt
-4 CT_patricia_L   68940    20  10      1   3    patricia_bin    < ./bench/patricia/large.udp > ./bench/output/o_pat_large.txt
-6 CT_fft_S        31210    20  10      1   3    fft             8 4096 > ./bench/output/o_fft_large.txt
-//5 CT_susanE_S	42000    20  10      1   6    susan_bin		-e < ./bench/susan/input_small.pgm > ./bench/output/o_susan_small.edges.pgm
+ID  name          WCET (us)  T   prio  aff  prec  task            arguments
+1 CT_fft_S        129000     40   10     1   0    fft             8 2048 > ./bench/output/o_fft_small.txt
+4 CT_bitcount_S    93000     60   10     1   1    bitcnts         75000 > ./bench/output/o_btcnt_small.txt
+6 CT_basicmath_S   68000     40   10     1   4    basicmath_small > ./bench/output/o_basmth_small.txt
+2 CT_sha_S         49000     60   10     1   6    sha             < ./bench/sha/input_small.asc > ./bench/output/o_sha_small.txt
+7 CT_fft_inv_S     25000     40   10     1   2    fft             8 4096 -i > ./bench/output/o_ffti_small.inv.txt
+//1 CT_fft_S        94000    100  10     1   0    fft             8 16384 > ./bench/output/o_fft_large.txt
+//3 CT_patricia_L   67500    100  10     1   2    patricia_bin    < ./bench/patricia/large.udp > ./bench/output/o_pat_large.txt
+//5 CT_gsmUToast_S  16170    100  10     1   4    untoast -dfps -c ./bench/gsm/small.au.run.gsm > ./bench/output/o_small.decode.run
+// 114.13 ms
+// 112.10 ms
+// 64.44 ms
+// 49.68 ms
+// 24.84 ms

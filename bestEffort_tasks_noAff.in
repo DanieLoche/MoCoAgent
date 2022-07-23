@@ -1,21 +1,21 @@
 ID  name                WCET    T    prio  aff  prec  task                 arguments
 //10  BE_cjpeg0_S         89000    30    -3    1    0    cjpeg           -dct int -progressive -opt -outfile ./bench/output/o_small_encode.jpeg ./bench/jpg/input_small.ppm
-11  BE_sha_S            24000    80    -3    2     0    sha             < ./bench/sha/input_small.asc > ./bench/output/o_sha_small.txt
-12  BE_susan_S_corners  26000    80    -3    2     0    susan_bin       ./bench/susan/input_small.pgm ./bench/output/o_susan_small.corners.pgm   -c
-13  BE_susan_S_smooth   20000    80    -3    2     0    susan_bin       ./bench/susan/input_small.pgm ./bench/output/o_susan_small.smoothing.pgm -s
-14  BE_susan_S_edges    24000    80    -3    2     0    susan_bin       ./bench/susan/input_small.pgm ./bench/output/o_susan_small.edges.pgm     -e
-15  BE_cjpeg_S          89000    30    -3    2     0    cjpeg           -dct int -progressive -opt -outfile ./bench/output/o_small_encode.jpeg ./bench/jpg/input_small.ppm
-16  BE_gsmToast_S      163000    60    -3    2     0    toast           -fps -c ./bench/gsm/small.au         > ./bench/output/o_small.encode.gsm
-17  BE_gsmUToast_S     153000    60    -3    2     0    toast           -dfps -c ./bench/gsm/small.au.run.gsm > ./bench/output/o_small.decode.run
-18  BE_bitcount_S       45000    60    -3    2     0    bitcnts         75000 > ./bench/output/o_btcnt_small.txt
-21  BE_sha2_S            24000   80    -3    3     0    sha             < ./bench/sha/input_small.asc > ./bench/output/o_sha_small.txt
-22  BE_susan2_S_corners  26000   80    -3    3     0    susan_bin       ./bench/susan/input_small.pgm ./bench/output/o_susan_small.corners.pgm   -c
-23  BE_susan2_S_smooth   20000   80    -3    3     0    susan_bin       ./bench/susan/input_small.pgm ./bench/output/o_susan_small.smoothing.pgm -s
-24  BE_susan2_S_edges    24000   80    -3    3     0    susan_bin       ./bench/susan/input_small.pgm ./bench/output/o_susan_small.edges.pgm     -e
-25  BE_cjpeg2_S          89000   30    -3    3     0    cjpeg           -dct int -progressive -opt -outfile ./bench/output/o_small_encode.jpeg ./bench/jpg/input_small.ppm
-26  BE_gsmToast2_S      163000   60    -3    3     0    toast           -fps -c ./bench/gsm/small.au         > ./bench/output/o_small.encode.gsm
-27  BE_gsmUToast2_S     153000   60    -3    3     0    toast           -dfps -c ./bench/gsm/small.au.run.gsm > ./bench/output/o_small.decode.run
-28  BE_bitcount2_S       45000   60    -3    3     0    bitcnts         75000 > ./bench/output/o_btcnt_small.txt
+11  BE_sha_S            24000    80    -3    9     0    sha             < ./bench/sha/input_small.asc > ./bench/output/o_sha_small.txt
+12  BE_susan_S_corners  26000    40    -3    9     0    susan_bin       ./bench/susan/input_small.pgm ./bench/output/o_susan_small.corners.pgm   -c
+13  BE_susan_S_smooth   20000    40    -3    9     0    susan_bin       ./bench/susan/input_small.pgm ./bench/output/o_susan_small.smoothing.pgm -s
+14  BE_susan_S_edges    24000    40    -3    9     0    susan_bin       ./bench/susan/input_small.pgm ./bench/output/o_susan_small.edges.pgm     -e
+15  BE_cjpeg_S          89000    60    -3    9     0    cjpeg           -dct int -progressive -opt -outfile ./bench/output/o_small_encode.jpeg ./bench/jpg/input_small.ppm
+16  BE_gsmToast_S      163000    80    -3    9     0    toast           -fps -c ./bench/gsm/small.au         > ./bench/output/o_small.encode.gsm
+17  BE_gsmUToast_S     153000    80    -3    9     0    toast           -dfps -c ./bench/gsm/small.au.run.gsm > ./bench/output/o_small.decode.run
+18  BE_bitcount_S       45000    60    -3    9     0    bitcnts         75000 > ./bench/output/o_btcnt_small.txt
+21  BE_sha2_S            24000   80    -3    9     0    sha             < ./bench/sha/input_small.asc > ./bench/output/o_sha_small.txt
+22  BE_susan2_S_corners  26000   40    -3    9     0    susan_bin       ./bench/susan/input_small.pgm ./bench/output/o_susan_small.corners.pgm   -c
+23  BE_susan2_S_smooth   20000   40    -3    9     0    susan_bin       ./bench/susan/input_small.pgm ./bench/output/o_susan_small.smoothing.pgm -s
+24  BE_susan2_S_edges    24000   40    -3    9     0    susan_bin       ./bench/susan/input_small.pgm ./bench/output/o_susan_small.edges.pgm     -e
+25  BE_cjpeg2_S          89000   60    -3    9     0    cjpeg           -dct int -progressive -opt -outfile ./bench/output/o_small_encode.jpeg ./bench/jpg/input_small.ppm
+26  BE_gsmToast2_S      163000   80    -3    9     0    toast           -fps -c ./bench/gsm/small.au         > ./bench/output/o_small.encode.gsm
+27  BE_gsmUToast2_S     153000   80    -3    9     0    toast           -dfps -c ./bench/gsm/small.au.run.gsm > ./bench/output/o_small.decode.run
+28  BE_bitcount2_S       45000   60    -3    9     0    bitcnts         75000 > ./bench/output/o_btcnt_small.txt
 //29 BE_load1_L             5000   10    -10   2     0     do_load              200000
 //30 BE_load2_L             5000   10    -10   3     0     do_load              200000
 //31  BE_cjpeg_L          18     60     0     3    0    cjpeg                -dct int -progressive -opt -outfile ./bench/output/o_large_encode.jpeg ./bench/jpg/input_large.ppm

@@ -1,5 +1,11 @@
 #!/bin/bash
 
+######
+# Ce script récupère en entrée un dossier de résultats d'expérimentations
+# Typiquement PHASES 1 - 2 de test des tâches individuelles
+# A partir de ce dossier, il y créer un fichier xx_resume.csv 
+# qui agrège tous les résultats des tâches individuellement testées
+# dans un tableur unique + affichage des résultats en console.
 function resumeFolder {
     FOLDER=$1
     VERBOSE=$2

@@ -163,6 +163,7 @@ void Agent::executeRun()
 
 void MonitoringAgent::executeRun()
 {
+   ulong ovrun = 0;
    #if VERBOSE_LOGS
    RTIME _time;
    #endif
@@ -187,7 +188,8 @@ void MonitoringAgent::executeRun()
       #if VERBOSE_LOGS
       rt_fprintf(stderr, "%llu ; Monitoring Agent ; %llu\n", _time, rt_timer_read());
       #endif
-      rt_task_wait_period(&overruns);
+      rt_task_wait_period(&ovrun);
+      overruns += ovrun;
    }
 
    //rt_task_delete(&msgReceiverTask);
@@ -231,6 +233,7 @@ void MonitoringControlAgent::executeRun()
          // Execute part //
          if ( chain.checkTaskE2E() && !chain.isAtRisk)
          {
+            chain.printState();
             chain.isAtRisk = TRUE;
             chain.logger->cptAnticipatedMisses++;
             setMode(MODE_OVERLOADED);
@@ -400,18 +403,18 @@ void MonitoringControlAgent::updateTaskInfo(monitoringMsg msg)
 ***********************/
 void Agent::setMode(uint _newMode)
 {
-   cout << "[MONITORING & CONTROL AGENT] Change mode to " << ((_newMode&MODE_OVERLOADED)?"OVERLOADED":"NOMINAL");
+   //cout << "[MONITORING & CONTROL AGENT] Change mode to " << ((_newMode&MODE_OVERLOADED)?"OVERLOADED":"NOMINAL");
    if (!bestEffortTasks.empty())
    {
-      cout << ". ";
+      //cout << ". ";
       if ((_newMode == MODE_OVERLOADED) )// && (runtimeMode == MODE_NOMINAL))
       { // Pause Best Effort Tasks if Nominal => OVERLOADED.
           //rt_fprintf(stderr,"[MCA] [%ld] - Stopping BE tasks.", rt_timer_read());
-          cout << "=> OVER.";
+          //cout << "=> OVER.";
          //rt_event_clear(&_event, MODE_NOMINAL, NULL); // => MODE_OVERLOADED.
          for (auto& bestEffortTask : bestEffortTasks)
          {   // Publier message pour dire à stopper
-            cout << "S";
+            //cout << "S";
             ERROR_MNG(rt_task_suspend(&bestEffortTask));
          }
          #if VERBOSE_DEBUG
@@ -421,14 +424,14 @@ void Agent::setMode(uint _newMode)
 
       else if ((_newMode == MODE_NOMINAL) ) // && (runtimeMode == MODE_OVERLOADED))
       { // resume Best Effort if Overloaded => NOMINAL
-         cout << "=> BACK.";
+         //cout << "=> BACK.";
          for (auto& bestEffortTask : bestEffortTasks)
          {
             ERROR_MNG(rt_task_resume(&bestEffortTask));
          }
          //rt_event_clear(&_event, MODE_OVERLOADED, NULL);
          //rt_event_signal(&_event, MODE_NOMINAL);
-         #if VERBOSE_DEBUG // ==1?"OVERLOADED":"NOMINAL"
+         #if VERBOSE_DEBUG
          rt_fprintf(stderr,"[MCA] [%ld] - Re-started BE tasks.", rt_timer_read());
          #endif
       }
@@ -436,7 +439,7 @@ void Agent::setMode(uint _newMode)
       #if VERBOSE_DEBUG // ==1?"OVERLOADED":"NOMINAL"
       rt_fprintf(stderr,"=> MoCoAgent Triggered to mode %s !\n",((_newMode==MODE_OVERLOADED)?"OVERLOADED":"NOMINAL"));
       #endif
-      cout  << endl;
+      //cout  << endl;
    }
 }
 
@@ -598,6 +601,7 @@ bool taskChain::checkPrecedency(uint _id)
    return isOkay;
 }
 */
+
 /***********************
 * Fonction limite respect de deadline
 * @params : [ systemRTInfo sInfos ]
@@ -608,11 +612,11 @@ bool taskChain::checkTaskE2E()
    bool miss = FALSE;
    if (startTime != 0)
    {
-      RTIME execTime = getExecutionTime();
+      execTime = getExecutionTime();
       //rt_printf("Exec Time = %lu.\n", execTime); rt_print_flush_buffers();
-      RTIME remTime = getRemWCET();
+      remWCRT = getRemWCET();
       //rt_printf("Remaining Time = %lu.\n", remTime); rt_print_flush_buffers();
-      miss = ( execTime + Wmax + t_RT + remTime > end2endDeadline ); // TOUT EN ns !!
+      miss = ( execTime + Wmax + t_RT + remWCRT > end2endDeadline ); // TOUT EN ns !!
       //cout << "Exec Time : " << execTime/1e6 << " | Rem Time : " << remTime/1e6 << " | Deadline : " << end2endDeadline/1e6 << endl;
    }
    //if (miss) cptAnticipatedMisses++;
@@ -669,6 +673,11 @@ void taskChain::displayTasks()
      _task.displayInfos();
   }
   #endif
+}
+
+void taskChain::printState()
+{
+   rt_printf("ET=%lu ; rWCRT=%lu ; S=%lu ; D=%lu\n", execTime, remWCRT, execTime + Wmax + t_RT + remWCRT, end2endDeadline);
 }
 
 /////////////////////////////////////////////////
@@ -795,7 +804,7 @@ bool taskMonitoringStruct::emptyPrecedency( RTIME limitTime, RTIME endOfChain)
    return  result;
 }
 
-ExecTimes taskMonitoringStruct::getState(RTIME limitTime)
+ExecTimes taskMonitoringStruct::getState(RTIME limitTime) // default limitTime = 0
 {
    // si aucun élément dans le tableau
    if (oldestElement == newestElement) return {0,0};
@@ -805,13 +814,13 @@ ExecTimes taskMonitoringStruct::getState(RTIME limitTime)
    #endif
 
    uint i = oldestElement;
-   while ( ( i != newestElement ) &&
-           (execLogs[i].start < limitTime) )
+   while ( ( i != newestElement )         &&
+           (execLogs[i].start <= limitTime) )
    {
       i++; // next element
       i = (i == maxPendingChains ? 0 : i); // comme un modulo
    }
-      return execLogs[i];
+   return execLogs[i];
 
    #if USE_MUTEX
    rt_mutex_release(&mtx_taskStatus);

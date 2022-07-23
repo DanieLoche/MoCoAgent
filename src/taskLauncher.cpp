@@ -95,7 +95,7 @@ int TaskLauncher::readTasksList(int cpuPercent)
             if (!(iss >> taskInfo->fP.id >> name
                       >> tmp_wcet     // WCET -> for task chain // placeholder.
                       >> tmp_period   // meanET -> period
-                      >> tmp_HRT    // -/+ => BE/HRT tasks. 0 => BE task with sched_other.
+                      >> tmp_HRT      // -/+ => BE/HRT tasks. 0 => BE task with sched_other.
                       >> taskInfo->rtP.affinity
                       >> taskInfo->fP.prec
                       >> taskInfo->fP.func ) )

@@ -1,6 +1,7 @@
 #ifndef TASKS_H
 #define TASKS_H
 
+#include <thread>
 #include <fcntl.h>      // gestion systèmes de fichiers ( dup() )
 
 #include "tools.h"
@@ -19,7 +20,7 @@
 #define  USE_MUTEX               0
 #define  WITH_BOOL               0
 
-#define   MCA_PERIOD       _mSEC(1) // ms
+#define   MCA_PERIOD       _uSEC(500) // ms
 const RTIME t_RT     =     _uSEC(100);  // time to trigger the Control Agent
 const RTIME Wmax     =     MCA_PERIOD;    // next slice max time
 
@@ -90,7 +91,8 @@ class taskChain
       char name[32];
       uint chainID;                // static
       RTIME startTime;       // Runtime - deduced
-      //RTIME remWCET;         // Runtime - computed
+      RTIME execTime;
+      RTIME remWCRT;         // Runtime - computed
       bool isAtRisk;         // Runtime - deduced
 
       taskMonitoringStruct* lastTask;
@@ -102,6 +104,7 @@ class taskChain
       bool unloadChain(RTIME endOfChain);  // renvoi la date de début de chaine;
       void updateStartTime();
       void displayTasks();
+      void printState();
 };
 
 class TaskProcess
@@ -114,7 +117,7 @@ class TaskProcess
       char _stdOut[50];
       std::vector<char*> _argv;
 
-      void setAffinity (int _aff, int mode);
+      void setAffinity (uint _aff, int mode);
       void setRTtask(rtPStruct, char*, RTIME);
       void parseParameters(string _arguments);
       void setIO( );
@@ -163,9 +166,6 @@ class RTMacroTask : public MacroTask
 
 class BEMacroTask : public MacroTask
 {
-   protected:
-      void setRTtask(rtPStruct, char*, RTIME);
-
    public:
       BEMacroTask(rtTaskInfosStruct taskInfos, RTIME initPeriodic, bool MoCoMode, string name);
 

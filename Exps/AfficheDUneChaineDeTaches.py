@@ -88,31 +88,31 @@ StressPresent = fullz.count(check)
 IsolePresent = fullz.count(checkIsole)
 
 if StressPresent > 0 and IsolePresent > 0:
-    sns.violinplot(ax=axs[0],x=dl[""],y=dl["Time (ms)"],hue=dl["Legende"],split=True,cut=0, scale="width")
+    sns.violinplot(ax=axs[0],x=dl[""],y=dl["Time (ms)"],hue=dl["Legende"],split=True,cut=0, scale="count")
     FlagArretWhile=0                
     while(FlagArretWhile < NmbreRwcet):   
         datafinal = {"":fullRx[FlagArretWhile],' ':fullR[FlagArretWhile],'Legende':fullRSTRESS[FlagArretWhile]}
         dl = pandas.DataFrame(datafinal)
-        sns.violinplot(ax=axs[FlagArretWhile+1],x=dl[""],y=dl[" "],hue=dl["Legende"],split=True,dodge=True,cut=0, scale="width") 
+        sns.violinplot(ax=axs[FlagArretWhile+1],x=dl[""],y=dl[" "],hue=dl["Legende"],split=True,dodge=True,cut=0, scale="count") 
         handles, labels = axs[FlagArretWhile+1].get_legend_handles_labels()
         axs[FlagArretWhile+1].legend(handles="", labels="")
         axs[FlagArretWhile+1].get_legend().remove()
         FlagArretWhile=FlagArretWhile+1 
 if StressPresent == 0 and IsolePresent > 0:
-    sns.violinplot(ax=axs[0],x=dl[""],y=dl["Time (ms)"],cut=0, scale="width")
+    sns.violinplot(ax=axs[0],x=dl[""],y=dl["Time (ms)"],cut=0, scale="count")
     FlagArretWhile=0                
     while(FlagArretWhile < NmbreRwcet):   
         datafinal = {"":fullRx[FlagArretWhile],' ':fullR[FlagArretWhile],'Legende':fullRSTRESS[FlagArretWhile]}
         dl = pandas.DataFrame(datafinal)
-        sns.violinplot(ax=axs[FlagArretWhile+1],x=dl[""],y=dl[" "],cut=0, scale="width") 
+        sns.violinplot(ax=axs[FlagArretWhile+1],x=dl[""],y=dl[" "],cut=0, scale="count") 
         FlagArretWhile=FlagArretWhile+1     
 if StressPresent > 0 and IsolePresent == 0:
-    sns.violinplot(ax=axs[0],x=dl[""],y=dl["Time (ms)"],cut=0, scale="width")
+    sns.violinplot(ax=axs[0],x=dl[""],y=dl["Time (ms)"],cut=0, scale="count")
     FlagArretWhile=0                
     while(FlagArretWhile < NmbreRwcet):
         datafinal = {"":fullRx[FlagArretWhile],' ':fullR[FlagArretWhile],'Legende':fullRSTRESS[FlagArretWhile]}
         dl = pandas.DataFrame(datafinal)
-        sns.violinplot(ax=axs[FlagArretWhile+1],x=dl[""],y=dl[" "],cut=0, scale="width") 
+        sns.violinplot(ax=axs[FlagArretWhile+1],x=dl[""],y=dl[" "],cut=0, scale="count") 
         FlagArretWhile=FlagArretWhile+1     
 fig.text(0.5, 0.04, 'Remaining Response Times', ha='center', va='center')
 figName=str(sys.argv[1]).split("/")

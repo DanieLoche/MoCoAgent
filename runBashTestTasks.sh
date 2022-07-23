@@ -34,6 +34,8 @@ while [ "$1" != "" ]; do
                            then schedName="RR"
                         elif test $1 = 7
                            then schedName="RM"
+                        elif test $1 = "OTHER"
+                            then schedPolicy="-OTHER" ; schedName="OTHER"
                         else schedName=$1
                         fi
       ;;
