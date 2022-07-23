@@ -454,7 +454,6 @@ void Agent::saveData()
    }
 
 }
-
 /***********************
 * Fonction de débug pour afficher
 * les informations de toutes les tâches reçues.
